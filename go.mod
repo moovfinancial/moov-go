@@ -1,3 +1,3 @@
-module moov-golang
+module moov-go
 
 go 1.21.3
