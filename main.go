@@ -2,7 +2,8 @@ package main
 
 import (
 	"log"
-	moov "moov-golang/client"
+
+	moov "github.com/moovfinancial/moov-go/client"
 )
 
 func main() {
