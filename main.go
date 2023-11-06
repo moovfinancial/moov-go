@@ -11,8 +11,8 @@ func main() {
 	// Setup Moov client
 	// Generate API keys from the Moov Dashboard. Sandbox keys are not compatable with production.
 	moov := new(moov.Client)
-	moov.KeyPublic = "Qo0j0ChSalMKmRI_"
-	moov.KeySecret = "nbyCvG0r0MpM2gxkzo2u2G70jr6ZtFdm"
+	moov.KeyPublic = "sandboxPublic"
+	moov.KeySecret = "sandboxSecret"
 
 	accessToken, _ := moov.BasicAuthToken()
 
