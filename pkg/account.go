@@ -19,10 +19,13 @@ const (
 // Accounts represent a legal entity (either a business or an individual) in Moov.
 type Account struct {
 	Mode            string            `json:"mode,omitempty"`
+	AccountID       string            `json:"accountID,omitempty"`
 	AccountType     string            `json:"accountType,omitempty"`
+	DisaplayName    string            `json:"displayName,omitempty"`
 	Profile         Profile           `json:"profile,omitempty"`
 	Metadata        map[string]string `json:"metadata,omitempty"`
 	TermsOfService  TermsOfService    `json:"termsOfService,omitempty"`
+	Verification    Verification      `json:"verification,omitempty"`
 	ForeignID       string            `json:"foreignID,omitempty"`
 	CustomerSupport CustomerSupport   `json:"customerSupport,omitempty"`
 	Settings        Settings          `json:"settings,omitempty"`
@@ -111,8 +114,8 @@ type Business struct {
 }
 
 type Profile struct {
-	Individual Individual `json:"individual,omitempty"`
-	Business   Business   `json:"business,omitempty"`
+	Individual Individual `json:"individual ,omitempty"`
+	Business   Business   `json:"business ,omitempty"`
 }
 
 type TermsOfService struct {
@@ -149,4 +152,17 @@ type AchPayment struct {
 type Settings struct {
 	CardPayment CardPayment `json:"cardPayment,omitempty"`
 	AchPayment  AchPayment  `json:"achPayment,omitempty"`
+}
+
+type Verification struct {
+	VerificationStatus string      `json:"verificationStatus,omitempty"`
+	Documents          []Documents `json:"documents,omitempty"`
+}
+
+type Documents struct {
+	DocumentID  string    `json:"documentID,omitempty"`
+	Type        string    `json:"type,omitempty"`
+	ContentType string    `json:"contentType,omitempty"`
+	ParseErrors []string  `json:"parseErrors,omitempty"`
+	UploadedAt  time.Time `json:"uploadedAt,omitempty"`
 }
