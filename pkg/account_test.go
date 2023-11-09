@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAccount(t *testing.T) {
@@ -16,8 +19,9 @@ func TestAccount(t *testing.T) {
 
 	err := dec.Decode(&account)
 	if err != nil {
-		t.Fatal(err)
+		require.NoError(t, err)
 	}
 
+	assert.Equal(t, "Wade", account.Profile.Individual.Name.FirstName)
 	t.Logf("%#v", account)
 }

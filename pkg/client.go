@@ -13,9 +13,18 @@ import (
 //func New(private)
 
 type Client struct {
-	KeyPublic string
-	KeySecret string
-	Domain    string
+	Credentials Credentials
+}
+
+type Credentials struct {
+	// AccountID Facilitator account ID
+	AccountID string `json:"accountID,omitempty"`
+	// PubliocKey Public key value from API key
+	PublicKey string `json:"publicKey,omitempty"`
+	// SecretKey Secret key value from API key
+	SecretKey string `json:"secretKey,omitempty"`
+	// Domain One of the domains from API key
+	Domain string `json:"domain,omitempty"`
 }
 
 type ClientCredentialsGrantToAccessTokenResponse struct {
@@ -26,10 +35,22 @@ type ClientCredentialsGrantToAccessTokenResponse struct {
 	Scope        string `json:"scope"`
 }
 
+func NewClient(creds Credentials) *Client {
+	nc := &Client{
+		Credentials: Credentials{
+			AccountID: creds.AccountID,
+			PublicKey: creds.PublicKey,
+			SecretKey: creds.SecretKey,
+			Domain:    creds.Domain,
+		},
+	}
+	return nc
+}
+
 // BasicAuth calls
 func (c Client) BasicAuthToken() (ClientCredentialsGrantToAccessTokenResponse, error) {
 	token := ClientCredentialsGrantToAccessTokenResponse{}
-	if c.KeyPublic == "" || c.KeySecret == "" {
+	if c.Credentials.PublicKey == "" || c.Credentials.SecretKey == "" {
 		// Make error for token's not set.
 		return token, fmt.Errorf("API Keys are not set")
 	}
@@ -46,7 +67,7 @@ func (c Client) BasicAuthToken() (ClientCredentialsGrantToAccessTokenResponse, e
 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(c.KeyPublic, c.KeySecret)
+	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
