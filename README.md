@@ -31,9 +31,13 @@ func main() {
 		Domain:    "localhost",
 	}
 
-	mc := moov.NewClient(creds)
+    mc, err := moov.NewClient(creds)
+	if err != nil {
+        // Network and authentication errors
+		log.Fatal(err)
+	}
 
-	token, err := mc.BasicAuthToken()
+	token, err := mc.SingleUseAccessToken()
 	if err != nil {
 		log.Fatal(err)
 	}
