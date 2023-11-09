@@ -2,11 +2,16 @@ package moov
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
+)
+
+var (
+	ErrAuthCreditionalsNotSet = errors.New("API Keys are not set")
 )
 
 // New create4s a new Moov client with the appropriate secret key.
@@ -35,7 +40,7 @@ type ClientCredentialsGrantToAccessTokenResponse struct {
 	Scope        string `json:"scope"`
 }
 
-func NewClient(creds Credentials) *Client {
+func NewClient(creds Credentials) (*Client, error) {
 	nc := &Client{
 		Credentials: Credentials{
 			AccountID: creds.AccountID,
@@ -44,7 +49,12 @@ func NewClient(creds Credentials) *Client {
 			Domain:    creds.Domain,
 		},
 	}
-	return nc
+
+	if creds.PublicKey == "" || creds.SecretKey == "" {
+		// Make error for token's not set.
+		return nc, ErrAuthCreditionalsNotSet
+	}
+	return nc, nil
 }
 
 // BasicAuth calls
@@ -88,3 +98,15 @@ func (c Client) BasicAuthToken() (ClientCredentialsGrantToAccessTokenResponse, e
 	}
 	return token, nil
 }
+func (c Client) Ping() {
+	log.Println("ping")
+
+}
+
+/*
+	params := url.Values{}
+	params.Add("grant_type", "client_credentials")
+	params.Add("scope", "/accounts.write")
+
+	req, err := http.NewRequest("POST", "https://api.moov.io/oauth2/token?"+params.Encode(), nil)
+*/
