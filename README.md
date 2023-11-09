@@ -27,7 +27,7 @@ func main() {
 	creds := moov.Credentials{
 		AccountID: "638481a5-FAKE-406c-84c7-2fc2239105d1",
 		PublicKey: "Qo0j0ChFAKEKmRI_",
-		SecretKey: "nbyCvG0r0MpM2gxkzo2u2G70jr6ZtFdm",
+		SecretKey: "nbyFAKEr0MpM2gxkzo2u2G70jr6ZtFdm",
 		Domain:    "localhost",
 	}
 
