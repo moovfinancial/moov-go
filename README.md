@@ -22,7 +22,7 @@ import (
 func main() {
 
 	// Setup Moov client
-	// Generate API keys from the Moov Dashboard. Sandbox keys are not compatable with production.
+	// Generate API keys from the Moov Dashboard. Sandbox keys are not compatible with production.
 
 	creds := moov.Credentials{
 		AccountID: "638481a5-FAKE-406c-84c7-2fc2239105d1",
@@ -31,7 +31,7 @@ func main() {
 		Domain:    "localhost",
 	}
 
-    mc, err := moov.NewClient(creds)
+    	mc, err := moov.NewClient(creds)
 	if err != nil {
         // Network and authentication errors
 		log.Fatal(err)
