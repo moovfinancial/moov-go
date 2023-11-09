@@ -84,6 +84,9 @@ type Individual struct {
 	Address      Address      `json:"address,omitempty"`
 	BirthDate    BirthDate    `json:"birthDate,omitempty"`
 	GovernmentID GovernmentID `json:"governmentID,omitempty"`
+
+	BirthDateProvided    bool `json:"birthDateProvided"`
+	GovernmentIDProvided bool `json:"governmentIDProvided"`
 }
 
 type Ein struct {
@@ -114,8 +117,8 @@ type Business struct {
 }
 
 type Profile struct {
-	Individual Individual `json:"individual ,omitempty"`
-	Business   Business   `json:"business ,omitempty"`
+	Individual Individual `json:"individual,omitempty"`
+	Business   Business   `json:"business,omitempty"`
 }
 
 type TermsOfService struct {
@@ -155,6 +158,7 @@ type Settings struct {
 }
 
 type Verification struct {
+	Status             string      `json:"status,omitempty"`
 	VerificationStatus string      `json:"verificationStatus,omitempty"`
 	Documents          []Documents `json:"documents,omitempty"`
 }
