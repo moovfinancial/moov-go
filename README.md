@@ -51,7 +51,7 @@ func main() {
 					FirstName: "Wade",
 					LastName:  "Arnold",
 				},
-				Email: "Wade@wadearnold.com",
+				Email: "Wade@arnold.com",
 				Phone: moov.Phone{
 					Number:      "555-555-5555",
 					CountryCode: "1",
