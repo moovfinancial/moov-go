@@ -21,6 +21,11 @@ const (
 	BUSINESS_TYPE_PARTNERSHIP                = "partnership"
 	BUSINESS_TYPE_UNINCORPORATED_NONPROFIT   = "unincorporatedNonProfit"
 	BUSINESS_TYPE_INCORPORATED_NONPROFIT     = "incorporatedNonProfit"
+	CAPABILITIES_TRANSFERS                   = "transfers"
+	CAPABILITIES_WALLET                      = "wallet"
+	CAPABILITIES_SEND_FUNDS                  = "send-funds"
+	CAPABILITIES_COLLECT_FUNDS               = "collect-funds"
+	CAPABILITIES_CARD_ISSUING                = "card-issuing"
 )
 
 // Accounts represent a legal entity (either a business or an individual) in Moov.
@@ -160,14 +165,40 @@ type Ein struct {
 	Number string `json:"number,omitempty"`
 }
 
+func (e Ein) jsonValue() interface{} {
+	if e.Number != "" {
+		return e
+	}
+	return nil
+}
+
 type TaxID struct {
 	Ein Ein `json:"ein,omitempty"`
+}
+
+func (t TaxID) jsonValue() interface{} {
+	if t.Ein != (Ein{}) {
+		type Alias struct {
+			Ein interface{} `json:"ein,omitempty"`
+		}
+
+		alias := Alias{Ein: t.Ein.jsonValue()}
+		return alias
+	}
+	return nil
 }
 
 type IndustryCodes struct {
 	Naics string `json:"naics,omitempty"`
 	Sic   string `json:"sic,omitempty"`
 	Mcc   string `json:"mcc,omitempty"`
+}
+
+func (i IndustryCodes) jsonValue() interface{} {
+	if i.Naics != "" && i.Sic != "" && i.Mcc != "" {
+		return i
+	}
+	return nil
 }
 
 type Business struct {
@@ -181,6 +212,26 @@ type Business struct {
 	Description       string        `json:"description,omitempty"`
 	TaxID             TaxID         `json:"taxID,omitempty"`
 	IndustryCodes     IndustryCodes `json:"industryCodes,omitempty"`
+}
+
+func (i Business) jsonValue() interface{} {
+	type Alias Business
+
+	type AliasWithInterface struct {
+		Alias
+		Address       interface{} `json:"address,omitempty"`
+		Phone         interface{} `json:"phone,omitempty"`
+		TaxID         interface{} `json:"taxID,omitempty"`
+		IndustryCodes interface{} `json:"industryCodes,omitempty"`
+	}
+
+	return (AliasWithInterface{
+		Alias:         Alias(i),
+		Address:       i.Address.jsonValue(),
+		Phone:         i.Phone.jsonValue(),
+		TaxID:         i.TaxID.jsonValue(),
+		IndustryCodes: i.IndustryCodes.jsonValue(),
+	})
 }
 
 type Profile struct {
@@ -197,9 +248,9 @@ func (p Profile) jsonValue() interface{} {
 	}
 	if p.Business != (Business{}) {
 		type aliasBusiness struct {
-			Business Business `json:"business,omitempty"`
+			Business interface{} `json:"business,omitempty"`
 		}
-		return aliasBusiness{Business: p.Business}
+		return aliasBusiness{Business: p.Business.jsonValue()}
 	}
 	return nil
 }
@@ -237,6 +288,8 @@ type CustomerSupport struct {
 	Address Address `json:"address,omitempty"`
 	Website string  `json:"website,omitempty"`
 }
+
+// TODO: Add jsonValue() interface{} to CustomerSupport
 
 type CardPayment struct {
 	StatementDescriptor string `json:"statementDescriptor,omitempty"`
@@ -313,6 +366,8 @@ func (a Account) MarshalJSON() ([]byte, error) {
 // CreateAccount creates a new account.
 func (c Client) CreateAccount(account Account) (Account, error) {
 	jsonValue, _ := json.Marshal(account)
+	fmt.Println(string(jsonValue))
+
 	req, _ := http.NewRequest(http.MethodPost, "https://api.moov.io/accounts", bytes.NewBuffer(jsonValue))
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -326,6 +381,7 @@ func (c Client) CreateAccount(account Account) (Account, error) {
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
 	respAccount := Account{}
+	fmt.Println("response Body:", string(body))
 
 	switch resp.StatusCode {
 	case http.StatusOK:
@@ -393,7 +449,6 @@ func (c Client) UpdateAccount(account Account) (Account, error) {
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
 	respAccount := Account{}
-
 	switch resp.StatusCode {
 	case http.StatusOK:
 		// Account Updated
