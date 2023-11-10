@@ -14,7 +14,7 @@ var (
 	creds = Credentials{
 		AccountID: "638481a5-5205-406c-84c7-2fc2239105d1",
 		PublicKey: "Qo0j0ChSalMKmRI_",
-		SecretKey: "junk",
+		SecretKey: "fake_secret_key",
 		Domain:    "localhost",
 	}
 )
@@ -78,3 +78,17 @@ func TestGetAccount(t *testing.T) {
 	}
 	assert.Equal(t, "638481a5-5205-406c-84c7-2fc2239105d1", account.AccountID)
 }
+
+/**func TestDeleateAccount(t *testing.T) {
+	mc, err := NewClient(creds)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = mc.DeleteAccount("30942467-cd58-4a97-9d02-91b2555640c6")
+	if err != nil {
+		t.Fatal(err)
+		assert.Error(t, err)
+	}
+
+}**/

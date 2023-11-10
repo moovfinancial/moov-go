@@ -44,4 +44,30 @@ func main() {
 	// Access token for website/mobile app to instantiate Moov.js
 	log.Print(token.AccessToken)
 
+	// Create a new account
+	account := moov.Account{
+		AccountType: moov.INDIVIDUAL,
+		Profile: moov.Profile{
+			Individual: moov.Individual{
+				Name: moov.Name{
+					FirstName: "Wade",
+					LastName:  "Arnold",
+				},
+				Email: "Wade@wadearnold.com",
+				Phone: moov.Phone{
+					Number:      "555-555-5555",
+					CountryCode: "1",
+				},
+			},
+		},
+	}
+
+	account, _ = mc.CreateAccount(account)
+	log.Print(account.AccountID)
+
+	// Get an account
+	account, _ = mc.GetAccount("638481a5-5205-406c-84c7-2fc2239105d1")
+	log.Print(account.Profile.Individual.Name.FirstName)
+}
+
 ```

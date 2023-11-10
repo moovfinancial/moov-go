@@ -374,3 +374,70 @@ func (c Client) GetAccount(accountID string) (Account, error) {
 	}
 	return respAccount, nil
 }
+
+// DeleteAccount deletes an account.
+// TODO: Delete is not currently supported by the api
+// https://docs.moov.io/guides/dashboard/accounts/#disconnect-accounts
+/** func (c Client) DeleteAccount(accountID string) error {
+	req, _ := http.NewRequest(http.MethodDelete, "https://api.moov.io/accounts/"+accountID, nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	fmt.Println("response Status:", resp.Status)
+
+	switch resp.StatusCode {
+	case http.StatusOK:
+		// Account created
+		return nil
+	case http.StatusUnauthorized:
+		return ErrAuthCreditionalsNotSet
+	case http.StatusUnprocessableEntity:
+		fmt.Println("UnprocessableEntity")
+	}
+	return nil
+} **/
+
+/*
+
+// HTTP Client template
+
+	   	params := url.Values{}
+	   	params.Add("grant_type", "client_credentials")
+	   	params.Add("scope", "/accounts.write")
+
+	   	req, err := http.NewRequest("POST", "https://api.moov.io/oauth2/token?"+params.Encode(), nil)
+
+	   	func (c Client) Ping() {
+	   	log.Println("ping")
+	   	req, _ := http.NewRequest("POST", "https://api.moov.io/ping", nil)
+	   	req.Header.Set("Accept", "application/json")
+	   	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	   	//req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
+
+	   	client := &http.Client{}
+	   	resp, err := client.Do(req)
+	   	if err != nil {
+	   		// Todo: return an error
+	   		log.Fatal(err)
+	   	}
+	   	defer resp.Body.Close()
+
+	   	body, err := io.ReadAll(resp.Body)
+	   	if err != nil {
+	   		// Todo: return an error
+	   		log.Fatal(err)
+	   	}
+
+	   	fmt.Println("response Status:", resp.Status)
+	   	fmt.Println("response Headers:", resp.Header)
+	   	fmt.Println("response Body:", string(body))
+
+	   }
+*/
