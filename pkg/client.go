@@ -64,7 +64,7 @@ func NewClient(creds Credentials) (*Client, error) {
 	return nc, nil
 }
 
-// BasicAuth calls
+// SingleUseAccessToken gets a token that can be used to instantiate Moov.js client side
 func (c Client) SingleUseAccessToken() (ClientCredentialsGrantToAccessTokenResponse, error) {
 	token := ClientCredentialsGrantToAccessTokenResponse{}
 	params := url.Values{}
@@ -77,6 +77,7 @@ func (c Client) SingleUseAccessToken() (ClientCredentialsGrantToAccessTokenRespo
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
 	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 	client := &http.Client{}
 	resp, err := client.Do(req)
