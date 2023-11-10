@@ -23,7 +23,6 @@ func main() {
 
 	// Setup Moov client
 	// Generate API keys from the Moov Dashboard. Sandbox keys are not compatible with production.
-
 	creds := moov.Credentials{
 		AccountID: "638481a5-FAKE-406c-84c7-2fc2239105d1",
 		PublicKey: "Qo0j0ChFAKEKmRI_",
@@ -31,12 +30,11 @@ func main() {
 		Domain:    "localhost",
 	}
 
-    	mc, err := moov.NewClient(creds)
+    mc, err := moov.NewClient(creds)
 	if err != nil {
         // Network and authentication errors
 		log.Fatal(err)
 	}
-
 	token, err := mc.SingleUseAccessToken()
 	if err != nil {
 		log.Fatal(err)
@@ -61,13 +59,38 @@ func main() {
 			},
 		},
 	}
-
 	account, _ = mc.CreateAccount(account)
 	log.Print(account.AccountID)
+
+	// List Accounts
+	accounts, _ := mc.ListAccounts()
+	log.Print(len(accounts)) // 2
 
 	// Get an account
 	account, _ = mc.GetAccount("638481a5-5205-406c-84c7-2fc2239105d1")
 	log.Print(account.Profile.Individual.Name.FirstName)
+
+	// Update an account 
+	account := Account{
+		AccountID:   "aa19c3a7-4c72-4f64-adfa-9069c80d81cf",
+		AccountType: INDIVIDUAL,
+		Profile: Profile{
+			Individual: Individual{
+				Name: Name{
+					FirstName: "David",
+					LastName:  "Arnold",
+				},
+				Email: "Wade@arnold.com",
+				Phone: Phone{
+					Number:      "333-333-3333",
+					CountryCode: "1",
+				},
+			},
+		},
+	}
+	account, _ = mc.UpdateAccount(account)
+	log.Print(account.AccountID) // David
+
 }
 
 ```

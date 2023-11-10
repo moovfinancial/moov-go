@@ -37,9 +37,9 @@ type Account struct {
 	CustomerSupport CustomerSupport   `json:"customerSupport,omitempty"`
 	Settings        Settings          `json:"settings,omitempty"`
 	Capabilities    []string          `json:"capabilities,omitempty"`
-	CreatedOn       time.Time         `json:"-"`
-	UpdatedOn       time.Time         `json:"-"`
-	DisabledOn      time.Time         `json:"-"`
+	CreatedOn       time.Time         `json:"createdOn,omitempty"`
+	UpdatedOn       time.Time         `json:"updatedOn,omitempty"`
+	DisabledOn      time.Time         `json:"disabledOn,omitempty"`
 }
 
 type Name struct {
@@ -310,6 +310,7 @@ func (a Account) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// CreateAccount creates a new account.
 func (c Client) CreateAccount(account Account) (Account, error) {
 	jsonValue, _ := json.Marshal(account)
 	req, _ := http.NewRequest(http.MethodPost, "https://api.moov.io/accounts", bytes.NewBuffer(jsonValue))
@@ -343,6 +344,7 @@ func (c Client) CreateAccount(account Account) (Account, error) {
 	return respAccount, nil
 }
 
+// GetAccount returns an account based on accountID.
 func (c Client) GetAccount(accountID string) (Account, error) {
 	respAccount := Account{}
 	req, _ := http.NewRequest(http.MethodGet, "https://api.moov.io/accounts/"+accountID, nil)
@@ -357,7 +359,7 @@ func (c Client) GetAccount(accountID string) (Account, error) {
 	}
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
-
+	fmt.Println("response Status:", resp.Status)
 	switch resp.StatusCode {
 	case http.StatusOK:
 		// Account created
@@ -373,6 +375,72 @@ func (c Client) GetAccount(accountID string) (Account, error) {
 		// TODO: error Account sent to server is missing or malformed
 	}
 	return respAccount, nil
+}
+
+// UpdateAccount updates an account.
+func (c Client) UpdateAccount(account Account) (Account, error) {
+	jsonValue, _ := json.Marshal(account)
+	req, _ := http.NewRequest(http.MethodPatch, "https://api.moov.io/accounts/"+account.AccountID, bytes.NewBuffer(jsonValue))
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return account, err
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	respAccount := Account{}
+
+	switch resp.StatusCode {
+	case http.StatusOK:
+		// Account Updated
+		err = json.Unmarshal(body, &respAccount)
+		if err != nil {
+			fmt.Println("Error unmarshalling JSON:", err)
+		}
+		return respAccount, nil
+	case http.StatusUnauthorized:
+		return respAccount, ErrAuthCreditionalsNotSet
+	case http.StatusUnprocessableEntity:
+		fmt.Println("UnprocessableEntity")
+		// TODO: error Account sent to server is missing or malformed
+	}
+	return respAccount, nil
+}
+
+// ListAccounts returns a list of accounts.
+// TODO: Add query parameters
+func (c Client) ListAccounts() ([]Account, error) {
+	respAccounts := []Account{}
+	req, _ := http.NewRequest(http.MethodGet, "https://api.moov.io/accounts", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return respAccounts, err
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	fmt.Println("response Status:", resp.Status)
+	switch resp.StatusCode {
+	case http.StatusOK:
+		err = json.Unmarshal(body, &respAccounts)
+		if err != nil {
+			fmt.Println("Error unmarshalling JSON:", err)
+		}
+		return respAccounts, nil
+	case http.StatusUnauthorized:
+		return respAccounts, ErrAuthCreditionalsNotSet
+	case http.StatusUnprocessableEntity:
+		fmt.Println("UnprocessableEntity")
+	}
+	return respAccounts, nil
 }
 
 // DeleteAccount deletes an account.
