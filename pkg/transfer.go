@@ -16,10 +16,12 @@ type Transfer struct {
 	MoovFeeDecimal string            `json:"moovFeeDecimal,omitempty"`
 	MoovFeeDetails MoovFeeDetails    `json:"moovFeeDetails,omitempty"`
 	GroupID        string            `json:"groupID,omitempty"`
-	RefundAmount   Amount            `json:"refundAmount,omitempty"`
+	RefundedAmount Amount            `json:"refundedAmount,omitempty"`
 	Refunds        []Refund          `json:"refunds,omitempty"`
 	DisputedAmount Amount            `json:"disputedAmount,omitempty"`
 	Disputes       []Dispute         `json:"disputes,omitempty"`
+	Source         Source            `json:"source,omitempty"`
+	Destination    Destination       `json:"destination,omitempty"`
 }
 
 type Amount struct {
@@ -64,6 +66,7 @@ type Source struct {
 	Wallet            Wallet          `json:"wallet,omitempty"`
 	Card              Card            `json:"card,omitempty"`
 	ApplePay          ApplePay        `json:"applePay,omitempty"`
+	AchDetails        AchDetails      `json:"achDetails,omitempty"`
 	CardDetails       CardDetails     `json:"cardDetails,omitempty"`
 	TransferID        string          `json:"transferID,omitempty"`
 }
@@ -147,34 +150,36 @@ type AchDetails struct {
 		Reason      string `json:"reason,omitempty"`
 		Description string `json:"description,omitempty"`
 	}
-	CompanyEntryDescription string `json:"companyEntryDescription,omitempty"`
-	OriginatingCompanyName  string `json:"originatingCompanyName,omitempty"`
-	StatusUpdates           struct {
-		Initiated  time.Time `json:"initiated,omitempty"`
-		Originated time.Time `json:"originated,omitempty"`
-		Corrected  time.Time `json:"corrected,omitempty"`
-		Returned   time.Time `json:"returned,omitempty"`
-		Completed  time.Time `json:"completed,omitempty"`
-	}
-	DebitHoldPeriod string `json:"debitHoldPeriod,omitempty"`
+	CompanyEntryDescription string           `json:"companyEntryDescription,omitempty"`
+	OriginatingCompanyName  string           `json:"originatingCompanyName,omitempty"`
+	StatusUpdates           ACHStatusUpdates `json:"statusUpdates,omitempty"`
+	DebitHoldPeriod         string           `json:"debitHoldPeriod,omitempty"`
 }
 
 type CardDetails struct {
-	Status                   string `json:"status,omitempty"`
-	FailureCode              string `json:"failureCode,omitempty"`
-	DynamicDescriptor        string `json:"dynamicDescriptor,omitempty"`
-	TransactionSource        string `json:"transactionSource,omitempty"`
-	InterchangeQualification string `json:"interchangeQualification,omitempty"`
-	StatusUpdates            StatusUpdates
+	Status                   string            `json:"status,omitempty"`
+	FailureCode              string            `json:"failureCode,omitempty"`
+	DynamicDescriptor        string            `json:"dynamicDescriptor,omitempty"`
+	TransactionSource        string            `json:"transactionSource,omitempty"`
+	InterchangeQualification string            `json:"interchangeQualification,omitempty"`
+	StatusUpdates            CardStatusUpdates `json:"statusUpdates,omitempty"`
 }
 
-type StatusUpdates struct {
+type CardStatusUpdates struct {
 	Initiated time.Time `json:"initiated,omitempty"`
 	Confirmed time.Time `json:"confirmed,omitempty"`
 	Settled   time.Time `json:"settled,omitempty"`
 	Failed    time.Time `json:"failed,omitempty"`
 	Canceled  time.Time `json:"canceled,omitempty"`
 	Completed time.Time `json:"completed,omitempty"`
+}
+
+type ACHStatusUpdates struct {
+	Initiated  time.Time `json:"initiated,omitempty"`
+	Originated time.Time `json:"originated,omitempty"`
+	Corrected  time.Time `json:"corrected,omitempty"`
+	Returned   time.Time `json:"returned,omitempty"`
+	Completed  time.Time `json:"completed,omitempty"`
 }
 
 type Destination struct {
