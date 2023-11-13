@@ -186,3 +186,30 @@ type Destination struct {
 	AchDetails        AchDetails      `json:"achDetails,omitempty"`
 	CardDetails       CardDetails     `json:"cardDetails,omitempty"`
 }
+
+// CreateTransfer creates a new transfer
+// https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
+
+// ListTransfers lists all transfers
+// https://docs.moov.io/api/index.html#tag/Transfers/operation/listTransfers
+
+// GetTransfer retrieves a transfer
+// https://docs.moov.io/api/index.html#tag/Transfers/operation/getTransfer
+
+// UpdateTransferMetaData updates the metadata for a transfer
+// https://docs.moov.io/api/index.html#tag/Transfers/operation/patchTransfer
+
+// TransferOptions lists all transfer options between a source and destination
+// https://docs.moov.io/api/#tag/Transfers/operation/createTransferOptions
+
+// RefundTransfer refunds a transfer
+// https://docs.moov.io/api/#tag/Transfers/operation/refundTransfer
+
+// ListRefunds lists all refunds for a transfer
+// https://docs.moov.io/api/index.html#tag/Transfers/operation/getRefunds
+
+// GetRefund retrieves a refund for a transfer
+// https://docs.moov.io/api/index.html#tag/Transfers/operation/getRefund
+
+// ReverseTransfer reverses a transfer
+// https://docs.moov.io/api/index.html#tag/Transfers/operation/reverseTransfer
