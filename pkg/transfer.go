@@ -2,7 +2,7 @@ package moov
 
 import "time"
 
-type Transfer struct {
+type SynchronousTransfer struct {
 	TransferID     string            `json:"transferID,omitempty"`
 	CreatedOn      time.Time         `json:"createdOn,omitempty"`
 	CompletedOn    time.Time         `json:"completedOn,omitempty"`
@@ -22,6 +22,11 @@ type Transfer struct {
 	Disputes       []Dispute         `json:"disputes,omitempty"`
 	Source         Source            `json:"source,omitempty"`
 	Destination    Destination       `json:"destination,omitempty"`
+}
+
+type AsynchronousTransfer struct {
+	TransferID string    `json:"transferID,omitempty"`
+	CreatedOn  time.Time `json:"createdOn,omitempty"`
 }
 
 type Amount struct {
@@ -75,18 +80,6 @@ type TransferAccount struct {
 	AccountID   string `json:"accountID,omitempty"`
 	Email       string `json:"email,omitempty"`
 	DisplayName string `json:"displayName,omitempty"`
-}
-
-type BankAccount struct {
-	BankAccountID         string `json:"bankAccountID,omitempty"`
-	Fingerprint           string `json:"fingerprint,omitempty"`
-	Status                string `json:"status,omitempty"`
-	HolderName            string `json:"holderName,omitempty"`
-	HolderType            string `json:"holderType,omitempty"`
-	BankName              string `json:"bankName,omitempty"`
-	BankAccountType       string `json:"bankAccountType,omitempty"`
-	RoutingNumber         string `json:"routingNumber,omitempty"`
-	LastFourAccountNumber string `json:"lastFourAccountNumber,omitempty"`
 }
 
 type Wallet struct {

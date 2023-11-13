@@ -192,7 +192,7 @@ func TestSynchronousTransferMarshalResponse(t *testing.T) {
 				"statusUpdates": {
 					"initiated": "2019-08-24T14:15:22Z","confirmed": "2019-08-24T14:15:22Z","settled": "2019-08-24T14:15:22Z","failed": "2019-08-24T14:15:22Z","canceled": "2019-08-24T14:15:22Z","completed": "2019-08-24T14:15:22Z"}}}
 		}`)
-	transfer := new(Transfer)
+	transfer := new(SynchronousTransfer)
 
 	dec := json.NewDecoder(bytes.NewReader(input))
 	dec.DisallowUnknownFields()
