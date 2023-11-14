@@ -82,19 +82,6 @@ type TransferAccount struct {
 	DisplayName string `json:"displayName,omitempty"`
 }
 
-type Wallet struct {
-	WalletID string `json:"walletID,omitempty"`
-}
-
-type ApplePay struct {
-	Brand           string     `json:"brand,omitempty"`
-	CardType        string     `json:"cardType,omitempty"`
-	CardDisplayName string     `json:"cardDisplayName,omitempty"`
-	Fingerprint     string     `json:"fingerprint,omitempty"`
-	Expiration      Expiration `json:"expiration,omitempty"`
-	DynamicLastFour string     `json:"dynamicLastFour,omitempty"`
-}
-
 type Destination struct {
 	PaymentMethodID   string          `json:"paymentMethodID,omitempty"`
 	PaymentMethodType string          `json:"paymentMethodType,omitempty"`
