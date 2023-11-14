@@ -8,6 +8,8 @@ Golang client for interacting with Moov API server side
 go get github.com/moovfinancial/moov-go/pkg
 ```
 
+This SDK requires and API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. Note that API Keys for Sandbox and Production are different keys. 
+
 ## Basic Usage 
 
 ```go 
