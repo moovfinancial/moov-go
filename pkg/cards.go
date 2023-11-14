@@ -54,3 +54,19 @@ type CardStatusUpdates struct {
 	Canceled  time.Time `json:"canceled,omitempty"`
 	Completed time.Time `json:"completed,omitempty"`
 }
+
+// CreateCard creates a new card for the given customer linked to their account
+// https://docs.moov.io/api/#tag/Cards/operation/card
+
+// ListCards lists all cards for the given customer Moov account
+// https://docs.moov.io/api/#tag/Cards/operation/listCards
+
+// GetCard retrieves a card for the given customer Moov account
+// https://docs.moov.io/api/#tag/Cards/operation/getCard
+
+// UpdateCard Update a linked card and/or resubmit it for verification.
+// If a value is provided for CVV, a new verification ($0 authorization) will be submitted for the card. Updating the expiration date or address will update the information stored on file for the card but will not be verified
+// https://docs.moov.io/api/#tag/Cards/operation/updateCard
+
+// DisableCard disables a card assocaited with a Moov account
+// https://docs.moov.io/api/#tag/Cards/operation/deleteCard
