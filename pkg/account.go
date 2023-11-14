@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"time"
 )
@@ -381,20 +382,20 @@ func (c Client) CreateAccount(account Account) (Account, error) {
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
 	respAccount := Account{}
-	fmt.Println("response Body:", string(body))
 
 	switch resp.StatusCode {
 	case http.StatusOK:
 		// Account created
 		err = json.Unmarshal(body, &respAccount)
 		if err != nil {
-			fmt.Println("Error unmarshalling JSON:", err)
+			// TODO: make a typed error
+			log.Println("Error unmarshalling JSON:", err)
 		}
 		return respAccount, nil
 	case http.StatusUnauthorized:
 		return respAccount, ErrAuthCreditionalsNotSet
 	case http.StatusUnprocessableEntity:
-		fmt.Println("UnprocessableEntity")
+		log.Println("UnprocessableEntity")
 		// TODO: error Account sent to server is missing or malformed
 	}
 	return respAccount, nil
@@ -421,13 +422,14 @@ func (c Client) GetAccount(accountID string) (Account, error) {
 		// Account created
 		err = json.Unmarshal(body, &respAccount)
 		if err != nil {
-			fmt.Println("Error unmarshalling JSON:", err)
+			// TODO: make a typed error
+			log.Println("Error unmarshalling JSON:", err)
 		}
 		return respAccount, nil
 	case http.StatusUnauthorized:
 		return respAccount, ErrAuthCreditionalsNotSet
 	case http.StatusUnprocessableEntity:
-		fmt.Println("UnprocessableEntity")
+		log.Println("UnprocessableEntity")
 		// TODO: error Account sent to server is missing or malformed
 	}
 	return respAccount, nil
@@ -454,13 +456,14 @@ func (c Client) UpdateAccount(account Account) (Account, error) {
 		// Account Updated
 		err = json.Unmarshal(body, &respAccount)
 		if err != nil {
-			fmt.Println("Error unmarshalling JSON:", err)
+			// TODO: make a typed error
+			log.Println("Error unmarshalling JSON:", err)
 		}
 		return respAccount, nil
 	case http.StatusUnauthorized:
 		return respAccount, ErrAuthCreditionalsNotSet
 	case http.StatusUnprocessableEntity:
-		fmt.Println("UnprocessableEntity")
+		log.Println("UnprocessableEntity")
 		// TODO: error Account sent to server is missing or malformed
 	}
 	return respAccount, nil
@@ -482,18 +485,19 @@ func (c Client) ListAccounts() ([]Account, error) {
 	}
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
-	fmt.Println("response Status:", resp.Status)
 	switch resp.StatusCode {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &respAccounts)
 		if err != nil {
-			fmt.Println("Error unmarshalling JSON:", err)
+			// TODO: make a typed error
+			log.Println("Error unmarshalling JSON:", err)
 		}
 		return respAccounts, nil
 	case http.StatusUnauthorized:
 		return respAccounts, ErrAuthCreditionalsNotSet
 	case http.StatusUnprocessableEntity:
-		fmt.Println("UnprocessableEntity")
+		// TODO: make a typed error
+		log.Println("UnprocessableEntity")
 	}
 	return respAccounts, nil
 }
