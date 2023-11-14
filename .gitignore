@@ -19,3 +19,16 @@
 
 # Go workspace file
 go.work
+
+/bin/
+misspell*
+staticcheck*
+lint-project.sh
+gitleaks.tar.gz
+
+# code coverage
+coverage.html
+cover.out
+coverage.txt
+
+.idea/*
