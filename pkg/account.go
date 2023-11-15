@@ -3,7 +3,6 @@ package moov
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -367,8 +366,6 @@ func (a Account) MarshalJSON() ([]byte, error) {
 // CreateAccount creates a new account.
 func (c Client) CreateAccount(account Account) (Account, error) {
 	jsonValue, _ := json.Marshal(account)
-	fmt.Println(string(jsonValue))
-
 	req, _ := http.NewRequest(http.MethodPost, "https://api.moov.io/accounts", bytes.NewBuffer(jsonValue))
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -416,7 +413,6 @@ func (c Client) GetAccount(accountID string) (Account, error) {
 	}
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
-	fmt.Println("response Status:", resp.Status)
 	switch resp.StatusCode {
 	case http.StatusOK:
 		// Account created
@@ -517,7 +513,6 @@ func (c Client) ListAccounts() ([]Account, error) {
 		return err
 	}
 	defer resp.Body.Close()
-	fmt.Println("response Status:", resp.Status)
 
 	switch resp.StatusCode {
 	case http.StatusOK:
@@ -526,7 +521,7 @@ func (c Client) ListAccounts() ([]Account, error) {
 	case http.StatusUnauthorized:
 		return ErrAuthCreditionalsNotSet
 	case http.StatusUnprocessableEntity:
-		fmt.Println("UnprocessableEntity")
+		log.Println("UnprocessableEntity")
 	}
 	return nil
 } **/
@@ -562,9 +557,9 @@ func (c Client) ListAccounts() ([]Account, error) {
 	   		log.Fatal(err)
 	   	}
 
-	   	fmt.Println("response Status:", resp.Status)
-	   	fmt.Println("response Headers:", resp.Header)
-	   	fmt.Println("response Body:", string(body))
+	   	log.Println("response Status:", resp.Status)
+	   	log.Println("response Headers:", resp.Header)
+	   	log.Println("response Body:", string(body))
 
 	   }
 */
