@@ -95,4 +95,12 @@ func main() {
 
 }
 
+// scoped access token
+scopes := []string{moov.SCOPE_ACCOUNTS_WRITE, moov.SCOPE_BANK_ACCOUNT_WRITE, moov.SCOPE_CARDS_WRITE}
+linkPaymentToken, err := mc.ScopedAccessToken(account.AccountID, scopes)
+if err != nil {
+	log.Fatal(err)
+}
+log.Print("LinkPaymentToken: ", linkPaymentToken.AccessToken)
+
 ```
