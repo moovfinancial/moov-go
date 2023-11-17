@@ -273,12 +273,6 @@ func (c Client) MicroDepositConfirm(accountID string, bankAccountID string, amou
 	}
 	defer resp.Body.Close()
 
-	body, _ := io.ReadAll(resp.Body)
-
-	var data map[string]interface{}
-	err = json.Unmarshal(body, &data)
-	log.Println(data)
-
 	switch resp.StatusCode {
 	case http.StatusOK:
 		return nil
