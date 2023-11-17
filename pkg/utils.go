@@ -2,7 +2,7 @@ package moov
 
 import (
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
+	"os"
 )
 
 type Credentials struct {
@@ -16,7 +16,7 @@ func readConfig() (Credentials, error) {
 	var cred Credentials
 
 	// Read the config file
-	data, err := ioutil.ReadFile("../config.yaml")
+	data, err := os.ReadFile("../config.yaml")
 	if err != nil {
 		return cred, err
 	}
