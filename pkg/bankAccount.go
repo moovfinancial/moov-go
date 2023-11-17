@@ -1,6 +1,14 @@
 package moov
 
-import "time"
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"time"
+)
 
 type BankAccount struct {
 	BankAccountID         string `json:"bankAccountID,omitempty"`
@@ -10,6 +18,7 @@ type BankAccount struct {
 	HolderType            string `json:"holderType,omitempty"`
 	BankName              string `json:"bankName,omitempty"`
 	BankAccountType       string `json:"bankAccountType,omitempty"`
+	AccountNumber         string `json:"accountNumber,omitempty"`
 	RoutingNumber         string `json:"routingNumber,omitempty"`
 	LastFourAccountNumber string `json:"lastFourAccountNumber,omitempty"`
 }
@@ -45,14 +54,238 @@ type ACHStatusUpdates struct {
 	Completed  time.Time `json:"completed,omitempty"`
 }
 
+type BankAccountPayload struct {
+	Account BankAccount `json:"account"`
+}
+
+const (
+	baseURL  = "https://api.moov.io"
+	endpoint = "accounts/%s/bank-accounts"
+)
+
 // CreateBankAccount creates a new bank account for the given customer account
+func (c Client) CreateBankAccount(accountID string, bankAccount BankAccount) (BankAccount, error) {
+	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(endpoint, accountID))
+
+	accountPayload := BankAccountPayload{
+		Account: bankAccount,
+	}
+
+	payload, err := json.Marshal(accountPayload)
+	if err != nil {
+		return bankAccount, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(payload))
+	if err != nil {
+		return bankAccount, err
+	}
+
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return bankAccount, err
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+
+	respAccount := BankAccount{}
+
+	switch resp.StatusCode {
+	case http.StatusOK:
+		// Account created
+		err = json.Unmarshal(body, &respAccount)
+		if err != nil {
+			log.Println("Error unmarshalling JSON:", err)
+		}
+		return respAccount, nil
+	case http.StatusUnauthorized:
+		return respAccount, ErrAuthCreditionalsNotSet
+	case http.StatusUnprocessableEntity:
+		log.Println("UnprocessableEntity")
+	}
+	return respAccount, nil
+}
 
 // GetBankAccount retrieves a bank account for the given customer account
+func (c Client) GetBankAccount(accountID string, bankAccountID string) (BankAccount, error) {
+	resAccount := BankAccount{}
+	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
 
-// DelteBankAccount deletes a bank account for the given customer account
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return BankAccount{}, err
+	}
+
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return resAccount, err
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	switch resp.StatusCode {
+	case http.StatusOK:
+		err = json.Unmarshal(body, &resAccount)
+		if err != nil {
+			log.Println("Error unmarshalling JSON:", err)
+		}
+		return resAccount, nil
+	case http.StatusUnauthorized:
+		return resAccount, ErrAuthCreditionalsNotSet
+	case http.StatusUnprocessableEntity:
+		log.Println("UnprocessableEntity")
+	}
+	return resAccount, nil
+}
+
+// DeleteBankAccount deletes a bank account for the given customer account
+func (c Client) DeleteBankAccount(accountID string, bankAccountID string) error {
+	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
+
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	switch resp.StatusCode {
+	case http.StatusNoContent:
+		// Account deleted
+		return nil
+	case http.StatusUnauthorized:
+		return ErrAuthCreditionalsNotSet
+	case http.StatusUnprocessableEntity:
+		log.Println("UnprocessableEntity")
+	}
+	return nil
+}
 
 // ListBankAccounts lists all bank accounts for the given customer account
+func (c Client) ListBankAccounts(accountID string) ([]BankAccount, error) {
+	var resAccounts []BankAccount
+	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(endpoint, accountID))
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return resAccounts, err
+	}
+
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return resAccounts, err
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	switch resp.StatusCode {
+	case http.StatusOK:
+		err = json.Unmarshal(body, &resAccounts)
+		if err != nil {
+			log.Println("Error unmarshalling JSON:", err)
+		}
+		return resAccounts, nil
+	case http.StatusUnauthorized:
+		return resAccounts, ErrAuthCreditionalsNotSet
+	case http.StatusUnprocessableEntity:
+		log.Println("UnprocessableEntity")
+	}
+	return resAccounts, nil
+}
 
 // MicroDepositInitiate creates a new micro deposit verification for the given bank account
+func (c Client) MicroDepositInitiate(accountID string, bankAccountID string) error {
+	url := fmt.Sprintf("%s/%s/%s/micro-deposits", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
+
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	switch resp.StatusCode {
+	case http.StatusNoContent:
+		return nil
+	case http.StatusUnauthorized:
+		return ErrAuthCreditionalsNotSet
+	case http.StatusUnprocessableEntity:
+		log.Println("UnprocessableEntity")
+	}
+	return nil
+}
 
 // MicroDepositConfirm confirms a micro deposit verification for the given bank account
+func (c Client) MicroDepositConfirm(accountID string, bankAccountID string, amounts []int) error {
+	url := fmt.Sprintf("%s/%s/%s/micro-deposits", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
+
+	payload, err := json.Marshal(map[string][]int{"amounts": amounts})
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(payload))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+
+	var data map[string]interface{}
+	err = json.Unmarshal(body, &data)
+	log.Println(data)
+
+	switch resp.StatusCode {
+	case http.StatusOK:
+		return nil
+	case http.StatusUnauthorized:
+		return ErrAuthCreditionalsNotSet
+	case http.StatusUnprocessableEntity:
+		log.Println("UnprocessableEntity")
+	}
+	return nil
+}
