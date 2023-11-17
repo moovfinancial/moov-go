@@ -52,17 +52,6 @@ type Client struct {
 	Credentials Credentials
 }
 
-type Credentials struct {
-	// AccountID Facilitator account ID
-	AccountID string `json:"accountID,omitempty"`
-	// PubliocKey Public key value from API key
-	PublicKey string `json:"publicKey,omitempty"`
-	// SecretKey Secret key value from API key
-	SecretKey string `json:"secretKey,omitempty"`
-	// Domain One of the domains from API key
-	Domain string `json:"domain,omitempty"`
-}
-
 type ClientCredentialsGrantToAccessTokenResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
@@ -71,23 +60,25 @@ type ClientCredentialsGrantToAccessTokenResponse struct {
 	Scope        string `json:"scope"`
 }
 
-func NewClient(creds Credentials) (*Client, error) {
+func NewClient() (*Client, error) {
+	credentials, err := readConfig()
+
+	if err != nil || credentials.PublicKey == "" || credentials.SecretKey == "" {
+		// Make error for token's not set.
+		return nil, ErrAuthCreditionalsNotSet
+	}
+
 	nc := &Client{
 		Credentials: Credentials{
-			AccountID: creds.AccountID,
-			PublicKey: creds.PublicKey,
-			SecretKey: creds.SecretKey,
-			Domain:    creds.Domain,
+			AccountID: credentials.AccountID,
+			PublicKey: credentials.PublicKey,
+			SecretKey: credentials.SecretKey,
+			Domain:    credentials.Domain,
 		},
 	}
 
-	if creds.PublicKey == "" || creds.SecretKey == "" {
-		// Make error for token's not set.
-		return nc, ErrAuthCreditionalsNotSet
-	}
-
 	// Ping the server to make sure we have valid credentials
-	err := nc.Ping()
+	err = nc.Ping()
 	if err != nil {
 		return nc, err
 	}

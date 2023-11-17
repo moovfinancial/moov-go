@@ -50,7 +50,7 @@ func TestCreateBankAccount(t *testing.T) {
 		RoutingNumber:   "273976369",
 	}
 
-	mc, err := NewClient(creds)
+	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,7 +64,7 @@ func TestCreateBankAccount(t *testing.T) {
 }
 
 func TestGetBankAccount(t *testing.T) {
-	mc, err := NewClient(creds)
+	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,7 +79,7 @@ func TestGetBankAccount(t *testing.T) {
 }
 
 func TestDeleteBankAccount(t *testing.T) {
-	mc, err := NewClient(creds)
+	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,7 +93,7 @@ func TestDeleteBankAccount(t *testing.T) {
 }
 
 func TestListBankAccounts(t *testing.T) {
-	mc, err := NewClient(creds)
+	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -107,7 +107,7 @@ func TestListBankAccounts(t *testing.T) {
 }
 
 func TestMicroDepositInitiate(t *testing.T) {
-	mc, err := NewClient(creds)
+	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -121,7 +121,7 @@ func TestMicroDepositInitiate(t *testing.T) {
 }
 
 func TestMicroDepositConfirm(t *testing.T) {
-	mc, err := NewClient(creds)
+	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
