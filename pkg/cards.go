@@ -68,5 +68,5 @@ type CardStatusUpdates struct {
 // If a value is provided for CVV, a new verification ($0 authorization) will be submitted for the card. Updating the expiration date or address will update the information stored on file for the card but will not be verified
 // https://docs.moov.io/api/#tag/Cards/operation/updateCard
 
-// DisableCard disables a card assocaited with a Moov account
+// DisableCard disables a card associated with a Moov account
 // https://docs.moov.io/api/#tag/Cards/operation/deleteCard

@@ -121,6 +121,7 @@ func (c *Client) ScopedAccessToken(accountID string, scope []string) (ClientCred
 		// Todo: return an error
 		log.Fatal(err)
 	}
+	defer resp.Body.Close()
 
 	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -156,6 +157,7 @@ func (c Client) SingleUseAccessToken() (ClientCredentialsGrantToAccessTokenRespo
 		// Todo: return an error
 		log.Fatal(err)
 	}
+	defer resp.Body.Close()
 
 	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
