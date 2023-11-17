@@ -1,10 +1,8 @@
 package moov
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"time"
@@ -71,31 +69,13 @@ func (c Client) CreateBankAccount(accountID string, bankAccount BankAccount) (Ba
 		Account: bankAccount,
 	}
 
-	payload, err := json.Marshal(accountPayload)
-	if err != nil {
-		return bankAccount, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(payload))
-	if err != nil {
-		return bankAccount, err
-	}
-
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return bankAccount, err
-	}
-	defer resp.Body.Close()
-	body, _ := io.ReadAll(resp.Body)
-
 	respAccount := BankAccount{}
+	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, accountPayload)
+	if err != nil {
+		return respAccount, err
+	}
 
-	switch resp.StatusCode {
+	switch statusCode {
 	case http.StatusOK:
 		// Account created
 		err = json.Unmarshal(body, &respAccount)
@@ -116,24 +96,12 @@ func (c Client) GetBankAccount(accountID string, bankAccountID string) (BankAcco
 	resAccount := BankAccount{}
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
 
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return BankAccount{}, err
-	}
-
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil)
 	if err != nil {
 		return resAccount, err
 	}
-	defer resp.Body.Close()
 
-	body, _ := io.ReadAll(resp.Body)
-	switch resp.StatusCode {
+	switch statusCode {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resAccount)
 		if err != nil {
@@ -152,23 +120,12 @@ func (c Client) GetBankAccount(accountID string, bankAccountID string) (BankAcco
 func (c Client) DeleteBankAccount(accountID string, bankAccountID string) error {
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
 
-	req, err := http.NewRequest("DELETE", url, nil)
+	_, statusCode, err := GetHTTPResponse(c, http.MethodDelete, url, nil)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	switch resp.StatusCode {
+	switch statusCode {
 	case http.StatusNoContent:
 		// Account deleted
 		return nil
@@ -185,24 +142,12 @@ func (c Client) ListBankAccounts(accountID string) ([]BankAccount, error) {
 	var resAccounts []BankAccount
 	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(endpoint, accountID))
 
-	req, err := http.NewRequest("GET", url, nil)
+	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil)
 	if err != nil {
 		return resAccounts, err
 	}
 
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return resAccounts, err
-	}
-	defer resp.Body.Close()
-
-	body, _ := io.ReadAll(resp.Body)
-	switch resp.StatusCode {
+	switch statusCode {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resAccounts)
 		if err != nil {
@@ -221,23 +166,12 @@ func (c Client) ListBankAccounts(accountID string) ([]BankAccount, error) {
 func (c Client) MicroDepositInitiate(accountID string, bankAccountID string) error {
 	url := fmt.Sprintf("%s/%s/%s/micro-deposits", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
 
-	req, err := http.NewRequest("POST", url, nil)
+	_, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, nil)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	switch resp.StatusCode {
+	switch statusCode {
 	case http.StatusNoContent:
 		return nil
 	case http.StatusUnauthorized:
@@ -252,28 +186,12 @@ func (c Client) MicroDepositInitiate(accountID string, bankAccountID string) err
 func (c Client) MicroDepositConfirm(accountID string, bankAccountID string, amounts []int) error {
 	url := fmt.Sprintf("%s/%s/%s/micro-deposits", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
 
-	payload, err := json.Marshal(map[string][]int{"amounts": amounts})
+	_, statusCode, err := GetHTTPResponse(c, http.MethodPut, url, map[string][]int{"amounts": amounts})
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(payload))
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	switch resp.StatusCode {
+	switch statusCode {
 	case http.StatusOK:
 		return nil
 	case http.StatusUnauthorized:
