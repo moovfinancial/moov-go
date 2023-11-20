@@ -7,7 +7,6 @@ import (
 )
 
 func TestNewClientErr(t *testing.T) {
-	creds := Credentials{}
-	_, err := NewClient(creds)
+	_, err := NewClient()
 	assert.Equal(t, ErrAuthCreditionalsNotSet, err)
 }

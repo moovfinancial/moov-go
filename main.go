@@ -1,24 +1,15 @@
 package main
 
 import (
-	"log"
-
 	moov "github.com/moovfinancial/moov-go/pkg"
+	"log"
 )
 
 func main() {
 
 	// Setup Moov client
-	// Generate API keys from the Moov Dashboard. Sandbox keys are not compatable with production.
 
-	creds := moov.Credentials{
-		AccountID: "638481a5-5205-406c-84c7-2fc2239105d1",
-		PublicKey: "Qo0j0ChSalMKmRI_",
-		SecretKey: "nbyCvG0r0MpM2gxkzo2u2G70jr6ZtFdm",
-		Domain:    "localhost",
-	}
-
-	mc, err := moov.NewClient(creds)
+	mc, err := moov.NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
