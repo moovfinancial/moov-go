@@ -57,6 +57,7 @@ const (
 var (
 	ErrAuthCreditionalsNotSet = errors.New("API Keys are not set or invalid credentials")
 	ErrAuthNetwork            = errors.New("network error")
+	ErrNoAccount              = errors.New("no account with the specified accountID was found")
 )
 
 // New create4s a new Moov client with the appropriate secret key.
