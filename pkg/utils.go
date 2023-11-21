@@ -34,7 +34,7 @@ func readConfig() (Credentials, error) {
 }
 
 // GetHTTPResponse performs an HTTP request and returns the response body or an error.
-func GetHTTPResponse(c Client, method string, url string, data any) ([]byte, int, error) {
+func GetHTTPResponse(c Client, method string, url string, data any, header map[string]string) ([]byte, int, error) {
 	// Make an HTTP request
 	var req *http.Request
 	if data != nil {
@@ -57,6 +57,11 @@ func GetHTTPResponse(c Client, method string, url string, data any) ([]byte, int
 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if header != nil {
+		for key, val := range header {
+			req.Header.Set(key, val)
+		}
+	}
 	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 
 	client := &http.Client{}

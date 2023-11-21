@@ -70,7 +70,7 @@ func (c Client) CreateBankAccount(accountID string, bankAccount BankAccount) (Ba
 	}
 
 	respAccount := BankAccount{}
-	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, accountPayload)
+	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, accountPayload, nil)
 	if err != nil {
 		return respAccount, err
 	}
@@ -96,7 +96,7 @@ func (c Client) GetBankAccount(accountID string, bankAccountID string) (BankAcco
 	resAccount := BankAccount{}
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil)
+	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resAccount, err
 	}
@@ -120,7 +120,7 @@ func (c Client) GetBankAccount(accountID string, bankAccountID string) (BankAcco
 func (c Client) DeleteBankAccount(accountID string, bankAccountID string) error {
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
 
-	_, statusCode, err := GetHTTPResponse(c, http.MethodDelete, url, nil)
+	_, statusCode, err := GetHTTPResponse(c, http.MethodDelete, url, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -142,7 +142,7 @@ func (c Client) ListBankAccounts(accountID string) ([]BankAccount, error) {
 	var resAccounts []BankAccount
 	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(endpoint, accountID))
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil)
+	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resAccounts, err
 	}
@@ -166,7 +166,7 @@ func (c Client) ListBankAccounts(accountID string) ([]BankAccount, error) {
 func (c Client) MicroDepositInitiate(accountID string, bankAccountID string) error {
 	url := fmt.Sprintf("%s/%s/%s/micro-deposits", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
 
-	_, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, nil)
+	_, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -186,7 +186,7 @@ func (c Client) MicroDepositInitiate(accountID string, bankAccountID string) err
 func (c Client) MicroDepositConfirm(accountID string, bankAccountID string, amounts []int) error {
 	url := fmt.Sprintf("%s/%s/%s/micro-deposits", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
 
-	_, statusCode, err := GetHTTPResponse(c, http.MethodPut, url, map[string][]int{"amounts": amounts})
+	_, statusCode, err := GetHTTPResponse(c, http.MethodPut, url, map[string][]int{"amounts": amounts}, nil)
 	if err != nil {
 		return err
 	}
