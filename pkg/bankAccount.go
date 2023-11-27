@@ -2,10 +2,15 @@ package moov
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
+)
+
+var (
+	ErrDuplicateBankAccount = errors.New("Duplciate bank account or invalid routing number")
 )
 
 type BankAccount struct {
@@ -64,26 +69,28 @@ func (c Client) CreateBankAccount(accountID string, bankAccount BankAccount) (Ba
 		Account: bankAccount,
 	}
 
-	respAccount := BankAccount{}
+	respBankAccount := BankAccount{}
 	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, accountPayload, nil)
 	if err != nil {
-		return respAccount, err
+		return respBankAccount, err
 	}
 
 	switch statusCode {
 	case http.StatusOK:
 		// Account created
-		err = json.Unmarshal(body, &respAccount)
+		err = json.Unmarshal(body, &respBankAccount)
 		if err != nil {
 			log.Println("Error unmarshalling JSON:", err)
 		}
-		return respAccount, nil
+		return respBankAccount, nil
+	case http.StatusConflict:
+		return respBankAccount, ErrDuplicateBankAccount
 	case http.StatusUnauthorized:
-		return respAccount, ErrAuthCreditionalsNotSet
+		return respBankAccount, ErrAuthCreditionalsNotSet
 	case http.StatusUnprocessableEntity:
 		log.Println("UnprocessableEntity")
 	}
-	return respAccount, nil
+	return respBankAccount, nil
 }
 
 // GetBankAccount retrieves a bank account for the given customer account
