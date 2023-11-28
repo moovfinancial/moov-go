@@ -1,9 +1,11 @@
 package moov
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -62,51 +64,60 @@ type CardStatusUpdates struct {
 	Completed time.Time `json:"completed,omitempty"`
 }
 
-type CardPayload struct {
-	Card
-	CardNumber string `json:"cardNumber,omitempty"`
-	CardCvv    string `json:"cardCvv,omitempty"`
+type CardPost struct {
+	CardNumber        string     `json:"cardNumber,omitempty"`
+	CardCvv           string     `json:"cardCvv,omitempty"`
+	Expiration        Expiration `json:"expiration,omitempty"`
+	HolderName        string     `json:"holderName,omitempty"`
+	BillingAddress    Address    `json:"billingAddress,omitempty"`
+	CardOnFile        bool       `json:"cardOnFile,omitempty"`
+	MerchantAccountID string     `json:"merchantAccountID,omitempty"`
 }
 
 // CreateCard creates a new card for the given customer linked to their account
 // https://docs.moov.io/api/#tag/Cards/operation/card
-func (c Client) CreateCard(accountID string, card Card, cardNumber string, cardCvv string) (Card, error) {
+func (c Client) CreateCard(accountID string, card CardPost) (Card, error) {
+	jsonValue, _ := json.Marshal(card)
+
+	// TODO: Check that accountID is not empty
 	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathCards, accountID))
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonValue))
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	// Makes the request synchronous
+	req.Header.Set("X-Wait-For", "payment-method")
+	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 
-	payload := CardPayload{
-		Card:       card,
-		CardNumber: cardNumber,
-		CardCvv:    cardCvv,
-	}
-
-	header := map[string]string{"X-Wait-For": "payment-method"}
-
-	resCard := Card{}
-	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, payload, header)
+	client := &http.Client{}
+	respCard := Card{}
+	resp, err := client.Do(req)
 	if err != nil {
-		return resCard, err
+		return respCard, err
 	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
 
-	switch statusCode {
+	switch resp.StatusCode {
 	case http.StatusOK:
 		// card created
-		err = json.Unmarshal(body, &resCard)
+		err = json.Unmarshal(body, &respCard)
 		if err != nil {
 			log.Println("Error unmarshalling JSON:", err)
 		}
-		return resCard, nil
+		return respCard, nil
 	case http.StatusUnauthorized:
-		return resCard, ErrAuthCreditionalsNotSet
+		return respCard, ErrAuthCreditionalsNotSet
+	// TODO: Handle 403 if for some reason we don't make the right URL because of a missing accountID
 	case http.StatusNotFound:
-		return resCard, ErrNoAccount
+		return respCard, ErrNoAccount
 	case http.StatusConflict:
-		return resCard, errors.New("attempted to link card that already exists on the account")
+		return respCard, errors.New("attempted to link card that already exists on the account")
 	case http.StatusUnprocessableEntity:
-		return resCard, errors.New("the supplied card data appeared invalid or was declined by the issuer")
+		return respCard, errors.New("the supplied card data appeared invalid or was declined by the issuer")
 	case http.StatusTooManyRequests:
-		return resCard, errors.New("request was refused due to rate limiting")
+		return respCard, errors.New("request was refused due to rate limiting")
 	}
-	return resCard, nil
+	return respCard, nil
 }
 
 // ListCards lists all cards for the given customer Moov account
@@ -171,8 +182,8 @@ func (c Client) GetCard(accountID string, cardID string) (Card, error) {
 func (c Client) UpdateCard(accountID string, cardID string, card Card, cardCvv string) (Card, error) {
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathCards, accountID), cardID)
 
-	payload := CardPayload{
-		Card:    card,
+	payload := CardPost{
+		//Card:    card,
 		CardCvv: cardCvv,
 	}
 

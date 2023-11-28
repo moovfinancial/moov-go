@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	ErrDuplicateBankAccount = errors.New("Duplciate bank account or invalid routing number")
+	ErrDuplicateBankAccount = errors.New("duplciate bank account or invalid routing number")
 )
 
 type BankAccount struct {

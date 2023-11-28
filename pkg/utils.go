@@ -3,10 +3,12 @@ package moov
 import (
 	"bytes"
 	"encoding/json"
-	"gopkg.in/yaml.v3"
 	"io"
+	"log"
 	"net/http"
 	"os"
+
+	"gopkg.in/yaml.v3"
 )
 
 type Credentials struct {
@@ -72,7 +74,7 @@ func GetHTTPResponse(c Client, method string, url string, data any, header map[s
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
 
-	//log.Printf("fetch data from url:\n%s\n response:\n%s", url, string(body))
+	log.Printf("fetch data from url:\n%s\n response:\n%s", url, string(body))
 
 	return body, resp.StatusCode, nil
 }

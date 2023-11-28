@@ -1,5 +1,8 @@
 package moov
 
+// TODO: Create faililng test for other card brands in test mode
+// https://docs.moov.io/guides/get-started/test-mode/#cards
+
 import (
 	"bytes"
 	"encoding/json"
@@ -9,6 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 )
 
 var (
@@ -64,8 +68,84 @@ func TestCardMarshal(t *testing.T) {
 	assert.Equal(t, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", card.CardID)
 }
 
-func TestCreateCard(t *testing.T) {
-	card := Card{
+type CardTestSuite struct {
+	suite.Suite
+	// values fort testing will be set in init()
+	accountID    string
+	cardID       string
+	deleteCardID string
+	cards        []string
+}
+
+// listen for 'go test' command --> run test methods
+func TestCardSuite(t *testing.T) {
+	suite.Run(t, new(CardTestSuite))
+}
+
+func (s *CardTestSuite) SetupSuite() {
+	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	accounts, err := mc.ListAccounts()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, account := range accounts {
+		if account.DisaplayName == "Lincoln National Corporation" {
+			// set the accountID for testing
+			s.accountID = account.AccountID
+		}
+	}
+
+	card := CardPost{
+		CardNumber: "371111111111114",
+		CardCvv:    "1234",
+		Expiration: Expiration{
+			Month: "10",
+			Year:  "28",
+		},
+		HolderName: "Wade Arnold",
+		BillingAddress: Address{
+			AddressLine1:    "123 Main Street",
+			City:            "Golden",
+			StateOrProvince: "CO",
+			PostalCode:      "80401",
+			Country:         "US",
+		},
+	}
+
+	respCard, err := mc.CreateCard(s.accountID, card)
+	if err != nil {
+		s.T().Fatalf("Error creating card: %v", err)
+	}
+
+	s.deleteCardID = respCard.CardID
+	s.cards = append(s.cards, respCard.CardID)
+
+}
+
+func (s *CardTestSuite) TearDownSuite() {
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	// delete the bank accounts we created
+	for _, cardID := range s.cards {
+		if cardID != "" {
+			err = mc.DisableCard(s.accountID, cardID)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
+}
+
+func (s *CardTestSuite) TestCreateCard() {
+	card := CardPost{
+		CardNumber: "4111111111111111",
+		CardCvv:    "123",
 		Expiration: Expiration{
 			Month: "01",
 			Year:  "28",
@@ -79,8 +159,10 @@ func TestCreateCard(t *testing.T) {
 			PostalCode:      "80301",
 			Country:         "US",
 		},
-		CardOnFile:        false,
-		MerchantAccountID: "50469144-f859-46dc-bdbd-9587c2fa7b41",
+		CardOnFile: false,
+		// TODO: Why do we need this MerchantAccountID
+		// MerchantAccountID: "50469144-f859-46dc-bdbd-9587c2fa7b42",
+		//4000 0200 0000 0000
 	}
 
 	mc, err := NewClient()
@@ -88,12 +170,14 @@ func TestCreateCard(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	card, err = mc.CreateCard(accountID, card, "4151066396992786", "937")
+	respCard, err := mc.CreateCard(s.accountID, card)
 	if err != nil {
-		t.Fatalf("Error creating card: %v", err)
+		s.T().Fatalf("Error creating card: %v", err)
 	}
 
-	assert.NotNil(t, card.CardID)
+	assert.NotEmpty(s.T(), respCard.CardID)
+	s.cardID = respCard.CardID
+	s.cards = append(s.cards, respCard.CardID)
 }
 
 func TestListCards(t *testing.T) {
