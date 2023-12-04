@@ -41,9 +41,23 @@ const (
 	SCOPE_PING_READ               = "/ping.read"
 )
 
+const (
+	baseURL            = "https://api.moov.io"
+	pathBankAccounts   = "accounts/%s/bank-accounts"
+	pathCards          = "accounts/%s/cards"
+	pathApplePay       = "accounts/%s/apple-pay"
+	pathPaymentMethods = "accounts/%s/payment-methods"
+	pathWallets        = "accounts/%s/wallets"
+	pathWalletTrans    = "accounts/%s/wallets/%s/transactions"
+	pathTransactions   = "accounts/%s/transactions"
+	pathTransfers      = "transfers"
+	pathDisputes       = "disputes"
+)
+
 var (
 	ErrAuthCreditionalsNotSet = errors.New("API Keys are not set or invalid credentials")
 	ErrAuthNetwork            = errors.New("network error")
+	ErrNoAccount              = errors.New("no account with the specified accountID was found")
 )
 
 // New create4s a new Moov client with the appropriate secret key.

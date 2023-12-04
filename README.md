@@ -10,6 +10,14 @@ go get github.com/moovfinancial/moov-go/pkg
 
 This SDK requires and API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. Note that API Keys for Sandbox and Production are different keys. 
 
+After getting API keys, you need to set up on `config.yaml` file
+```
+account_id: account_id
+public_key: public_key
+secret_key: secret_key
+domain    : domain
+```
+
 ## Basic Usage 
 
 ```go 
@@ -17,22 +25,12 @@ package main
 
 import (
 	"log"
-
 	moov "github.com/moovfinancial/moov-go/pkg"
 )
 
 func main() {
-
 	// Setup Moov client
-	// Generate API keys from the Moov Dashboard. Sandbox keys are not compatible with production.
-	creds := moov.Credentials{
-		AccountID: "638481a5-FAKE-406c-84c7-2fc2239105d1",
-		PublicKey: "Qo0j0ChFAKEKmRI_",
-		SecretKey: "nbyFAKEr0MpM2gxkzo2u2G70jr6ZtFdm",
-		Domain:    "localhost",
-	}
-
-    mc, err := moov.NewClient(creds)
+    mc, err := moov.NewClient()
 	if err != nil {
         // Network and authentication errors
 		log.Fatal(err)

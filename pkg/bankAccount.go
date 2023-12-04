@@ -2,10 +2,15 @@ package moov
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
+)
+
+var (
+	ErrDuplicateBankAccount = errors.New("duplciate bank account or invalid routing number")
 )
 
 type BankAccount struct {
@@ -56,47 +61,44 @@ type BankAccountPayload struct {
 	Account BankAccount `json:"account"`
 }
 
-const (
-	baseURL  = "https://api.moov.io"
-	endpoint = "accounts/%s/bank-accounts"
-)
-
 // CreateBankAccount creates a new bank account for the given customer account
 func (c Client) CreateBankAccount(accountID string, bankAccount BankAccount) (BankAccount, error) {
-	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(endpoint, accountID))
+	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathBankAccounts, accountID))
 
 	accountPayload := BankAccountPayload{
 		Account: bankAccount,
 	}
 
-	respAccount := BankAccount{}
-	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, accountPayload)
+	respBankAccount := BankAccount{}
+	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, accountPayload, nil)
 	if err != nil {
-		return respAccount, err
+		return respBankAccount, err
 	}
 
 	switch statusCode {
 	case http.StatusOK:
 		// Account created
-		err = json.Unmarshal(body, &respAccount)
+		err = json.Unmarshal(body, &respBankAccount)
 		if err != nil {
 			log.Println("Error unmarshalling JSON:", err)
 		}
-		return respAccount, nil
+		return respBankAccount, nil
+	case http.StatusConflict:
+		return respBankAccount, ErrDuplicateBankAccount
 	case http.StatusUnauthorized:
-		return respAccount, ErrAuthCreditionalsNotSet
+		return respBankAccount, ErrAuthCreditionalsNotSet
 	case http.StatusUnprocessableEntity:
 		log.Println("UnprocessableEntity")
 	}
-	return respAccount, nil
+	return respBankAccount, nil
 }
 
 // GetBankAccount retrieves a bank account for the given customer account
 func (c Client) GetBankAccount(accountID string, bankAccountID string) (BankAccount, error) {
 	resAccount := BankAccount{}
-	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
+	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathBankAccounts, accountID), bankAccountID)
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil)
+	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resAccount, err
 	}
@@ -118,9 +120,9 @@ func (c Client) GetBankAccount(accountID string, bankAccountID string) (BankAcco
 
 // DeleteBankAccount deletes a bank account for the given customer account
 func (c Client) DeleteBankAccount(accountID string, bankAccountID string) error {
-	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
+	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathBankAccounts, accountID), bankAccountID)
 
-	_, statusCode, err := GetHTTPResponse(c, http.MethodDelete, url, nil)
+	_, statusCode, err := GetHTTPResponse(c, http.MethodDelete, url, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -140,9 +142,9 @@ func (c Client) DeleteBankAccount(accountID string, bankAccountID string) error 
 // ListBankAccounts lists all bank accounts for the given customer account
 func (c Client) ListBankAccounts(accountID string) ([]BankAccount, error) {
 	var resAccounts []BankAccount
-	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(endpoint, accountID))
+	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathBankAccounts, accountID))
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil)
+	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resAccounts, err
 	}
@@ -164,9 +166,9 @@ func (c Client) ListBankAccounts(accountID string) ([]BankAccount, error) {
 
 // MicroDepositInitiate creates a new micro deposit verification for the given bank account
 func (c Client) MicroDepositInitiate(accountID string, bankAccountID string) error {
-	url := fmt.Sprintf("%s/%s/%s/micro-deposits", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
+	url := fmt.Sprintf("%s/%s/%s/micro-deposits", baseURL, fmt.Sprintf(pathBankAccounts, accountID), bankAccountID)
 
-	_, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, nil)
+	_, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -184,9 +186,9 @@ func (c Client) MicroDepositInitiate(accountID string, bankAccountID string) err
 
 // MicroDepositConfirm confirms a micro deposit verification for the given bank account
 func (c Client) MicroDepositConfirm(accountID string, bankAccountID string, amounts []int) error {
-	url := fmt.Sprintf("%s/%s/%s/micro-deposits", baseURL, fmt.Sprintf(endpoint, accountID), bankAccountID)
+	url := fmt.Sprintf("%s/%s/%s/micro-deposits", baseURL, fmt.Sprintf(pathBankAccounts, accountID), bankAccountID)
 
-	_, statusCode, err := GetHTTPResponse(c, http.MethodPut, url, map[string][]int{"amounts": amounts})
+	_, statusCode, err := GetHTTPResponse(c, http.MethodPut, url, map[string][]int{"amounts": amounts}, nil)
 	if err != nil {
 		return err
 	}

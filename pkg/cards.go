@@ -1,6 +1,13 @@
 package moov
 
-import "time"
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"log"
+	"net/http"
+	"time"
+)
 
 type Card struct {
 	CardID             string             `json:"cardID,omitempty"`
@@ -55,18 +62,167 @@ type CardStatusUpdates struct {
 	Completed time.Time `json:"completed,omitempty"`
 }
 
+type CardPost struct {
+	CardNumber        string     `json:"cardNumber,omitempty"`
+	CardCvv           string     `json:"cardCvv,omitempty"`
+	Expiration        Expiration `json:"expiration,omitempty"`
+	HolderName        string     `json:"holderName,omitempty"`
+	BillingAddress    Address    `json:"billingAddress,omitempty"`
+	CardOnFile        bool       `json:"cardOnFile,omitempty"`
+	MerchantAccountID string     `json:"merchantAccountID,omitempty"`
+}
+
 // CreateCard creates a new card for the given customer linked to their account
 // https://docs.moov.io/api/#tag/Cards/operation/card
+func (c Client) CreateCard(accountID string, card CardPost) (Card, error) {
+	respCard := Card{}
+
+	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathCards, accountID))
+	header := map[string]string{"X-Wait-For": "payment-method"}
+	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, card, header)
+
+	if err != nil {
+		return respCard, err
+	}
+
+	switch statusCode {
+	case http.StatusOK:
+		// card created
+		err = json.Unmarshal(body, &respCard)
+		if err != nil {
+			log.Println("Error unmarshalling JSON:", err)
+		}
+		return respCard, nil
+	case http.StatusUnauthorized:
+		return respCard, ErrAuthCreditionalsNotSet
+	case http.StatusNotFound:
+		return respCard, ErrNoAccount
+	case http.StatusConflict:
+		return respCard, errors.New("attempted to link card that already exists on the account")
+	case http.StatusUnprocessableEntity:
+		return respCard, errors.New("the supplied card data appeared invalid or was declined by the issuer")
+	case http.StatusTooManyRequests:
+		return respCard, errors.New("request was refused due to rate limiting")
+	}
+	return respCard, nil
+}
 
 // ListCards lists all cards for the given customer Moov account
 // https://docs.moov.io/api/#tag/Cards/operation/listCards
+func (c Client) ListCards(accountID string) ([]Card, error) {
+	var resCards []Card
+	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathCards, accountID))
+
+	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
+	if err != nil {
+		return resCards, err
+	}
+
+	switch statusCode {
+	case http.StatusOK:
+		err = json.Unmarshal(body, &resCards)
+		if err != nil {
+			log.Println("Error unmarshalling JSON:", err)
+		}
+		return resCards, nil
+	case http.StatusUnauthorized:
+		return resCards, ErrAuthCreditionalsNotSet
+	case http.StatusNotFound:
+		return resCards, ErrNoAccount
+	case http.StatusUnprocessableEntity:
+		log.Println("UnprocessableEntity")
+	}
+	return resCards, nil
+}
 
 // GetCard retrieves a card for the given customer Moov account
 // https://docs.moov.io/api/#tag/Cards/operation/getCard
+func (c Client) GetCard(accountID string, cardID string) (Card, error) {
+	resCard := Card{}
+	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathCards, accountID), cardID)
+
+	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
+	if err != nil {
+		return resCard, err
+	}
+
+	switch statusCode {
+	case http.StatusOK:
+		err = json.Unmarshal(body, &resCard)
+		if err != nil {
+			log.Println("Error unmarshalling JSON:", err)
+		}
+		return resCard, nil
+	case http.StatusUnauthorized:
+		return resCard, ErrAuthCreditionalsNotSet
+	case http.StatusNotFound:
+		return resCard, ErrNoAccount
+	case http.StatusUnprocessableEntity:
+		log.Println("UnprocessableEntity")
+	}
+	return resCard, nil
+}
 
 // UpdateCard Update a linked card and/or resubmit it for verification.
 // If a value is provided for CVV, a new verification ($0 authorization) will be submitted for the card. Updating the expiration date or address will update the information stored on file for the card but will not be verified
 // https://docs.moov.io/api/#tag/Cards/operation/updateCard
+func (c Client) UpdateCard(accountID string, cardID string, card Card, cardCvv string) (Card, error) {
+	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathCards, accountID), cardID)
+
+	payload := CardPost{
+		BillingAddress: card.BillingAddress,
+		Expiration:     card.Expiration,
+		CardOnFile:     card.CardOnFile,
+		CardCvv:        cardCvv,
+	}
+
+	resCard := Card{}
+	body, statusCode, err := GetHTTPResponse(c, http.MethodPatch, url, payload, nil)
+	if err != nil {
+		return resCard, err
+	}
+
+	switch statusCode {
+	case http.StatusOK:
+		err = json.Unmarshal(body, &resCard)
+		if err != nil {
+			log.Println("Error unmarshalling JSON:", err)
+		}
+		return resCard, nil
+	case http.StatusUnauthorized:
+		return resCard, ErrAuthCreditionalsNotSet
+	case http.StatusNotFound:
+		return resCard, ErrNoAccount
+	case http.StatusConflict:
+		return resCard, errors.New("attempted to link card that already exists on the account")
+	case http.StatusUnprocessableEntity:
+		return resCard, errors.New("the supplied card data appeared invalid or was declined by the issuer")
+	case http.StatusTooManyRequests:
+		return resCard, errors.New("request was refused due to rate limiting")
+	}
+	return resCard, nil
+}
 
 // DisableCard disables a card associated with a Moov account
 // https://docs.moov.io/api/#tag/Cards/operation/deleteCard
+func (c Client) DisableCard(accountID string, cardID string) error {
+	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathCards, accountID), cardID)
+
+	_, statusCode, err := GetHTTPResponse(c, http.MethodDelete, url, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	switch statusCode {
+	case http.StatusNoContent:
+		// card deleted
+		return nil
+	case http.StatusUnauthorized:
+		return ErrAuthCreditionalsNotSet
+	case http.StatusNotFound:
+		return ErrNoAccount
+	case http.StatusUnprocessableEntity:
+		log.Println("UnprocessableEntity")
+	}
+	return nil
+}

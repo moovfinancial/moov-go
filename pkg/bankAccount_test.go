@@ -5,15 +5,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 )
 
-var (
-	accountID = "e9a255fd-ecdb-4c78-8049-e9b725bdd28c"
-)
+func randomBankAccountNumber() string {
+	rand.Seed(time.Now().UnixNano())
+	return fmt.Sprintf("%d", 100000000+rand.Intn(999999999))
+}
 
 func TestBankAccountMarshal(t *testing.T) {
 	input := []byte(`{
@@ -41,12 +45,91 @@ func TestBankAccountMarshal(t *testing.T) {
 	assert.Equal(t, "Chase Bank", bankAccount.BankName)
 }
 
-func TestCreateBankAccount(t *testing.T) {
+type BankAccountTestSuite struct {
+	suite.Suite
+	// values fort testing will be set in init()
+	accountID           string
+	bankAccountIDDelete string
+	bankAccountID       string
+	bankAccounts        []string
+}
+
+// listen for 'go test' command --> run test methods
+func TestBankAccountSuite(t *testing.T) {
+	suite.Run(t, new(BankAccountTestSuite))
+}
+
+func (s *BankAccountTestSuite) SetupSuite() {
+	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	accounts, err := mc.ListAccounts()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, account := range accounts {
+		if account.DisaplayName == "Lincoln National Corporation" {
+			// set the accountID for testing
+			s.accountID = account.AccountID
+		}
+	}
+
+	// create a bank account for Lincoln National Corporation
+	bankAccount := BankAccount{
+		HolderName:      "Sir Test ALot",
+		HolderType:      "individual",
+		BankAccountType: "checking",
+		AccountNumber:   randomBankAccountNumber(),
+		RoutingNumber:   "273976369",
+	}
+
+	bankAccount, err = mc.CreateBankAccount(s.accountID, bankAccount)
+	if err != nil {
+		log.Fatal(err)
+	}
+	s.bankAccountID = bankAccount.BankAccountID
+	s.bankAccounts = append(s.bankAccounts, bankAccount.BankAccountID)
+
+	bankAccountDelete := BankAccount{
+		HolderName:      "Sir Test Delete ALot",
+		HolderType:      "individual",
+		BankAccountType: "checking",
+		AccountNumber:   randomBankAccountNumber(),
+		RoutingNumber:   "273976369",
+	}
+
+	bankAccount, err = mc.CreateBankAccount(s.accountID, bankAccountDelete)
+	if err != nil {
+		log.Fatal(err)
+	}
+	s.bankAccountIDDelete = bankAccount.BankAccountID
+	s.bankAccounts = append(s.bankAccounts, bankAccount.BankAccountID)
+}
+
+func (s *BankAccountTestSuite) TearDownSuite() {
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	// delete the bank accounts we created
+	for _, bankAccountID := range s.bankAccounts {
+		if bankAccountID != "" {
+			err = mc.DeleteBankAccount(s.accountID, bankAccountID)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
+}
+
+func (s *BankAccountTestSuite) TestCreateBankAccount() {
 	bankAccount := BankAccount{
 		HolderName:      "Jules Jackson",
 		HolderType:      "individual",
 		BankAccountType: "checking",
-		AccountNumber:   "81957272176",
+		AccountNumber:   randomBankAccountNumber(),
 		RoutingNumber:   "273976369",
 	}
 
@@ -55,81 +138,74 @@ func TestCreateBankAccount(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	bankAccount, err = mc.CreateBankAccount(accountID, bankAccount)
+	bankAccount, err = mc.CreateBankAccount(s.accountID, bankAccount)
 	if err != nil {
-		t.Fatalf("Error creating bank account: %v", err)
+		s.T().Fatalf("Error creating bank account: %v", err)
 	}
 
-	assert.NotNil(t, bankAccount.BankAccountID)
+	assert.NotEmpty(s.T(), bankAccount.BankAccountID)
+
+	s.bankAccounts = append(s.bankAccounts, bankAccount.BankAccountID)
 }
 
-func TestGetBankAccount(t *testing.T) {
+func (s *BankAccountTestSuite) TestGetBankAccount() {
 	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
-	// sample bank account id
-	bankAccountID := "fc8cc388-35d0-4da6-bebd-9b9800fe9d4d"
-
-	account, err := mc.GetBankAccount(accountID, bankAccountID)
+	account, err := mc.GetBankAccount(s.accountID, s.bankAccountID)
 	if err != nil {
-		t.Fatal(err)
+		s.T().Fatal(err)
 	}
-	assert.Equal(t, bankAccountID, account.BankAccountID)
+	assert.Equal(s.T(), s.bankAccountID, account.BankAccountID)
 }
 
-func TestDeleteBankAccount(t *testing.T) {
+func (s *BankAccountTestSuite) TestDeleteBankAccount() {
 	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
-	// sample bank account id
-	bankAccountID := "bdba60ba-3e22-4984-8159-e86ebbf43690"
-
-	err = mc.DeleteBankAccount(accountID, bankAccountID)
+	err = mc.DeleteBankAccount(s.accountID, s.bankAccountIDDelete)
 	if err != nil {
-		assert.Error(t, err)
+		assert.Error(s.T(), err)
 	}
 }
 
-func TestListBankAccounts(t *testing.T) {
+func (s *BankAccountTestSuite) TestListBankAccounts() {
 	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	accounts, err := mc.ListBankAccounts(accountID)
+	accounts, err := mc.ListBankAccounts(s.accountID)
 	if err != nil {
-		t.Fatal(err)
+		s.T().Fatal(err)
 	}
 	fmt.Println(len(accounts))
-	assert.NotNil(t, accounts)
+	assert.NotNil(s.T(), accounts)
 }
 
-func TestMicroDepositInitiate(t *testing.T) {
+func (s *BankAccountTestSuite) TestMicroDepositInitiate() {
 	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
-	// sample bank account id
-	bankAccountID := "fc8cc388-35d0-4da6-bebd-9b9800fe9d4d"
-
-	err = mc.MicroDepositInitiate(accountID, bankAccountID)
+	err = mc.MicroDepositInitiate(s.accountID, s.bankAccountID)
 	if err != nil {
-		assert.Error(t, err)
+		assert.Error(s.T(), err)
 	}
 }
 
-func TestMicroDepositConfirm(t *testing.T) {
+// TODO: test this could run before TestMicroDepositInitiate
+func (s *BankAccountTestSuite) TestMicroDepositConfirm() {
 	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
 	// sample data
-	bankAccountID := "c9fe9144-dbe5-4d6f-9994-c5be9813718c"
 	amounts := []int{22, 21}
-	err = mc.MicroDepositConfirm(accountID, bankAccountID, amounts)
+	err = mc.MicroDepositConfirm(s.accountID, s.bankAccountID, amounts)
 	if err != nil {
-		assert.Error(t, err)
+		assert.Error(s.T(), err)
 	}
 }

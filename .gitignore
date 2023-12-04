@@ -32,3 +32,6 @@ cover.out
 coverage.txt
 
 .idea/*
+
+# security config
+config.yaml
