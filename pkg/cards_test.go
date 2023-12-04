@@ -70,7 +70,7 @@ func TestCardMarshal(t *testing.T) {
 
 type CardTestSuite struct {
 	suite.Suite
-	// values fort testing will be set in init()
+	// values for testing will be set in init()
 	accountID    string
 	cardID       string
 	deleteCardID string
@@ -160,16 +160,12 @@ func (s *CardTestSuite) TestCreateCard() {
 			Country:         "US",
 		},
 		CardOnFile: false,
-		// TODO: Why do we need this MerchantAccountID
-		// MerchantAccountID: "50469144-f859-46dc-bdbd-9587c2fa7b42",
-		//4000 0200 0000 0000
 	}
 
 	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	respCard, err := mc.CreateCard(s.accountID, card)
 	if err != nil {
 		s.T().Fatalf("Error creating card: %v", err)
@@ -180,47 +176,45 @@ func (s *CardTestSuite) TestCreateCard() {
 	s.cards = append(s.cards, respCard.CardID)
 }
 
-func TestListCards(t *testing.T) {
+func (s *CardTestSuite) TestListCards() {
 	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	cards, err := mc.ListCards(accountID)
+	cards, err := mc.ListCards(s.accountID)
 	if err != nil {
-		t.Fatal(err)
+		s.T().Fatal(err)
 	}
 	fmt.Println(len(cards))
-	assert.NotNil(t, cards)
+	assert.NotNil(s.T(), cards)
 }
 
-func TestGetCard(t *testing.T) {
+func (s *CardTestSuite) TestGetCard() {
 	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
-	// sample card id
-	cardID := "ec7e1848-dc80-4ab0-8827-dd7fc0737b43"
 
-	card, err := mc.GetCard(accountID, cardID)
+	card, err := mc.GetCard(s.accountID, s.cardID)
 	if err != nil {
-		t.Fatal(err)
+		s.T().Fatal(err)
 	}
-	assert.Equal(t, cardID, card.CardID)
+	assert.Equal(s.T(), s.cardID, card.CardID)
 }
 
-func TestUpdateCard(t *testing.T) {
+func (s *CardTestSuite) TestUpdateCard() {
 	card := Card{
 		Expiration: Expiration{
 			Month: "01",
 			Year:  "28",
 		},
 		BillingAddress: Address{
-			AddressLine1:    "123 Main Street",
+			AddressLine1:    "125 Main Street",
 			AddressLine2:    "Apt 302",
 			City:            "Boulder",
 			StateOrProvince: "CO",
-			PostalCode:      "80301",
+			PostalCode:      "80303",
 			Country:         "US",
 		},
 		CardOnFile: false,
@@ -231,28 +225,22 @@ func TestUpdateCard(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	// sample card id
-	cardID := "ec7e1848-dc80-4ab0-8827-dd7fc0737b43"
-
-	card, err = mc.UpdateCard(accountID, cardID, card, "937")
+	newCard, err := mc.UpdateCard(s.accountID, s.cardID, card, "937")
 	if err != nil {
-		t.Fatalf("Error creating card: %v", err)
+		s.T().Fatalf("Error updating card: %v", err)
 	}
 
-	assert.NotNil(t, card.CardID)
+	assert.Equal(s.T(), newCard.BillingAddress, card.BillingAddress)
 }
 
-func TestDisableCard(t *testing.T) {
+func (s *CardTestSuite) TestDisableCard() {
 	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// sample card id
-	cardID := "ec7e1848-dc80-4ab0-8827-dd7fc0737b43"
-
-	err = mc.DisableCard(accountID, cardID)
+	err = mc.DisableCard(s.accountID, s.cardID)
 	if err != nil {
-		assert.Error(t, err)
+		assert.Error(s.T(), err)
 	}
 }

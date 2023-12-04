@@ -1,11 +1,9 @@
 package moov
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"time"
@@ -77,27 +75,17 @@ type CardPost struct {
 // CreateCard creates a new card for the given customer linked to their account
 // https://docs.moov.io/api/#tag/Cards/operation/card
 func (c Client) CreateCard(accountID string, card CardPost) (Card, error) {
-	jsonValue, _ := json.Marshal(card)
-
-	// TODO: Check that accountID is not empty
-	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathCards, accountID))
-	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonValue))
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	// Makes the request synchronous
-	req.Header.Set("X-Wait-For", "payment-method")
-	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
-
-	client := &http.Client{}
 	respCard := Card{}
-	resp, err := client.Do(req)
+
+	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathCards, accountID))
+	header := map[string]string{"X-Wait-For": "payment-method"}
+	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, card, header)
+
 	if err != nil {
 		return respCard, err
 	}
-	defer resp.Body.Close()
-	body, _ := io.ReadAll(resp.Body)
 
-	switch resp.StatusCode {
+	switch statusCode {
 	case http.StatusOK:
 		// card created
 		err = json.Unmarshal(body, &respCard)
@@ -107,7 +95,6 @@ func (c Client) CreateCard(accountID string, card CardPost) (Card, error) {
 		return respCard, nil
 	case http.StatusUnauthorized:
 		return respCard, ErrAuthCreditionalsNotSet
-	// TODO: Handle 403 if for some reason we don't make the right URL because of a missing accountID
 	case http.StatusNotFound:
 		return respCard, ErrNoAccount
 	case http.StatusConflict:
@@ -183,8 +170,10 @@ func (c Client) UpdateCard(accountID string, cardID string, card Card, cardCvv s
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathCards, accountID), cardID)
 
 	payload := CardPost{
-		//Card:    card,
-		CardCvv: cardCvv,
+		BillingAddress: card.BillingAddress,
+		Expiration:     card.Expiration,
+		CardOnFile:     card.CardOnFile,
+		CardCvv:        cardCvv,
 	}
 
 	resCard := Card{}
