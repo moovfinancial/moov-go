@@ -58,6 +58,8 @@ var (
 	ErrAuthCreditionalsNotSet = errors.New("API Keys are not set or invalid credentials")
 	ErrAuthNetwork            = errors.New("network error")
 	ErrNoAccount              = errors.New("no account with the specified accountID was found")
+	ErrRateLimit              = errors.New("request was refused due to rate limiting")
+	ErrDefault                = errors.New("empty response for unauthorized or any other returned http status code")
 )
 
 // New create4s a new Moov client with the appropriate secret key.
