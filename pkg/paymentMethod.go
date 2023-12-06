@@ -34,12 +34,12 @@ func (c Client) ListPaymentMethods(accountID string, sourceID string) ([]Payment
 			log.Println("Error unmarshalling JSON:", err)
 		}
 		return resPaymentMethods, nil
-	case http.StatusUnauthorized:
-		return resPaymentMethods, ErrAuthCreditionalsNotSet
 	case http.StatusNotFound:
 		return resPaymentMethods, ErrNoAccount
+	case http.StatusTooManyRequests:
+		return resPaymentMethods, ErrRateLimit
 	}
-	return resPaymentMethods, nil
+	return resPaymentMethods, ErrDefault
 }
 
 // GetPaymentMethod retrieves a payment method for the given payment method id
@@ -60,10 +60,10 @@ func (c Client) GetPaymentMethod(accountID string, paymentMethodID string) (Paym
 			log.Println("Error unmarshalling JSON:", err)
 		}
 		return resPaymentMethod, nil
-	case http.StatusUnauthorized:
-		return resPaymentMethod, ErrAuthCreditionalsNotSet
 	case http.StatusNotFound:
 		return resPaymentMethod, ErrNoAccount
+	case http.StatusTooManyRequests:
+		return resPaymentMethod, ErrRateLimit
 	}
-	return resPaymentMethod, nil
+	return resPaymentMethod, ErrDefault
 }
