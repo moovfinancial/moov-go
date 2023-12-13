@@ -3,6 +3,9 @@ package moov
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"github.com/stretchr/testify/suite"
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -204,4 +207,293 @@ func TestSynchronousTransferMarshalResponse(t *testing.T) {
 
 	assert.Equal(t, "Gym Dues", transfer.Source.AchDetails.CompanyEntryDescription)
 	t.Logf("%#v", transfer)
+}
+
+type TransferTestSuite struct {
+	suite.Suite
+	// values for testing will be set in init()
+	accountID           string
+	card                Card
+	deleteCardID        string
+	paymentMethodSource PaymentMethod
+	paymentMethodDest   PaymentMethod
+	transfer            SynchronousTransfer
+}
+
+// listen for 'go test' command --> run test methods
+func TestTransferSuite(t *testing.T) {
+	suite.Run(t, new(TransferTestSuite))
+}
+
+func (s *TransferTestSuite) SetupSuite() {
+	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	accounts, err := mc.ListAccounts()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, account := range accounts {
+		if account.DisaplayName == "Lincoln National Corporation" {
+			// set the accountID for testing
+			s.accountID = account.AccountID
+		}
+	}
+	// get card to get paymentID
+	cards, err := mc.ListCards(s.accountID)
+	if len(cards) == 0 {
+		card := CardPost{
+			CardNumber: "371111111111114",
+			CardCvv:    "1234",
+			Expiration: Expiration{
+				Month: "10",
+				Year:  "28",
+			},
+			HolderName: "Wade Arnold",
+			BillingAddress: Address{
+				AddressLine1:    "123 Main Street",
+				City:            "Golden",
+				StateOrProvince: "CO",
+				PostalCode:      "80401",
+				Country:         "US",
+			},
+		}
+
+		respCard, err := mc.CreateCard(s.accountID, card)
+		if err != nil {
+			s.T().Fatalf("Error creating card: %v", err)
+		}
+		s.card = respCard
+		s.deleteCardID = respCard.CardID
+	} else {
+		s.card = cards[0]
+		s.deleteCardID = ""
+	}
+
+	// get payment method from card
+	respPaymentMethods, err := mc.ListPaymentMethods(s.accountID, s.card.CardID)
+	s.paymentMethodSource = respPaymentMethods[0]
+
+	// get payment method of wallet
+	respWallets, err := mc.ListWallets(s.accountID)
+	respPaymentMethods1, err := mc.ListPaymentMethods(s.accountID, respWallets[0].WalletID)
+	s.paymentMethodDest = respPaymentMethods1[0]
+
+	//	get sample transfer
+	payload := SearchQueryPayload{}
+	respTransfers, err := mc.ListTransfers(payload)
+	if len(respTransfers) > 0 {
+		s.transfer = respTransfers[0]
+	}
+}
+
+func (s *TransferTestSuite) TearDownSuite() {
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//delete the card we created
+	if s.deleteCardID != "" {
+		err = mc.DisableCard(s.accountID, s.deleteCardID)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func (s *TransferTestSuite) TestCreateTransfer() {
+	source := Source{
+		PaymentMethodID: s.paymentMethodSource.PaymentMethodID,
+		Card:            s.card,
+		CardDetails: CardDetails{
+			DynamicDescriptor: "WhlBdy *Yoga 11-12",
+			TransactionSource: "first-recurring",
+		},
+	}
+	destination := Destination{
+		PaymentMethodID: s.paymentMethodDest.PaymentMethodID,
+		Wallet:          s.paymentMethodDest.Wallet,
+		AchDetails: AchDetails{
+			CompanyEntryDescription: "Gym Dues",
+			OriginatingCompanyName:  "Whole Body Fit",
+		},
+	}
+	amount := Amount{
+		Currency: "USD",
+		Value:    1204,
+	}
+	facilitatorFee := FacilitatorFee{
+		Total: 8, // $0.08
+	}
+	description := "Pay Instructor for May 15 Class"
+	metadata := map[string]string{
+		"property1": "string1",
+		"property2": "string2",
+	}
+
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	respTransfer, err := mc.CreateTransfer(source, destination, amount, facilitatorFee, description, metadata, true)
+	if err != nil {
+		s.T().Fatalf("Error creating transfer: %v", err)
+	}
+
+	assert.NotEmpty(s.T(), respTransfer.TransferID)
+	s.transfer = respTransfer
+}
+
+func (s *TransferTestSuite) TestListTransfers() {
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	payload := SearchQueryPayload{}
+	transfers, err := mc.ListTransfers(payload)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	fmt.Println(len(transfers))
+	assert.NotNil(s.T(), transfers)
+}
+
+func (s *TransferTestSuite) TestGetTransfer() {
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	transferID := "1ddcedb6-83a3-4ce9-89a4-c3d03106dda4"
+	if s.transfer.TransferID != "" {
+		transferID = s.transfer.TransferID
+	}
+	transfer, err := mc.GetTransfer(transferID, "")
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	assert.Equal(s.T(), transferID, transfer.TransferID)
+}
+
+func (s *TransferTestSuite) TestUpdateTransferMetaData() {
+	metadata := map[string]string{"property1": "property  1",
+		"property2": "property  2"}
+
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	transferID := "1ddcedb6-83a3-4ce9-89a4-c3d03106dda4"
+	if s.transfer.TransferID != "" {
+		transferID = s.transfer.TransferID
+	}
+
+	transfer, err := mc.UpdateTransferMetaData(transferID, "", metadata)
+	if err != nil {
+		s.T().Fatalf("Error updating transfer metadata: %v", err)
+	}
+
+	assert.Equal(s.T(), transfer.Metadata, metadata)
+}
+
+func (s *TransferTestSuite) TestTransferOptions() {
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	payload := TransferOptionsPayload{
+		Source: TransferOptionsSourcePayload{
+			PaymentMethodID: s.paymentMethodSource.PaymentMethodID,
+			AccountID:       s.accountID,
+		},
+		Destination: TransferOptionsDestinationPayload{
+			PaymentMethodID: s.paymentMethodSource.PaymentMethodID,
+			AccountID:       s.accountID,
+		},
+		Amount: Amount{
+			Currency: "USD",
+			Value:    1204,
+		},
+	}
+
+	options, err := mc.TransferOptions(payload)
+	if err != nil {
+		assert.Error(s.T(), err)
+	}
+
+	fmt.Println(options)
+	assert.NotNil(s.T(), options)
+}
+
+func (s *TransferTestSuite) TestRefundTransfer() {
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	transferID := "1ddcedb6-83a3-4ce9-89a4-c3d03106dda4"
+	if s.transfer.TransferID != "" {
+		transferID = s.transfer.TransferID
+	}
+	refund, err := mc.RefundTransfer(transferID, true, 1000)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	assert.NotEmpty(s.T(), refund.RefundID)
+}
+
+func (s *TransferTestSuite) TestListRefunds() {
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	transferID := "1ddcedb6-83a3-4ce9-89a4-c3d03106dda4"
+	if s.transfer.TransferID != "" {
+		transferID = s.transfer.TransferID
+	}
+	refunds, err := mc.ListRefunds(transferID)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	fmt.Println(len(refunds))
+	assert.NotNil(s.T(), refunds)
+}
+
+func (s *TransferTestSuite) TestGetRefund() {
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	transferID := "1ddcedb6-83a3-4ce9-89a4-c3d03106dda4"
+	if s.transfer.TransferID != "" {
+		transferID = s.transfer.TransferID
+	}
+
+	refundID := "8b491eb3-a262-4eba-a0ca-35983bef3262"
+	refund, err := mc.GetRefund(transferID, refundID)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	assert.Equal(s.T(), refundID, refund.RefundID)
+}
+
+func (s *TransferTestSuite) TestReverseTransfer() {
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	transferID := "1ddcedb6-83a3-4ce9-89a4-c3d03106dda4"
+	if s.transfer.TransferID != "" {
+		transferID = s.transfer.TransferID
+	}
+
+	reverse, err := mc.ReverseTransfer(transferID, 50)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	assert.NotEmpty(s.T(), reverse.Refund.RefundID)
 }

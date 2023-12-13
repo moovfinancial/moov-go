@@ -123,6 +123,22 @@ type RefundPayload struct {
 	Amount int `json:"amount,omitempty"`
 }
 
+type TransferOptionsSourcePayload struct {
+	PaymentMethodID string `json:"paymentMethodID,omitempty"`
+	AccountID       string `json:"accountID,omitempty"`
+}
+
+type TransferOptionsDestinationPayload struct {
+	PaymentMethodID string `json:"paymentMethodID,omitempty"`
+	AccountID       string `json:"accountID,omitempty"`
+}
+
+type TransferOptionsPayload struct {
+	Source      TransferOptionsSourcePayload      `json:"source,omitempty"`
+	Destination TransferOptionsDestinationPayload `json:"destination,omitempty"`
+	Amount      Amount                            `json:"amount,omitempty"`
+}
+
 type CreatedTransferOptions struct {
 	SourceOptions      []Source `json:"sourceOptions,omitempty"`
 	DestinationOptions []Source `json:"destinationOptions,omitempty"`
@@ -133,9 +149,14 @@ type RefundStatus struct {
 	CreatedOn time.Time `json:"createdOn,omitempty"`
 }
 
+type CanceledTransfer struct {
+	Cancellation RefundStatus `json:"cancellation,omitempty"`
+	Refund       Refund       `json:"refund,omitempty"`
+}
+
 // CreateTransfer creates a new transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
-func (c Client) CreateTransfer(trans SynchronousTransfer, isSync bool) (SynchronousTransfer, error) {
+func (c Client) CreateTransfer(source Source, destination Destination, amount Amount, facilitatorFee FacilitatorFee, description string, metadata map[string]string, isSync bool) (SynchronousTransfer, error) {
 	respTransfer := SynchronousTransfer{}
 
 	urlStr := fmt.Sprintf("%s/%s", baseURL, pathTransfers)
@@ -144,6 +165,15 @@ func (c Client) CreateTransfer(trans SynchronousTransfer, isSync bool) (Synchron
 	if isSync {
 		header["X-Wait-For"] = "rail-response"
 	}
+
+	trans := SynchronousTransfer{
+		Source:         source,
+		Destination:    destination,
+		Amount:         amount,
+		FacilitatorFee: facilitatorFee,
+		Description:    description,
+		Metadata:       metadata,
+	}
 	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, urlStr, trans, header)
 
 	if err != nil {
@@ -151,9 +181,7 @@ func (c Client) CreateTransfer(trans SynchronousTransfer, isSync bool) (Synchron
 	}
 
 	switch statusCode {
-	case http.StatusOK:
-	case http.StatusCreated:
-	case http.StatusAccepted:
+	case http.StatusOK, http.StatusCreated, http.StatusAccepted:
 		err = json.Unmarshal(body, &respTransfer)
 		if err != nil {
 			log.Println("Error unmarshalling JSON:", err)
@@ -296,14 +324,9 @@ func (c Client) UpdateTransferMetaData(transferID string, accountID string, meta
 
 // TransferOptions lists all transfer options between a source and destination
 // https://docs.moov.io/api/#tag/Transfers/operation/createTransferOptions
-func (c Client) TransferOptions(source Source, destination Destination, amount Amount) (CreatedTransferOptions, error) {
+func (c Client) TransferOptions(payload TransferOptionsPayload) (CreatedTransferOptions, error) {
 	var respOptions CreatedTransferOptions
 	urlStr := fmt.Sprintf("%s/%s", baseURL, pathTransferOptions)
-	payload := SynchronousTransfer{
-		Source:      source,
-		Destination: destination,
-		Amount:      amount,
-	}
 
 	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, urlStr, payload, nil)
 	if err != nil {
@@ -345,8 +368,7 @@ func (c Client) RefundTransfer(transferID string, isSync bool, amount int) (Refu
 	}
 
 	switch statusCode {
-	case http.StatusOK:
-	case http.StatusAccepted:
+	case http.StatusOK, http.StatusAccepted:
 		err = json.Unmarshal(body, &respRefund)
 		if err != nil {
 			log.Println("Error unmarshalling JSON:", err)
@@ -418,8 +440,8 @@ func (c Client) GetRefund(transferID string, refundID string) (Refund, error) {
 
 // ReverseTransfer reverses a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/reverseTransfer
-func (c Client) ReverseTransfer(transferID string, amount int) (RefundStatus, error) {
-	respStatus := RefundStatus{}
+func (c Client) ReverseTransfer(transferID string, amount int) (CanceledTransfer, error) {
+	respTransfer := CanceledTransfer{}
 
 	urlStr := fmt.Sprintf("%s/%s/%s/reversals", baseURL, pathTransfers, transferID)
 	uuidV4 := uuid.NewString()
@@ -432,27 +454,26 @@ func (c Client) ReverseTransfer(transferID string, amount int) (RefundStatus, er
 	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, urlStr, refundPayload, header)
 
 	if err != nil {
-		return respStatus, err
+		return respTransfer, err
 	}
 
 	switch statusCode {
-	case http.StatusOK:
-	case http.StatusAccepted:
-		err = json.Unmarshal(body, &respStatus)
+	case http.StatusOK, http.StatusAccepted:
+		err = json.Unmarshal(body, &respTransfer)
 		if err != nil {
 			log.Println("Error unmarshalling JSON:", err)
 		}
-		return respStatus, nil
+		return respTransfer, nil
 	case http.StatusBadRequest:
 		var err error
 		_ = json.Unmarshal(body, &err)
-		return respStatus, err
+		return respTransfer, err
 	case http.StatusConflict:
-		return respStatus, ErrXIdempotencyKey
+		return respTransfer, ErrXIdempotencyKey
 	case http.StatusUnprocessableEntity:
-		return respStatus, ErrRequestBody
+		return respTransfer, ErrRequestBody
 	case http.StatusTooManyRequests:
-		return respStatus, ErrRateLimit
+		return respTransfer, ErrRateLimit
 	}
-	return respStatus, ErrDefault
+	return respTransfer, ErrDefault
 }
