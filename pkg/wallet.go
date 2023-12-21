@@ -83,7 +83,7 @@ func (c Client) GetWallet(accountID string, walletID string) (Wallet, error) {
 		}
 		return resWallet, nil
 	case http.StatusUnauthorized:
-		return resWallet, ErrAuthCreditionalsNotSet
+		return resWallet, ErrAuthCredentialsNotSet
 	case http.StatusNotFound:
 		return resWallet, ErrNoAccount
 	case http.StatusTooManyRequests:
@@ -137,7 +137,7 @@ func (c Client) GetWalletTransaction(accountID string, walletID string, transact
 		}
 		return resTransaction, nil
 	case http.StatusUnauthorized:
-		return resTransaction, ErrAuthCreditionalsNotSet
+		return resTransaction, ErrAuthCredentialsNotSet
 	case http.StatusNotFound:
 		return resTransaction, ErrNoAccount
 	case http.StatusTooManyRequests:

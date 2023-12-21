@@ -2,7 +2,6 @@ package moov
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -94,17 +93,17 @@ func (c Client) CreateCard(accountID string, card CardPost) (Card, error) {
 		}
 		return respCard, nil
 	case http.StatusUnauthorized:
-		return respCard, ErrAuthCreditionalsNotSet
+		return respCard, ErrAuthCredentialsNotSet
 	case http.StatusNotFound:
 		return respCard, ErrNoAccount
 	case http.StatusConflict:
-		return respCard, errors.New("attempted to link card that already exists on the account")
+		return respCard, ErrDuplicateLinkCard
 	case http.StatusUnprocessableEntity:
-		return respCard, errors.New("the supplied card data appeared invalid or was declined by the issuer")
+		return respCard, ErrCardDataInvalid
 	case http.StatusTooManyRequests:
-		return respCard, errors.New("request was refused due to rate limiting")
+		return respCard, ErrRateLimit
 	}
-	return respCard, nil
+	return respCard, ErrDefault
 }
 
 // ListCards lists all cards for the given customer Moov account
@@ -126,13 +125,13 @@ func (c Client) ListCards(accountID string) ([]Card, error) {
 		}
 		return resCards, nil
 	case http.StatusUnauthorized:
-		return resCards, ErrAuthCreditionalsNotSet
+		return resCards, ErrAuthCredentialsNotSet
 	case http.StatusNotFound:
 		return resCards, ErrNoAccount
-	case http.StatusUnprocessableEntity:
-		log.Println("UnprocessableEntity")
+	case http.StatusTooManyRequests:
+		return resCards, ErrRateLimit
 	}
-	return resCards, nil
+	return resCards, ErrDefault
 }
 
 // GetCard retrieves a card for the given customer Moov account
@@ -154,13 +153,13 @@ func (c Client) GetCard(accountID string, cardID string) (Card, error) {
 		}
 		return resCard, nil
 	case http.StatusUnauthorized:
-		return resCard, ErrAuthCreditionalsNotSet
+		return resCard, ErrAuthCredentialsNotSet
 	case http.StatusNotFound:
 		return resCard, ErrNoAccount
-	case http.StatusUnprocessableEntity:
-		log.Println("UnprocessableEntity")
+	case http.StatusTooManyRequests:
+		return resCard, ErrRateLimit
 	}
-	return resCard, nil
+	return resCard, ErrDefault
 }
 
 // UpdateCard Update a linked card and/or resubmit it for verification.
@@ -190,17 +189,17 @@ func (c Client) UpdateCard(accountID string, cardID string, card Card, cardCvv s
 		}
 		return resCard, nil
 	case http.StatusUnauthorized:
-		return resCard, ErrAuthCreditionalsNotSet
+		return resCard, ErrAuthCredentialsNotSet
 	case http.StatusNotFound:
 		return resCard, ErrNoAccount
 	case http.StatusConflict:
-		return resCard, errors.New("attempted to link card that already exists on the account")
+		return resCard, ErrDuplicateLinkCard
 	case http.StatusUnprocessableEntity:
-		return resCard, errors.New("the supplied card data appeared invalid or was declined by the issuer")
+		return resCard, ErrCardDataInvalid
 	case http.StatusTooManyRequests:
-		return resCard, errors.New("request was refused due to rate limiting")
+		return resCard, ErrRateLimit
 	}
-	return resCard, nil
+	return resCard, ErrDefault
 }
 
 // DisableCard disables a card associated with a Moov account
@@ -218,11 +217,11 @@ func (c Client) DisableCard(accountID string, cardID string) error {
 		// card deleted
 		return nil
 	case http.StatusUnauthorized:
-		return ErrAuthCreditionalsNotSet
+		return ErrAuthCredentialsNotSet
 	case http.StatusNotFound:
 		return ErrNoAccount
-	case http.StatusUnprocessableEntity:
-		log.Println("UnprocessableEntity")
+	case http.StatusTooManyRequests:
+		return ErrRateLimit
 	}
 	return nil
 }
