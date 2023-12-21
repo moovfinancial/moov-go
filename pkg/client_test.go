@@ -8,5 +8,5 @@ import (
 
 func TestNewClientErr(t *testing.T) {
 	_, err := NewClient()
-	assert.Equal(t, ErrAuthCreditionalsNotSet, err)
+	assert.Equal(t, ErrAuthCredentialsNotSet, err)
 }

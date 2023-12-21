@@ -279,7 +279,7 @@ type TermsOfServiceManual struct {
 	AcceptedDate      string `json:"acceptedDate,omitempty"`
 	AcceptedIP        string `json:"acceptedIP,omitempty"`
 	AcceptedUserAgent string `json:"acceptedUserAgent,omitempty"`
-	AccepetedDomain   string `json:"acceptedDomain,omitempty"`
+	AcceptedDomain    string `json:"acceptedDomain,omitempty"`
 }
 
 type CustomerSupport struct {
@@ -390,12 +390,13 @@ func (c Client) CreateAccount(account Account) (Account, error) {
 		}
 		return respAccount, nil
 	case http.StatusUnauthorized:
-		return respAccount, ErrAuthCreditionalsNotSet
+		return respAccount, ErrAuthCredentialsNotSet
 	case http.StatusUnprocessableEntity:
-		log.Println("UnprocessableEntity")
-		// TODO: error Account sent to server is missing or malformed
+		return respAccount, ErrBadRequest
+	case http.StatusTooManyRequests:
+		return respAccount, ErrRateLimit
 	}
-	return respAccount, nil
+	return respAccount, ErrDefault
 }
 
 // GetAccount returns an account based on accountID.
@@ -423,12 +424,13 @@ func (c Client) GetAccount(accountID string) (Account, error) {
 		}
 		return respAccount, nil
 	case http.StatusUnauthorized:
-		return respAccount, ErrAuthCreditionalsNotSet
+		return respAccount, ErrAuthCredentialsNotSet
 	case http.StatusUnprocessableEntity:
-		log.Println("UnprocessableEntity")
-		// TODO: error Account sent to server is missing or malformed
+		return respAccount, ErrBadRequest
+	case http.StatusTooManyRequests:
+		return respAccount, ErrRateLimit
 	}
-	return respAccount, nil
+	return respAccount, ErrDefault
 }
 
 // UpdateAccount updates an account.
@@ -457,12 +459,13 @@ func (c Client) UpdateAccount(account Account) (Account, error) {
 		}
 		return respAccount, nil
 	case http.StatusUnauthorized:
-		return respAccount, ErrAuthCreditionalsNotSet
+		return respAccount, ErrAuthCredentialsNotSet
 	case http.StatusUnprocessableEntity:
-		log.Println("UnprocessableEntity")
-		// TODO: error Account sent to server is missing or malformed
+		return respAccount, ErrBadRequest
+	case http.StatusTooManyRequests:
+		return respAccount, ErrRateLimit
 	}
-	return respAccount, nil
+	return respAccount, ErrDefault
 }
 
 // ListAccounts returns a list of accounts.
@@ -490,12 +493,13 @@ func (c Client) ListAccounts() ([]Account, error) {
 		}
 		return respAccounts, nil
 	case http.StatusUnauthorized:
-		return respAccounts, ErrAuthCreditionalsNotSet
+		return respAccounts, ErrAuthCredentialsNotSet
 	case http.StatusUnprocessableEntity:
-		// TODO: make a typed error
-		log.Println("UnprocessableEntity")
+		return respAccounts, ErrBadRequest
+	case http.StatusTooManyRequests:
+		return respAccounts, ErrRateLimit
 	}
-	return respAccounts, nil
+	return respAccounts, ErrDefault
 }
 
 // DeleteAccount deletes an account.
@@ -519,7 +523,7 @@ func (c Client) ListAccounts() ([]Account, error) {
 		// Account created
 		return nil
 	case http.StatusUnauthorized:
-		return ErrAuthCreditionalsNotSet
+		return ErrAuthCredentialsNotSet
 	case http.StatusUnprocessableEntity:
 		log.Println("UnprocessableEntity")
 	}
