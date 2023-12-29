@@ -42,16 +42,17 @@ const (
 )
 
 const (
-	baseURL            = "https://api.moov.io"
-	pathBankAccounts   = "accounts/%s/bank-accounts"
-	pathCards          = "accounts/%s/cards"
-	pathApplePay       = "accounts/%s/apple-pay"
-	pathPaymentMethods = "accounts/%s/payment-methods"
-	pathWallets        = "accounts/%s/wallets"
-	pathWalletTrans    = "accounts/%s/wallets/%s/transactions"
-	pathTransactions   = "accounts/%s/transactions"
-	pathTransfers      = "transfers"
-	pathDisputes       = "disputes"
+	baseURL             = "https://api.moov.io"
+	pathBankAccounts    = "accounts/%s/bank-accounts"
+	pathCards           = "accounts/%s/cards"
+	pathApplePay        = "accounts/%s/apple-pay"
+	pathPaymentMethods  = "accounts/%s/payment-methods"
+	pathWallets         = "accounts/%s/wallets"
+	pathWalletTrans     = "accounts/%s/wallets/%s/transactions"
+	pathTransactions    = "accounts/%s/transactions"
+	pathTransfers       = "transfers"
+	pathTransferOptions = "transfer-options"
+	pathDisputes        = "disputes"
 )
 
 var (
@@ -68,8 +69,31 @@ var (
 	ErrDomainsNotRegistered     = errors.New("no Apple Pay domains registered for this account were found")
 	ErrLinkingApplePayToken     = errors.New("an error occurred when linking an Apple Pay token")
 	ErrRateLimit                = errors.New("request was refused due to rate limiting")
+	ErrXIdempotencyKey        = errors.New("attempted to create a transfer using a duplicate X-Idempotency-Key header")
 	ErrDefault                  = errors.New("empty response for unauthorized or any other returned http status code")
 )
+
+type TransferStatus int
+
+const (
+	TransferStatusCreated TransferStatus = iota
+	TransferStatusPending
+	TransferStatusCompleted
+	TransferStatusFailed
+	TransferStatusReversed
+	TransferStatusQueued
+	TransferStatusCanceled
+)
+
+var TransferStatusStrings = map[TransferStatus]string{
+	TransferStatusCreated:   "created",
+	TransferStatusPending:   "pending",
+	TransferStatusCompleted: "completed",
+	TransferStatusFailed:    "failed",
+	TransferStatusReversed:  "reversed",
+	TransferStatusQueued:    "queued",
+	TransferStatusCanceled:  "canceled",
+}
 
 // New create4s a new Moov client with the appropriate secret key.
 
