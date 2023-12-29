@@ -15,10 +15,6 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-var (
-	accountID string
-)
-
 func TestCardMarshal(t *testing.T) {
 	input := []byte(`{
 		  "cardID": "ec7e1848-dc80-4ab0-8827-dd7fc0737b43",

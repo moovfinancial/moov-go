@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/suite"
 	"log"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -242,7 +243,7 @@ func (s *TransferTestSuite) SetupSuite() {
 		}
 	}
 	// get card to get paymentID
-	cards, err := mc.ListCards(s.accountID)
+	cards, _ := mc.ListCards(s.accountID)
 	if len(cards) == 0 {
 		card := CardPost{
 			CardNumber: "371111111111114",
@@ -273,17 +274,17 @@ func (s *TransferTestSuite) SetupSuite() {
 	}
 
 	// get payment method from card
-	respPaymentMethods, err := mc.ListPaymentMethods(s.accountID, s.card.CardID)
+	respPaymentMethods, _ := mc.ListPaymentMethods(s.accountID, s.card.CardID)
 	s.paymentMethodSource = respPaymentMethods[0]
 
 	// get payment method of wallet
-	respWallets, err := mc.ListWallets(s.accountID)
-	respPaymentMethods1, err := mc.ListPaymentMethods(s.accountID, respWallets[0].WalletID)
+	respWallets, _ := mc.ListWallets(s.accountID)
+	respPaymentMethods1, _ := mc.ListPaymentMethods(s.accountID, respWallets[0].WalletID)
 	s.paymentMethodDest = respPaymentMethods1[0]
 
 	//	get sample transfer
 	payload := SearchQueryPayload{}
-	respTransfers, err := mc.ListTransfers(payload)
+	respTransfers, _ := mc.ListTransfers(payload)
 	if len(respTransfers) > 0 {
 		s.transfer = respTransfers[0]
 	}

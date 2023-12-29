@@ -59,10 +59,8 @@ func GetHTTPResponse(c Client, method string, url string, data any, header map[s
 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	if header != nil {
-		for key, val := range header {
-			req.Header.Set(key, val)
-		}
+	for key, val := range header {
+		req.Header.Set(key, val)
 	}
 	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 
