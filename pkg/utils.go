@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
@@ -69,8 +68,5 @@ func GetHTTPResponse(c Client, method string, url string, data any, header map[s
 	}
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
-
-	log.Printf("fetch data from url:\n%s\n response:\n%s", url, string(body))
-
 	return body, resp.StatusCode, nil
 }

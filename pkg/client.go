@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -72,6 +71,7 @@ var (
 	ErrRateLimit                = errors.New("request was refused due to rate limiting")
 	ErrXIdempotencyKey          = errors.New("attempted to create a transfer using a duplicate X-Idempotency-Key header")
 	ErrDefault                  = errors.New("empty response for unauthorized or any other returned http status code")
+	ErrURL                      = errors.New("invalid URL")
 )
 
 type TransferStatus int
@@ -127,7 +127,6 @@ func NewClient() (*Client, error) {
 	if err != nil {
 		return nc, err
 	}
-
 	return nc, nil
 }
 
@@ -135,39 +134,33 @@ func (c *Client) ScopedAccessToken(accountID string, scope []string) (ClientCred
 	token := ClientCredentialsGrantToAccessTokenResponse{}
 	renderedScope := make([]string, len(scope))
 	for i := 0; i < len(scope); i++ {
-		// TODO: check if string is null or empty
 		renderedScope[i] = strings.Replace(scope[i], "{accountID}", accountID, 1)
 	}
 	params := url.Values{}
 	params.Add("grant_type", "client_credentials")
 	params.Add("scope", strings.Join(renderedScope, " "))
 	req, err := http.NewRequest("POST", "https://api.moov.io/oauth2/token?"+params.Encode(), nil)
-	log.Println("https://api.moov.io/oauth2/token?" + params.Encode())
 	if err != nil {
-		// Todo: return an error
-		log.Fatal(err)
+		err := errors.Join(err, ErrURL)
+		return token, err
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
 	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		// Todo: return an error
-		log.Fatal(err)
+		// *url.Error
+		return token, err
 	}
 	defer resp.Body.Close()
 
 	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		// Todo: return an error
-		log.Fatal(err)
+		return token, err
 	}
-
-	if err := json.Unmarshal(resBody, &token); err != nil { // Parse []byte to go struct pointer
-		// Todo: return an error
-		log.Fatal("Can not unmarshal JSON")
+	if err := json.Unmarshal(resBody, &token); err != nil {
+		return token, err
 	}
 	return token, nil
 }
@@ -180,8 +173,8 @@ func (c Client) SingleUseAccessToken() (ClientCredentialsGrantToAccessTokenRespo
 	params.Add("scope", "/accounts.write")
 	req, err := http.NewRequest("POST", "https://api.moov.io/oauth2/token?"+params.Encode(), nil)
 	if err != nil {
-		// Todo: return an error
-		log.Fatal(err)
+		err := errors.Join(err, ErrURL)
+		return token, err
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -190,20 +183,17 @@ func (c Client) SingleUseAccessToken() (ClientCredentialsGrantToAccessTokenRespo
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		// Todo: return an error
-		log.Fatal(err)
+		// *url.Error
+		return token, err
 	}
 	defer resp.Body.Close()
 
 	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		// Todo: return an error
-		log.Fatal(err)
+		return token, err
 	}
-
 	if err := json.Unmarshal(resBody, &token); err != nil { // Parse []byte to go struct pointer
-		// Todo: return an error
-		log.Fatal("Can not unmarshal JSON")
+		return token, err
 	}
 	return token, nil
 }

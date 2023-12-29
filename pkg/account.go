@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"time"
 )
@@ -289,8 +288,6 @@ type CustomerSupport struct {
 	Website string  `json:"website,omitempty"`
 }
 
-// TODO: Add jsonValue() interface{} to CustomerSupport
-
 type CardPayment struct {
 	StatementDescriptor string `json:"statementDescriptor,omitempty"`
 }
@@ -385,8 +382,7 @@ func (c Client) CreateAccount(account Account) (Account, error) {
 		// Account created
 		err = json.Unmarshal(body, &respAccount)
 		if err != nil {
-			// TODO: make a typed error
-			log.Println("Error unmarshalling JSON:", err)
+			return respAccount, err
 		}
 		return respAccount, nil
 	case http.StatusUnauthorized:
@@ -416,11 +412,9 @@ func (c Client) GetAccount(accountID string) (Account, error) {
 	body, _ := io.ReadAll(resp.Body)
 	switch resp.StatusCode {
 	case http.StatusOK:
-		// Account created
 		err = json.Unmarshal(body, &respAccount)
 		if err != nil {
-			// TODO: make a typed error
-			log.Println("Error unmarshalling JSON:", err)
+			return respAccount, ErrDefault
 		}
 		return respAccount, nil
 	case http.StatusUnauthorized:
@@ -454,8 +448,7 @@ func (c Client) UpdateAccount(account Account) (Account, error) {
 		// Account Updated
 		err = json.Unmarshal(body, &respAccount)
 		if err != nil {
-			// TODO: make a typed error
-			log.Println("Error unmarshalling JSON:", err)
+			return respAccount, ErrDefault
 		}
 		return respAccount, nil
 	case http.StatusUnauthorized:
@@ -488,8 +481,7 @@ func (c Client) ListAccounts() ([]Account, error) {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &respAccounts)
 		if err != nil {
-			// TODO: make a typed error
-			log.Println("Error unmarshalling JSON:", err)
+			return respAccounts, ErrDefault
 		}
 		return respAccounts, nil
 	case http.StatusUnauthorized:

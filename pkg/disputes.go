@@ -3,7 +3,6 @@ package moov
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -84,7 +83,7 @@ func (c Client) ListDisputes(count int,
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resp)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return resp, err
 		}
 		return resp, nil
 	case http.StatusTooManyRequests:
@@ -108,7 +107,7 @@ func (c Client) GetDispute(disputeID string) (Dispute, error) {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resp)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return resp, err
 		}
 		return resp, nil
 	case http.StatusNotFound:
