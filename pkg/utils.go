@@ -12,10 +12,8 @@ import (
 )
 
 type Credentials struct {
-	AccountID string `yaml:"account_id,omitempty"`
 	PublicKey string `yaml:"public_key,omitempty"`
 	SecretKey string `yaml:"secret_key,omitempty"`
-	Domain    string `yaml:"domain,omitempty"`
 }
 
 func readConfig() (Credentials, error) {

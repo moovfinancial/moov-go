@@ -96,8 +96,6 @@ var TransferStatusStrings = map[TransferStatus]string{
 	TransferStatusCanceled:  "canceled",
 }
 
-// New create4s a new Moov client with the appropriate secret key.
-
 type Client struct {
 	Credentials Credentials
 }
@@ -114,16 +112,13 @@ func NewClient() (*Client, error) {
 	credentials, err := readConfig()
 
 	if err != nil || credentials.PublicKey == "" || credentials.SecretKey == "" {
-		// Make error for token's not set.
 		return nil, ErrAuthCredentialsNotSet
 	}
 
 	nc := &Client{
 		Credentials: Credentials{
-			AccountID: credentials.AccountID,
 			PublicKey: credentials.PublicKey,
 			SecretKey: credentials.SecretKey,
-			Domain:    credentials.Domain,
 		},
 	}
 

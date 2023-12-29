@@ -1,6 +1,4 @@
 # Generate API keys from the Moov Dashboard. Sandbox keys are not compatible with production.
 
-account_id: account_id
 public_key: public_key
 secret_key: secret_key
-domain:    domain

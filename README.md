@@ -12,10 +12,8 @@ This SDK requires and API key. To generate an API login to the Moov Dashboard an
 
 After getting API keys, you need to set up on `config.yaml` file
 ```
-account_id: account_id
 public_key: public_key
 secret_key: secret_key
-domain    : domain
 ```
 
 ## Basic Usage 

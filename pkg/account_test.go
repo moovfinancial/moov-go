@@ -117,7 +117,7 @@ func TestListAccounts(t *testing.T) {
 	assert.NotNil(t, accounts)
 }
 
-/**func TestDeleateAccount(t *testing.T) {
+/* func TestDeleateAccount(t *testing.T) {
 	mc, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
@@ -129,4 +129,4 @@ func TestListAccounts(t *testing.T) {
 		assert.Error(t, err)
 	}
 
-}**/
+} */
