@@ -57,6 +57,7 @@ const (
 
 var (
 	ErrAuthCredentialsNotSet    = errors.New("API Keys are not set or invalid credentials")
+	ErrRequestBody              = errors.New("request body could not be parsed")
 	ErrAuthNetwork              = errors.New("network error")
 	ErrNoAccount                = errors.New("no account with the specified accountID was found")
 	ErrBadRequest               = errors.New("the request body could not be processed")
@@ -69,7 +70,7 @@ var (
 	ErrDomainsNotRegistered     = errors.New("no Apple Pay domains registered for this account were found")
 	ErrLinkingApplePayToken     = errors.New("an error occurred when linking an Apple Pay token")
 	ErrRateLimit                = errors.New("request was refused due to rate limiting")
-	ErrXIdempotencyKey        = errors.New("attempted to create a transfer using a duplicate X-Idempotency-Key header")
+	ErrXIdempotencyKey          = errors.New("attempted to create a transfer using a duplicate X-Idempotency-Key header")
 	ErrDefault                  = errors.New("empty response for unauthorized or any other returned http status code")
 )
 
