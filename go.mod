@@ -1,6 +1,6 @@
 module github.com/moovfinancial/moov-go
 
-go 1.21.4
+go 1.21.5
 
 require (
 	github.com/google/uuid v1.5.0
