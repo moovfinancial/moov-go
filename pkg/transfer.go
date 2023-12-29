@@ -66,12 +66,6 @@ type Refund struct {
 	CardDetails CardDetails `json:"cardDetails,omitempty"`
 }
 
-type Dispute struct {
-	DisputeID string    `json:"disputeID,omitempty"`
-	CreatedOn time.Time `json:"createdOn,omitempty"`
-	Amount    Amount    `json:"amount,omitempty"`
-}
-
 type Source struct {
 	PaymentMethodID   string          `json:"paymentMethodID,omitempty"`
 	PaymentMethodType string          `json:"paymentMethodType,omitempty"`

@@ -83,39 +83,45 @@ func (c Client) CreateBankAccount(accountID string, bankAccount BankAccount) (Ba
 			log.Println("Error unmarshalling JSON:", err)
 		}
 		return respBankAccount, nil
+	case http.StatusUnauthorized:
+		return respBankAccount, ErrAuthCredentialsNotSet
+	case http.StatusNotFound:
+		return respBankAccount, ErrNoAccount
 	case http.StatusConflict:
 		return respBankAccount, ErrDuplicateBankAccount
-	case http.StatusUnauthorized:
-		return respBankAccount, ErrAuthCreditionalsNotSet
 	case http.StatusUnprocessableEntity:
-		log.Println("UnprocessableEntity")
+		return respBankAccount, ErrBadRequest
+	case http.StatusTooManyRequests:
+		return respBankAccount, ErrRateLimit
 	}
-	return respBankAccount, nil
+	return respBankAccount, ErrDefault
 }
 
 // GetBankAccount retrieves a bank account for the given customer account
 func (c Client) GetBankAccount(accountID string, bankAccountID string) (BankAccount, error) {
-	resAccount := BankAccount{}
+	respBankAccount := BankAccount{}
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathBankAccounts, accountID), bankAccountID)
 
 	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
 	if err != nil {
-		return resAccount, err
+		return respBankAccount, err
 	}
 
 	switch statusCode {
 	case http.StatusOK:
-		err = json.Unmarshal(body, &resAccount)
+		err = json.Unmarshal(body, &respBankAccount)
 		if err != nil {
 			log.Println("Error unmarshalling JSON:", err)
 		}
-		return resAccount, nil
+		return respBankAccount, nil
 	case http.StatusUnauthorized:
-		return resAccount, ErrAuthCreditionalsNotSet
-	case http.StatusUnprocessableEntity:
-		log.Println("UnprocessableEntity")
+		return respBankAccount, ErrAuthCredentialsNotSet
+	case http.StatusNotFound:
+		return respBankAccount, ErrNoAccount
+	case http.StatusTooManyRequests:
+		return respBankAccount, ErrRateLimit
 	}
-	return resAccount, nil
+	return respBankAccount, ErrDefault
 }
 
 // DeleteBankAccount deletes a bank account for the given customer account
@@ -132,11 +138,13 @@ func (c Client) DeleteBankAccount(accountID string, bankAccountID string) error 
 		// Account deleted
 		return nil
 	case http.StatusUnauthorized:
-		return ErrAuthCreditionalsNotSet
-	case http.StatusUnprocessableEntity:
-		log.Println("UnprocessableEntity")
+		return ErrAuthCredentialsNotSet
+	case http.StatusNotFound:
+		return ErrNoAccount
+	case http.StatusTooManyRequests:
+		return ErrRateLimit
 	}
-	return nil
+	return ErrDefault
 }
 
 // ListBankAccounts lists all bank accounts for the given customer account
@@ -157,11 +165,13 @@ func (c Client) ListBankAccounts(accountID string) ([]BankAccount, error) {
 		}
 		return resAccounts, nil
 	case http.StatusUnauthorized:
-		return resAccounts, ErrAuthCreditionalsNotSet
-	case http.StatusUnprocessableEntity:
-		log.Println("UnprocessableEntity")
+		return resAccounts, ErrAuthCredentialsNotSet
+	case http.StatusNotFound:
+		return resAccounts, ErrNoAccount
+	case http.StatusTooManyRequests:
+		return resAccounts, ErrRateLimit
 	}
-	return resAccounts, nil
+	return resAccounts, ErrDefault
 }
 
 // MicroDepositInitiate creates a new micro deposit verification for the given bank account
@@ -177,9 +187,13 @@ func (c Client) MicroDepositInitiate(accountID string, bankAccountID string) err
 	case http.StatusNoContent:
 		return nil
 	case http.StatusUnauthorized:
-		return ErrAuthCreditionalsNotSet
+		return ErrAuthCredentialsNotSet
+	case http.StatusNotFound:
+		return ErrNoAccount
 	case http.StatusUnprocessableEntity:
-		log.Println("UnprocessableEntity")
+		return ErrInvalidBankAccount
+	case http.StatusTooManyRequests:
+		return ErrRateLimit
 	}
 	return nil
 }
@@ -197,9 +211,13 @@ func (c Client) MicroDepositConfirm(accountID string, bankAccountID string, amou
 	case http.StatusOK:
 		return nil
 	case http.StatusUnauthorized:
-		return ErrAuthCreditionalsNotSet
-	case http.StatusUnprocessableEntity:
-		log.Println("UnprocessableEntity")
+		return ErrAuthCredentialsNotSet
+	case http.StatusNotFound:
+		return ErrNoAccount
+	case http.StatusConflict:
+		return ErrAmountIncorrect
+	case http.StatusTooManyRequests:
+		return ErrRateLimit
 	}
 	return nil
 }

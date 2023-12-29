@@ -56,13 +56,21 @@ const (
 )
 
 var (
-	ErrAuthCreditionalsNotSet = errors.New("API Keys are not set or invalid credentials")
-	ErrAuthNetwork            = errors.New("network error")
-	ErrNoAccount              = errors.New("no account with the specified accountID was found")
-	ErrRateLimit              = errors.New("request was refused due to rate limiting")
-	ErrRequestBody            = errors.New("the request body could not be processed")
+	ErrAuthCredentialsNotSet    = errors.New("API Keys are not set or invalid credentials")
+	ErrAuthNetwork              = errors.New("network error")
+	ErrNoAccount                = errors.New("no account with the specified accountID was found")
+	ErrBadRequest               = errors.New("the request body could not be processed")
+	ErrInvalidBankAccount       = errors.New("the bank account is not a bank account or is already pending verification")
+	ErrAmountIncorrect          = errors.New("the amounts provided are incorrect or the bank account is in an unexpected state")
+	ErrDuplicateLinkCard        = errors.New("attempted to link card that already exists on the account")
+	ErrCardDataInvalid          = errors.New("the supplied card data appeared invalid or was declined by the issuer")
+	ErrDuplicatedApplePayDomain = errors.New("apple Pay domains already registered for this account")
+	ErrDomainsNotVerified       = errors.New("domains not verified with Apple")
+	ErrDomainsNotRegistered     = errors.New("no Apple Pay domains registered for this account were found")
+	ErrLinkingApplePayToken     = errors.New("an error occurred when linking an Apple Pay token")
+	ErrRateLimit                = errors.New("request was refused due to rate limiting")
 	ErrXIdempotencyKey        = errors.New("attempted to create a transfer using a duplicate X-Idempotency-Key header")
-	ErrDefault                = errors.New("empty response for unauthorized or any other returned http status code")
+	ErrDefault                  = errors.New("empty response for unauthorized or any other returned http status code")
 )
 
 type TransferStatus int
@@ -106,7 +114,7 @@ func NewClient() (*Client, error) {
 
 	if err != nil || credentials.PublicKey == "" || credentials.SecretKey == "" {
 		// Make error for token's not set.
-		return nil, ErrAuthCreditionalsNotSet
+		return nil, ErrAuthCredentialsNotSet
 	}
 
 	nc := &Client{
@@ -222,7 +230,7 @@ func (c Client) Ping() error {
 	case http.StatusOK:
 		return nil
 	case http.StatusUnauthorized:
-		return ErrAuthCreditionalsNotSet
+		return ErrAuthCredentialsNotSet
 	}
 	return nil
 }
