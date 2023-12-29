@@ -3,7 +3,6 @@ package moov
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 )
@@ -89,7 +88,7 @@ func (c Client) CreateCard(accountID string, card CardPost) (Card, error) {
 		// card created
 		err = json.Unmarshal(body, &respCard)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respCard, err
 		}
 		return respCard, nil
 	case http.StatusUnauthorized:
@@ -121,7 +120,7 @@ func (c Client) ListCards(accountID string) ([]Card, error) {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resCards)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return resCards, err
 		}
 		return resCards, nil
 	case http.StatusUnauthorized:
@@ -149,7 +148,7 @@ func (c Client) GetCard(accountID string, cardID string) (Card, error) {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resCard)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return resCard, err
 		}
 		return resCard, nil
 	case http.StatusUnauthorized:
@@ -185,7 +184,7 @@ func (c Client) UpdateCard(accountID string, cardID string, card Card, cardCvv s
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resCard)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return resCard, err
 		}
 		return resCard, nil
 	case http.StatusUnauthorized:

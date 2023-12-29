@@ -3,7 +3,6 @@ package moov
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 )
@@ -55,7 +54,7 @@ func (c Client) ListWallets(accountID string) ([]Wallet, error) {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resWallets)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return resWallets, err
 		}
 		return resWallets, nil
 	case http.StatusTooManyRequests:
@@ -79,7 +78,7 @@ func (c Client) GetWallet(accountID string, walletID string) (Wallet, error) {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resWallet)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return resWallet, err
 		}
 		return resWallet, nil
 	case http.StatusUnauthorized:
@@ -107,7 +106,7 @@ func (c Client) ListWalletTransactions(accountID string, walletID string) ([]Tra
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resTransactions)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return resTransactions, err
 		}
 		return resTransactions, nil
 	case http.StatusNotFound:
@@ -133,7 +132,7 @@ func (c Client) GetWalletTransaction(accountID string, walletID string, transact
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resTransaction)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return resTransaction, err
 		}
 		return resTransaction, nil
 	case http.StatusUnauthorized:

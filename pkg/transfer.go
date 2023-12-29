@@ -3,12 +3,12 @@ package moov
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type SynchronousTransfer struct {
@@ -178,7 +178,7 @@ func (c Client) CreateTransfer(source Source, destination Destination, amount Am
 	case http.StatusOK, http.StatusCreated, http.StatusAccepted:
 		err = json.Unmarshal(body, &respTransfer)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respTransfer, err
 		}
 		return respTransfer, nil
 	case http.StatusBadRequest:
@@ -245,7 +245,7 @@ func (c Client) ListTransfers(payload SearchQueryPayload) ([]SynchronousTransfer
 	case http.StatusOK:
 		err = json.Unmarshal(body, &respTransfers)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respTransfers, err
 		}
 		return respTransfers, nil
 	case http.StatusTooManyRequests:
@@ -275,7 +275,7 @@ func (c Client) GetTransfer(transferID string, accountID string) (SynchronousTra
 	case http.StatusOK:
 		err = json.Unmarshal(body, &respTransfer)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respTransfer, err
 		}
 		return respTransfer, nil
 	case http.StatusTooManyRequests:
@@ -307,7 +307,7 @@ func (c Client) UpdateTransferMetaData(transferID string, accountID string, meta
 	case http.StatusOK:
 		err = json.Unmarshal(body, &respTransfer)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respTransfer, err
 		}
 		return respTransfer, nil
 	case http.StatusTooManyRequests:
@@ -331,7 +331,7 @@ func (c Client) TransferOptions(payload TransferOptionsPayload) (CreatedTransfer
 	case http.StatusOK:
 		err = json.Unmarshal(body, &respOptions)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respOptions, err
 		}
 		return respOptions, nil
 	case http.StatusTooManyRequests:
@@ -365,7 +365,7 @@ func (c Client) RefundTransfer(transferID string, isSync bool, amount int) (Refu
 	case http.StatusOK, http.StatusAccepted:
 		err = json.Unmarshal(body, &respRefund)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respRefund, err
 		}
 		return respRefund, nil
 	case http.StatusBadRequest:
@@ -398,7 +398,7 @@ func (c Client) ListRefunds(transferID string) ([]Refund, error) {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &respRefunds)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respRefunds, err
 		}
 		return respRefunds, nil
 	case http.StatusTooManyRequests:
@@ -423,7 +423,7 @@ func (c Client) GetRefund(transferID string, refundID string) (Refund, error) {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &respRefund)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respRefund, err
 		}
 		return respRefund, nil
 	case http.StatusTooManyRequests:
@@ -455,7 +455,7 @@ func (c Client) ReverseTransfer(transferID string, amount int) (CanceledTransfer
 	case http.StatusOK, http.StatusAccepted:
 		err = json.Unmarshal(body, &respTransfer)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respTransfer, err
 		}
 		return respTransfer, nil
 	case http.StatusBadRequest:

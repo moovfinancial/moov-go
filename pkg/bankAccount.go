@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 )
@@ -80,7 +79,7 @@ func (c Client) CreateBankAccount(accountID string, bankAccount BankAccount) (Ba
 		// Account created
 		err = json.Unmarshal(body, &respBankAccount)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respBankAccount, err
 		}
 		return respBankAccount, nil
 	case http.StatusUnauthorized:
@@ -111,7 +110,7 @@ func (c Client) GetBankAccount(accountID string, bankAccountID string) (BankAcco
 	case http.StatusOK:
 		err = json.Unmarshal(body, &respBankAccount)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respBankAccount, err
 		}
 		return respBankAccount, nil
 	case http.StatusUnauthorized:
@@ -149,29 +148,29 @@ func (c Client) DeleteBankAccount(accountID string, bankAccountID string) error 
 
 // ListBankAccounts lists all bank accounts for the given customer account
 func (c Client) ListBankAccounts(accountID string) ([]BankAccount, error) {
-	var resAccounts []BankAccount
+	var respBankAccounts []BankAccount
 	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathBankAccounts, accountID))
 
 	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
 	if err != nil {
-		return resAccounts, err
+		return respBankAccounts, err
 	}
 
 	switch statusCode {
 	case http.StatusOK:
-		err = json.Unmarshal(body, &resAccounts)
+		err = json.Unmarshal(body, &respBankAccounts)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return respBankAccounts, err
 		}
-		return resAccounts, nil
+		return respBankAccounts, nil
 	case http.StatusUnauthorized:
-		return resAccounts, ErrAuthCredentialsNotSet
+		return respBankAccounts, ErrAuthCredentialsNotSet
 	case http.StatusNotFound:
-		return resAccounts, ErrNoAccount
+		return respBankAccounts, ErrNoAccount
 	case http.StatusTooManyRequests:
-		return resAccounts, ErrRateLimit
+		return respBankAccounts, ErrRateLimit
 	}
-	return resAccounts, ErrDefault
+	return respBankAccounts, ErrDefault
 }
 
 // MicroDepositInitiate creates a new micro deposit verification for the given bank account

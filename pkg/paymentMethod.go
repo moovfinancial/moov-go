@@ -3,7 +3,6 @@ package moov
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -31,7 +30,7 @@ func (c Client) ListPaymentMethods(accountID string, sourceID string) ([]Payment
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resPaymentMethods)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return resPaymentMethods, err
 		}
 		return resPaymentMethods, nil
 	case http.StatusNotFound:
@@ -57,7 +56,7 @@ func (c Client) GetPaymentMethod(accountID string, paymentMethodID string) (Paym
 	case http.StatusOK:
 		err = json.Unmarshal(body, &resPaymentMethod)
 		if err != nil {
-			log.Println("Error unmarshalling JSON:", err)
+			return resPaymentMethod, err
 		}
 		return resPaymentMethod, nil
 	case http.StatusNotFound:
