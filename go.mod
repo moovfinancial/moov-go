@@ -3,7 +3,7 @@ module github.com/moovfinancial/moov-go
 go 1.21.4
 
 require (
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.5.0
 	github.com/stretchr/testify v1.8.4
 	gopkg.in/yaml.v3 v3.0.1
 )
