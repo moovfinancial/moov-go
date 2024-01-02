@@ -3,11 +3,8 @@ package moov
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"log"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -27,10 +24,9 @@ func TestPaymentMethodMarshal(t *testing.T) {
 	dec.DisallowUnknownFields()
 
 	err := dec.Decode(&paymentMethod)
-	if err != nil {
-		require.NoError(t, err)
-	}
-	assert.Equal(t, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", paymentMethod.PaymentMethodID)
+	require.NoError(t, err)
+
+	require.Equal(t, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", paymentMethod.PaymentMethodID)
 }
 
 type PaymentMethodTestSuite struct {
@@ -47,14 +43,10 @@ func TestPaymentMethodSuite(t *testing.T) {
 
 func (s *PaymentMethodTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
-	mc, err := NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
+	mc := NewTestClient(s.T())
+
 	accounts, err := mc.ListAccounts()
-	if err != nil {
-		log.Fatal(err)
-	}
+	s.NoError(err)
 
 	defaultAccountName := "Daniella Singh"
 	for _, account := range accounts {
@@ -69,26 +61,18 @@ func (s *PaymentMethodTestSuite) TearDownSuite() {
 }
 
 func (s *PaymentMethodTestSuite) TestListPaymentMethods() {
-	mc, err := NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
+	mc := NewTestClient(s.T())
 
 	paymentMethods, err := mc.ListPaymentMethods(s.accountID, "")
-	if err != nil {
-		s.T().Fatal(err)
-	}
-	fmt.Println(len(paymentMethods))
-	assert.NotNil(s.T(), paymentMethods)
+	s.NoError(err)
+
+	s.Require().NotNil(paymentMethods)
 
 	s.paymentMethodID = paymentMethods[0].PaymentMethodID
 }
 
 func (s *PaymentMethodTestSuite) TestGetPaymentMethod() {
-	mc, err := NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
+	mc := NewTestClient(s.T())
 
 	paymentMethodID := s.paymentMethodID
 	if paymentMethodID == "" {
@@ -96,8 +80,7 @@ func (s *PaymentMethodTestSuite) TestGetPaymentMethod() {
 	}
 
 	paymentMethod, err := mc.GetPaymentMethod(s.accountID, paymentMethodID)
-	if err != nil {
-		s.T().Fatal(err)
-	}
-	assert.Equal(s.T(), paymentMethodID, paymentMethod.PaymentMethodID)
+	s.NoError(err)
+
+	s.Equal(paymentMethodID, paymentMethod.PaymentMethodID)
 }

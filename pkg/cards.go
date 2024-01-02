@@ -102,7 +102,7 @@ func (c Client) CreateCard(accountID string, card CardPost) (Card, error) {
 	case http.StatusTooManyRequests:
 		return respCard, ErrRateLimit
 	}
-	return respCard, ErrDefault
+	return respCard, ErrDefault(statusCode)
 }
 
 // ListCards lists all cards for the given customer Moov account
@@ -130,7 +130,7 @@ func (c Client) ListCards(accountID string) ([]Card, error) {
 	case http.StatusTooManyRequests:
 		return resCards, ErrRateLimit
 	}
-	return resCards, ErrDefault
+	return resCards, ErrDefault(statusCode)
 }
 
 // GetCard retrieves a card for the given customer Moov account
@@ -158,7 +158,7 @@ func (c Client) GetCard(accountID string, cardID string) (Card, error) {
 	case http.StatusTooManyRequests:
 		return resCard, ErrRateLimit
 	}
-	return resCard, ErrDefault
+	return resCard, ErrDefault(statusCode)
 }
 
 // UpdateCard Update a linked card and/or resubmit it for verification.
@@ -198,7 +198,7 @@ func (c Client) UpdateCard(accountID string, cardID string, card Card, cardCvv s
 	case http.StatusTooManyRequests:
 		return resCard, ErrRateLimit
 	}
-	return resCard, ErrDefault
+	return resCard, ErrDefault(statusCode)
 }
 
 // DisableCard disables a card associated with a Moov account

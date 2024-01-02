@@ -60,7 +60,7 @@ func (c Client) ListWallets(accountID string) ([]Wallet, error) {
 	case http.StatusTooManyRequests:
 		return resWallets, ErrRateLimit
 	}
-	return resWallets, ErrDefault
+	return resWallets, ErrDefault(statusCode)
 }
 
 // GetWallet retrieves a wallet for the given wallet id
@@ -88,7 +88,7 @@ func (c Client) GetWallet(accountID string, walletID string) (Wallet, error) {
 	case http.StatusTooManyRequests:
 		return resWallet, ErrRateLimit
 	}
-	return resWallet, ErrDefault
+	return resWallet, ErrDefault(statusCode)
 }
 
 // ListWalletTransactions lists all transactions for the given wallet id
@@ -114,7 +114,7 @@ func (c Client) ListWalletTransactions(accountID string, walletID string) ([]Tra
 	case http.StatusTooManyRequests:
 		return resTransactions, ErrRateLimit
 	}
-	return resTransactions, ErrDefault
+	return resTransactions, ErrDefault(statusCode)
 }
 
 // GetWalletTransaction retrieves a transaction for the given wallet id and transaction id
@@ -142,5 +142,5 @@ func (c Client) GetWalletTransaction(accountID string, walletID string, transact
 	case http.StatusTooManyRequests:
 		return resTransaction, ErrRateLimit
 	}
-	return resTransaction, ErrDefault
+	return resTransaction, ErrDefault(statusCode)
 }
