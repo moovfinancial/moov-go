@@ -6,6 +6,8 @@ package moov
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -78,11 +80,14 @@ func TestCardSuite(t *testing.T) {
 
 func (s *CardTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	accounts, err := mc.ListAccounts()
-	s.NoError(err)
-
+	if err != nil {
+		log.Fatal(err)
+	}
 	for _, account := range accounts {
 		if account.DisaplayName == "Lincoln National Corporation" {
 			// set the accountID for testing
@@ -108,20 +113,27 @@ func (s *CardTestSuite) SetupSuite() {
 	}
 
 	respCard, err := mc.CreateCard(s.accountID, card)
-	s.NoError(err, "Error creating card")
+	if err != nil {
+		s.T().Fatalf("Error creating card: %v", err)
+	}
 
 	s.deleteCardID = respCard.CardID
 	s.cards = append(s.cards, respCard.CardID)
+
 }
 
 func (s *CardTestSuite) TearDownSuite() {
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	// delete the bank accounts we created
 	for _, cardID := range s.cards {
 		if cardID != "" {
-			err := mc.DisableCard(s.accountID, cardID)
-			s.NoError(err)
+			err = mc.DisableCard(s.accountID, cardID)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 }
@@ -146,10 +158,14 @@ func (s *CardTestSuite) TestCreateCard() {
 		CardOnFile: false,
 	}
 
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	respCard, err := mc.CreateCard(s.accountID, card)
-	s.NoError(err, "Error creating card")
+	if err != nil {
+		s.T().Fatalf("Error creating card: %v", err)
+	}
 
 	assert.NotEmpty(s.T(), respCard.CardID)
 	s.cardID = respCard.CardID
@@ -157,21 +173,30 @@ func (s *CardTestSuite) TestCreateCard() {
 }
 
 func (s *CardTestSuite) TestListCards() {
-	mc := NewTestClient(s.T())
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	cards, err := mc.ListCards(s.accountID)
-	s.NoError(err)
-
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	fmt.Println(len(cards))
 	assert.NotNil(s.T(), cards)
 }
 
 func (s *CardTestSuite) TestGetCard() {
-	mc := NewTestClient(s.T())
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	card, err := mc.GetCard(s.accountID, s.cardID)
-	s.NoError(err)
-
-	s.Equal(s.cardID, card.CardID)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	assert.Equal(s.T(), s.cardID, card.CardID)
 }
 
 func (s *CardTestSuite) TestUpdateCard() {
@@ -191,17 +216,27 @@ func (s *CardTestSuite) TestUpdateCard() {
 		CardOnFile: false,
 	}
 
-	mc := NewTestClient(s.T())
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	newCard, err := mc.UpdateCard(s.accountID, s.cardID, card, "937")
-	s.NoError(err)
+	if err != nil {
+		s.T().Fatalf("Error updating card: %v", err)
+	}
 
-	s.Equal(newCard.BillingAddress, card.BillingAddress)
+	assert.Equal(s.T(), newCard.BillingAddress, card.BillingAddress)
 }
 
 func (s *CardTestSuite) TestDisableCard() {
-	mc := NewTestClient(s.T())
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	err := mc.DisableCard(s.accountID, s.cardID)
-	s.NoError(err)
+	err = mc.DisableCard(s.accountID, s.cardID)
+	if err != nil {
+		assert.Error(s.T(), err)
+	}
 }

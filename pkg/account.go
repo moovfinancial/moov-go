@@ -392,7 +392,7 @@ func (c Client) CreateAccount(account Account) (Account, error) {
 	case http.StatusTooManyRequests:
 		return respAccount, ErrRateLimit
 	}
-	return respAccount, ErrDefault(resp.StatusCode)
+	return respAccount, ErrDefault
 }
 
 // GetAccount returns an account based on accountID.
@@ -414,7 +414,7 @@ func (c Client) GetAccount(accountID string) (Account, error) {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &respAccount)
 		if err != nil {
-			return respAccount, ErrDefault(resp.StatusCode)
+			return respAccount, ErrDefault
 		}
 		return respAccount, nil
 	case http.StatusUnauthorized:
@@ -424,7 +424,7 @@ func (c Client) GetAccount(accountID string) (Account, error) {
 	case http.StatusTooManyRequests:
 		return respAccount, ErrRateLimit
 	}
-	return respAccount, ErrDefault(resp.StatusCode)
+	return respAccount, ErrDefault
 }
 
 // UpdateAccount updates an account.
@@ -448,7 +448,7 @@ func (c Client) UpdateAccount(account Account) (Account, error) {
 		// Account Updated
 		err = json.Unmarshal(body, &respAccount)
 		if err != nil {
-			return respAccount, ErrDefault(resp.StatusCode)
+			return respAccount, ErrDefault
 		}
 		return respAccount, nil
 	case http.StatusUnauthorized:
@@ -458,7 +458,7 @@ func (c Client) UpdateAccount(account Account) (Account, error) {
 	case http.StatusTooManyRequests:
 		return respAccount, ErrRateLimit
 	}
-	return respAccount, ErrDefault(resp.StatusCode)
+	return respAccount, ErrDefault
 }
 
 // ListAccounts returns a list of accounts.
@@ -481,7 +481,7 @@ func (c Client) ListAccounts() ([]Account, error) {
 	case http.StatusOK:
 		err = json.Unmarshal(body, &respAccounts)
 		if err != nil {
-			return respAccounts, ErrDefault(resp.StatusCode)
+			return respAccounts, ErrDefault
 		}
 		return respAccounts, nil
 	case http.StatusUnauthorized:
@@ -491,7 +491,7 @@ func (c Client) ListAccounts() ([]Account, error) {
 	case http.StatusTooManyRequests:
 		return respAccounts, ErrRateLimit
 	}
-	return respAccounts, ErrDefault(resp.StatusCode)
+	return respAccounts, ErrDefault
 }
 
 // DeleteAccount deletes an account.

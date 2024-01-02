@@ -38,7 +38,7 @@ func (c Client) ListPaymentMethods(accountID string, sourceID string) ([]Payment
 	case http.StatusTooManyRequests:
 		return resPaymentMethods, ErrRateLimit
 	}
-	return resPaymentMethods, ErrDefault(statusCode)
+	return resPaymentMethods, ErrDefault
 }
 
 // GetPaymentMethod retrieves a payment method for the given payment method id
@@ -64,5 +64,5 @@ func (c Client) GetPaymentMethod(accountID string, paymentMethodID string) (Paym
 	case http.StatusTooManyRequests:
 		return resPaymentMethod, ErrRateLimit
 	}
-	return resPaymentMethod, ErrDefault(statusCode)
+	return resPaymentMethod, ErrDefault
 }

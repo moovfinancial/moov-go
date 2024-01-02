@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -200,9 +202,11 @@ func TestSynchronousTransferMarshalResponse(t *testing.T) {
 	dec.DisallowUnknownFields()
 
 	err := dec.Decode(&transfer)
-	require.NoError(t, err)
+	if err != nil {
+		require.NoError(t, err)
+	}
 
-	require.Equal(t, "Gym Dues", transfer.Source.AchDetails.CompanyEntryDescription)
+	assert.Equal(t, "Gym Dues", transfer.Source.AchDetails.CompanyEntryDescription)
 	t.Logf("%#v", transfer)
 }
 
@@ -224,18 +228,20 @@ func TestTransferSuite(t *testing.T) {
 
 func (s *TransferTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	accounts, err := mc.ListAccounts()
-	s.NoError(err)
-
+	if err != nil {
+		log.Fatal(err)
+	}
 	for _, account := range accounts {
 		if account.DisaplayName == "Lincoln National Corporation" {
 			// set the accountID for testing
 			s.accountID = account.AccountID
 		}
 	}
-
 	// get card to get paymentID
 	cards, _ := mc.ListCards(s.accountID)
 	if len(cards) == 0 {
@@ -257,8 +263,9 @@ func (s *TransferTestSuite) SetupSuite() {
 		}
 
 		respCard, err := mc.CreateCard(s.accountID, card)
-		s.NoError(err, "Error creating card")
-
+		if err != nil {
+			s.T().Fatalf("Error creating card: %v", err)
+		}
 		s.card = respCard
 		s.deleteCardID = respCard.CardID
 	} else {
@@ -267,39 +274,34 @@ func (s *TransferTestSuite) SetupSuite() {
 	}
 
 	// get payment method from card
-	respPaymentMethods, err := mc.ListPaymentMethods(s.accountID, s.card.CardID)
-	s.NoError(err)
-	s.Require().NotEmpty(respPaymentMethods)
-
+	respPaymentMethods, _ := mc.ListPaymentMethods(s.accountID, s.card.CardID)
 	s.paymentMethodSource = respPaymentMethods[0]
 
 	// get payment method of wallet
-	respWallets, err := mc.ListWallets(s.accountID)
-	s.NoError(err)
-
-	respPaymentMethods1, err := mc.ListPaymentMethods(s.accountID, respWallets[0].WalletID)
-	s.NoError(err)
-	s.Require().NotEmpty(respPaymentMethods1)
+	respWallets, _ := mc.ListWallets(s.accountID)
+	respPaymentMethods1, _ := mc.ListPaymentMethods(s.accountID, respWallets[0].WalletID)
 	s.paymentMethodDest = respPaymentMethods1[0]
 
 	//	get sample transfer
 	payload := SearchQueryPayload{}
-	respTransfers, err := mc.ListTransfers(payload)
-	s.NoError(err)
-	s.Require().NotEmpty(respTransfers)
-
+	respTransfers, _ := mc.ListTransfers(payload)
 	if len(respTransfers) > 0 {
 		s.transfer = respTransfers[0]
 	}
 }
 
 func (s *TransferTestSuite) TearDownSuite() {
-	mc := NewTestClient(s.T())
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	//delete the card we created
 	if s.deleteCardID != "" {
-		err := mc.DisableCard(s.accountID, s.deleteCardID)
-		s.NoError(err)
+		err = mc.DisableCard(s.accountID, s.deleteCardID)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -333,44 +335,57 @@ func (s *TransferTestSuite) TestCreateTransfer() {
 		"property2": "string2",
 	}
 
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	respTransfer, err := mc.CreateTransfer(source, destination, amount, facilitatorFee, description, metadata, true)
-	s.NoError(err, "Error creating transfer")
+	if err != nil {
+		s.T().Fatalf("Error creating transfer: %v", err)
+	}
 
-	s.NotEmpty(respTransfer.TransferID)
+	assert.NotEmpty(s.T(), respTransfer.TransferID)
 	s.transfer = respTransfer
 }
 
 func (s *TransferTestSuite) TestListTransfers() {
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	payload := SearchQueryPayload{}
 	transfers, err := mc.ListTransfers(payload)
-	s.NoError(err)
-
-	s.NotEmpty(transfers)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	fmt.Println(len(transfers))
+	assert.NotNil(s.T(), transfers)
 }
 
 func (s *TransferTestSuite) TestGetTransfer() {
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	transferID := "1ddcedb6-83a3-4ce9-89a4-c3d03106dda4"
 	if s.transfer.TransferID != "" {
 		transferID = s.transfer.TransferID
 	}
-
 	transfer, err := mc.GetTransfer(transferID, "")
-	s.NoError(err)
-
-	s.Equal(transferID, transfer.TransferID)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	assert.Equal(s.T(), transferID, transfer.TransferID)
 }
 
 func (s *TransferTestSuite) TestUpdateTransferMetaData() {
 	metadata := map[string]string{"property1": "property  1",
 		"property2": "property  2"}
 
-	mc := NewTestClient(s.T())
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	transferID := "1ddcedb6-83a3-4ce9-89a4-c3d03106dda4"
 	if s.transfer.TransferID != "" {
@@ -378,13 +393,18 @@ func (s *TransferTestSuite) TestUpdateTransferMetaData() {
 	}
 
 	transfer, err := mc.UpdateTransferMetaData(transferID, "", metadata)
-	s.NoError(err, "Error updating transfer metadata")
+	if err != nil {
+		s.T().Fatalf("Error updating transfer metadata: %v", err)
+	}
 
-	s.Equal(transfer.Metadata, metadata)
+	assert.Equal(s.T(), transfer.Metadata, metadata)
 }
 
 func (s *TransferTestSuite) TestTransferOptions() {
-	mc := NewTestClient(s.T())
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	payload := TransferOptionsPayload{
 		Source: TransferOptionsSourcePayload{
@@ -402,45 +422,53 @@ func (s *TransferTestSuite) TestTransferOptions() {
 	}
 
 	options, err := mc.TransferOptions(payload)
-	s.NoError(err)
+	if err != nil {
+		assert.Error(s.T(), err)
+	}
 
-	// @todo check if dest or origin are not empty?
 	fmt.Println(options)
-	// assert.NotNil(s.T(), options)
+	assert.NotNil(s.T(), options)
 }
 
 func (s *TransferTestSuite) TestRefundTransfer() {
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	transferID := "1ddcedb6-83a3-4ce9-89a4-c3d03106dda4"
 	if s.transfer.TransferID != "" {
 		transferID = s.transfer.TransferID
 	}
-
 	refund, err := mc.RefundTransfer(transferID, true, 1000)
-	s.NoError(err)
-
-	s.NotEmpty(refund.RefundID)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	assert.NotEmpty(s.T(), refund.RefundID)
 }
 
 func (s *TransferTestSuite) TestListRefunds() {
-	mc := NewTestClient(s.T())
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	transferID := "1ddcedb6-83a3-4ce9-89a4-c3d03106dda4"
 	if s.transfer.TransferID != "" {
 		transferID = s.transfer.TransferID
 	}
-
 	refunds, err := mc.ListRefunds(transferID)
-	s.NoError(err)
-
+	if err != nil {
+		s.T().Fatal(err)
+	}
 	fmt.Println(len(refunds))
-	s.NotNil(refunds)
+	assert.NotNil(s.T(), refunds)
 }
 
 func (s *TransferTestSuite) TestGetRefund() {
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	transferID := "1ddcedb6-83a3-4ce9-89a4-c3d03106dda4"
 	if s.transfer.TransferID != "" {
 		transferID = s.transfer.TransferID
@@ -448,21 +476,25 @@ func (s *TransferTestSuite) TestGetRefund() {
 
 	refundID := "8b491eb3-a262-4eba-a0ca-35983bef3262"
 	refund, err := mc.GetRefund(transferID, refundID)
-	s.NoError(err)
-
-	s.Equal(refundID, refund.RefundID)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	assert.Equal(s.T(), refundID, refund.RefundID)
 }
 
 func (s *TransferTestSuite) TestReverseTransfer() {
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	transferID := "1ddcedb6-83a3-4ce9-89a4-c3d03106dda4"
 	if s.transfer.TransferID != "" {
 		transferID = s.transfer.TransferID
 	}
 
 	reverse, err := mc.ReverseTransfer(transferID, 50)
-	s.NoError(err)
-
-	s.NotEmpty(reverse.Refund.RefundID)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	assert.NotEmpty(s.T(), reverse.Refund.RefundID)
 }

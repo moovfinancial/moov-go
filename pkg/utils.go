@@ -5,7 +5,32 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"os"
+
+	"gopkg.in/yaml.v3"
 )
+
+type Credentials struct {
+	PublicKey string `yaml:"public_key,omitempty"`
+	SecretKey string `yaml:"secret_key,omitempty"`
+}
+
+func readConfig() (Credentials, error) {
+	var cred Credentials
+
+	// Read the config file
+	data, err := os.ReadFile("../config.yaml")
+	if err != nil {
+		return cred, err
+	}
+
+	// Unmarshal the YAML data into the cred struct
+	if err := yaml.Unmarshal(data, &cred); err != nil {
+		return cred, err
+	}
+
+	return cred, nil
+}
 
 // GetHTTPResponse performs an HTTP request and returns the response body or an error.
 func GetHTTPResponse(c Client, method string, url string, data any, header map[string]string) ([]byte, int, error) {

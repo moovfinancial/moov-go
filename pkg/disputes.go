@@ -89,7 +89,7 @@ func (c Client) ListDisputes(count int,
 	case http.StatusTooManyRequests:
 		return resp, ErrRateLimit
 	}
-	return resp, ErrDefault(statusCode)
+	return resp, ErrDefault
 }
 
 // GetDispute retrieves a dispute for the given dispute id
@@ -115,5 +115,5 @@ func (c Client) GetDispute(disputeID string) (Dispute, error) {
 	case http.StatusTooManyRequests:
 		return resp, ErrRateLimit
 	}
-	return resp, ErrDefault(statusCode)
+	return resp, ErrDefault
 }

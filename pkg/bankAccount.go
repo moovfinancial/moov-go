@@ -93,7 +93,7 @@ func (c Client) CreateBankAccount(accountID string, bankAccount BankAccount) (Ba
 	case http.StatusTooManyRequests:
 		return respBankAccount, ErrRateLimit
 	}
-	return respBankAccount, ErrDefault(statusCode)
+	return respBankAccount, ErrDefault
 }
 
 // GetBankAccount retrieves a bank account for the given customer account
@@ -120,7 +120,7 @@ func (c Client) GetBankAccount(accountID string, bankAccountID string) (BankAcco
 	case http.StatusTooManyRequests:
 		return respBankAccount, ErrRateLimit
 	}
-	return respBankAccount, ErrDefault(statusCode)
+	return respBankAccount, ErrDefault
 }
 
 // DeleteBankAccount deletes a bank account for the given customer account
@@ -143,7 +143,7 @@ func (c Client) DeleteBankAccount(accountID string, bankAccountID string) error 
 	case http.StatusTooManyRequests:
 		return ErrRateLimit
 	}
-	return ErrDefault(statusCode)
+	return ErrDefault
 }
 
 // ListBankAccounts lists all bank accounts for the given customer account
@@ -170,7 +170,7 @@ func (c Client) ListBankAccounts(accountID string) ([]BankAccount, error) {
 	case http.StatusTooManyRequests:
 		return respBankAccounts, ErrRateLimit
 	}
-	return respBankAccounts, ErrDefault(statusCode)
+	return respBankAccounts, ErrDefault
 }
 
 // MicroDepositInitiate creates a new micro deposit verification for the given bank account

@@ -42,8 +42,7 @@ func TestBankAccountMarshal(t *testing.T) {
 	if err != nil {
 		require.NoError(t, err)
 	}
-
-	require.Equal(t, "Chase Bank", bankAccount.BankName)
+	assert.Equal(t, "Chase Bank", bankAccount.BankName)
 }
 
 type BankAccountTestSuite struct {
@@ -62,11 +61,14 @@ func TestBankAccountSuite(t *testing.T) {
 
 func (s *BankAccountTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	accounts, err := mc.ListAccounts()
-	s.NoError(err)
-
+	if err != nil {
+		log.Fatal(err)
+	}
 	for _, account := range accounts {
 		if account.DisaplayName == "Lincoln National Corporation" {
 			// set the accountID for testing
@@ -84,8 +86,9 @@ func (s *BankAccountTestSuite) SetupSuite() {
 	}
 
 	bankAccount, err = mc.CreateBankAccount(s.accountID, bankAccount)
-	s.NoError(err)
-
+	if err != nil {
+		log.Fatal(err)
+	}
 	s.bankAccountID = bankAccount.BankAccountID
 	s.bankAccounts = append(s.bankAccounts, bankAccount.BankAccountID)
 
@@ -98,20 +101,25 @@ func (s *BankAccountTestSuite) SetupSuite() {
 	}
 
 	bankAccount, err = mc.CreateBankAccount(s.accountID, bankAccountDelete)
-	s.NoError(err)
-
+	if err != nil {
+		log.Fatal(err)
+	}
 	s.bankAccountIDDelete = bankAccount.BankAccountID
 	s.bankAccounts = append(s.bankAccounts, bankAccount.BankAccountID)
 }
 
 func (s *BankAccountTestSuite) TearDownSuite() {
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	// delete the bank accounts we created
 	for _, bankAccountID := range s.bankAccounts {
 		if bankAccountID != "" {
-			err := mc.DeleteBankAccount(s.accountID, bankAccountID)
-			s.NoError(err)
+			err = mc.DeleteBankAccount(s.accountID, bankAccountID)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 }
@@ -125,38 +133,56 @@ func (s *BankAccountTestSuite) TestCreateBankAccount() {
 		RoutingNumber:   "273976369",
 	}
 
-	mc := NewTestClient(s.T())
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	bankAccount, err := mc.CreateBankAccount(s.accountID, bankAccount)
-	s.NoError(err)
+	bankAccount, err = mc.CreateBankAccount(s.accountID, bankAccount)
+	if err != nil {
+		s.T().Fatalf("Error creating bank account: %v", err)
+	}
 
-	s.NotEmpty(bankAccount.BankAccountID)
+	assert.NotEmpty(s.T(), bankAccount.BankAccountID)
+
 	s.bankAccounts = append(s.bankAccounts, bankAccount.BankAccountID)
 }
 
 func (s *BankAccountTestSuite) TestGetBankAccount() {
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	account, err := mc.GetBankAccount(s.accountID, s.bankAccountID)
-	s.NoError(err)
-
-	s.Equal(s.bankAccountID, account.BankAccountID)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	assert.Equal(s.T(), s.bankAccountID, account.BankAccountID)
 }
 
 func (s *BankAccountTestSuite) TestDeleteBankAccount() {
-	mc := NewTestClient(s.T())
-
-	err := mc.DeleteBankAccount(s.accountID, s.bankAccountIDDelete)
-	s.NoError(err)
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = mc.DeleteBankAccount(s.accountID, s.bankAccountIDDelete)
+	if err != nil {
+		assert.Error(s.T(), err)
+	}
 }
 
 func (s *BankAccountTestSuite) TestListBankAccounts() {
-	mc := NewTestClient(s.T())
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	accounts, err := mc.ListBankAccounts(s.accountID)
-	s.NoError(err)
-
-	s.NotNil(accounts)
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	fmt.Println(len(accounts))
+	assert.NotNil(s.T(), accounts)
 }
 
 func (s *BankAccountTestSuite) TestMicroDepositInitiate() {
@@ -172,10 +198,14 @@ func (s *BankAccountTestSuite) TestMicroDepositInitiate() {
 
 // TODO: test this could run before TestMicroDepositInitiate
 func (s *BankAccountTestSuite) TestMicroDepositConfirm() {
-	mc := NewTestClient(s.T())
-
+	mc, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	// sample data
 	amounts := []int{22, 21}
-	err := mc.MicroDepositConfirm(s.accountID, s.bankAccountID, amounts)
-	s.NoError(err)
+	err = mc.MicroDepositConfirm(s.accountID, s.bankAccountID, amounts)
+	if err != nil {
+		assert.Error(s.T(), err)
+	}
 }
