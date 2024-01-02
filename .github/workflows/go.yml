@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+env:
+  MOOV_PUBLIC_KEY: ${{ secrets.MOOV_PUBLIC_KEY }}
+  MOOV_SECRET_KEY: ${{ secrets.MOOV_SECRET_KEY }}
+  
 jobs:
   build:
     name: Go Build (CGO)
