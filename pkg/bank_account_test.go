@@ -5,11 +5,9 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
-	"log"
 	"math/big"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -160,14 +158,10 @@ func (s *BankAccountTestSuite) TestListBankAccounts() {
 }
 
 func (s *BankAccountTestSuite) TestMicroDepositInitiate() {
-	mc, err := NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = mc.MicroDepositInitiate(s.accountID, s.bankAccountID)
-	if err != nil {
-		assert.Error(s.T(), err)
-	}
+	mc := NewTestClient(s.T())
+
+	err := mc.MicroDepositInitiate(s.accountID, s.bankAccountID)
+	s.NoError(err)
 }
 
 // TODO: test this could run before TestMicroDepositInitiate

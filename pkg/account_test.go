@@ -3,7 +3,6 @@ package moov
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -43,18 +42,16 @@ func TestCreateAccountIndividual(t *testing.T) {
 		},
 	}
 
-	mc, err := NewClient()
-	require.NoError(t, err)
+	mc := NewTestClient(t)
 
-	account, err = mc.CreateAccount(account)
+	account, err := mc.CreateAccount(account)
 	require.NoError(t, err)
 
 	assert.NotNil(t, account.AccountID)
 }
 
 func TestGetAccount(t *testing.T) {
-	mc, err := NewClient()
-	require.NoError(t, err)
+	mc := NewTestClient(t)
 
 	account, err := mc.GetAccount("638481a5-5205-406c-84c7-2fc2239105d1")
 	require.NoError(t, err)
@@ -63,8 +60,7 @@ func TestGetAccount(t *testing.T) {
 }
 
 func TestUpdateAccount(t *testing.T) {
-	mc, err := NewClient()
-	require.NoError(t, err)
+	mc := NewTestClient(t)
 
 	account := Account{
 		AccountID:   "aa19c3a7-4c72-4f64-adfa-9069c80d81cf",
@@ -84,21 +80,19 @@ func TestUpdateAccount(t *testing.T) {
 		},
 	}
 
-	account, err = mc.UpdateAccount(account)
+	account, err := mc.UpdateAccount(account)
 	require.NoError(t, err)
 
 	require.Equal(t, "David", account.Profile.Individual.Name.FirstName)
 }
 
 func TestListAccounts(t *testing.T) {
-	mc, err := NewClient()
-	require.NoError(t, err)
+	mc := NewTestClient(t)
 
 	accounts, err := mc.ListAccounts()
 	require.NoError(t, err)
 
-	fmt.Println(len(accounts))
-	assert.NotNil(t, accounts)
+	require.NotNil(t, accounts)
 }
 
 /* func TestDeleateAccount(t *testing.T) {
