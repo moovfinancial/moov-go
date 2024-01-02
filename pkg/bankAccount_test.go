@@ -2,12 +2,12 @@ package moov
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
+	"math/big"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -15,8 +15,8 @@ import (
 )
 
 func randomBankAccountNumber() string {
-	rand.Seed(time.Now().UnixNano())
-	return fmt.Sprintf("%d", 100000000+rand.Intn(999999999))
+	n, _ := rand.Int(rand.Reader, big.NewInt(999999999))
+	return fmt.Sprintf("%d", 100000000+n.Int64())
 }
 
 func TestBankAccountMarshal(t *testing.T) {
