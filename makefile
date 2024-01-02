@@ -1,3 +1,12 @@
+ifneq (,$(wildcard ./secrets.env))
+    include secrets.env
+    export
+endif
+
+.PHONY: build
+build:
+	go build ./...
+
 .PHONY: setup
 setup:
 	echo "TODO: add any needed commands"

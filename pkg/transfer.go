@@ -192,7 +192,7 @@ func (c Client) CreateTransfer(source Source, destination Destination, amount Am
 	case http.StatusTooManyRequests:
 		return respTransfer, ErrRateLimit
 	}
-	return respTransfer, ErrDefault
+	return respTransfer, ErrDefault(statusCode)
 }
 
 // ListTransfers lists all transfers
@@ -251,7 +251,7 @@ func (c Client) ListTransfers(payload SearchQueryPayload) ([]SynchronousTransfer
 	case http.StatusTooManyRequests:
 		return respTransfers, ErrRateLimit
 	}
-	return respTransfers, ErrDefault
+	return respTransfers, ErrDefault(statusCode)
 }
 
 // GetTransfer retrieves a transfer
@@ -281,7 +281,7 @@ func (c Client) GetTransfer(transferID string, accountID string) (SynchronousTra
 	case http.StatusTooManyRequests:
 		return respTransfer, ErrRateLimit
 	}
-	return respTransfer, ErrDefault
+	return respTransfer, ErrDefault(statusCode)
 }
 
 // UpdateTransferMetaData updates the metadata for a transfer
@@ -313,7 +313,7 @@ func (c Client) UpdateTransferMetaData(transferID string, accountID string, meta
 	case http.StatusTooManyRequests:
 		return respTransfer, ErrRateLimit
 	}
-	return respTransfer, ErrDefault
+	return respTransfer, ErrDefault(statusCode)
 }
 
 // TransferOptions lists all transfer options between a source and destination
@@ -337,7 +337,7 @@ func (c Client) TransferOptions(payload TransferOptionsPayload) (CreatedTransfer
 	case http.StatusTooManyRequests:
 		return respOptions, ErrRateLimit
 	}
-	return respOptions, ErrDefault
+	return respOptions, ErrDefault(statusCode)
 }
 
 // RefundTransfer refunds a transfer
@@ -379,7 +379,7 @@ func (c Client) RefundTransfer(transferID string, isSync bool, amount int) (Refu
 	case http.StatusTooManyRequests:
 		return respRefund, ErrRateLimit
 	}
-	return respRefund, ErrDefault
+	return respRefund, ErrDefault(statusCode)
 }
 
 // ListRefunds lists all refunds for a transfer
@@ -404,7 +404,7 @@ func (c Client) ListRefunds(transferID string) ([]Refund, error) {
 	case http.StatusTooManyRequests:
 		return respRefunds, ErrRateLimit
 	}
-	return respRefunds, ErrDefault
+	return respRefunds, ErrDefault(statusCode)
 }
 
 // GetRefund retrieves a refund for a transfer
@@ -429,7 +429,7 @@ func (c Client) GetRefund(transferID string, refundID string) (Refund, error) {
 	case http.StatusTooManyRequests:
 		return respRefund, ErrRateLimit
 	}
-	return respRefund, ErrDefault
+	return respRefund, ErrDefault(statusCode)
 }
 
 // ReverseTransfer reverses a transfer
@@ -469,5 +469,5 @@ func (c Client) ReverseTransfer(transferID string, amount int) (CanceledTransfer
 	case http.StatusTooManyRequests:
 		return respTransfer, ErrRateLimit
 	}
-	return respTransfer, ErrDefault
+	return respTransfer, ErrDefault(statusCode)
 }

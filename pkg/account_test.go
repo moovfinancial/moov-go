@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,9 +19,7 @@ func TestAccountMarshalResponse(t *testing.T) {
 	dec.DisallowUnknownFields()
 
 	err := dec.Decode(&account)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 
 	assert.Equal(t, "Wade", account.Profile.Individual.Name.FirstName)
 	t.Logf("%#v", account)
@@ -47,35 +44,27 @@ func TestCreateAccountIndividual(t *testing.T) {
 	}
 
 	mc, err := NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	account, err = mc.CreateAccount(account)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	assert.NotNil(t, account.AccountID)
 }
 
 func TestGetAccount(t *testing.T) {
 	mc, err := NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	account, err := mc.GetAccount("638481a5-5205-406c-84c7-2fc2239105d1")
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, "638481a5-5205-406c-84c7-2fc2239105d1", account.AccountID)
+	require.NoError(t, err)
+
+	require.Equal(t, "638481a5-5205-406c-84c7-2fc2239105d1", account.AccountID)
 }
 
 func TestUpdateAccount(t *testing.T) {
 	mc, err := NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	account := Account{
 		AccountID:   "aa19c3a7-4c72-4f64-adfa-9069c80d81cf",
@@ -96,23 +85,18 @@ func TestUpdateAccount(t *testing.T) {
 	}
 
 	account, err = mc.UpdateAccount(account)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
-	assert.Equal(t, "David", account.Profile.Individual.Name.FirstName)
+	require.Equal(t, "David", account.Profile.Individual.Name.FirstName)
 }
 
 func TestListAccounts(t *testing.T) {
 	mc, err := NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	accounts, err := mc.ListAccounts()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	fmt.Println(len(accounts))
 	assert.NotNil(t, accounts)
 }

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"testing"
 	"time"
 
@@ -35,9 +34,8 @@ func TestDisputesMarshal(t *testing.T) {
 	dec.DisallowUnknownFields()
 
 	err := dec.Decode(&dispute)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
+
 	assert.Equal(t, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", dispute.DisputeID)
 }
 
@@ -67,19 +65,15 @@ func (s *DisputesTestSuite) TearDownSuite() {
 }
 
 func (s *DisputesTestSuite) TestListDisputes() {
-	mc, err := NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
+	mc := NewTestClient(s.T())
 
 	zeroTime := time.Time{}
 
 	disputes, err := mc.ListDisputes(100, 0, zeroTime, zeroTime, "", "", "", zeroTime, zeroTime, "")
-	if err != nil {
-		s.T().Fatal(err)
-	}
+	s.NoError(err)
+
 	fmt.Println(len(disputes))
-	assert.NotNil(s.T(), disputes)
+	s.NotNil(disputes)
 
 	if len(disputes) > 0 {
 		s.DisputeID = disputes[0].DisputeID
@@ -87,10 +81,7 @@ func (s *DisputesTestSuite) TestListDisputes() {
 }
 
 func (s *DisputesTestSuite) TestGetDispute() {
-	mc, err := NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
+	mc := NewTestClient(s.T())
 
 	disputeID := s.DisputeID
 	if disputeID == "" {
@@ -98,8 +89,7 @@ func (s *DisputesTestSuite) TestGetDispute() {
 	}
 
 	dispute, err := mc.GetDispute(disputeID)
-	if err != nil {
-		s.T().Fatal(err)
-	}
-	assert.Equal(s.T(), disputeID, dispute.DisputeID)
+	s.NoError(err)
+
+	s.Equal(disputeID, dispute.DisputeID)
 }
