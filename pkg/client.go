@@ -1,12 +1,8 @@
 package moov
 
 import (
-	"encoding/json"
 	"errors"
-	"io"
-	"net/http"
-	"net/url"
-	"strings"
+	"fmt"
 )
 
 const (
@@ -70,9 +66,12 @@ var (
 	ErrLinkingApplePayToken     = errors.New("an error occurred when linking an Apple Pay token")
 	ErrRateLimit                = errors.New("request was refused due to rate limiting")
 	ErrXIdempotencyKey          = errors.New("attempted to create a transfer using a duplicate X-Idempotency-Key header")
-	ErrDefault                  = errors.New("empty response for unauthorized or any other returned http status code")
 	ErrURL                      = errors.New("invalid URL")
 )
+
+func ErrDefault(code int) error {
+	return fmt.Errorf("empty response for unauthorized or any other returned http status code (%d)", code)
+}
 
 type TransferStatus int
 
@@ -108,115 +107,38 @@ type ClientCredentialsGrantToAccessTokenResponse struct {
 	Scope        string `json:"scope"`
 }
 
-func NewClient() (*Client, error) {
-	credentials, err := readConfig()
-
-	if err != nil || credentials.PublicKey == "" || credentials.SecretKey == "" {
-		return nil, ErrAuthCredentialsNotSet
+func NewClient(configurables ...ClientConfigurable) (*Client, error) {
+	// Default client configuration if no configurables were specificied
+	client := &Client{
+		Credentials: CredentialsFromEnv(),
 	}
 
-	nc := &Client{
-		Credentials: Credentials{
-			PublicKey: credentials.PublicKey,
-			SecretKey: credentials.SecretKey,
-		},
+	// Apply all the configurable functions to the client
+	for _, configurable := range configurables {
+		if err := configurable(client); err != nil {
+			return nil, err
+		}
+	}
+
+	// Lets make sure that whatever they passed in for the credentials is valid.
+	if err := client.Credentials.Validate(); err != nil {
+		return nil, err
 	}
 
 	// Ping the server to make sure we have valid credentials
-	err = nc.Ping()
-	if err != nil {
-		return nc, err
-	}
-	return nc, nil
+	// @todo Should let them call this if they want incase that makes 1000's of these...
+	// if err := client.Ping(); err != nil {
+	// 	return client, err
+	// }
+
+	return client, nil
 }
 
-func (c *Client) ScopedAccessToken(accountID string, scope []string) (ClientCredentialsGrantToAccessTokenResponse, error) {
-	token := ClientCredentialsGrantToAccessTokenResponse{}
-	renderedScope := make([]string, len(scope))
-	for i := 0; i < len(scope); i++ {
-		renderedScope[i] = strings.Replace(scope[i], "{accountID}", accountID, 1)
-	}
-	params := url.Values{}
-	params.Add("grant_type", "client_credentials")
-	params.Add("scope", strings.Join(renderedScope, " "))
-	req, err := http.NewRequest("POST", "https://api.moov.io/oauth2/token?"+params.Encode(), nil)
-	if err != nil {
-		err := errors.Join(err, ErrURL)
-		return token, err
-	}
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		// *url.Error
-		return token, err
-	}
-	defer resp.Body.Close()
+type ClientConfigurable func(c *Client) error
 
-	resBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return token, err
+func WithCredentials(credentials Credentials) ClientConfigurable {
+	return func(c *Client) error {
+		c.Credentials = credentials
+		return c.Credentials.Validate()
 	}
-	if err := json.Unmarshal(resBody, &token); err != nil {
-		return token, err
-	}
-	return token, nil
-}
-
-// SingleUseAccessToken gets a token that can be used to instantiate Moov.js client side
-func (c Client) SingleUseAccessToken() (ClientCredentialsGrantToAccessTokenResponse, error) {
-	token := ClientCredentialsGrantToAccessTokenResponse{}
-	params := url.Values{}
-	params.Add("grant_type", "client_credentials")
-	params.Add("scope", "/accounts.write")
-	req, err := http.NewRequest("POST", "https://api.moov.io/oauth2/token?"+params.Encode(), nil)
-	if err != nil {
-		err := errors.Join(err, ErrURL)
-		return token, err
-	}
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		// *url.Error
-		return token, err
-	}
-	defer resp.Body.Close()
-
-	resBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return token, err
-	}
-	if err := json.Unmarshal(resBody, &token); err != nil { // Parse []byte to go struct pointer
-		return token, err
-	}
-	return token, nil
-}
-
-// Ping calls the ping endpoint to make sure we have valid credentials
-func (c Client) Ping() error {
-	req, _ := http.NewRequest(http.MethodGet, "https://api.moov.io/ping", nil)
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return ErrAuthNetwork
-	}
-	defer resp.Body.Close()
-
-	switch resp.StatusCode {
-	case http.StatusOK:
-		return nil
-	case http.StatusUnauthorized:
-		return ErrAuthCredentialsNotSet
-	}
-	return nil
 }

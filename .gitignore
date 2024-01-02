@@ -35,3 +35,4 @@ coverage.txt
 
 # security config
 config.yaml
+secrets.env
