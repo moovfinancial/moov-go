@@ -17,8 +17,6 @@ func init() {
 }
 
 func NewTestClient(t require.TestingT, c ...ClientConfigurable) *Client {
-	require.NoError(t, godotenv.Load("../secrets.env"), "Unable to load env")
-
 	mc, err := NewClient(c...)
 	require.NoError(t, err)
 
