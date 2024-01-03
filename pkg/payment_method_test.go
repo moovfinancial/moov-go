@@ -45,7 +45,7 @@ func (s *PaymentMethodTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
 	mc := NewTestClient(s.T())
 
-	accounts, err := mc.ListAccounts()
+	accounts, err := mc.ListAccounts(WithAccountName("Lincoln National Corporation"))
 	s.NoError(err)
 
 	defaultAccountName := "Daniella Singh"
