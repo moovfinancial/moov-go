@@ -168,7 +168,7 @@ func (c Client) CreateTransfer(source Source, destination Destination, amount Am
 		Description:    description,
 		Metadata:       metadata,
 	}
-	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, urlStr, trans, header)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodPost, urlStr, trans, header)
 
 	if err != nil {
 		return respTransfer, err
@@ -236,7 +236,7 @@ func (c Client) ListTransfers(payload SearchQueryPayload) ([]SynchronousTransfer
 
 	urlStr := fmt.Sprintf("%s/%s?%s", baseURL, pathTransfers, values.Encode())
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, urlStr, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, urlStr, nil, nil)
 	if err != nil {
 		return respTransfers, err
 	}
@@ -266,7 +266,7 @@ func (c Client) GetTransfer(transferID string, accountID string) (SynchronousTra
 
 	urlStr := fmt.Sprintf("%s/%s/%s?%s", baseURL, pathTransfers, transferID, values.Encode())
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, urlStr, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, urlStr, nil, nil)
 	if err != nil {
 		return respTransfer, err
 	}
@@ -298,7 +298,7 @@ func (c Client) UpdateTransferMetaData(transferID string, accountID string, meta
 		Metadata: metadata,
 	}
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodPatch, urlStr, metaDataPayload, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodPatch, urlStr, metaDataPayload, nil)
 	if err != nil {
 		return respTransfer, err
 	}
@@ -322,7 +322,7 @@ func (c Client) TransferOptions(payload TransferOptionsPayload) (CreatedTransfer
 	var respOptions CreatedTransferOptions
 	urlStr := fmt.Sprintf("%s/%s", baseURL, pathTransferOptions)
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, urlStr, payload, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodPost, urlStr, payload, nil)
 	if err != nil {
 		return respOptions, err
 	}
@@ -355,7 +355,7 @@ func (c Client) RefundTransfer(transferID string, isSync bool, amount int) (Refu
 	refundPayload := RefundPayload{
 		Amount: amount,
 	}
-	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, urlStr, refundPayload, header)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodPost, urlStr, refundPayload, header)
 
 	if err != nil {
 		return respRefund, err
@@ -389,7 +389,7 @@ func (c Client) ListRefunds(transferID string) ([]Refund, error) {
 
 	urlStr := fmt.Sprintf("%s/%s/%s/refunds", baseURL, pathTransfers, transferID)
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, urlStr, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, urlStr, nil, nil)
 	if err != nil {
 		return respRefunds, err
 	}
@@ -414,7 +414,7 @@ func (c Client) GetRefund(transferID string, refundID string) (Refund, error) {
 
 	urlStr := fmt.Sprintf("%s/%s/%s/refunds/%s", baseURL, pathTransfers, transferID, refundID)
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, urlStr, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, urlStr, nil, nil)
 	if err != nil {
 		return respRefund, err
 	}
@@ -445,7 +445,7 @@ func (c Client) ReverseTransfer(transferID string, amount int) (CanceledTransfer
 		Amount: amount,
 	}
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, urlStr, refundPayload, header)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodPost, urlStr, refundPayload, header)
 
 	if err != nil {
 		return respTransfer, err

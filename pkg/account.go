@@ -554,7 +554,6 @@ func WithAccountSkip(skip int) ListAccountFilter {
 
 // ListAccounts returns a list of accounts.
 func (c Client) ListAccounts(opts ...ListAccountFilter) ([]Account, error) {
-
 	respAccounts := []Account{}
 	req, _ := http.NewRequest(http.MethodGet, "https://api.moov.io/accounts", nil)
 	req.Header.Set("Accept", "application/json")

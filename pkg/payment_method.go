@@ -21,7 +21,7 @@ func (c Client) ListPaymentMethods(accountID string, sourceID string) ([]Payment
 		url = fmt.Sprintf("%s?sourceID=%s", url, sourceID)
 	}
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resPaymentMethods, err
 	}
@@ -47,7 +47,7 @@ func (c Client) GetPaymentMethod(accountID string, paymentMethodID string) (Paym
 	resPaymentMethod := PaymentMethod{}
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathPaymentMethods, accountID), paymentMethodID)
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resPaymentMethod, err
 	}

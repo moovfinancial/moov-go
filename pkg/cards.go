@@ -77,7 +77,7 @@ func (c Client) CreateCard(accountID string, card CardPost) (Card, error) {
 
 	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathCards, accountID))
 	header := map[string]string{"X-Wait-For": "payment-method"}
-	body, statusCode, err := GetHTTPResponse(c, http.MethodPost, url, card, header)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodPost, url, card, header)
 
 	if err != nil {
 		return respCard, err
@@ -111,7 +111,7 @@ func (c Client) ListCards(accountID string) ([]Card, error) {
 	var resCards []Card
 	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathCards, accountID))
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resCards, err
 	}
@@ -139,7 +139,7 @@ func (c Client) GetCard(accountID string, cardID string) (Card, error) {
 	resCard := Card{}
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathCards, accountID), cardID)
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resCard, err
 	}
@@ -175,7 +175,7 @@ func (c Client) UpdateCard(accountID string, cardID string, card Card, cardCvv s
 	}
 
 	resCard := Card{}
-	body, statusCode, err := GetHTTPResponse(c, http.MethodPatch, url, payload, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodPatch, url, payload, nil)
 	if err != nil {
 		return resCard, err
 	}
@@ -206,7 +206,7 @@ func (c Client) UpdateCard(accountID string, cardID string, card Card, cardCvv s
 func (c Client) DisableCard(accountID string, cardID string) error {
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathCards, accountID), cardID)
 
-	_, statusCode, err := GetHTTPResponse(c, http.MethodDelete, url, nil, nil)
+	_, statusCode, err := c.GetHTTPResponse(http.MethodDelete, url, nil, nil)
 	if err != nil {
 		return err
 	}

@@ -74,7 +74,7 @@ func (c Client) ListDisputes(count int,
 
 	urlStr := fmt.Sprintf("%s/%s?%s", baseURL, pathDisputes, values.Encode())
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, urlStr, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, urlStr, nil, nil)
 	if err != nil {
 		return resp, err
 	}
@@ -98,7 +98,7 @@ func (c Client) GetDispute(disputeID string) (Dispute, error) {
 	resp := Dispute{}
 	url := fmt.Sprintf("%s/%s/%s", baseURL, pathDisputes, disputeID)
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resp, err
 	}
