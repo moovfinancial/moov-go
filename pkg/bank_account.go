@@ -10,6 +10,7 @@ import (
 
 var (
 	ErrDuplicateBankAccount = errors.New("duplciate bank account or invalid routing number")
+	ErrNoMicroDeposit       = errors.New("No account with the specified accountID was found or micro-deposits have not been sent for the source.")
 )
 
 type BankAccount struct {
@@ -205,14 +206,13 @@ func (c Client) MicroDepositConfirm(accountID string, bankAccountID string, amou
 	if err != nil {
 		return err
 	}
-
 	switch statusCode {
 	case http.StatusOK:
 		return nil
 	case http.StatusUnauthorized:
 		return ErrAuthCredentialsNotSet
 	case http.StatusNotFound:
-		return ErrNoAccount
+		return ErrNoMicroDeposit
 	case http.StatusConflict:
 		return ErrAmountIncorrect
 	case http.StatusTooManyRequests:
