@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 )
@@ -462,70 +463,97 @@ func (c Client) UpdateAccount(account Account) (Account, error) {
 	return respAccount, ErrDefault(resp.StatusCode)
 }
 
-type AccountConfigurable func(c *Client)
+type accountFilters map[string]string
+
+// Func that applies a filter and returns an error if validation fails
+type ListAccountFilter func(c accountFilters) error
+
+func applyAccountFilters(url *url.URL, opts ...ListAccountFilter) {
+	filters := make(accountFilters)
+
+	// apply all of the selected filters and de-dupe
+	for _, opt := range opts {
+		opt(filters)
+	}
+
+	// parses current query string
+	q := url.Query()
+
+	// Add all the set accountParams to the query
+	for k, v := range filters {
+		q.Add(k, v)
+	}
+
+	// need to re-encode with the added items
+	url.RawQuery = q.Encode()
+}
 
 // WithAccountName if provided, this query will attempt to find matches against the following Account and Profile fields: diplayName, firstName, middleName, lastName, legalBusinessName
-func WithAccountName(name string) AccountConfigurable {
-	return func(c *Client) {
-		c.accountParams["name"] = name
+func WithAccountName(name string) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["name"] = name
+		return nil
 	}
 }
 
 // WithAccountEmail filter connected accounts by email address.
-func WithAccountEmail(email string) AccountConfigurable {
-	return func(c *Client) {
-		c.accountParams["email"] = email
+func WithAccountEmail(email string) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["email"] = email
+		return nil
 	}
 }
 
 // WithAccountType filter type possible values: individual, business
-func WithAccountType(accountType string) AccountConfigurable {
-	return func(c *Client) {
-		c.accountParams["type"] = accountType
+func WithAccountType(accountType string) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["type"] = accountType
+		return nil
 	}
 }
 
 // WithAccountForeignID filter as an optional alias from a foreign/external system which can be used to reference this resource.
-func WithAccountForeignID(foreignID string) AccountConfigurable {
-	return func(c *Client) {
-		c.accountParams["foreignID"] = foreignID
+func WithAccountForeignID(foreignID string) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["foreignID"] = foreignID
+		return nil
 	}
 }
 
 // WithAccountVerificationStatus possible values: unverified, pending, resubmit, review, verified, failed
-func WithAccountVerificationStatus(verificationStatus string) AccountConfigurable {
-	return func(c *Client) {
-		c.accountParams["verification_status"] = verificationStatus
+func WithAccountVerificationStatus(verificationStatus string) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["verification_status"] = verificationStatus
+		return nil
 	}
 }
 
 // WithAccountIncludeDisconnected if true, the response will include disconnected accounts.
-func WithAccountIncludeDisconnected() AccountConfigurable {
-	return func(c *Client) {
-		c.accountParams["includeDisconnected"] = "true"
+func WithAccountIncludeDisconnected() ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["includeDisconnected"] = "true"
+		return nil
 	}
 }
 
 // WithAccountCount value to limit the number of results in the query. Default is 20
-func WithAccountCount(count int) AccountConfigurable {
-	return func(c *Client) {
-		c.accountParams["count"] = strconv.Itoa(count)
+func WithAccountCount(count int) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["count"] = strconv.Itoa(count)
+		return nil
 	}
 }
 
 // WithAccountSkip the number of items to offset before starting to collect the result set
-func WithAccountSkip(skip int) AccountConfigurable {
-	return func(c *Client) {
-		c.accountParams["skip"] = strconv.Itoa(skip)
+func WithAccountSkip(skip int) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["skip"] = strconv.Itoa(skip)
+		return nil
 	}
 }
 
 // ListAccounts returns a list of accounts.
-func (c Client) ListAccounts(opts ...AccountConfigurable) ([]Account, error) {
-	// Apply all the configurable functions to the client
-	for _, opt := range opts {
-		opt(&c)
-	}
+func (c Client) ListAccounts(opts ...ListAccountFilter) ([]Account, error) {
 
 	respAccounts := []Account{}
 	req, _ := http.NewRequest(http.MethodGet, "https://api.moov.io/accounts", nil)
@@ -533,12 +561,8 @@ func (c Client) ListAccounts(opts ...AccountConfigurable) ([]Account, error) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 
-	q := req.URL.Query()
-	// Add all the set accountParams to the query
-	for k, v := range c.accountParams {
-		q.Add(k, v)
-	}
-	req.URL.RawQuery = q.Encode()
+	// Apply all the filters to the url query strings
+	applyAccountFilters(req.URL, opts...)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

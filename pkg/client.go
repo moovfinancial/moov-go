@@ -3,6 +3,7 @@ package moov
 import (
 	"errors"
 	"fmt"
+	"net/http"
 )
 
 const (
@@ -96,8 +97,8 @@ var TransferStatusStrings = map[TransferStatus]string{
 }
 
 type Client struct {
-	Credentials   Credentials
-	accountParams map[string]string
+	Credentials Credentials
+	HttpClient  *http.Client
 }
 
 type ClientCredentialsGrantToAccessTokenResponse struct {
@@ -112,9 +113,8 @@ func NewClient(configurables ...ClientConfigurable) (*Client, error) {
 	// Default client configuration if no configurables were specificied
 	client := &Client{
 		Credentials: CredentialsFromEnv(),
+		HttpClient:  DefaultHttpClient(),
 	}
-
-	client.accountParams = make(map[string]string)
 
 	// Apply all the configurable functions to the client
 	for _, configurable := range configurables {
@@ -128,12 +128,6 @@ func NewClient(configurables ...ClientConfigurable) (*Client, error) {
 		return nil, err
 	}
 
-	// Ping the server to make sure we have valid credentials
-	// @todo Should let them call this if they want incase that makes 1000's of these...
-	// if err := client.Ping(); err != nil {
-	// 	return client, err
-	// }
-
 	return client, nil
 }
 
@@ -143,5 +137,12 @@ func WithCredentials(credentials Credentials) ClientConfigurable {
 	return func(c *Client) error {
 		c.Credentials = credentials
 		return c.Credentials.Validate()
+	}
+}
+
+func WithHttpClient(client *http.Client) ClientConfigurable {
+	return func(c *Client) error {
+		c.HttpClient = client
+		return nil
 	}
 }
