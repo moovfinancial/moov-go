@@ -489,6 +489,48 @@ func WithAccountName(name string) AccountConfigurable {
 	}
 }
 
+func WithAccountEmail(email string) AccountConfigurable {
+	return func(c *Client) {
+		c.AccountParams.Email = email
+	}
+}
+
+func WithAccountType(accountType string) AccountConfigurable {
+	return func(c *Client) {
+		c.AccountParams.Type = accountType
+	}
+}
+
+func WithAccountForeignID(foreignID string) AccountConfigurable {
+	return func(c *Client) {
+		c.AccountParams.ForeignID = foreignID
+	}
+}
+
+func WithAccountVerificationStatus(verificationStatus string) AccountConfigurable {
+	return func(c *Client) {
+		c.AccountParams.VerificationStatus = verificationStatus
+	}
+}
+
+func WithAccountIncludeDisconnected(includeDisconnected bool) AccountConfigurable {
+	return func(c *Client) {
+		c.AccountParams.IncludeDisconnected = includeDisconnected
+	}
+}
+
+func WithAccountCount(count int) AccountConfigurable {
+	return func(c *Client) {
+		c.AccountParams.Count = count
+	}
+}
+
+func WithAccountSkip(skip int) AccountConfigurable {
+	return func(c *Client) {
+		c.AccountParams.Skip = skip
+	}
+}
+
 // ListAccounts returns a list of accounts.
 func (c Client) ListAccounts(opts ...AccountConfigurable) ([]Account, error) {
 	// Apply all the configurable functions to the client
