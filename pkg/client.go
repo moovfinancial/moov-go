@@ -97,7 +97,7 @@ var TransferStatusStrings = map[TransferStatus]string{
 
 type Client struct {
 	Credentials   Credentials
-	AccountParams AccountFilters
+	accountParams map[string]string
 }
 
 type ClientCredentialsGrantToAccessTokenResponse struct {
@@ -113,6 +113,8 @@ func NewClient(configurables ...ClientConfigurable) (*Client, error) {
 	client := &Client{
 		Credentials: CredentialsFromEnv(),
 	}
+
+	client.accountParams = make(map[string]string)
 
 	// Apply all the configurable functions to the client
 	for _, configurable := range configurables {
