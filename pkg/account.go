@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 )
@@ -462,81 +463,97 @@ func (c Client) UpdateAccount(account Account) (Account, error) {
 	return respAccount, ErrDefault(resp.StatusCode)
 }
 
-type AccountConfigurable func(c *Client)
+type accountFilters map[string]string
 
-type AccountFilters struct {
-	// Name If provided, this query will attempt to find matches against the following Account and Profile fields: diplayName, firstName, middleName, lastName, legalBusinessName
-	Name string `url:"name"`
-	// Email Filter connected accounts by email address.
-	Email string `url:"email"`
-	// Type Possible values: individual, business
-	Type string `url:"type"`
-	// ForeignID Serves as an optional alias from a foreign/external system which can be used to reference this resource.
-	ForeignID string `url:"foreignID"`
-	// VerificationStatus Possible values: unverified, pending, resubmit, review, verified, failed
-	VerificationStatus string `url:"verification_status"`
-	// includeDisconnected If true, the response will include disconnected accounts.
-	IncludeDisconnected bool `url:"includeDisconnected"`
-	// Count Optional parameter to limit the number of results in the query. Default is 20
-	Count int `url:"count"`
-	// Skip The number of items to offset before starting to collect the result set
-	Skip int `url:"skip"`
+// Func that applies a filter and returns an error if validation fails
+type ListAccountFilter func(c accountFilters) error
+
+func applyAccountFilters(url *url.URL, opts ...ListAccountFilter) {
+	filters := make(accountFilters)
+
+	// apply all of the selected filters and de-dupe
+	for _, opt := range opts {
+		opt(filters)
+	}
+
+	// parses current query string
+	q := url.Query()
+
+	// Add all the set accountParams to the query
+	for k, v := range filters {
+		q.Add(k, v)
+	}
+
+	// need to re-encode with the added items
+	url.RawQuery = q.Encode()
 }
 
-func WithAccountName(name string) AccountConfigurable {
-	return func(c *Client) {
-		c.AccountParams.Name = name
+// WithAccountName if provided, this query will attempt to find matches against the following Account and Profile fields: diplayName, firstName, middleName, lastName, legalBusinessName
+func WithAccountName(name string) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["name"] = name
+		return nil
 	}
 }
 
-func WithAccountEmail(email string) AccountConfigurable {
-	return func(c *Client) {
-		c.AccountParams.Email = email
+// WithAccountEmail filter connected accounts by email address.
+func WithAccountEmail(email string) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["email"] = email
+		return nil
 	}
 }
 
-func WithAccountType(accountType string) AccountConfigurable {
-	return func(c *Client) {
-		c.AccountParams.Type = accountType
+// WithAccountType filter type possible values: individual, business
+func WithAccountType(accountType string) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["type"] = accountType
+		return nil
 	}
 }
 
-func WithAccountForeignID(foreignID string) AccountConfigurable {
-	return func(c *Client) {
-		c.AccountParams.ForeignID = foreignID
+// WithAccountForeignID filter as an optional alias from a foreign/external system which can be used to reference this resource.
+func WithAccountForeignID(foreignID string) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["foreignID"] = foreignID
+		return nil
 	}
 }
 
-func WithAccountVerificationStatus(verificationStatus string) AccountConfigurable {
-	return func(c *Client) {
-		c.AccountParams.VerificationStatus = verificationStatus
+// WithAccountVerificationStatus possible values: unverified, pending, resubmit, review, verified, failed
+func WithAccountVerificationStatus(verificationStatus string) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["verification_status"] = verificationStatus
+		return nil
 	}
 }
 
-func WithAccountIncludeDisconnected(includeDisconnected bool) AccountConfigurable {
-	return func(c *Client) {
-		c.AccountParams.IncludeDisconnected = includeDisconnected
+// WithAccountIncludeDisconnected if true, the response will include disconnected accounts.
+func WithAccountIncludeDisconnected() ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["includeDisconnected"] = "true"
+		return nil
 	}
 }
 
-func WithAccountCount(count int) AccountConfigurable {
-	return func(c *Client) {
-		c.AccountParams.Count = count
+// WithAccountCount value to limit the number of results in the query. Default is 20
+func WithAccountCount(count int) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["count"] = strconv.Itoa(count)
+		return nil
 	}
 }
 
-func WithAccountSkip(skip int) AccountConfigurable {
-	return func(c *Client) {
-		c.AccountParams.Skip = skip
+// WithAccountSkip the number of items to offset before starting to collect the result set
+func WithAccountSkip(skip int) ListAccountFilter {
+	return func(filters accountFilters) error {
+		filters["skip"] = strconv.Itoa(skip)
+		return nil
 	}
 }
 
 // ListAccounts returns a list of accounts.
-func (c Client) ListAccounts(opts ...AccountConfigurable) ([]Account, error) {
-	// Apply all the configurable functions to the client
-	for _, opt := range opts {
-		opt(&c)
-	}
+func (c Client) ListAccounts(opts ...ListAccountFilter) ([]Account, error) {
 
 	respAccounts := []Account{}
 	req, _ := http.NewRequest(http.MethodGet, "https://api.moov.io/accounts", nil)
@@ -544,40 +561,8 @@ func (c Client) ListAccounts(opts ...AccountConfigurable) ([]Account, error) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 
-	q := req.URL.Query()
-	// Add a name query if it was provided
-	if c.AccountParams.Name != "" {
-		q.Add("name", c.AccountParams.Name)
-	}
-	// Add a email query if it was provided
-	if c.AccountParams.Email != "" {
-		q.Add("email", c.AccountParams.Email)
-	}
-	// Add a type query if it was provided
-	if c.AccountParams.Type != "" {
-		q.Add("type", c.AccountParams.Type)
-	}
-	// Add a foreignID query if it was provided
-	if c.AccountParams.ForeignID != "" {
-		q.Add("foreignID", c.AccountParams.ForeignID)
-	}
-	// Add a verification_status query if it was provided
-	if c.AccountParams.VerificationStatus != "" {
-		q.Add("verification_status", c.AccountParams.VerificationStatus)
-	}
-	// Add a includeDisconnected query if it was provided
-	if c.AccountParams.IncludeDisconnected {
-		q.Add("includeDisconnected", "true")
-	}
-	// Add a count query if it was provided
-	if c.AccountParams.Count != 0 {
-		q.Add("count", strconv.Itoa(c.AccountParams.Count))
-	}
-	// Add a skip query if it was provided
-	if c.AccountParams.Skip != 0 {
-		q.Add("skip", strconv.Itoa(c.AccountParams.Skip))
-	}
-	req.URL.RawQuery = q.Encode()
+	// Apply all the filters to the url query strings
+	applyAccountFilters(req.URL, opts...)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

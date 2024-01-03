@@ -72,6 +72,8 @@ func (s *BankAccountTestSuite) SetupSuite() {
 		}
 	}
 
+	s.Assert().NotEmpty(s.accountID)
+
 	// create a bank account for Lincoln National Corporation
 	bankAccount := BankAccount{
 		HolderName:      "Sir Test ALot",

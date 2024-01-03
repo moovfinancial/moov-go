@@ -32,7 +32,7 @@ func CallHttp(ctx context.Context, c Client, method string, url string, data any
 		return nil, 0, err
 	}
 
-	// by default send basic auth but allow the header to be overriden
+	// by default send basic auth but allow the header to be overridden
 	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 
 	for key, val := range header {
