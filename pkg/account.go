@@ -464,7 +464,7 @@ func (c Client) UpdateAccount(account Account) (Account, error) {
 
 type AccountConfigurable func(c *Client)
 
-type AccountParams struct {
+type AccountFilters struct {
 	// Name If provided, this query will attempt to find matches against the following Account and Profile fields: diplayName, firstName, middleName, lastName, legalBusinessName
 	Name string `url:"name"`
 	// Email Filter connected accounts by email address.

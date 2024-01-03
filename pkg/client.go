@@ -97,7 +97,7 @@ var TransferStatusStrings = map[TransferStatus]string{
 
 type Client struct {
 	Credentials   Credentials
-	AccountParams AccountParams
+	AccountParams AccountFilters
 }
 
 type ClientCredentialsGrantToAccessTokenResponse struct {
