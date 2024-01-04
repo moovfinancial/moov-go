@@ -45,7 +45,7 @@ func (c Client) ListWallets(accountID string) ([]Wallet, error) {
 	var resWallets []Wallet
 	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathWallets, accountID))
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resWallets, err
 	}
@@ -69,7 +69,7 @@ func (c Client) GetWallet(accountID string, walletID string) (Wallet, error) {
 	resWallet := Wallet{}
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathWallets, accountID), walletID)
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resWallet, err
 	}
@@ -97,7 +97,7 @@ func (c Client) ListWalletTransactions(accountID string, walletID string) ([]Tra
 	var resTransactions []Transaction
 	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathWalletTrans, accountID, walletID))
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resTransactions, err
 	}
@@ -123,7 +123,7 @@ func (c Client) GetWalletTransaction(accountID string, walletID string, transact
 	resTransaction := Transaction{}
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathWalletTrans, accountID, walletID), transactionID)
 
-	body, statusCode, err := GetHTTPResponse(c, http.MethodGet, url, nil, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
 	if err != nil {
 		return resTransaction, err
 	}

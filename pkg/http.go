@@ -15,12 +15,12 @@ func DefaultHttpClient() *http.Client {
 }
 
 // GetHTTPResponse performs an HTTP request and returns the response body or an error.
-func GetHTTPResponse(c Client, method string, url string, data any, header map[string]string) ([]byte, int, error) {
-	return CallHttp(context.Background(), c, method, url, data, header)
+func (c *Client) GetHTTPResponse(method string, url string, data any, header map[string]string) ([]byte, int, error) {
+	return c.CallHttp(context.Background(), method, url, data, header)
 }
 
 // GetHTTPResponse performs an HTTP request and returns the response body or an error.
-func CallHttp(ctx context.Context, c Client, method string, url string, data any, header map[string]string) ([]byte, int, error) {
+func (c *Client) CallHttp(ctx context.Context, method string, url string, data any, header map[string]string) ([]byte, int, error) {
 
 	reqBody, err := httpRequestBody(data)
 	if err != nil {
