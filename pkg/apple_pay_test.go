@@ -50,11 +50,11 @@ func (s *ApplePayTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
 	mc := NewTestClient(s.T())
 
-	accounts, err := mc.ListAccounts()
+	accounts, err := mc.ListAccounts(WithAccountName("Lincoln National Corporation"))
 	s.NoError(err)
 
 	for _, account := range accounts {
-		if account.DisaplayName == "Arch Coal, Inc." {
+		if account.DisaplayName == "Lincoln National Corporation" {
 			// set the accountID for testing
 			s.accountID = account.AccountID
 		}
