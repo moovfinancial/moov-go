@@ -171,19 +171,16 @@ type CardUpdateFilter func(*CardPost) error
 
 func applyCardUpdateFilters(opts ...CardUpdateFilter) (*CardPost, error) {
 	card := &CardPost{}
-
 	// Error if no opts provided
 	if len(opts) == 0 {
 		return card, ErrNoCardUpdateFilters
 	}
-
 	// apply each filter to the card
 	for _, opt := range opts {
 		if err := opt(card); err != nil {
 			return card, err
 		}
 	}
-
 	return card, nil
 }
 
