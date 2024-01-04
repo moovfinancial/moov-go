@@ -64,14 +64,12 @@ func TestCardMarshal(t *testing.T) {
 
 type CardTestSuite struct {
 	suite.Suite
-	// values for testing will be set in init()
 	accountID    string
 	cardID       string
 	deleteCardID string
 	cards        []string
 }
 
-// listen for 'go test' command --> run test methods
 func TestCardSuite(t *testing.T) {
 	suite.Run(t, new(CardTestSuite))
 }
@@ -109,7 +107,7 @@ func (s *CardTestSuite) SetupSuite() {
 
 	respCard, err := mc.CreateCard(s.accountID, card)
 	s.NoError(err, "Error creating card")
-
+	s.cardID = respCard.CardID
 	s.deleteCardID = respCard.CardID
 	s.cards = append(s.cards, respCard.CardID)
 }
@@ -117,7 +115,7 @@ func (s *CardTestSuite) SetupSuite() {
 func (s *CardTestSuite) TearDownSuite() {
 	mc := NewTestClient(s.T())
 
-	// delete the bank accounts we created
+	// delete the cards we created
 	for _, cardID := range s.cards {
 		if cardID != "" {
 			err := mc.DisableCard(s.accountID, cardID)
@@ -193,10 +191,10 @@ func (s *CardTestSuite) TestUpdateCard() {
 
 	mc := NewTestClient(s.T())
 
-	newCard, err := mc.UpdateCard(s.accountID, s.cardID, card, "937")
+	updatedCard, err := mc.UpdateCard(s.accountID, s.cardID, card, "937")
 	s.NoError(err)
 
-	s.Equal(newCard.BillingAddress, card.BillingAddress)
+	s.Equal(updatedCard.BillingAddress, card.BillingAddress)
 }
 
 func (s *CardTestSuite) TestDisableCard() {
