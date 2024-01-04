@@ -76,6 +76,13 @@ type CardPost struct {
 	MerchantAccountID string     `json:"merchantAccountID,omitempty"`
 }
 
+type CardPatch struct {
+	CardCvv        string     `json:"cardCvv,omitempty"`
+	Expiration     Expiration `json:"expiration,omitempty"`
+	BillingAddress Address    `json:"billingAddress,omitempty"`
+	CardOnFile     bool       `json:"cardOnFile,omitempty"`
+}
+
 // CreateCard creates a new card for the given customer linked to their account
 // https://docs.moov.io/api/#tag/Cards/operation/card
 func (c Client) CreateCard(accountID string, card CardPost) (Card, error) {
@@ -167,10 +174,10 @@ func (c Client) GetCard(accountID string, cardID string) (Card, error) {
 	return resCard, ErrDefault(statusCode)
 }
 
-type CardUpdateFilter func(*CardPost) error
+type CardUpdateFilter func(*CardPatch) error
 
-func applyCardUpdateFilters(opts ...CardUpdateFilter) (*CardPost, error) {
-	card := &CardPost{}
+func applyCardUpdateFilters(opts ...CardUpdateFilter) (*CardPatch, error) {
+	card := &CardPatch{}
 	// Error if no opts provided
 	if len(opts) == 0 {
 		return card, ErrNoCardUpdateFilters
@@ -186,7 +193,7 @@ func applyCardUpdateFilters(opts ...CardUpdateFilter) (*CardPost, error) {
 
 // WithCardBillingAddress sets the billing address for the card
 func WithCardBillingAddress(address Address) CardUpdateFilter {
-	return func(card *CardPost) error {
+	return func(card *CardPatch) error {
 		card.BillingAddress = address
 		return nil
 	}
@@ -194,7 +201,7 @@ func WithCardBillingAddress(address Address) CardUpdateFilter {
 
 // WithCardExpiration sets the expiration date for the card
 func WithCardExpiration(expiration Expiration) CardUpdateFilter {
-	return func(card *CardPost) error {
+	return func(card *CardPatch) error {
 		card.Expiration = expiration
 		return nil
 	}
@@ -202,7 +209,7 @@ func WithCardExpiration(expiration Expiration) CardUpdateFilter {
 
 // WithCardCvv sets the CVV for the card
 func WithCardCVV(cvv string) CardUpdateFilter {
-	return func(card *CardPost) error {
+	return func(card *CardPatch) error {
 		card.CardCvv = cvv
 		return nil
 	}
@@ -210,7 +217,7 @@ func WithCardCVV(cvv string) CardUpdateFilter {
 
 // WithCardOnFile sets the card on file for the card boolean
 func WithCardOnFile(cardOnFile bool) CardUpdateFilter {
-	return func(card *CardPost) error {
+	return func(card *CardPatch) error {
 		card.CardOnFile = cardOnFile
 		return nil
 	}
@@ -219,15 +226,17 @@ func WithCardOnFile(cardOnFile bool) CardUpdateFilter {
 // UpdateCard Update a linked card and/or resubmit it for verification.
 // If a value is provided for CVV, a new verification ($0 authorization) will be submitted for the card. Updating the expiration date or address will update the information stored on file for the card but will not be verified
 // https://docs.moov.io/api/#tag/Cards/operation/updateCard
-func (c Client) UpdateCard(accountID string, cardID string, opts ...CardUpdateFilter) (Card, error) {
+func (c Client) UpdateCard(accountID string, cardID string, opt1 CardUpdateFilter, opts ...CardUpdateFilter) (Card, error) {
 	resCard := Card{}
 	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathCards, accountID), cardID)
 	// Create a new CardPost payload and apply any filters
+	opts = append([]CardUpdateFilter{opt1}, opts...)
 	payload, err := applyCardUpdateFilters(opts...)
 	if err != nil {
 		return resCard, err
 	}
-	body, statusCode, err := GetHTTPResponse(c, http.MethodPatch, url, payload, nil)
+	body, statusCode, err := c.GetHTTPResponse(http.MethodPatch, url, payload, nil)
+
 	if err != nil {
 		return resCard, err
 	}

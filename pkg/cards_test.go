@@ -209,9 +209,15 @@ func (s *CardTestSuite) TestUpdateCardCVV() {
 	s.Equal("unavailable", updatedCard.CardVerification.Cvv)
 }
 
+func (s *CardTestSuite) TestUpdateMultipleFilters() {
+	mc := NewTestClient(s.T())
+	updatedCard, err := mc.UpdateCard(s.accountID, s.cardID, WithCardOnFile(true), WithCardCVV("666"))
+	s.NoError(err)
+	s.True(updatedCard.CardOnFile)
+}
+
 func (s *CardTestSuite) TestDisableCard() {
 	mc := NewTestClient(s.T())
-
 	err := mc.DisableCard(s.accountID, s.cardID)
 	s.NoError(err)
 }
