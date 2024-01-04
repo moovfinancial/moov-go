@@ -171,30 +171,42 @@ func (s *CardTestSuite) TestGetCard() {
 
 	s.Equal(s.cardID, card.CardID)
 }
-
-func (s *CardTestSuite) TestUpdateCard() {
-	card := Card{
-		Expiration: Expiration{
-			Month: "01",
-			Year:  "28",
-		},
-		BillingAddress: Address{
-			AddressLine1:    "125 Main Street",
-			AddressLine2:    "Apt 302",
-			City:            "Boulder",
-			StateOrProvince: "CO",
-			PostalCode:      "80303",
-			Country:         "US",
-		},
-		CardOnFile: false,
+func (s *CardTestSuite) TestUpdateCardBillingAddress() {
+	mc := NewTestClient(s.T())
+	billingAddress := Address{
+		AddressLine1:    "125 Main Street",
+		AddressLine2:    "Apt 302",
+		City:            "Boulder",
+		StateOrProvince: "CO",
+		PostalCode:      "80303",
+		Country:         "US",
 	}
 
-	mc := NewTestClient(s.T())
-
-	updatedCard, err := mc.UpdateCard(s.accountID, s.cardID, card, "937")
+	updatedCard, err := mc.UpdateCard(s.accountID, s.cardID, WithCardBillingAddress(billingAddress))
 	s.NoError(err)
+	s.Equal(billingAddress, updatedCard.BillingAddress)
+	// TODO: This should be "match" but isn't implemented in Moov's test mode and needs a server side fix
+	s.Equal("unavailable", updatedCard.CardVerification.AddressLine1)
+}
 
-	s.Equal(updatedCard.BillingAddress, card.BillingAddress)
+func (s *CardTestSuite) TestUpdateCardExpiration() {
+	mc := NewTestClient(s.T())
+	exp := Expiration{
+		Month: "01",
+		Year:  "28",
+	}
+
+	updatedCard, err := mc.UpdateCard(s.accountID, s.cardID, WithCardExpiration(exp))
+	s.NoError(err)
+	s.Equal(exp, updatedCard.Expiration)
+}
+
+func (s *CardTestSuite) TestUpdateCardCVV() {
+	mc := NewTestClient(s.T())
+	updatedCard, err := mc.UpdateCard(s.accountID, s.cardID, WithCardCVV("987"))
+	s.NoError(err)
+	// TODO: This should be "match" but isn't implemented in Moov's test mode and needs a server side fix
+	s.Equal("unavailable", updatedCard.CardVerification.Cvv)
 }
 
 func (s *CardTestSuite) TestDisableCard() {

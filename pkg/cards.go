@@ -2,9 +2,15 @@ package moov
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
+)
+
+var (
+	ErrNoCardUpdateFilters = errors.New("no card update filters provided")
+	ErrUpdateCardConflict  = errors.New("attempting to update an existing disabled card")
 )
 
 type Card struct {
@@ -161,20 +167,69 @@ func (c Client) GetCard(accountID string, cardID string) (Card, error) {
 	return resCard, ErrDefault(statusCode)
 }
 
+type CardUpdateFilter func(*CardPost) error
+
+func applyCardUpdateFilters(opts ...CardUpdateFilter) (*CardPost, error) {
+	card := &CardPost{}
+
+	// Error if no opts provided
+	if len(opts) == 0 {
+		return card, ErrNoCardUpdateFilters
+	}
+
+	// apply each filter to the card
+	for _, opt := range opts {
+		if err := opt(card); err != nil {
+			return card, err
+		}
+	}
+
+	return card, nil
+}
+
+// WithCardBillingAddress sets the billing address for the card
+func WithCardBillingAddress(address Address) CardUpdateFilter {
+	return func(card *CardPost) error {
+		card.BillingAddress = address
+		return nil
+	}
+}
+
+// WithCardExpiration sets the expiration date for the card
+func WithCardExpiration(expiration Expiration) CardUpdateFilter {
+	return func(card *CardPost) error {
+		card.Expiration = expiration
+		return nil
+	}
+}
+
+// WithCardCvv sets the CVV for the card
+func WithCardCVV(cvv string) CardUpdateFilter {
+	return func(card *CardPost) error {
+		card.CardCvv = cvv
+		return nil
+	}
+}
+
+// WithCardOnFile sets the card on file for the card boolean
+func WithCardOnFile(cardOnFile bool) CardUpdateFilter {
+	return func(card *CardPost) error {
+		card.CardOnFile = cardOnFile
+		return nil
+	}
+}
+
 // UpdateCard Update a linked card and/or resubmit it for verification.
 // If a value is provided for CVV, a new verification ($0 authorization) will be submitted for the card. Updating the expiration date or address will update the information stored on file for the card but will not be verified
 // https://docs.moov.io/api/#tag/Cards/operation/updateCard
-func (c Client) UpdateCard(accountID string, cardID string, card Card, cardCvv string) (Card, error) {
-	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathCards, accountID), cardID)
-
-	payload := CardPost{
-		BillingAddress: card.BillingAddress,
-		Expiration:     card.Expiration,
-		CardOnFile:     card.CardOnFile,
-		CardCvv:        cardCvv,
-	}
-
+func (c Client) UpdateCard(accountID string, cardID string, opts ...CardUpdateFilter) (Card, error) {
 	resCard := Card{}
+	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathCards, accountID), cardID)
+	// Create a new CardPost payload and apply any filters
+	payload, err := applyCardUpdateFilters(opts...)
+	if err != nil {
+		return resCard, err
+	}
 	body, statusCode, err := GetHTTPResponse(c, http.MethodPatch, url, payload, nil)
 	if err != nil {
 		return resCard, err
@@ -192,8 +247,9 @@ func (c Client) UpdateCard(accountID string, cardID string, card Card, cardCvv s
 	case http.StatusNotFound:
 		return resCard, ErrNoAccount
 	case http.StatusConflict:
-		return resCard, ErrDuplicateLinkCard
+		return resCard, ErrUpdateCardConflict
 	case http.StatusUnprocessableEntity:
+		// TODO: parse error message from the body. See https://docs.moov.io/api/sources/cards/update/
 		return resCard, ErrCardDataInvalid
 	case http.StatusTooManyRequests:
 		return resCard, ErrRateLimit
