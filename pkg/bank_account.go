@@ -10,7 +10,7 @@ import (
 
 var (
 	ErrDuplicateBankAccount = errors.New("duplciate bank account or invalid routing number")
-	ErrNoMicroDeposit       = errors.New("No account with the specified accountID was found or micro-deposits have not been sent for the source.")
+	ErrNoMicroDeposit       = errors.New("no account with the specified accountID was found or micro-deposits have not been sent for the source")
 )
 
 type BankAccount struct {
