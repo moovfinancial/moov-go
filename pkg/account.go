@@ -437,8 +437,7 @@ func (c Client) UpdateAccount(account Account) (Account, error) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return account, err
 	}
@@ -563,8 +562,7 @@ func (c Client) ListAccounts(opts ...ListAccountFilter) ([]Account, error) {
 	// Apply all the filters to the url query strings
 	applyAccountFilters(req.URL, opts...)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return respAccounts, err
 	}
