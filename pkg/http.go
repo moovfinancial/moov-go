@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 func DefaultHttpClient() *http.Client {
@@ -16,18 +18,12 @@ func DefaultHttpClient() *http.Client {
 
 // GetHTTPResponse performs an HTTP request and returns the response body or an error.
 func (c *Client) GetHTTPResponse(method string, url string, data any, header map[string]string) ([]byte, int, error) {
-	return c.CallHttp(context.Background(), method, url, data, header)
-}
-
-// GetHTTPResponse performs an HTTP request and returns the response body or an error.
-func (c *Client) CallHttp(ctx context.Context, method string, url string, data any, header map[string]string) ([]byte, int, error) {
-
 	reqBody, err := httpRequestBody(data)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, url, reqBody)
+	req, err := http.NewRequestWithContext(context.Background(), method, url, reqBody)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -61,4 +57,101 @@ func httpRequestBody(data any) (io.Reader, error) {
 	}
 
 	return nil, nil
+}
+
+func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...callArg) (CallResponse, error) {
+	call, err := newCall(endpoint, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	url := fmt.Sprintf("https://%s%s", c.Credentials.Host, call.path)
+
+	req, err := http.NewRequestWithContext(ctx, call.method, url, call.body)
+	if err != nil {
+		return nil, err
+	}
+
+	qry := req.URL.Query()
+	for k, v := range call.params {
+		qry.Add(k, v)
+	}
+	req.URL.RawQuery = qry.Encode()
+
+	for k, v := range call.headers {
+		req.Header.Add(k, v)
+	}
+
+	if call.token != nil {
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", *call.token))
+	} else {
+		req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
+	}
+
+	resp, err := c.HttpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+
+	return &httpCallResponse{
+		resp: resp,
+		body: body,
+	}, nil
+}
+
+var _ CallResponse = &httpCallResponse{}
+
+type httpCallResponse struct {
+	resp *http.Response
+	body []byte
+}
+
+func (r *httpCallResponse) Status() CallStatus {
+	switch r.resp.StatusCode {
+	case http.StatusOK, http.StatusNoContent:
+		return StatusCompleted
+	case http.StatusCreated:
+		return StatusStarted
+
+	case http.StatusBadRequest:
+		return StatusBadRequest
+	case http.StatusConflict:
+		return StatusStateConflict
+	case http.StatusUnprocessableEntity:
+		return StatusFailedValidation
+
+	case http.StatusUnauthorized:
+		return StatusUnauthenticated
+	case http.StatusForbidden:
+		return StatusUnauthorized
+
+	case http.StatusTooManyRequests:
+		return StatusRateLimited
+
+	default:
+		return StatusServerError
+	}
+}
+
+func (r *httpCallResponse) Marshal(item any) error {
+	ct := strings.ToLower(r.resp.Header.Get("content-type"))
+
+	if strings.Contains(ct, "json") {
+		// content type checking here...
+		return json.Unmarshal(r.body, item)
+	}
+
+	return fmt.Errorf("unknown content-type: %s", ct)
+}
+
+func (r *httpCallResponse) Error() error {
+	switch r.Status() {
+	case StatusCompleted, StatusStarted:
+		return nil
+	default:
+		return fmt.Errorf("error from moov - status: %s", r.Status().Name)
+	}
 }
