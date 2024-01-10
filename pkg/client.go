@@ -50,6 +50,7 @@ const (
 	pathTransfers       = "/transfers"
 	pathTransferOptions = "/transfer-options"
 	pathDisputes        = "/disputes"
+	pathDisputeID       = "/disputes/%s"
 )
 
 var (

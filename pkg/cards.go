@@ -75,13 +75,6 @@ type CreateCard struct {
 	MerchantAccountID string     `json:"merchantAccountID,omitempty"`
 }
 
-type CardPatch struct {
-	CardCvv        string     `json:"cardCvv,omitempty"`
-	Expiration     Expiration `json:"expiration,omitempty"`
-	BillingAddress Address    `json:"billingAddress,omitempty"`
-	CardOnFile     bool       `json:"cardOnFile,omitempty"`
-}
-
 // CreateCard creates a new card for the given customer linked to their account
 // https://docs.moov.io/api/#tag/Cards/operation/card
 func (c Client) CreateCard(ctx context.Context, accountID string, card CreateCard) (*Card, error) {
@@ -124,10 +117,17 @@ func (c Client) GetCard(ctx context.Context, accountID string, cardID string) (*
 	return CompletedObjectOrError[Card](resp)
 }
 
-type CardUpdateFilter func(*CardPatch) error
+type CardUpdateFilter func(*cardPatch) error
 
-func applyCardUpdateFilters(opts ...CardUpdateFilter) (*CardPatch, error) {
-	card := &CardPatch{}
+type cardPatch struct {
+	CardCvv        string     `json:"cardCvv,omitempty"`
+	Expiration     Expiration `json:"expiration,omitempty"`
+	BillingAddress Address    `json:"billingAddress,omitempty"`
+	CardOnFile     bool       `json:"cardOnFile,omitempty"`
+}
+
+func applyCardUpdateFilters(opts ...CardUpdateFilter) (*cardPatch, error) {
+	card := &cardPatch{}
 	// apply each filter to the card
 	for _, opt := range opts {
 		if err := opt(card); err != nil {
@@ -139,7 +139,7 @@ func applyCardUpdateFilters(opts ...CardUpdateFilter) (*CardPatch, error) {
 
 // WithCardBillingAddress sets the billing address for the card
 func WithCardBillingAddress(address Address) CardUpdateFilter {
-	return func(card *CardPatch) error {
+	return func(card *cardPatch) error {
 		card.BillingAddress = address
 		return nil
 	}
@@ -147,7 +147,7 @@ func WithCardBillingAddress(address Address) CardUpdateFilter {
 
 // WithCardExpiration sets the expiration date for the card
 func WithCardExpiration(expiration Expiration) CardUpdateFilter {
-	return func(card *CardPatch) error {
+	return func(card *cardPatch) error {
 		card.Expiration = expiration
 		return nil
 	}
@@ -155,7 +155,7 @@ func WithCardExpiration(expiration Expiration) CardUpdateFilter {
 
 // WithCardCvv sets the CVV for the card
 func WithCardCVV(cvv string) CardUpdateFilter {
-	return func(card *CardPatch) error {
+	return func(card *cardPatch) error {
 		card.CardCvv = cvv
 		return nil
 	}
@@ -163,7 +163,7 @@ func WithCardCVV(cvv string) CardUpdateFilter {
 
 // WithCardOnFile sets the card on file for the card boolean
 func WithCardOnFile(cardOnFile bool) CardUpdateFilter {
-	return func(card *CardPatch) error {
+	return func(card *cardPatch) error {
 		card.CardOnFile = cardOnFile
 		return nil
 	}
