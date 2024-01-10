@@ -176,8 +176,11 @@ func (s *BankAccountTestSuite) TestMicroDepositInitiate() {
 func (s *BankAccountTestSuite) TestMicroDepositConfirm() {
 	mc := NewTestClient(s.T())
 
+	err := mc.MicroDepositInitiate(context.Background(), s.accountID, s.bankAccountID)
+	s.NoError(err)
+	
 	// sample data
-	amounts := []int{22, 21}
-	err := mc.MicroDepositConfirm(context.Background(), s.accountID, s.bankAccountID, amounts)
+	amounts := []int{0, 0}
+	err = mc.MicroDepositConfirm(context.Background(), s.accountID, s.bankAccountID, amounts)
 	s.NoError(err)
 }

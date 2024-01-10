@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -58,6 +59,20 @@ func (s *WalletTestSuite) SetupSuite() {
 			s.accountID = account.AccountID
 		}
 	}
+	wallets, err := mc.ListWallets(s.accountID)
+	s.NoError(err)
+
+	for _, wallet := range wallets {
+		s.walletID = wallet.WalletID
+	}
+	s.Assert().NotEmpty(s.accountID)
+
+	transactions, err := mc.ListWalletTransactions(s.accountID, s.walletID, WithTransactionCount(1))
+	s.NoError(err)
+	for _, transaction := range transactions {
+		s.walletTransactionID = transaction.TransactionID
+	}
+	s.Assert().NotEmpty(s.walletTransactionID)
 }
 
 func (s *WalletTestSuite) TearDownSuite() {}
@@ -67,55 +82,31 @@ func (s *WalletTestSuite) TestListWallets() {
 
 	wallets, err := mc.ListWallets(s.accountID)
 	s.NoError(err)
-
+	// range over wallets and print walletID
+	for _, wallet := range wallets {
+		log.Printf("Wallet: %s", wallet.WalletID)
+	}
 	s.Require().NotEmpty(wallets)
-
-	s.walletID = wallets[0].WalletID
 }
 
 func (s *WalletTestSuite) TestGetWallet() {
 	mc := NewTestClient(s.T())
-
-	walletID := s.walletID
-	if walletID == "" {
-		walletID = "3097f356-f763-4b24-b282-b53b9bb644ef"
-	}
-
-	wallet, err := mc.GetWallet(s.accountID, walletID)
+	wallet, err := mc.GetWallet(s.accountID, s.walletID)
 	s.NoError(err)
-
-	s.Equal(walletID, wallet.WalletID)
+	s.Equal(s.walletID, wallet.WalletID)
 }
 
 func (s *WalletTestSuite) TestListWalletTransactions() {
 	mc := NewTestClient(s.T())
-
-	walletID := s.walletID
-	if walletID == "" {
-		walletID = "3097f356-f763-4b24-b282-b53b9bb644ef"
-	}
-
-	walletTrans, err := mc.ListWalletTransactions(s.accountID, walletID)
+	walletTransactions, err := mc.ListWalletTransactions(s.accountID, s.walletID, WithTransactionStatus("completed"), WithTransactionCount(50))
 	s.NoError(err)
-
-	s.NotNil(walletTrans)
+	s.NotNil(walletTransactions)
+	s.Greater(len(walletTransactions), 3)
 }
 
 func (s *WalletTestSuite) TestGetWalletTransaction() {
 	mc := NewTestClient(s.T())
-
-	walletID := s.walletID
-	if walletID == "" {
-		walletID = "3097f356-f763-4b24-b282-b53b9bb644ef"
-	}
-
-	walletTransactionID := s.walletTransactionID
-	if walletTransactionID == "" {
-		walletTransactionID = "3097f356-f763-4b24-b282-b53b9bb644ef"
-	}
-
-	walletTran, err := mc.GetWalletTransaction(s.accountID, walletID, walletTransactionID)
+	walletTran, err := mc.GetWalletTransaction(s.accountID, s.walletID, s.walletTransactionID)
 	s.NoError(err)
-
-	s.Equal(walletTransactionID, walletTran.TransactionID)
+	s.Equal(s.walletTransactionID, walletTran.TransactionID)
 }
