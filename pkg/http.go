@@ -136,7 +136,7 @@ func (r *httpCallResponse) Status() CallStatus {
 	}
 }
 
-func (r *httpCallResponse) Marshal(item any) error {
+func (r *httpCallResponse) Unmarshal(item any) error {
 	ct := strings.ToLower(r.resp.Header.Get("content-type"))
 
 	if strings.Contains(ct, "json") {

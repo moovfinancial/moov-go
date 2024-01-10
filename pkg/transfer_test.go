@@ -238,9 +238,9 @@ func (s *TransferTestSuite) SetupSuite() {
 	}
 
 	// get card to get paymentID
-	cards, _ := mc.ListCards(s.accountID)
+	cards, _ := mc.ListCards(context.Background(), s.accountID)
 	if len(cards) == 0 {
-		card := CardPost{
+		card := CreateCard{
 			CardNumber: "371111111111114",
 			CardCvv:    "1234",
 			Expiration: Expiration{
@@ -257,10 +257,10 @@ func (s *TransferTestSuite) SetupSuite() {
 			},
 		}
 
-		respCard, err := mc.CreateCard(s.accountID, card)
+		respCard, err := mc.CreateCard(context.Background(), s.accountID, card)
 		s.NoError(err, "Error creating card")
 
-		s.card = respCard
+		s.card = *respCard
 		s.deleteCardID = respCard.CardID
 	} else {
 		s.card = cards[0]
@@ -299,7 +299,7 @@ func (s *TransferTestSuite) TearDownSuite() {
 
 	//delete the card we created
 	if s.deleteCardID != "" {
-		err := mc.DisableCard(s.accountID, s.deleteCardID)
+		err := mc.DisableCard(context.Background(), s.accountID, s.deleteCardID)
 		s.NoError(err)
 	}
 }
@@ -336,11 +336,21 @@ func (s *TransferTestSuite) TestCreateTransfer() {
 
 	mc := NewTestClient(s.T())
 
-	respTransfer, err := mc.CreateTransfer(source, destination, amount, facilitatorFee, description, metadata, true)
-	s.NoError(err, "Error creating transfer")
+	completedTransfer, startedTransfer, err := mc.CreateTransfer(context.Background(), CreateTransfer{
+		Source:         source,
+		Destination:    destination,
+		Amount:         amount,
+		FacilitatorFee: facilitatorFee,
+		Description:    description,
+		Metadata:       metadata,
+	}, true)
 
-	s.NotEmpty(respTransfer.TransferID)
-	s.transfer = respTransfer
+	s.Require().NoError(err, "Error creating transfer")
+	s.Require().Nil(startedTransfer) // We asked it to be synchronous so hopefully is nil
+	s.Require().NotNil(completedTransfer)
+	s.Require().NotEmpty(completedTransfer.TransferID)
+
+	s.transfer = *completedTransfer
 }
 
 func (s *TransferTestSuite) TestListTransfers() {

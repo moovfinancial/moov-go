@@ -38,12 +38,7 @@ func (c Client) GetAccount(ctx context.Context, accountID string) (*Account, err
 		return nil, err
 	}
 
-	switch resp.Status() {
-	case StatusCompleted:
-		return UnmarshalObjectResponse[Account](resp)
-	default:
-		return nil, resp.Error()
-	}
+	return CompletedObjectOrError[Account](resp)
 }
 
 // UpdateAccount updates an account.
@@ -56,12 +51,7 @@ func (c Client) UpdateAccount(ctx context.Context, account Account) (*Account, e
 		return nil, err
 	}
 
-	switch resp.Status() {
-	case StatusCompleted:
-		return UnmarshalObjectResponse[Account](resp)
-	default:
-		return nil, resp.Error()
-	}
+	return CompletedObjectOrError[Account](resp)
 }
 
 // Func that applies a filter and returns an error if validation fails
@@ -69,7 +59,7 @@ type ListAccountFilter callArg
 
 // WithAccountName if provided, this query will attempt to find matches against the following Account and Profile fields: diplayName, firstName, middleName, lastName, legalBusinessName
 func WithAccountName(name string) ListAccountFilter {
-	return wrapCallFn(func(call *callBuilder) error {
+	return callBuilderFn(func(call *callBuilder) error {
 		call.params["name"] = name
 		return nil
 	})
@@ -77,7 +67,7 @@ func WithAccountName(name string) ListAccountFilter {
 
 // WithAccountEmail filter connected accounts by email address.
 func WithAccountEmail(email string) ListAccountFilter {
-	return wrapCallFn(func(call *callBuilder) error {
+	return callBuilderFn(func(call *callBuilder) error {
 		call.params["email"] = email
 		return nil
 	})
@@ -85,7 +75,7 @@ func WithAccountEmail(email string) ListAccountFilter {
 
 // WithAccountType filter type possible values: individual, business
 func WithAccountType(accountType string) ListAccountFilter {
-	return wrapCallFn(func(call *callBuilder) error {
+	return callBuilderFn(func(call *callBuilder) error {
 		call.params["type"] = accountType
 		return nil
 	})
@@ -93,7 +83,7 @@ func WithAccountType(accountType string) ListAccountFilter {
 
 // WithAccountForeignID filter as an optional alias from a foreign/external system which can be used to reference this resource.
 func WithAccountForeignID(foreignID string) ListAccountFilter {
-	return wrapCallFn(func(call *callBuilder) error {
+	return callBuilderFn(func(call *callBuilder) error {
 		call.params["foreignID"] = foreignID
 		return nil
 	})
@@ -101,7 +91,7 @@ func WithAccountForeignID(foreignID string) ListAccountFilter {
 
 // WithAccountVerificationStatus possible values: unverified, pending, resubmit, review, verified, failed
 func WithAccountVerificationStatus(verificationStatus string) ListAccountFilter {
-	return wrapCallFn(func(call *callBuilder) error {
+	return callBuilderFn(func(call *callBuilder) error {
 		call.params["verification_status"] = verificationStatus
 		return nil
 	})
@@ -109,7 +99,7 @@ func WithAccountVerificationStatus(verificationStatus string) ListAccountFilter 
 
 // WithAccountIncludeDisconnected if true, the response will include disconnected accounts.
 func WithAccountIncludeDisconnected() ListAccountFilter {
-	return wrapCallFn(func(call *callBuilder) error {
+	return callBuilderFn(func(call *callBuilder) error {
 		call.params["includeDisconnected"] = "true"
 		return nil
 	})
@@ -117,7 +107,7 @@ func WithAccountIncludeDisconnected() ListAccountFilter {
 
 // WithAccountCount value to limit the number of results in the query. Default is 20
 func WithAccountCount(count int) ListAccountFilter {
-	return wrapCallFn(func(call *callBuilder) error {
+	return callBuilderFn(func(call *callBuilder) error {
 		call.params["count"] = strconv.Itoa(count)
 		return nil
 	})
@@ -125,7 +115,7 @@ func WithAccountCount(count int) ListAccountFilter {
 
 // WithAccountSkip the number of items to offset before starting to collect the result set
 func WithAccountSkip(skip int) ListAccountFilter {
-	return wrapCallFn(func(call *callBuilder) error {
+	return callBuilderFn(func(call *callBuilder) error {
 		call.params["skip"] = strconv.Itoa(skip)
 		return nil
 	})
@@ -140,12 +130,7 @@ func (c Client) ListAccounts(ctx context.Context, opts ...ListAccountFilter) ([]
 		return nil, err
 	}
 
-	switch resp.Status() {
-	case StatusCompleted:
-		return UnmarshalListResponse[Account](resp)
-	default:
-		return nil, resp.Error()
-	}
+	return CompletedListOrError[Account](resp)
 }
 
 // DeleteAccount deletes an account.

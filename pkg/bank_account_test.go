@@ -84,8 +84,10 @@ func (s *BankAccountTestSuite) SetupSuite() {
 		RoutingNumber:   "273976369",
 	}
 
-	bankAccount, err = mc.CreateBankAccount(s.accountID, bankAccount)
+	result, err := mc.CreateBankAccount(context.Background(), s.accountID, bankAccount)
 	s.NoError(err)
+	s.NotNil(result)
+	bankAccount = *result
 
 	s.bankAccountID = bankAccount.BankAccountID
 	s.bankAccounts = append(s.bankAccounts, bankAccount.BankAccountID)
@@ -98,8 +100,10 @@ func (s *BankAccountTestSuite) SetupSuite() {
 		RoutingNumber:   "273976369",
 	}
 
-	bankAccount, err = mc.CreateBankAccount(s.accountID, bankAccountDelete)
+	result, err = mc.CreateBankAccount(context.Background(), s.accountID, bankAccountDelete)
 	s.NoError(err)
+	s.NotNil(result)
+	bankAccount = *result
 
 	s.bankAccountIDDelete = bankAccount.BankAccountID
 	s.bankAccounts = append(s.bankAccounts, bankAccount.BankAccountID)
@@ -111,7 +115,7 @@ func (s *BankAccountTestSuite) TearDownSuite() {
 	// delete the bank accounts we created
 	for _, bankAccountID := range s.bankAccounts {
 		if bankAccountID != "" {
-			err := mc.DeleteBankAccount(s.accountID, bankAccountID)
+			err := mc.DeleteBankAccount(context.Background(), s.accountID, bankAccountID)
 			s.NoError(err)
 		}
 	}
@@ -128,8 +132,9 @@ func (s *BankAccountTestSuite) TestCreateBankAccount() {
 
 	mc := NewTestClient(s.T())
 
-	bankAccount, err := mc.CreateBankAccount(s.accountID, bankAccount)
+	result, err := mc.CreateBankAccount(context.Background(), s.accountID, bankAccount)
 	s.NoError(err)
+	s.NotNil(result)
 
 	s.NotEmpty(bankAccount.BankAccountID)
 	s.bankAccounts = append(s.bankAccounts, bankAccount.BankAccountID)
@@ -138,7 +143,7 @@ func (s *BankAccountTestSuite) TestCreateBankAccount() {
 func (s *BankAccountTestSuite) TestGetBankAccount() {
 	mc := NewTestClient(s.T())
 
-	account, err := mc.GetBankAccount(s.accountID, s.bankAccountID)
+	account, err := mc.GetBankAccount(context.Background(), s.accountID, s.bankAccountID)
 	s.NoError(err)
 
 	s.Equal(s.bankAccountID, account.BankAccountID)
@@ -147,14 +152,14 @@ func (s *BankAccountTestSuite) TestGetBankAccount() {
 func (s *BankAccountTestSuite) TestDeleteBankAccount() {
 	mc := NewTestClient(s.T())
 
-	err := mc.DeleteBankAccount(s.accountID, s.bankAccountIDDelete)
+	err := mc.DeleteBankAccount(context.Background(), s.accountID, s.bankAccountIDDelete)
 	s.NoError(err)
 }
 
 func (s *BankAccountTestSuite) TestListBankAccounts() {
 	mc := NewTestClient(s.T())
 
-	accounts, err := mc.ListBankAccounts(s.accountID)
+	accounts, err := mc.ListBankAccounts(context.Background(), s.accountID)
 	s.NoError(err)
 
 	s.NotNil(accounts)
@@ -163,7 +168,7 @@ func (s *BankAccountTestSuite) TestListBankAccounts() {
 func (s *BankAccountTestSuite) TestMicroDepositInitiate() {
 	mc := NewTestClient(s.T())
 
-	err := mc.MicroDepositInitiate(s.accountID, s.bankAccountID)
+	err := mc.MicroDepositInitiate(context.Background(), s.accountID, s.bankAccountID)
 	s.NoError(err)
 }
 
@@ -173,6 +178,6 @@ func (s *BankAccountTestSuite) TestMicroDepositConfirm() {
 
 	// sample data
 	amounts := []int{22, 21}
-	err := mc.MicroDepositConfirm(s.accountID, s.bankAccountID, amounts)
+	err := mc.MicroDepositConfirm(context.Background(), s.accountID, s.bankAccountID, amounts)
 	s.NoError(err)
 }

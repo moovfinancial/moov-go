@@ -64,20 +64,6 @@ func newCall(endpoint EndpointArg, args ...callArg) (*callBuilder, error) {
 	return call, nil
 }
 
-// Request
-
-type EndpointArg callArg
-
-func Endpoint(method string, pathFmt string, args ...any) EndpointArg {
-	return wrapCallFn(func(call *callBuilder) error {
-		call.method = method
-		call.path = fmt.Sprintf(pathFmt, args...)
-
-		return nil
-	})
-}
-
-// type callArg func(call *Call) error
 type callArg interface {
 	apply(call *callBuilder) error
 }
@@ -90,7 +76,7 @@ func (ca *callArgInstance) apply(call *callBuilder) error {
 	return ca.fn(call)
 }
 
-func wrapCallFn(fn func(call *callBuilder) error) callArg {
+func callBuilderFn(fn func(call *callBuilder) error) callArg {
 	return &callArgInstance{fn: fn}
 }
 
@@ -103,8 +89,21 @@ func prependArgs[A callArg](opts []A, args ...callArg) []callArg {
 	return args
 }
 
+// Request
+
+type EndpointArg callArg
+
+func Endpoint(method string, pathFmt string, args ...any) EndpointArg {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.method = method
+		call.path = fmt.Sprintf(pathFmt, args...)
+
+		return nil
+	})
+}
+
 func JsonBody(body any) callArg {
-	return wrapCallFn(func(call *callBuilder) error {
+	return callBuilderFn(func(call *callBuilder) error {
 		payload, err := json.Marshal(body)
 		if err != nil {
 			return err
@@ -118,32 +117,18 @@ func JsonBody(body any) callArg {
 }
 
 func AcceptJson() callArg {
-	return wrapCallFn(func(call *callBuilder) error {
+	return callBuilderFn(func(call *callBuilder) error {
 		call.headers["Accept"] = "application/json"
 		return nil
 	})
 }
 
 func WaitFor(state string) callArg {
-	return wrapCallFn(func(call *callBuilder) error {
+	return callBuilderFn(func(call *callBuilder) error {
 		call.headers["X-Wait-For"] = state
 		return nil
 	})
 }
-
-// func Count(count int) CallArg {
-// 	return wrapCallFn(func(call *callBuilder) error {
-// 		call.params["count"] = strconv.Itoa(count)
-// 		return nil
-// 	})
-// }
-
-// func Skip(skip int) CallArg {
-// 	return wrapCallFn(func(call *callBuilder) error {
-// 		call.params["skip"] = strconv.Itoa(skip)
-// 		return nil
-// 	})
-// }
 
 // Response
 
@@ -152,14 +137,15 @@ type CallResponse interface {
 
 	// Deserializes the body of the response into the item.
 	// This is here so the response can handle any content type.
-	Marshal(item any) error
+	Unmarshal(item any) error
 
+	// Convert response into an golang error
 	Error() error
 }
 
 func UnmarshalObjectResponse[A interface{}](resp CallResponse) (*A, error) {
 	item := new(A)
-	if err := resp.Marshal(item); err != nil {
+	if err := resp.Unmarshal(item); err != nil {
 		return nil, err
 	}
 
@@ -168,9 +154,39 @@ func UnmarshalObjectResponse[A interface{}](resp CallResponse) (*A, error) {
 
 func UnmarshalListResponse[A interface{}](resp CallResponse) ([]A, error) {
 	item := []A{}
-	if err := resp.Marshal(&item); err != nil {
+	if err := resp.Unmarshal(&item); err != nil {
 		return nil, err
 	}
 
 	return item, nil
+}
+
+// Helper function for a common pattern of API calls that return no body so its either an error or not.
+func CompletedNilOrError(resp CallResponse) error {
+	switch resp.Status() {
+	case StatusCompleted:
+		return nil
+	default:
+		return resp.Error()
+	}
+}
+
+// Helper for a common pattern of successful API calls returning an object body or an error
+func CompletedObjectOrError[A interface{}](resp CallResponse) (*A, error) {
+	switch resp.Status() {
+	case StatusCompleted:
+		return UnmarshalObjectResponse[A](resp)
+	default:
+		return nil, resp.Error()
+	}
+}
+
+// Helper for a common pattern of successful API calls returning a body with a slice of objects or an error
+func CompletedListOrError[A interface{}](resp CallResponse) ([]A, error) {
+	switch resp.Status() {
+	case StatusCompleted:
+		return UnmarshalListResponse[A](resp)
+	default:
+		return nil, resp.Error()
+	}
 }

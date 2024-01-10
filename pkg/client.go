@@ -39,16 +39,17 @@ const (
 
 const (
 	baseURL             = "https://api.moov.io"
-	pathBankAccounts    = "accounts/%s/bank-accounts"
-	pathCards           = "accounts/%s/cards"
-	pathApplePay        = "accounts/%s/apple-pay"
-	pathPaymentMethods  = "accounts/%s/payment-methods"
-	pathWallets         = "accounts/%s/wallets"
-	pathWalletTrans     = "accounts/%s/wallets/%s/transactions"
-	pathTransactions    = "accounts/%s/transactions"
-	pathTransfers       = "transfers"
-	pathTransferOptions = "transfer-options"
-	pathDisputes        = "disputes"
+	pathBankAccounts    = "/accounts/%s/bank-accounts"
+	pathMicroDeposits   = "/accounts/%s/bank-accounts/%s/microdeposits"
+	pathCards           = "/accounts/%s/cards"
+	pathApplePay        = "/accounts/%s/apple-pay"
+	pathPaymentMethods  = "/accounts/%s/payment-methods"
+	pathWallets         = "/accounts/%s/wallets"
+	pathWalletTrans     = "/accounts/%s/wallets/%s/transactions"
+	pathTransactions    = "/accounts/%s/transactions"
+	pathTransfers       = "/transfers"
+	pathTransferOptions = "/transfer-options"
+	pathDisputes        = "/disputes"
 )
 
 var (

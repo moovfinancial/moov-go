@@ -91,7 +91,7 @@ func (s *CardTestSuite) SetupSuite() {
 		}
 	}
 
-	card := CardPost{
+	card := CreateCard{
 		CardNumber: "371111111111114",
 		CardCvv:    "1234",
 		Expiration: Expiration{
@@ -108,7 +108,7 @@ func (s *CardTestSuite) SetupSuite() {
 		},
 	}
 
-	respCard, err := mc.CreateCard(s.accountID, card)
+	respCard, err := mc.CreateCard(context.Background(), s.accountID, card)
 	s.NoError(err, "Error creating card")
 
 	s.deleteCardID = respCard.CardID
@@ -121,14 +121,14 @@ func (s *CardTestSuite) TearDownSuite() {
 	// delete the bank accounts we created
 	for _, cardID := range s.cards {
 		if cardID != "" {
-			err := mc.DisableCard(s.accountID, cardID)
+			err := mc.DisableCard(context.Background(), s.accountID, cardID)
 			s.NoError(err)
 		}
 	}
 }
 
 func (s *CardTestSuite) TestCreateCard() {
-	card := CardPost{
+	card := CreateCard{
 		CardNumber: "4111111111111111",
 		CardCvv:    "123",
 		Expiration: Expiration{
@@ -149,10 +149,12 @@ func (s *CardTestSuite) TestCreateCard() {
 
 	mc := NewTestClient(s.T())
 
-	respCard, err := mc.CreateCard(s.accountID, card)
-	s.NoError(err, "Error creating card")
+	respCard, err := mc.CreateCard(context.Background(), s.accountID, card)
+	s.Require().NoError(err, "Error creating card")
 
-	assert.NotEmpty(s.T(), respCard.CardID)
+	s.Require().NotNil(respCard)
+	s.Require().NotEmpty(s.T(), respCard.CardID)
+
 	s.cardID = respCard.CardID
 	s.cards = append(s.cards, respCard.CardID)
 }
@@ -160,7 +162,7 @@ func (s *CardTestSuite) TestCreateCard() {
 func (s *CardTestSuite) TestListCards() {
 	mc := NewTestClient(s.T())
 
-	cards, err := mc.ListCards(s.accountID)
+	cards, err := mc.ListCards(context.Background(), s.accountID)
 	s.NoError(err)
 
 	assert.NotNil(s.T(), cards)
@@ -169,19 +171,23 @@ func (s *CardTestSuite) TestListCards() {
 func (s *CardTestSuite) TestGetCard() {
 	mc := NewTestClient(s.T())
 
-	card, err := mc.GetCard(s.accountID, s.cardID)
-	s.NoError(err)
+	s.Require().NotEmpty(s.cardID)
+
+	card, err := mc.GetCard(context.Background(), s.accountID, s.cardID)
+	s.Require().NoError(err)
 
 	s.Equal(s.cardID, card.CardID)
 }
 
 func (s *CardTestSuite) TestUpdateCard() {
-	card := Card{
-		Expiration: Expiration{
+	cardOnFile := false
+	cvv := "937"
+	card := UpdateCard{
+		Expiration: &Expiration{
 			Month: "01",
 			Year:  "28",
 		},
-		BillingAddress: Address{
+		BillingAddress: &Address{
 			AddressLine1:    "125 Main Street",
 			AddressLine2:    "Apt 302",
 			City:            "Boulder",
@@ -189,13 +195,14 @@ func (s *CardTestSuite) TestUpdateCard() {
 			PostalCode:      "80303",
 			Country:         "US",
 		},
-		CardOnFile: false,
+		CardOnFile: &cardOnFile,
+		CardCvv:    &cvv,
 	}
 
 	mc := NewTestClient(s.T())
 
-	newCard, err := mc.UpdateCard(s.accountID, s.cardID, card, "937")
-	s.NoError(err)
+	newCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, card)
+	s.Require().NoError(err)
 
 	s.Equal(newCard.BillingAddress, card.BillingAddress)
 }
@@ -203,6 +210,6 @@ func (s *CardTestSuite) TestUpdateCard() {
 func (s *CardTestSuite) TestDisableCard() {
 	mc := NewTestClient(s.T())
 
-	err := mc.DisableCard(s.accountID, s.cardID)
+	err := mc.DisableCard(context.Background(), s.accountID, s.cardID)
 	s.NoError(err)
 }
