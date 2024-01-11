@@ -123,6 +123,8 @@ func (r *httpCallResponse) Status() CallStatus {
 	case http.StatusUnprocessableEntity:
 		return StatusFailedValidation
 
+	case http.StatusNotFound:
+		return StatusNotFound
 	case http.StatusUnauthorized:
 		return StatusUnauthenticated
 	case http.StatusForbidden:
@@ -152,6 +154,41 @@ func (r *httpCallResponse) Error() error {
 	case StatusCompleted, StatusStarted:
 		return nil
 	default:
-		return fmt.Errorf("error from moov - status: %s", r.Status().Name)
+		return &httpCallError{
+			status:     r.Status(),
+			requestId:  r.resp.Header.Get("X-Request-ID"),
+			statusCode: r.resp.StatusCode,
+		}
 	}
+}
+
+var _ HttpCallError = &httpCallError{}
+
+type HttpCallError interface {
+	error
+	Status() CallStatus
+	RequestId() string
+	StatusCode() int
+}
+
+type httpCallError struct {
+	status     CallStatus
+	requestId  string
+	statusCode int
+}
+
+func (he *httpCallError) Status() CallStatus {
+	return he.status
+}
+
+func (he *httpCallError) RequestId() string {
+	return he.requestId
+}
+
+func (he *httpCallError) StatusCode() int {
+	return he.statusCode
+}
+
+func (he *httpCallError) Error() string {
+	return fmt.Sprintf("error from moov - status: %s http.request_id: %s http.status_code: %d", he.status.Name, he.requestId, he.statusCode)
 }

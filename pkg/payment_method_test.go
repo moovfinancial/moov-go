@@ -64,7 +64,7 @@ func (s *PaymentMethodTestSuite) TearDownSuite() {
 func (s *PaymentMethodTestSuite) TestListPaymentMethods() {
 	mc := NewTestClient(s.T())
 
-	paymentMethods, err := mc.ListPaymentMethods(s.accountID, "")
+	paymentMethods, err := mc.ListPaymentMethods(context.Background(), s.accountID)
 	s.NoError(err)
 
 	s.Require().NotNil(paymentMethods)
@@ -80,7 +80,7 @@ func (s *PaymentMethodTestSuite) TestGetPaymentMethod() {
 		paymentMethodID = "2ce45e4e-8d96-45e4-8658-5767423e098d"
 	}
 
-	paymentMethod, err := mc.GetPaymentMethod(s.accountID, paymentMethodID)
+	paymentMethod, err := mc.GetPaymentMethod(context.Background(), s.accountID, paymentMethodID)
 	s.NoError(err)
 
 	s.Equal(paymentMethodID, paymentMethod.PaymentMethodID)

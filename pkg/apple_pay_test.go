@@ -2,11 +2,13 @@ package moov
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"testing"
 )
 
 func TestApplePayMarshal(t *testing.T) {
@@ -50,7 +52,7 @@ func (s *ApplePayTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
 	mc := NewTestClient(s.T())
 
-	accounts, err := mc.ListAccounts(WithAccountName("Lincoln National Corporation"))
+	accounts, err := mc.ListAccounts(context.Background(), WithAccountName("Lincoln National Corporation"))
 	s.NoError(err)
 
 	for _, account := range accounts {

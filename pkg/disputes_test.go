@@ -2,14 +2,13 @@ package moov
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
-	"fmt"
 	"testing"
-	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
 )
 
 func TestDisputesMarshal(t *testing.T) {
@@ -39,57 +38,25 @@ func TestDisputesMarshal(t *testing.T) {
 	assert.Equal(t, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", dispute.DisputeID)
 }
 
-type DisputesTestSuite struct {
-	suite.Suite
-	// values for testing will be set in init()
-	DisputeID string
+func Test_Disputes(t *testing.T) {
+	mc := NewTestClient(t)
+
+	disputes, err := mc.ListDisputes(context.Background(), WithDisputeCount(200), WithDisputeSkip(0))
+	require.NoError(t, err)
+	require.NotNil(t, disputes)
 }
 
-// listen for 'go test' command --> run test methods
-func TestDisputesSuite(t *testing.T) {
-	suite.Run(t, new(DisputesTestSuite))
-}
+func Test_GetDisputes_NotFound(t *testing.T) {
+	mc := NewTestClient(t)
 
-func (s *DisputesTestSuite) SetupSuite() {
-	//mc, err := NewClient()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//disputes, err := mc.listdi()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-}
+	// We don't have any disputes to test against! So we can at least check for not found vs other possible errors
+	disputeID := uuid.NewString()
+	dispute, err := mc.GetDispute(context.Background(), disputeID)
+	require.Nil(t, dispute)
 
-func (s *DisputesTestSuite) TearDownSuite() {
-}
+	// find and cast the error into HttpCallError so it can be inspected
+	var httpErr HttpCallError
+	require.ErrorAs(t, err, &httpErr)
 
-func (s *DisputesTestSuite) TestListDisputes() {
-	mc := NewTestClient(s.T())
-
-	zeroTime := time.Time{}
-
-	disputes, err := mc.ListDisputes(100, 0, zeroTime, zeroTime, "", "", "", zeroTime, zeroTime, "")
-	s.NoError(err)
-
-	fmt.Println(len(disputes))
-	s.NotNil(disputes)
-
-	if len(disputes) > 0 {
-		s.DisputeID = disputes[0].DisputeID
-	}
-}
-
-func (s *DisputesTestSuite) TestGetDispute() {
-	mc := NewTestClient(s.T())
-
-	disputeID := s.DisputeID
-	if disputeID == "" {
-		disputeID = "2ce45e4e-8d96-45e4-8658-5767423e098d"
-	}
-
-	dispute, err := mc.GetDispute(disputeID)
-	s.NoError(err)
-
-	s.Equal(disputeID, dispute.DisputeID)
+	require.Equal(t, StatusNotFound, httpErr.Status())
 }

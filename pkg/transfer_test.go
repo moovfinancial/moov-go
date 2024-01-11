@@ -224,6 +224,7 @@ func TestTransferSuite(t *testing.T) {
 }
 
 func (s *TransferTestSuite) SetupSuite() {
+
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
 	mc := NewTestClient(s.T())
 
@@ -268,7 +269,7 @@ func (s *TransferTestSuite) SetupSuite() {
 	}
 
 	// get payment method from card
-	respPaymentMethods, err := mc.ListPaymentMethods(s.accountID, s.card.CardID)
+	respPaymentMethods, err := mc.ListPaymentMethods(context.Background(), s.accountID, WithPaymentMethodSourceID(s.card.CardID))
 	s.NoError(err)
 	s.Require().NotEmpty(respPaymentMethods)
 
@@ -278,7 +279,7 @@ func (s *TransferTestSuite) SetupSuite() {
 	respWallets, err := mc.ListWallets(s.accountID)
 	s.NoError(err)
 
-	respPaymentMethods1, err := mc.ListPaymentMethods(s.accountID, respWallets[0].WalletID)
+	respPaymentMethods1, err := mc.ListPaymentMethods(context.Background(), s.accountID, WithPaymentMethodSourceID(respWallets[0].WalletID))
 	s.NoError(err)
 	s.Require().NotEmpty(respPaymentMethods1)
 	s.paymentMethodDest = respPaymentMethods1[0]
