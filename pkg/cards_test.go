@@ -188,7 +188,7 @@ func (s *CardTestSuite) TestUpdateCardBillingAddress() {
 		Country:         "US",
 	}
 
-	updatedCard, err := mc.UpdateCard(s.accountID, s.cardID, WithCardBillingAddress(billingAddress))
+	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, WithCardBillingAddress(billingAddress))
 	s.NoError(err)
 	s.Equal(billingAddress, updatedCard.BillingAddress)
 	// TODO: This should be "match" but isn't implemented in Moov's test mode and needs a server side fix
@@ -197,16 +197,33 @@ func (s *CardTestSuite) TestUpdateCardBillingAddress() {
 
 func (s *CardTestSuite) TestUpdateCardExpiration() {
 	mc := NewTestClient(s.T())
+	exp := Expiration{
+		Month: "01",
+		Year:  "28",
+	}
 
-	newCard, err := mc.UpdateCard(s.accountID, s.cardID, WithCardCVV("987"))
+	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, WithCardExpiration(exp))
 	s.NoError(err)
+	s.Equal(exp, updatedCard.Expiration)
+}
 
-	s.Equal(newCard.BillingAddress, card.BillingAddress)
+func (s *CardTestSuite) TestUpdateCardCVV() {
+	mc := NewTestClient(s.T())
+	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, WithCardCVV("987"))
+	s.NoError(err)
+	// TODO: This should be "match" but isn't implemented in Moov's test mode and needs a server side fix
+	s.Equal("unavailable", updatedCard.CardVerification.Cvv)
+}
+
+func (s *CardTestSuite) TestUpdateMultipleFilters() {
+	mc := NewTestClient(s.T())
+	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, WithCardOnFile(true), WithCardCVV("666"))
+	s.NoError(err)
+	s.True(updatedCard.CardOnFile)
 }
 
 func (s *CardTestSuite) TestDisableCard() {
 	mc := NewTestClient(s.T())
-
 	err := mc.DisableCard(context.Background(), s.accountID, s.cardID)
 	s.NoError(err)
 }
