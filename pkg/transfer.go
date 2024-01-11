@@ -1,6 +1,7 @@
 package moov
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -148,51 +149,40 @@ type CanceledTransfer struct {
 	Refund       Refund       `json:"refund,omitempty"`
 }
 
+type CreateTransfer struct {
+	Source         Source            `json:"source,omitempty"`
+	Destination    Destination       `json:"destination,omitempty"`
+	Amount         Amount            `json:"amount,omitempty"`
+	FacilitatorFee FacilitatorFee    `json:"facilitatorFee,omitempty"`
+	Description    string            `json:"description,omitempty"`
+	Metadata       map[string]string `json:"metadata,omitempty"`
+}
+
 // CreateTransfer creates a new transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
-func (c Client) CreateTransfer(source Source, destination Destination, amount Amount, facilitatorFee FacilitatorFee, description string, metadata map[string]string, isSync bool) (SynchronousTransfer, error) {
-	respTransfer := SynchronousTransfer{}
-
-	urlStr := fmt.Sprintf("%s/%s", baseURL, pathTransfers)
-	uuidV4 := uuid.NewString()
-	header := map[string]string{"X-Idempotency-Key": uuidV4}
+func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, isSync bool) (*SynchronousTransfer, *AsynchronousTransfer, error) {
+	args := []callArg{AcceptJson(), JsonBody(transfer)}
 	if isSync {
-		header["X-Wait-For"] = "rail-response"
+		args = append(args, WaitFor("rail-response"))
 	}
 
-	trans := SynchronousTransfer{
-		Source:         source,
-		Destination:    destination,
-		Amount:         amount,
-		FacilitatorFee: facilitatorFee,
-		Description:    description,
-		Metadata:       metadata,
-	}
-	body, statusCode, err := c.GetHTTPResponse(http.MethodPost, urlStr, trans, header)
-
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathTransfers), args...)
 	if err != nil {
-		return respTransfer, err
+		return nil, nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK, http.StatusCreated, http.StatusAccepted:
-		err = json.Unmarshal(body, &respTransfer)
-		if err != nil {
-			return respTransfer, err
-		}
-		return respTransfer, nil
-	case http.StatusBadRequest:
-		var err error
-		_ = json.Unmarshal(body, &err)
-		return respTransfer, err
-	case http.StatusConflict:
-		return respTransfer, ErrXIdempotencyKey
-	case http.StatusUnprocessableEntity:
-		return respTransfer, ErrRequestBody
-	case http.StatusTooManyRequests:
-		return respTransfer, ErrRateLimit
+	switch resp.Status() {
+	case StatusCompleted:
+		st, err := UnmarshalObjectResponse[SynchronousTransfer](resp)
+		return st, nil, err
+	case StatusStarted:
+		st, err := UnmarshalObjectResponse[AsynchronousTransfer](resp)
+		return nil, st, err
+	case StatusStateConflict:
+		return nil, nil, ErrXIdempotencyKey
+	default:
+		return nil, nil, resp.Error()
 	}
-	return respTransfer, ErrDefault(statusCode)
 }
 
 // ListTransfers lists all transfers

@@ -2,6 +2,7 @@ package moov
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"testing"
 
@@ -44,16 +45,16 @@ func TestCreateAccountIndividual(t *testing.T) {
 
 	mc := NewTestClient(t)
 
-	account, err := mc.CreateAccount(account)
+	completed, started, err := mc.CreateAccount(context.Background(), account)
 	require.NoError(t, err)
-
-	assert.NotNil(t, account.AccountID)
+	require.NotNil(t, completed)
+	require.Nil(t, started)
 }
 
 func TestGetAccount(t *testing.T) {
 	mc := NewTestClient(t)
 
-	account, err := mc.GetAccount("638481a5-5205-406c-84c7-2fc2239105d1")
+	account, err := mc.GetAccount(context.Background(), "638481a5-5205-406c-84c7-2fc2239105d1")
 	require.NoError(t, err)
 
 	require.Equal(t, "638481a5-5205-406c-84c7-2fc2239105d1", account.AccountID)
@@ -80,18 +81,17 @@ func TestUpdateAccount(t *testing.T) {
 		},
 	}
 
-	account, err := mc.UpdateAccount(account)
+	result, err := mc.UpdateAccount(context.Background(), account)
 	require.NoError(t, err)
 
-	require.Equal(t, "David", account.Profile.Individual.Name.FirstName)
+	require.Equal(t, "David", result.Profile.Individual.Name.FirstName)
 }
 
 func TestListAccounts(t *testing.T) {
 	mc := NewTestClient(t)
 
-	accounts, err := mc.ListAccounts()
+	accounts, err := mc.ListAccounts(context.Background())
 	require.NoError(t, err)
-
 	require.NotNil(t, accounts)
 }
 

@@ -1,9 +1,8 @@
 package moov
 
 import (
-	"encoding/json"
+	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -62,161 +61,87 @@ type BankAccountPayload struct {
 }
 
 // CreateBankAccount creates a new bank account for the given customer account
-func (c Client) CreateBankAccount(accountID string, bankAccount BankAccount) (BankAccount, error) {
-	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathBankAccounts, accountID))
-
-	accountPayload := BankAccountPayload{
-		Account: bankAccount,
-	}
-
-	respBankAccount := BankAccount{}
-	body, statusCode, err := c.GetHTTPResponse(http.MethodPost, url, accountPayload, nil)
+func (c Client) CreateBankAccount(ctx context.Context, accountID string, bankAccount BankAccount) (*BankAccount, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathBankAccounts, accountID),
+		AcceptJson(),
+		JsonBody(bankAccount))
 	if err != nil {
-		return respBankAccount, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK:
-		// Account created
-		err = json.Unmarshal(body, &respBankAccount)
-		if err != nil {
-			return respBankAccount, err
-		}
-		return respBankAccount, nil
-	case http.StatusUnauthorized:
-		return respBankAccount, ErrAuthCredentialsNotSet
-	case http.StatusNotFound:
-		return respBankAccount, ErrNoAccount
-	case http.StatusConflict:
-		return respBankAccount, ErrDuplicateBankAccount
-	case http.StatusUnprocessableEntity:
-		return respBankAccount, ErrBadRequest
-	case http.StatusTooManyRequests:
-		return respBankAccount, ErrRateLimit
+	switch resp.Status() {
+	case StatusCompleted:
+		return CompletedObjectOrError[BankAccount](resp)
+	case StatusStateConflict:
+		return nil, ErrDuplicateBankAccount
+	default:
+		return nil, resp.Error()
 	}
-	return respBankAccount, ErrDefault(statusCode)
 }
 
 // GetBankAccount retrieves a bank account for the given customer account
-func (c Client) GetBankAccount(accountID string, bankAccountID string) (BankAccount, error) {
-	respBankAccount := BankAccount{}
-	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathBankAccounts, accountID), bankAccountID)
-
-	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
+func (c Client) GetBankAccount(ctx context.Context, accountID string, bankAccountID string) (*BankAccount, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathBankAccounts, accountID),
+		AcceptJson())
 	if err != nil {
-		return respBankAccount, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK:
-		err = json.Unmarshal(body, &respBankAccount)
-		if err != nil {
-			return respBankAccount, err
-		}
-		return respBankAccount, nil
-	case http.StatusUnauthorized:
-		return respBankAccount, ErrAuthCredentialsNotSet
-	case http.StatusNotFound:
-		return respBankAccount, ErrNoAccount
-	case http.StatusTooManyRequests:
-		return respBankAccount, ErrRateLimit
-	}
-	return respBankAccount, ErrDefault(statusCode)
+	return CompletedObjectOrError[BankAccount](resp)
 }
 
 // DeleteBankAccount deletes a bank account for the given customer account
-func (c Client) DeleteBankAccount(accountID string, bankAccountID string) error {
-	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathBankAccounts, accountID), bankAccountID)
-
-	_, statusCode, err := c.GetHTTPResponse(http.MethodDelete, url, nil, nil)
+func (c Client) DeleteBankAccount(ctx context.Context, accountID string, bankAccountID string) error {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathBankAccounts, accountID))
 	if err != nil {
 		return err
 	}
 
-	switch statusCode {
-	case http.StatusNoContent:
-		// Account deleted
-		return nil
-	case http.StatusUnauthorized:
-		return ErrAuthCredentialsNotSet
-	case http.StatusNotFound:
-		return ErrNoAccount
-	case http.StatusTooManyRequests:
-		return ErrRateLimit
-	}
-	return ErrDefault(statusCode)
+	return CompletedNilOrError(resp)
 }
 
 // ListBankAccounts lists all bank accounts for the given customer account
-func (c Client) ListBankAccounts(accountID string) ([]BankAccount, error) {
-	var respBankAccounts []BankAccount
-	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathBankAccounts, accountID))
-
-	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
+func (c Client) ListBankAccounts(ctx context.Context, accountID string) ([]BankAccount, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathBankAccounts, accountID),
+		AcceptJson())
 	if err != nil {
-		return respBankAccounts, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK:
-		err = json.Unmarshal(body, &respBankAccounts)
-		if err != nil {
-			return respBankAccounts, err
-		}
-		return respBankAccounts, nil
-	case http.StatusUnauthorized:
-		return respBankAccounts, ErrAuthCredentialsNotSet
-	case http.StatusNotFound:
-		return respBankAccounts, ErrNoAccount
-	case http.StatusTooManyRequests:
-		return respBankAccounts, ErrRateLimit
-	}
-	return respBankAccounts, ErrDefault(statusCode)
+	return CompletedListOrError[BankAccount](resp)
 }
 
 // MicroDepositInitiate creates a new micro deposit verification for the given bank account
-func (c Client) MicroDepositInitiate(accountID string, bankAccountID string) error {
-	url := fmt.Sprintf("%s/%s/%s/micro-deposits", baseURL, fmt.Sprintf(pathBankAccounts, accountID), bankAccountID)
-
-	_, statusCode, err := c.GetHTTPResponse(http.MethodPost, url, nil, nil)
+func (c Client) MicroDepositInitiate(ctx context.Context, accountID string, bankAccountID string) error {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathMicroDeposits, accountID, bankAccountID))
 	if err != nil {
 		return err
 	}
 
-	switch statusCode {
-	case http.StatusNoContent:
-		return nil
-	case http.StatusUnauthorized:
-		return ErrAuthCredentialsNotSet
-	case http.StatusNotFound:
-		return ErrNoAccount
-	case http.StatusUnprocessableEntity:
-		return ErrInvalidBankAccount
-	case http.StatusTooManyRequests:
-		return ErrRateLimit
-	}
-	return nil
+	return CompletedNilOrError(resp)
 }
 
 // MicroDepositConfirm confirms a micro deposit verification for the given bank account
-func (c Client) MicroDepositConfirm(accountID string, bankAccountID string, amounts []int) error {
-	url := fmt.Sprintf("%s/%s/%s/micro-deposits", baseURL, fmt.Sprintf(pathBankAccounts, accountID), bankAccountID)
-
-	_, statusCode, err := c.GetHTTPResponse(http.MethodPut, url, map[string][]int{"amounts": amounts}, nil)
+func (c Client) MicroDepositConfirm(ctx context.Context, accountID string, bankAccountID string, amounts []int) error {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPut, pathMicroDeposits, accountID, bankAccountID),
+		AcceptJson(),
+		JsonBody(map[string][]int{"amounts": amounts}))
 	if err != nil {
 		return err
 	}
-	switch statusCode {
-	case http.StatusOK:
+
+	switch resp.Status() {
+	case StatusCompleted:
 		return nil
-	case http.StatusUnauthorized:
-		return ErrAuthCredentialsNotSet
-	case http.StatusNotFound:
+	case StatusNotFound:
 		return ErrNoMicroDeposit
-	case http.StatusConflict:
+	case StatusStateConflict:
 		return ErrAmountIncorrect
-	case http.StatusTooManyRequests:
-		return ErrRateLimit
+	default:
+		return resp.Error()
 	}
-	return nil
 }

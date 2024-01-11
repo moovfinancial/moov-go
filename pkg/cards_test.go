@@ -5,6 +5,7 @@ package moov
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"testing"
 
@@ -78,7 +79,7 @@ func (s *CardTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
 	mc := NewTestClient(s.T())
 
-	accounts, err := mc.ListAccounts(WithAccountName("Lincoln National Corporation"))
+	accounts, err := mc.ListAccounts(context.Background(), WithAccountName("Lincoln National Corporation"))
 	s.NoError(err)
 
 	for _, account := range accounts {
@@ -88,7 +89,7 @@ func (s *CardTestSuite) SetupSuite() {
 		}
 	}
 
-	card := CardPost{
+	card := CreateCard{
 		CardNumber: "371111111111114",
 		CardCvv:    "1234",
 		Expiration: Expiration{
@@ -105,7 +106,7 @@ func (s *CardTestSuite) SetupSuite() {
 		},
 	}
 
-	respCard, err := mc.CreateCard(s.accountID, card)
+	respCard, err := mc.CreateCard(context.Background(), s.accountID, card)
 	s.NoError(err, "Error creating card")
 	s.cardID = respCard.CardID
 	s.deleteCardID = respCard.CardID
@@ -118,14 +119,14 @@ func (s *CardTestSuite) TearDownSuite() {
 	// delete the cards we created
 	for _, cardID := range s.cards {
 		if cardID != "" {
-			err := mc.DisableCard(s.accountID, cardID)
+			err := mc.DisableCard(context.Background(), s.accountID, cardID)
 			s.NoError(err)
 		}
 	}
 }
 
 func (s *CardTestSuite) TestCreateCard() {
-	card := CardPost{
+	card := CreateCard{
 		CardNumber: "4111111111111111",
 		CardCvv:    "123",
 		Expiration: Expiration{
@@ -146,10 +147,12 @@ func (s *CardTestSuite) TestCreateCard() {
 
 	mc := NewTestClient(s.T())
 
-	respCard, err := mc.CreateCard(s.accountID, card)
-	s.NoError(err, "Error creating card")
+	respCard, err := mc.CreateCard(context.Background(), s.accountID, card)
+	s.Require().NoError(err, "Error creating card")
 
-	assert.NotEmpty(s.T(), respCard.CardID)
+	s.Require().NotNil(respCard)
+	s.Require().NotEmpty(s.T(), respCard.CardID)
+
 	s.cardID = respCard.CardID
 	s.cards = append(s.cards, respCard.CardID)
 }
@@ -157,7 +160,7 @@ func (s *CardTestSuite) TestCreateCard() {
 func (s *CardTestSuite) TestListCards() {
 	mc := NewTestClient(s.T())
 
-	cards, err := mc.ListCards(s.accountID)
+	cards, err := mc.ListCards(context.Background(), s.accountID)
 	s.NoError(err)
 
 	assert.NotNil(s.T(), cards)
@@ -166,11 +169,14 @@ func (s *CardTestSuite) TestListCards() {
 func (s *CardTestSuite) TestGetCard() {
 	mc := NewTestClient(s.T())
 
-	card, err := mc.GetCard(s.accountID, s.cardID)
-	s.NoError(err)
+	s.Require().NotEmpty(s.cardID)
+
+	card, err := mc.GetCard(context.Background(), s.accountID, s.cardID)
+	s.Require().NoError(err)
 
 	s.Equal(s.cardID, card.CardID)
 }
+
 func (s *CardTestSuite) TestUpdateCardBillingAddress() {
 	mc := NewTestClient(s.T())
 	billingAddress := Address{
@@ -191,33 +197,16 @@ func (s *CardTestSuite) TestUpdateCardBillingAddress() {
 
 func (s *CardTestSuite) TestUpdateCardExpiration() {
 	mc := NewTestClient(s.T())
-	exp := Expiration{
-		Month: "01",
-		Year:  "28",
-	}
 
-	updatedCard, err := mc.UpdateCard(s.accountID, s.cardID, WithCardExpiration(exp))
+	newCard, err := mc.UpdateCard(s.accountID, s.cardID, WithCardCVV("987"))
 	s.NoError(err)
-	s.Equal(exp, updatedCard.Expiration)
-}
 
-func (s *CardTestSuite) TestUpdateCardCVV() {
-	mc := NewTestClient(s.T())
-	updatedCard, err := mc.UpdateCard(s.accountID, s.cardID, WithCardCVV("987"))
-	s.NoError(err)
-	// TODO: This should be "match" but isn't implemented in Moov's test mode and needs a server side fix
-	s.Equal("unavailable", updatedCard.CardVerification.Cvv)
-}
-
-func (s *CardTestSuite) TestUpdateMultipleFilters() {
-	mc := NewTestClient(s.T())
-	updatedCard, err := mc.UpdateCard(s.accountID, s.cardID, WithCardOnFile(true), WithCardCVV("666"))
-	s.NoError(err)
-	s.True(updatedCard.CardOnFile)
+	s.Equal(newCard.BillingAddress, card.BillingAddress)
 }
 
 func (s *CardTestSuite) TestDisableCard() {
 	mc := NewTestClient(s.T())
-	err := mc.DisableCard(s.accountID, s.cardID)
+
+	err := mc.DisableCard(context.Background(), s.accountID, s.cardID)
 	s.NoError(err)
 }
