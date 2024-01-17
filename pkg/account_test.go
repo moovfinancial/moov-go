@@ -1,4 +1,4 @@
-package moov
+package moov_test
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	moov "github.com/moovfinancial/moov-go/pkg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -13,7 +14,7 @@ import (
 func TestAccountMarshalResponse(t *testing.T) {
 	input := []byte(`{"mode":"sandbox","accountID":"638481a5-5205-406c-84c7-2fc2239105d1","accountType":"individual","displayName":"Wade Arnold","profile":{"individual":{"name":{"firstName":"Wade","lastName":"Arnold"},"phone":{"number":"5555555555","countryCode":"1"},"birthDateProvided":false,"governmentIDProvided":false}},"verification":{"verificationStatus":"unverified","status":"unverified"},"foreignID":"your-correlation-id","createdOn":"2023-11-08T23:06:16.168497001Z","updatedOn":"2023-11-08T23:06:16.168497001Z"}`)
 
-	account := new(Account)
+	account := new(moov.Account)
 
 	dec := json.NewDecoder(bytes.NewReader(input))
 	dec.DisallowUnknownFields()
@@ -26,16 +27,16 @@ func TestAccountMarshalResponse(t *testing.T) {
 }
 
 func TestCreateAccountIndividual(t *testing.T) {
-	account := Account{
-		AccountType: INDIVIDUAL,
-		Profile: Profile{
-			Individual: Individual{
-				Name: Name{
+	account := moov.Account{
+		AccountType: moov.INDIVIDUAL,
+		Profile: moov.Profile{
+			Individual: moov.Individual{
+				Name: moov.Name{
 					FirstName: "Wade",
 					LastName:  "Arnold",
 				},
 				Email: "Wade@wadearnold.com",
-				Phone: Phone{
+				Phone: moov.Phone{
 					Number:      "555-555-5555",
 					CountryCode: "1",
 				},
@@ -63,17 +64,17 @@ func TestGetAccount(t *testing.T) {
 func TestUpdateAccount(t *testing.T) {
 	mc := NewTestClient(t)
 
-	account := Account{
+	account := moov.Account{
 		AccountID:   "aa19c3a7-4c72-4f64-adfa-9069c80d81cf",
-		AccountType: INDIVIDUAL,
-		Profile: Profile{
-			Individual: Individual{
-				Name: Name{
+		AccountType: moov.INDIVIDUAL,
+		Profile: moov.Profile{
+			Individual: moov.Individual{
+				Name: moov.Name{
 					FirstName: "David",
 					LastName:  "Arnold",
 				},
 				Email: "Wade@arnold.com",
-				Phone: Phone{
+				Phone: moov.Phone{
 					Number:      "333-333-3333",
 					CountryCode: "1",
 				},

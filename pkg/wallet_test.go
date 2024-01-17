@@ -1,4 +1,4 @@
-package moov
+package moov_test
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"log"
 	"testing"
 
+	moov "github.com/moovfinancial/moov-go/pkg"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -21,7 +22,7 @@ func TestWalletMarshal(t *testing.T) {
 			}
 		}`)
 
-	wallet := new(Wallet)
+	wallet := new(moov.Wallet)
 
 	dec := json.NewDecoder(bytes.NewReader(input))
 	dec.DisallowUnknownFields()
@@ -49,7 +50,7 @@ func (s *WalletTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
 	mc := NewTestClient(s.T())
 
-	accounts, err := mc.ListAccounts(context.Background(), WithAccountName("Lincoln National Corporation"))
+	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
 	s.NoError(err)
 
 	defaultAccountName := "Lincoln National Corporation"
@@ -67,7 +68,7 @@ func (s *WalletTestSuite) SetupSuite() {
 	}
 	s.Assert().NotEmpty(s.accountID)
 
-	transactions, err := mc.ListWalletTransactions(s.accountID, s.walletID, WithTransactionCount(1))
+	transactions, err := mc.ListWalletTransactions(s.accountID, s.walletID, moov.WithTransactionCount(1))
 	s.NoError(err)
 	for _, transaction := range transactions {
 		s.walletTransactionID = transaction.TransactionID
@@ -98,7 +99,7 @@ func (s *WalletTestSuite) TestGetWallet() {
 
 func (s *WalletTestSuite) TestListWalletTransactions() {
 	mc := NewTestClient(s.T())
-	walletTransactions, err := mc.ListWalletTransactions(s.accountID, s.walletID, WithTransactionStatus("completed"), WithTransactionCount(50))
+	walletTransactions, err := mc.ListWalletTransactions(s.accountID, s.walletID, moov.WithTransactionStatus("completed"), moov.WithTransactionCount(50))
 	s.NoError(err)
 	s.NotNil(walletTransactions)
 	s.Greater(len(walletTransactions), 3)

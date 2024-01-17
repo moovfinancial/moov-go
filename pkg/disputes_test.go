@@ -1,4 +1,4 @@
-package moov
+package moov_test
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	moov "github.com/moovfinancial/moov-go/pkg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -27,7 +28,7 @@ func TestDisputesMarshal(t *testing.T) {
 				"transferID": "ec7e1848-dc80-4ab0-8827-dd7fc0737b43"
 			}}`)
 
-	dispute := new(Dispute)
+	dispute := new(moov.Dispute)
 
 	dec := json.NewDecoder(bytes.NewReader(input))
 	dec.DisallowUnknownFields()
@@ -41,7 +42,7 @@ func TestDisputesMarshal(t *testing.T) {
 func Test_Disputes(t *testing.T) {
 	mc := NewTestClient(t)
 
-	disputes, err := mc.ListDisputes(context.Background(), WithDisputeCount(200), WithDisputeSkip(0))
+	disputes, err := mc.ListDisputes(context.Background(), moov.WithDisputeCount(200), moov.WithDisputeSkip(0))
 	require.NoError(t, err)
 	require.NotNil(t, disputes)
 }
@@ -55,8 +56,8 @@ func Test_GetDisputes_NotFound(t *testing.T) {
 	require.Nil(t, dispute)
 
 	// find and cast the error into HttpCallError so it can be inspected
-	var httpErr HttpCallError
+	var httpErr moov.HttpCallError
 	require.ErrorAs(t, err, &httpErr)
 
-	require.Equal(t, StatusNotFound, httpErr.Status())
+	require.Equal(t, moov.StatusNotFound, httpErr.Status())
 }

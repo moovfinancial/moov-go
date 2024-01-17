@@ -1,4 +1,4 @@
-package moov
+package moov_test
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"math/big"
 	"testing"
 
+	moov "github.com/moovfinancial/moov-go/pkg"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -32,7 +33,7 @@ func TestBankAccountMarshal(t *testing.T) {
 		"lastFourAccountNumber": "7000"
 	  }`)
 
-	bankAccount := new(BankAccount)
+	bankAccount := new(moov.BankAccount)
 
 	dec := json.NewDecoder(bytes.NewReader(input))
 	dec.DisallowUnknownFields()
@@ -63,7 +64,7 @@ func (s *BankAccountTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
 	mc := NewTestClient(s.T())
 
-	accounts, err := mc.ListAccounts(context.Background(), WithAccountName("Lincoln National Corporation"))
+	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
 	s.NoError(err)
 
 	for _, account := range accounts {
@@ -76,7 +77,7 @@ func (s *BankAccountTestSuite) SetupSuite() {
 	s.Assert().NotEmpty(s.accountID)
 
 	// create a bank account for Lincoln National Corporation
-	bankAccount := BankAccount{
+	bankAccount := moov.BankAccount{
 		HolderName:      "Sir Test ALot",
 		HolderType:      "individual",
 		BankAccountType: "checking",
@@ -92,7 +93,7 @@ func (s *BankAccountTestSuite) SetupSuite() {
 	s.bankAccountID = bankAccount.BankAccountID
 	s.bankAccounts = append(s.bankAccounts, bankAccount.BankAccountID)
 
-	bankAccountDelete := BankAccount{
+	bankAccountDelete := moov.BankAccount{
 		HolderName:      "Sir Test Delete ALot",
 		HolderType:      "individual",
 		BankAccountType: "checking",
@@ -122,7 +123,7 @@ func (s *BankAccountTestSuite) TearDownSuite() {
 }
 
 func (s *BankAccountTestSuite) TestCreateBankAccount() {
-	bankAccount := BankAccount{
+	bankAccount := moov.BankAccount{
 		HolderName:      "Jules Jackson",
 		HolderType:      "individual",
 		BankAccountType: "checking",
@@ -178,7 +179,7 @@ func (s *BankAccountTestSuite) TestMicroDepositConfirm() {
 
 	err := mc.MicroDepositInitiate(context.Background(), s.accountID, s.bankAccountID)
 	s.NoError(err)
-	
+
 	// sample data
 	amounts := []int{0, 0}
 	err = mc.MicroDepositConfirm(context.Background(), s.accountID, s.bankAccountID, amounts)
