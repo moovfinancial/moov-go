@@ -1,28 +1,21 @@
 package moov
 
 import (
+	"context"
 	"net/http"
 )
 
 // Ping calls the ping endpoint to make sure we have valid credentials
-func (c Client) Ping() error {
-	req, _ := http.NewRequest(http.MethodGet, "https://api.moov.io/ping", nil)
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
+func (c Client) Ping(ctx context.Context) error {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, "/ping"))
 	if err != nil {
-		return ErrAuthNetwork
+		return err
 	}
-	defer resp.Body.Close()
 
-	switch resp.StatusCode {
-	case http.StatusOK:
+	switch resp.Status() {
+	case StatusCompleted:
 		return nil
-	case http.StatusUnauthorized:
-		return ErrAuthCredentialsNotSet
+	default:
+		return resp.Error()
 	}
-	return nil
 }
