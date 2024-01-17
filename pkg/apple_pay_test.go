@@ -70,7 +70,11 @@ func (s *ApplePayTestSuite) TestCreateApplePayDomain() {
 	mc := NewTestClient(s.T())
 
 	domains := []string{"checkout.classbooker.dev"}
-	resp, err := mc.CreateApplePayDomain(s.accountID, "Example Merchant", domains)
+	resp, err := mc.CreateApplePayDomain(BgCtx(), s.accountID,
+		ApplePayDomains{
+			DisplayName: "Example Merchant",
+			Domains:     domains,
+		})
 
 	s.NoError(err)
 	assert.Equal(s.T(), domains, resp.Domains)
@@ -82,14 +86,18 @@ func (s *ApplePayTestSuite) TestUpdateApplePayDomain() {
 	addDomains := []string{"pay.classbooker.dev"}
 	removeDomains := []string{"checkout.classbooker.dev"}
 
-	err := mc.UpdateApplePayDomain(s.accountID, addDomains, removeDomains)
+	err := mc.UpdateApplePayDomain(BgCtx(), s.accountID,
+		PatchApplyPayDomains{
+			AddDomains:    addDomains,
+			RemoveDomains: removeDomains,
+		})
 	assert.Nil(s.T(), err)
 }
 
 func (s *ApplePayTestSuite) TestGetApplePayDomain() {
 	mc := NewTestClient(s.T())
 
-	resp, err := mc.GetApplePayDomain(s.accountID)
+	resp, err := mc.GetApplePayDomain(BgCtx(), s.accountID)
 
 	s.NoError(err)
 	assert.NotNil(s.T(), resp.Domains)
@@ -98,7 +106,11 @@ func (s *ApplePayTestSuite) TestGetApplePayDomain() {
 func (s *ApplePayTestSuite) TestCreateApplePaySession() {
 	mc := NewTestClient(s.T())
 
-	err := mc.CreateApplePaySession(s.accountID, "checkout.classbooker.dev", "Example Merchant")
+	_, err := mc.StartApplePaySession(BgCtx(), s.accountID,
+		StartApplePaySession{
+			Domain:      "checkout.classbooker.dev",
+			DisplayName: "Example Merchant",
+		})
 	s.NoError(err)
 }
 
@@ -134,7 +146,11 @@ func (s *ApplePayTestSuite) TestApplePayToken() {
 		CountryCode:        "US",
 	}
 
-	resp, err := mc.ApplePayToken(s.accountID, token, address)
+	resp, err := mc.LinkApplePayToken(BgCtx(), s.accountID,
+		LinkApplePay{
+			Token:          token,
+			BillingContact: address,
+		})
 
 	s.NoError(err)
 	assert.NotNil(s.T(), resp.PaymentMethodID)

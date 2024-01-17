@@ -38,19 +38,22 @@ const (
 )
 
 const (
-	baseURL             = "https://api.moov.io"
-	pathBankAccounts    = "/accounts/%s/bank-accounts"
-	pathMicroDeposits   = "/accounts/%s/bank-accounts/%s/microdeposits"
-	pathCards           = "/accounts/%s/cards"
-	pathApplePay        = "/accounts/%s/apple-pay"
-	pathPaymentMethods  = "/accounts/%s/payment-methods"
-	pathWallets         = "/accounts/%s/wallets"
-	pathWalletTrans     = "/accounts/%s/wallets/%s/transactions"
-	pathTransactions    = "/accounts/%s/transactions"
-	pathTransfers       = "/transfers"
-	pathTransferOptions = "/transfer-options"
-	pathDisputes        = "/disputes"
-	pathDisputeID       = "/disputes/%s"
+	baseURL              = "https://api.moov.io"
+	pathBankAccounts     = "/accounts/%s/bank-accounts"
+	pathMicroDeposits    = "/accounts/%s/bank-accounts/%s/microdeposits"
+	pathCards            = "/accounts/%s/cards"
+	pathApplePay         = "/accounts/%s/apple-pay"
+	pathApplePayDomains  = "/accounts/%s/apple-pay/domains"
+	pathApplePaySessions = "/accounts/%s/apple-pay/sessions"
+	pathApplePayTokens   = "/accounts/%s/apple-pay/tokens"
+	pathPaymentMethods   = "/accounts/%s/payment-methods"
+	pathWallets          = "/accounts/%s/wallets"
+	pathWalletTrans      = "/accounts/%s/wallets/%s/transactions"
+	pathTransactions     = "/accounts/%s/transactions"
+	pathTransfers        = "/transfers"
+	pathTransferOptions  = "/transfer-options"
+	pathDisputes         = "/disputes"
+	pathDisputeID        = "/disputes/%s"
 )
 
 var (
