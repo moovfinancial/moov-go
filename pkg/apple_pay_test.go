@@ -1,4 +1,4 @@
-package moov
+package moov_test
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	moov "github.com/moovfinancial/moov-go/pkg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -24,7 +25,7 @@ func TestApplePayMarshal(t *testing.T) {
 		"dynamicLastFour": "1234"
 	  }`)
 
-	applePay := new(ApplePay)
+	applePay := new(moov.ApplePay)
 
 	dec := json.NewDecoder(bytes.NewReader(input))
 	dec.DisallowUnknownFields()
@@ -52,7 +53,7 @@ func (s *ApplePayTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
 	mc := NewTestClient(s.T())
 
-	accounts, err := mc.ListAccounts(context.Background(), WithAccountName("Lincoln National Corporation"))
+	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
 	s.NoError(err)
 
 	for _, account := range accounts {
@@ -71,7 +72,7 @@ func (s *ApplePayTestSuite) TestCreateApplePayDomain() {
 
 	domains := []string{"checkout.classbooker.dev"}
 	resp, err := mc.CreateApplePayDomain(BgCtx(), s.accountID,
-		ApplePayDomains{
+		moov.ApplePayDomains{
 			DisplayName: "Example Merchant",
 			Domains:     domains,
 		})
@@ -87,7 +88,7 @@ func (s *ApplePayTestSuite) TestUpdateApplePayDomain() {
 	removeDomains := []string{"checkout.classbooker.dev"}
 
 	err := mc.UpdateApplePayDomain(BgCtx(), s.accountID,
-		PatchApplyPayDomains{
+		moov.PatchApplyPayDomains{
 			AddDomains:    addDomains,
 			RemoveDomains: removeDomains,
 		})
@@ -107,7 +108,7 @@ func (s *ApplePayTestSuite) TestCreateApplePaySession() {
 	mc := NewTestClient(s.T())
 
 	_, err := mc.StartApplePaySession(BgCtx(), s.accountID,
-		StartApplePaySession{
+		moov.StartApplePaySession{
 			Domain:      "checkout.classbooker.dev",
 			DisplayName: "Example Merchant",
 		})
@@ -117,18 +118,18 @@ func (s *ApplePayTestSuite) TestCreateApplePaySession() {
 func (s *ApplePayTestSuite) TestApplePayToken() {
 	mc := NewTestClient(s.T())
 
-	token := ApplePayToken{
-		PaymentData: ApplePaymentData{
+	token := moov.ApplePayToken{
+		PaymentData: moov.ApplePaymentData{
 			Version:   "EC_v1",
 			Data:      "3+f4oOTwPa6f1UZ6tG...CE=",
 			Signature: "MIAGCSqGSIb3DQ.AAAA==",
-			Header: ApplePaymentDataHeader{
+			Header: moov.ApplePaymentDataHeader{
 				EphemeralPublicKey: "MFkwEK...Md==",
 				PublicKeyHash:      "l0CnXdMv...D1I=",
 				TransactionId:      "32b...4f3",
 			},
 		},
-		PaymentMethod: ApplePaymentMethod{
+		PaymentMethod: moov.ApplePaymentMethod{
 			DisplayName: "Visa 1234",
 			Network:     "Visa",
 			Type:        "debit",
@@ -136,7 +137,7 @@ func (s *ApplePayTestSuite) TestApplePayToken() {
 		TransactionIdentifier: "32b...4f3",
 	}
 
-	address := ApplePayBillingContact{
+	address := moov.ApplePayBillingContact{
 		AddressLines: []string{
 			"123 Sesame Street",
 		},
@@ -147,7 +148,7 @@ func (s *ApplePayTestSuite) TestApplePayToken() {
 	}
 
 	resp, err := mc.LinkApplePayToken(BgCtx(), s.accountID,
-		LinkApplePay{
+		moov.LinkApplePay{
 			Token:          token,
 			BillingContact: address,
 		})

@@ -1,4 +1,4 @@
-package moov
+package moov_test
 
 // TODO: Create faililng test for other card brands in test mode
 // https://docs.moov.io/guides/get-started/test-mode/#cards
@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	moov "github.com/moovfinancial/moov-go/pkg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -51,7 +52,7 @@ func TestCardMarshal(t *testing.T) {
 		  "domesticPushToCard": "fast-funds"
 		}`)
 
-	card := new(Card)
+	card := new(moov.Card)
 
 	dec := json.NewDecoder(bytes.NewReader(input))
 	dec.DisallowUnknownFields()
@@ -79,7 +80,7 @@ func (s *CardTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
 	mc := NewTestClient(s.T())
 
-	accounts, err := mc.ListAccounts(context.Background(), WithAccountName("Lincoln National Corporation"))
+	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
 	s.NoError(err)
 
 	for _, account := range accounts {
@@ -89,15 +90,15 @@ func (s *CardTestSuite) SetupSuite() {
 		}
 	}
 
-	card := CreateCard{
+	card := moov.CreateCard{
 		CardNumber: "371111111111114",
 		CardCvv:    "1234",
-		Expiration: Expiration{
+		Expiration: moov.Expiration{
 			Month: "10",
 			Year:  "28",
 		},
 		HolderName: "Wade Arnold",
-		BillingAddress: Address{
+		BillingAddress: moov.Address{
 			AddressLine1:    "123 Main Street",
 			City:            "Golden",
 			StateOrProvince: "CO",
@@ -126,15 +127,15 @@ func (s *CardTestSuite) TearDownSuite() {
 }
 
 func (s *CardTestSuite) TestCreateCard() {
-	card := CreateCard{
+	card := moov.CreateCard{
 		CardNumber: "4111111111111111",
 		CardCvv:    "123",
-		Expiration: Expiration{
+		Expiration: moov.Expiration{
 			Month: "01",
 			Year:  "28",
 		},
 		HolderName: "Jules Jackson",
-		BillingAddress: Address{
+		BillingAddress: moov.Address{
 			AddressLine1:    "123 Main Street",
 			AddressLine2:    "Apt 302",
 			City:            "Boulder",
@@ -179,7 +180,7 @@ func (s *CardTestSuite) TestGetCard() {
 
 func (s *CardTestSuite) TestUpdateCardBillingAddress() {
 	mc := NewTestClient(s.T())
-	billingAddress := Address{
+	billingAddress := moov.Address{
 		AddressLine1:    "125 Main Street",
 		AddressLine2:    "Apt 302",
 		City:            "Boulder",
@@ -188,7 +189,7 @@ func (s *CardTestSuite) TestUpdateCardBillingAddress() {
 		Country:         "US",
 	}
 
-	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, WithCardBillingAddress(billingAddress))
+	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, moov.WithCardBillingAddress(billingAddress))
 	s.NoError(err)
 	s.Equal(billingAddress, updatedCard.BillingAddress)
 	// TODO: This should be "match" but isn't implemented in Moov's test mode and needs a server side fix
@@ -197,19 +198,19 @@ func (s *CardTestSuite) TestUpdateCardBillingAddress() {
 
 func (s *CardTestSuite) TestUpdateCardExpiration() {
 	mc := NewTestClient(s.T())
-	exp := Expiration{
+	exp := moov.Expiration{
 		Month: "01",
 		Year:  "28",
 	}
 
-	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, WithCardExpiration(exp))
+	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, moov.WithCardExpiration(exp))
 	s.NoError(err)
 	s.Equal(exp, updatedCard.Expiration)
 }
 
 func (s *CardTestSuite) TestUpdateCardCVV() {
 	mc := NewTestClient(s.T())
-	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, WithCardCVV("987"))
+	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, moov.WithCardCVV("987"))
 	s.NoError(err)
 	// TODO: This should be "match" but isn't implemented in Moov's test mode and needs a server side fix
 	s.Equal("unavailable", updatedCard.CardVerification.Cvv)
@@ -217,7 +218,7 @@ func (s *CardTestSuite) TestUpdateCardCVV() {
 
 func (s *CardTestSuite) TestUpdateMultipleFilters() {
 	mc := NewTestClient(s.T())
-	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, WithCardOnFile(true), WithCardCVV("666"))
+	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, moov.WithCardOnFile(true), moov.WithCardCVV("666"))
 	s.NoError(err)
 	s.True(updatedCard.CardOnFile)
 }

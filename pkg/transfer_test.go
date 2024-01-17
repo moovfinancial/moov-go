@@ -1,4 +1,4 @@
-package moov
+package moov_test
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"testing"
 
+	moov "github.com/moovfinancial/moov-go/pkg"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/stretchr/testify/require"
@@ -195,7 +196,7 @@ func TestSynchronousTransferMarshalResponse(t *testing.T) {
 				"statusUpdates": {
 					"initiated": "2019-08-24T14:15:22Z","confirmed": "2019-08-24T14:15:22Z","settled": "2019-08-24T14:15:22Z","failed": "2019-08-24T14:15:22Z","canceled": "2019-08-24T14:15:22Z","completed": "2019-08-24T14:15:22Z"}}}
 		}`)
-	transfer := new(SynchronousTransfer)
+	transfer := new(moov.SynchronousTransfer)
 
 	dec := json.NewDecoder(bytes.NewReader(input))
 	dec.DisallowUnknownFields()
@@ -211,11 +212,11 @@ type TransferTestSuite struct {
 	suite.Suite
 	// values for testing will be set in init()
 	accountID           string
-	card                Card
+	card                moov.Card
 	deleteCardID        string
-	paymentMethodSource PaymentMethod
-	paymentMethodDest   PaymentMethod
-	transfer            SynchronousTransfer
+	paymentMethodSource moov.PaymentMethod
+	paymentMethodDest   moov.PaymentMethod
+	transfer            moov.SynchronousTransfer
 }
 
 // listen for 'go test' command --> run test methods
@@ -228,7 +229,7 @@ func (s *TransferTestSuite) SetupSuite() {
 	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
 	mc := NewTestClient(s.T())
 
-	accounts, err := mc.ListAccounts(context.Background(), WithAccountName("Lincoln National Corporation"))
+	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
 	s.NoError(err)
 
 	for _, account := range accounts {
@@ -241,15 +242,15 @@ func (s *TransferTestSuite) SetupSuite() {
 	// get card to get paymentID
 	cards, _ := mc.ListCards(context.Background(), s.accountID)
 	if len(cards) == 0 {
-		card := CreateCard{
+		card := moov.CreateCard{
 			CardNumber: "371111111111114",
 			CardCvv:    "1234",
-			Expiration: Expiration{
+			Expiration: moov.Expiration{
 				Month: "10",
 				Year:  "28",
 			},
 			HolderName: "Wade Arnold",
-			BillingAddress: Address{
+			BillingAddress: moov.Address{
 				AddressLine1:    "123 Main Street",
 				City:            "Golden",
 				StateOrProvince: "CO",
@@ -269,7 +270,7 @@ func (s *TransferTestSuite) SetupSuite() {
 	}
 
 	// get payment method from card
-	respPaymentMethods, err := mc.ListPaymentMethods(context.Background(), s.accountID, WithPaymentMethodSourceID(s.card.CardID))
+	respPaymentMethods, err := mc.ListPaymentMethods(context.Background(), s.accountID, moov.WithPaymentMethodSourceID(s.card.CardID))
 	s.NoError(err)
 	s.Require().NotEmpty(respPaymentMethods)
 
@@ -279,13 +280,13 @@ func (s *TransferTestSuite) SetupSuite() {
 	respWallets, err := mc.ListWallets(s.accountID)
 	s.NoError(err)
 
-	respPaymentMethods1, err := mc.ListPaymentMethods(context.Background(), s.accountID, WithPaymentMethodSourceID(respWallets[0].WalletID))
+	respPaymentMethods1, err := mc.ListPaymentMethods(context.Background(), s.accountID, moov.WithPaymentMethodSourceID(respWallets[0].WalletID))
 	s.NoError(err)
 	s.Require().NotEmpty(respPaymentMethods1)
 	s.paymentMethodDest = respPaymentMethods1[0]
 
 	//	get sample transfer
-	payload := SearchQueryPayload{}
+	payload := moov.SearchQueryPayload{}
 	respTransfers, err := mc.ListTransfers(payload)
 	s.NoError(err)
 	s.Require().NotEmpty(respTransfers)
@@ -306,27 +307,27 @@ func (s *TransferTestSuite) TearDownSuite() {
 }
 
 func (s *TransferTestSuite) TestCreateTransfer() {
-	source := Source{
+	source := moov.Source{
 		PaymentMethodID: s.paymentMethodSource.PaymentMethodID,
 		Card:            s.card,
-		CardDetails: CardDetails{
+		CardDetails: moov.CardDetails{
 			DynamicDescriptor: "WhlBdy *Yoga 11-12",
 			TransactionSource: "first-recurring",
 		},
 	}
-	destination := Destination{
+	destination := moov.Destination{
 		PaymentMethodID: s.paymentMethodDest.PaymentMethodID,
 		Wallet:          s.paymentMethodDest.Wallet,
-		AchDetails: AchDetails{
+		AchDetails: moov.AchDetails{
 			CompanyEntryDescription: "Gym Dues",
 			OriginatingCompanyName:  "Whole Body Fit",
 		},
 	}
-	amount := Amount{
+	amount := moov.Amount{
 		Currency: "USD",
 		Value:    1204,
 	}
-	facilitatorFee := FacilitatorFee{
+	facilitatorFee := moov.FacilitatorFee{
 		Total: 8, // $0.08
 	}
 	description := "Pay Instructor for May 15 Class"
@@ -337,7 +338,7 @@ func (s *TransferTestSuite) TestCreateTransfer() {
 
 	mc := NewTestClient(s.T())
 
-	completedTransfer, startedTransfer, err := mc.CreateTransfer(context.Background(), CreateTransfer{
+	completedTransfer, startedTransfer, err := mc.CreateTransfer(context.Background(), moov.CreateTransfer{
 		Source:         source,
 		Destination:    destination,
 		Amount:         amount,
@@ -357,7 +358,7 @@ func (s *TransferTestSuite) TestCreateTransfer() {
 func (s *TransferTestSuite) TestListTransfers() {
 	mc := NewTestClient(s.T())
 
-	payload := SearchQueryPayload{}
+	payload := moov.SearchQueryPayload{}
 	transfers, err := mc.ListTransfers(payload)
 	s.NoError(err)
 
@@ -398,16 +399,16 @@ func (s *TransferTestSuite) TestUpdateTransferMetaData() {
 func (s *TransferTestSuite) TestTransferOptions() {
 	mc := NewTestClient(s.T())
 
-	payload := TransferOptionsPayload{
-		Source: TransferOptionsSourcePayload{
+	payload := moov.TransferOptionsPayload{
+		Source: moov.TransferOptionsSourcePayload{
 			PaymentMethodID: s.paymentMethodSource.PaymentMethodID,
 			AccountID:       s.accountID,
 		},
-		Destination: TransferOptionsDestinationPayload{
+		Destination: moov.TransferOptionsDestinationPayload{
 			PaymentMethodID: s.paymentMethodSource.PaymentMethodID,
 			AccountID:       s.accountID,
 		},
-		Amount: Amount{
+		Amount: moov.Amount{
 			Currency: "USD",
 			Value:    1204,
 		},

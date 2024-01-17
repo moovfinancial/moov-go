@@ -1,9 +1,11 @@
-package moov
+package moov_test
 
 import (
+	"context"
 	"os"
 	"testing"
 
+	moov "github.com/moovfinancial/moov-go/pkg"
 	"github.com/stretchr/testify/require"
 
 	"github.com/joho/godotenv"
@@ -11,13 +13,17 @@ import (
 
 func init() {
 	// If we don't have the environment variables set due to running in an IDE or directly via the go command, load it up here
-	if _, ok := os.LookupEnv(ENV_MOOV_SECRET_KEY); !ok {
+	if _, ok := os.LookupEnv(moov.ENV_MOOV_SECRET_KEY); !ok {
 		godotenv.Load("../secrets.env")
 	}
 }
 
-func NewTestClient(t require.TestingT, c ...ClientConfigurable) *Client {
-	mc, err := NewClient(c...)
+func BgCtx() context.Context {
+	return context.Background()
+}
+
+func NewTestClient(t require.TestingT, c ...moov.ClientConfigurable) *moov.Client {
+	mc, err := moov.NewClient(c...)
 	require.NoError(t, err)
 
 	require.NoError(t, mc.Ping(), "Unable to ping with credentials")
@@ -33,6 +39,6 @@ func Test_Client(t *testing.T) {
 }
 
 func Test_Client_InvalidCredentials(t *testing.T) {
-	_, err := NewClient(WithCredentials(Credentials{}))
-	require.Equal(t, ErrAuthCredentialsNotSet, err)
+	_, err := moov.NewClient(moov.WithCredentials(moov.Credentials{}))
+	require.Equal(t, moov.ErrAuthCredentialsNotSet, err)
 }
