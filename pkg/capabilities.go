@@ -32,3 +32,5 @@ type Captability struct {
 	UpdatedOn      time.Time `json:"updatedOn,omitempty"`
 	DisabledOn     time.Time `json:"disabledOn,omitempty"`
 }
+
+// @todo need to add in requesting capabilities...

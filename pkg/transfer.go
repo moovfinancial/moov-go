@@ -12,6 +12,28 @@ import (
 	"github.com/google/uuid"
 )
 
+type TransferStatus int
+
+const (
+	TransferStatusCreated TransferStatus = iota
+	TransferStatusPending
+	TransferStatusCompleted
+	TransferStatusFailed
+	TransferStatusReversed
+	TransferStatusQueued
+	TransferStatusCanceled
+)
+
+var TransferStatusStrings = map[TransferStatus]string{
+	TransferStatusCreated:   "created",
+	TransferStatusPending:   "pending",
+	TransferStatusCompleted: "completed",
+	TransferStatusFailed:    "failed",
+	TransferStatusReversed:  "reversed",
+	TransferStatusQueued:    "queued",
+	TransferStatusCanceled:  "canceled",
+}
+
 type SynchronousTransfer struct {
 	TransferID     string            `json:"transferID,omitempty"`
 	CreatedOn      time.Time         `json:"createdOn,omitempty"`

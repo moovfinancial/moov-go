@@ -7,37 +7,6 @@ import (
 )
 
 const (
-	// SCOPE_ACCOUNTS_READ allows a new Moov account to be created
-	SCOPE_ACCOUNTS_READ = "/accounts.read"
-	// SCOPE_ACCOUNTS_WRITE View all connected accounts
-	SCOPE_ACCOUNTS_WRITE = "/accounts.write"
-
-	// TODO: Add the rest of the scopes https://docs.moov.io/guides/developer-tools/scopes/
-	SCOPE_BANK_ACCOUNT_READ       = "/accounts/{accountID}/bank-accounts.read"
-	SCOPE_BANK_ACCOUNT_WRITE      = "/accounts/{accountID}/bank-accounts.write"
-	SCOPE_CARDS_READ              = "/accounts/{accountID}/cards.read"
-	SCOPE_CARDS_WRITE             = "/accounts/{accountID}/cards.write"
-	SCOPE_CAPABILITIES_READ       = "/accounts/{accountID}/capabilities.read"
-	SCOPE_CAPABILITIES_WRITE      = "/accounts/{accountID}/capabilities.write"
-	SCOPE_DOCUMENTS_READ          = "/accounts/{accountID}/documents.read"
-	SCOPE_DOCUMENTS_WRITE         = "/accounts/{accountID}/documents.write"
-	SCOPE_FILES_READ              = "/accounts/{accountID}/files.read"
-	SCOPE_FILES_WRITE             = "/accounts/{accountID}/files.write"
-	SCOPE_PAYMENT_METHODS_READ    = "/accounts/{accountID}/payment-methods.read"
-	SCOPE_PAYMENT_METHODS_WRITE   = "/accounts/{accountID}/payment-methods.write"
-	SCOPE_PROFILE_READ            = "/accounts/{accountID}/profile.read"
-	SCOPE_PROFILE_WRITE           = "/accounts/{accountID}/profile.write"
-	SCOPE_PREFILE_ENRICHMENT_READ = "/accounts/{accountID}/prefile-enrichment.read"
-	SCOPE_REPRESENTATIVES_READ    = "/accounts/{accountID}/representatives.read"
-	SCOPE_REPRESENTATIVES_WRITE   = "/accounts/{accountID}/representatives.write"
-	SCOPE_TRANSFERS_READ          = "/accounts/{accountID}/transfers.read"
-	SCOPE_TRANSFERS_WRITE         = "/accounts/{accountID}/transfers.write"
-	SCOPE_WALLETS_READ            = "/accounts/{accountID}/wallets.read"
-	SCOPE_FED_READ                = "/fed.read"
-	SCOPE_PING_READ               = "/ping.read"
-)
-
-const (
 	baseURL              = "https://api.moov.io"
 	pathBankAccounts     = "/accounts/%s/bank-accounts"
 	pathMicroDeposits    = "/accounts/%s/bank-accounts/%s/microdeposits"
@@ -79,39 +48,9 @@ func ErrDefault(code int) error {
 	return fmt.Errorf("empty response for unauthorized or any other returned http status code (%d)", code)
 }
 
-type TransferStatus int
-
-const (
-	TransferStatusCreated TransferStatus = iota
-	TransferStatusPending
-	TransferStatusCompleted
-	TransferStatusFailed
-	TransferStatusReversed
-	TransferStatusQueued
-	TransferStatusCanceled
-)
-
-var TransferStatusStrings = map[TransferStatus]string{
-	TransferStatusCreated:   "created",
-	TransferStatusPending:   "pending",
-	TransferStatusCompleted: "completed",
-	TransferStatusFailed:    "failed",
-	TransferStatusReversed:  "reversed",
-	TransferStatusQueued:    "queued",
-	TransferStatusCanceled:  "canceled",
-}
-
 type Client struct {
 	Credentials Credentials
 	HttpClient  *http.Client
-}
-
-type ClientCredentialsGrantToAccessTokenResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	TokenType    string `json:"token_type"`
-	ExpiresIn    int32  `json:"expires_in"`
-	Scope        string `json:"scope"`
 }
 
 func NewClient(configurables ...ClientConfigurable) (*Client, error) {
