@@ -26,7 +26,7 @@ func NewTestClient(t require.TestingT, c ...moov.ClientConfigurable) *moov.Clien
 	mc, err := moov.NewClient(c...)
 	require.NoError(t, err)
 
-	require.NoError(t, mc.Ping(), "Unable to ping with credentials")
+	require.NoError(t, mc.Ping(BgCtx()), "Unable to ping with credentials")
 
 	return mc
 }
@@ -34,7 +34,7 @@ func NewTestClient(t require.TestingT, c ...moov.ClientConfigurable) *moov.Clien
 func Test_Client(t *testing.T) {
 	mc := NewTestClient(t)
 
-	err := mc.Ping()
+	err := mc.Ping(BgCtx())
 	require.NoError(t, err)
 }
 
