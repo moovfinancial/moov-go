@@ -32,7 +32,7 @@ type Account struct {
 	Mode            string            `json:"mode,omitempty"`
 	AccountID       string            `json:"accountID,omitempty"`
 	AccountType     string            `json:"accountType,omitempty"`
-	DisaplayName    string            `json:"displayName,omitempty"`
+	DisplayName    string            `json:"displayName,omitempty"`
 	Profile         Profile           `json:"profile,omitempty"`
 	Metadata        map[string]string `json:"metadata,omitempty"`
 	TermsOfService  TermsOfService    `json:"termsOfService,omitempty"`
