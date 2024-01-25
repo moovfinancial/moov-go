@@ -55,7 +55,7 @@ func (s *WalletTestSuite) SetupSuite() {
 
 	defaultAccountName := "Lincoln National Corporation"
 	for _, account := range accounts {
-		if account.DisaplayName == defaultAccountName {
+		if account.DisplayName == defaultAccountName {
 			// set the accountID for testing
 			s.accountID = account.AccountID
 		}

@@ -68,7 +68,7 @@ func (s *BankAccountTestSuite) SetupSuite() {
 	s.NoError(err)
 
 	for _, account := range accounts {
-		if account.DisaplayName == "Lincoln National Corporation" {
+		if account.DisplayName == "Lincoln National Corporation" {
 			// set the accountID for testing
 			s.accountID = account.AccountID
 		}

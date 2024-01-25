@@ -52,7 +52,7 @@ func (s *PaymentMethodTestSuite) SetupSuite() {
 
 	defaultAccountName := "Daniella Singh"
 	for _, account := range accounts {
-		if account.DisaplayName == defaultAccountName {
+		if account.DisplayName == defaultAccountName {
 			// set the accountID for testing
 			s.accountID = account.AccountID
 		}
