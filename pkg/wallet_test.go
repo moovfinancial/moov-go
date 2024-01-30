@@ -60,7 +60,7 @@ func (s *WalletTestSuite) SetupSuite() {
 			s.accountID = account.AccountID
 		}
 	}
-	wallets, err := mc.ListWallets(s.accountID)
+	wallets, err := mc.ListWallets(BgCtx(), s.accountID)
 	s.NoError(err)
 
 	for _, wallet := range wallets {
@@ -68,7 +68,7 @@ func (s *WalletTestSuite) SetupSuite() {
 	}
 	s.Assert().NotEmpty(s.accountID)
 
-	transactions, err := mc.ListWalletTransactions(s.accountID, s.walletID, moov.WithTransactionCount(1))
+	transactions, err := mc.ListWalletTransactions(BgCtx(), s.accountID, s.walletID, moov.WithTransactionCount(1))
 	s.NoError(err)
 	for _, transaction := range transactions {
 		s.walletTransactionID = transaction.TransactionID
@@ -81,7 +81,7 @@ func (s *WalletTestSuite) TearDownSuite() {}
 func (s *WalletTestSuite) TestListWallets() {
 	mc := NewTestClient(s.T())
 
-	wallets, err := mc.ListWallets(s.accountID)
+	wallets, err := mc.ListWallets(BgCtx(), s.accountID)
 	s.NoError(err)
 	// range over wallets and print walletID
 	for _, wallet := range wallets {
@@ -92,14 +92,14 @@ func (s *WalletTestSuite) TestListWallets() {
 
 func (s *WalletTestSuite) TestGetWallet() {
 	mc := NewTestClient(s.T())
-	wallet, err := mc.GetWallet(s.accountID, s.walletID)
+	wallet, err := mc.GetWallet(BgCtx(), s.accountID, s.walletID)
 	s.NoError(err)
 	s.Equal(s.walletID, wallet.WalletID)
 }
 
 func (s *WalletTestSuite) TestListWalletTransactions() {
 	mc := NewTestClient(s.T())
-	walletTransactions, err := mc.ListWalletTransactions(s.accountID, s.walletID, moov.WithTransactionStatus("completed"), moov.WithTransactionCount(50))
+	walletTransactions, err := mc.ListWalletTransactions(BgCtx(), s.accountID, s.walletID, moov.WithTransactionStatus("completed"), moov.WithTransactionCount(50))
 	s.NoError(err)
 	s.NotNil(walletTransactions)
 	s.Greater(len(walletTransactions), 3)
@@ -107,7 +107,7 @@ func (s *WalletTestSuite) TestListWalletTransactions() {
 
 func (s *WalletTestSuite) TestGetWalletTransaction() {
 	mc := NewTestClient(s.T())
-	walletTran, err := mc.GetWalletTransaction(s.accountID, s.walletID, s.walletTransactionID)
+	walletTran, err := mc.GetWalletTransaction(BgCtx(), s.accountID, s.walletID, s.walletTransactionID)
 	s.NoError(err)
 	s.Equal(s.walletTransactionID, walletTran.TransactionID)
 }

@@ -1,11 +1,8 @@
 package moov
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
+	"context"
 	"net/http"
-	"net/url"
 	"time"
 )
 
@@ -43,208 +40,121 @@ type Transaction struct {
 
 // ListWallets lists all wallets that are associated with a Moov account
 // https://docs.moov.io/api/index.html#tag/Wallets/operation/listWalletsForAccount
-func (c Client) ListWallets(accountID string) ([]Wallet, error) {
-	var resWallets []Wallet
-	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathWallets, accountID))
-
-	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
+func (c Client) ListWallets(ctx context.Context, accountID string) ([]Wallet, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWallets, accountID), AcceptJson())
 	if err != nil {
-		return resWallets, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK:
-		err = json.Unmarshal(body, &resWallets)
-		if err != nil {
-			return resWallets, err
-		}
-		return resWallets, nil
-	case http.StatusTooManyRequests:
-		return resWallets, ErrRateLimit
-	}
-	return resWallets, ErrDefault(statusCode)
+	return CompletedListOrError[Wallet](resp)
 }
 
 // GetWallet retrieves a wallet for the given wallet id
 // https://docs.moov.io/api/index.html#tag/Wallets/operation/getWalletForAccount
-func (c Client) GetWallet(accountID string, walletID string) (Wallet, error) {
-	resWallet := Wallet{}
-	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathWallets, accountID), walletID)
-
-	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
+func (c Client) GetWallet(ctx context.Context, accountID string, walletID string) (*Wallet, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWallet, accountID, walletID), AcceptJson())
 	if err != nil {
-		return resWallet, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK:
-		err = json.Unmarshal(body, &resWallet)
-		if err != nil {
-			return resWallet, err
-		}
-		return resWallet, nil
-	case http.StatusUnauthorized:
-		return resWallet, ErrAuthCredentialsNotSet
-	case http.StatusNotFound:
-		return resWallet, ErrNoAccount
-	case http.StatusTooManyRequests:
-		return resWallet, ErrRateLimit
-	}
-	return resWallet, ErrDefault(statusCode)
+	return CompletedObjectOrError[Wallet](resp)
 }
 
-type transactionFilter map[string]string
-
-type ListTransactionFilter func(c transactionFilter) error
-
-func applyTransactionFilters(url *url.URL, opts ...ListTransactionFilter) {
-	filters := make(transactionFilter)
-	for _, opt := range opts {
-		opt(filters)
-	}
-	q := url.Query()
-	for k, v := range filters {
-		q.Add(k, v)
-	}
-	url.RawQuery = q.Encode()
-}
+type ListTransactionFilter callArg
 
 // WithTransactionType filters transactions by transaction type
 func WithTransactionType(transactionType string) ListTransactionFilter {
-	return func(c transactionFilter) error {
-		c["transactionType"] = transactionType
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["transactionType"] = transactionType
 		return nil
-	}
+	})
 }
 
 // WithSourceType filters transactions by source type (transfer, dispute, issuing-transaction).
-func WithSourceType(sourceType string) ListTransactionFilter {
-	return func(c transactionFilter) error {
-		c["sourceType"] = sourceType
+func WithTransactionSourceType(sourceType string) ListTransactionFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["sourceType"] = sourceType
 		return nil
-	}
+	})
 }
 
 // WithSourceID filters transactions by source ID
-func WithSourceID(sourceID string) ListTransactionFilter {
-	return func(c transactionFilter) error {
-		c["sourceID"] = sourceID
+func WithTransactionSourceID(sourceID string) ListTransactionFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["sourceID"] = sourceID
 		return nil
-	}
+	})
 }
 
 // WithTransactionStatus filters transactions by transaction status (pending, completed, canceled, failed)
 func WithTransactionStatus(status string) ListTransactionFilter {
-	return func(c transactionFilter) error {
-		c["status"] = status
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["status"] = status
 		return nil
-	}
+	})
 }
 
 // WithTransactionCount filters transactions by transaction count
 func WithTransactionCount(count int) ListTransactionFilter {
-	return func(c transactionFilter) error {
-		c["count"] = fmt.Sprintf("%d", count)
-		return nil
-	}
+	return Count(count)
 }
 
 // WithTransactionSkip filters transactions by transaction skip
 func WithTransactionSkip(skip int) ListTransactionFilter {
-	return func(c transactionFilter) error {
-		c["skip"] = fmt.Sprintf("%d", skip)
-		return nil
-	}
+	return Skip(skip)
 }
 
 // WithCreatedStartDateTime filters transactions by created start date time
 func WithCreatedStartDateTime(createdStartDateTime time.Time) ListTransactionFilter {
-	return func(c transactionFilter) error {
-		c["createdStartDateTime"] = createdStartDateTime.Format(time.RFC3339)
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["createdStartDateTime"] = createdStartDateTime.Format(time.RFC3339)
 		return nil
-	}
+	})
 }
 
 // WithCreatedEndDateTime filters transactions by created end date time
 func WithCreatedEndDateTime(createdEndDateTime time.Time) ListTransactionFilter {
-	return func(c transactionFilter) error {
-		c["createdEndDateTime"] = createdEndDateTime.Format(time.RFC3339)
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["createdEndDateTime"] = createdEndDateTime.Format(time.RFC3339)
 		return nil
-	}
+	})
 }
 
 // WithCompletedStartDateTime filters transactions by completed start date time
 func WithCompletedStartDateTime(completedStartDateTime time.Time) ListTransactionFilter {
-	return func(c transactionFilter) error {
-		c["completedStartDateTime"] = completedStartDateTime.Format(time.RFC3339)
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["completedStartDateTime"] = completedStartDateTime.Format(time.RFC3339)
 		return nil
-	}
+	})
 }
 
 // WithCompletedEndDateTime filters transactions by completed end date time
 func WithCompletedEndDateTime(completedEndDateTime time.Time) ListTransactionFilter {
-	return func(c transactionFilter) error {
-		c["completedEndDateTime"] = completedEndDateTime.Format(time.RFC3339)
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["completedEndDateTime"] = completedEndDateTime.Format(time.RFC3339)
 		return nil
-	}
+	})
 }
 
 // ListWalletTransactions lists all transactions for the given wallet id
 // https://docs.moov.io/api/index.html#tag/Wallet-transactions
-func (c Client) ListWalletTransactions(accountID string, walletID string, opts ...ListTransactionFilter) ([]Transaction, error) {
-	var resTransactions []Transaction
-	url := fmt.Sprintf("%s/%s", baseURL, fmt.Sprintf(pathWalletTrans, accountID, walletID))
-	req, _ := http.NewRequest(http.MethodGet, url, nil)
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
-	applyTransactionFilters(req.URL, opts...)
-	resp, err := c.HttpClient.Do(req)
+func (c Client) ListWalletTransactions(ctx context.Context, accountID string, walletID string, opts ...ListTransactionFilter) ([]Transaction, error) {
+	args := prependArgs(opts, AcceptJson())
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWalletTrans, accountID, walletID), args...)
 	if err != nil {
-		return resTransactions, err
+		return nil, err
 	}
-	defer resp.Body.Close()
-	body, _ := io.ReadAll(resp.Body)
 
-	switch resp.StatusCode {
-	case http.StatusOK:
-		err = json.Unmarshal(body, &resTransactions)
-		if err != nil {
-			return resTransactions, err
-		}
-		return resTransactions, nil
-	case http.StatusNotFound:
-		return resTransactions, ErrNoAccount
-	case http.StatusTooManyRequests:
-		return resTransactions, ErrRateLimit
-	}
-	return resTransactions, ErrDefault(resp.StatusCode)
+	return CompletedListOrError[Transaction](resp)
 }
 
 // GetWalletTransaction retrieves a transaction for the given wallet id and transaction id
 // https://docs.moov.io/api/index.html#tag/Wallet-transactions/operation/getWalletTransaction
-func (c Client) GetWalletTransaction(accountID string, walletID string, transactionID string) (Transaction, error) {
-	resTransaction := Transaction{}
-	url := fmt.Sprintf("%s/%s/%s", baseURL, fmt.Sprintf(pathWalletTrans, accountID, walletID), transactionID)
-
-	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, url, nil, nil)
+func (c Client) GetWalletTransaction(ctx context.Context, accountID string, walletID string, transactionID string) (*Transaction, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWalletTran, accountID, walletID, transactionID), AcceptJson())
 	if err != nil {
-		return resTransaction, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK:
-		err = json.Unmarshal(body, &resTransaction)
-		if err != nil {
-			return resTransaction, err
-		}
-		return resTransaction, nil
-	case http.StatusUnauthorized:
-		return resTransaction, ErrAuthCredentialsNotSet
-	case http.StatusNotFound:
-		return resTransaction, ErrNoAccount
-	case http.StatusTooManyRequests:
-		return resTransaction, ErrRateLimit
-	}
-	return resTransaction, ErrDefault(statusCode)
+	return CompletedObjectOrError[Transaction](resp)
 }

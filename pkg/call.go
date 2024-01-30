@@ -130,6 +130,27 @@ func WaitFor(state string) callArg {
 	})
 }
 
+func IdempotencyKey(uuid string) callArg {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.headers["X-Idempotency-Key"] = uuid
+		return nil
+	})
+}
+
+func Skip(skip int) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["skip"] = fmt.Sprintf("%d", skip)
+		return nil
+	})
+}
+
+func Count(count int) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["count"] = fmt.Sprintf("%d", count)
+		return nil
+	})
+}
+
 // Response
 
 type CallResponse interface {
