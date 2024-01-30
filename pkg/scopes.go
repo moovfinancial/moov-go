@@ -58,12 +58,12 @@ func (sl *scopeList) IssuedCardsReadSecure(accountID string) ScopeBuilder {
 
 // Give to the registered ApplePay merchants to allow them manage their ApplePay integration.
 func (sl *scopeList) ApplePayMerchantRead(accountID string) ScopeBuilder {
-	return appendScope("/accounts/%s/apple-pay.read", accountID)
+	return appendScope("/accounts/%s/apple-pay-merchant.read", accountID)
 }
 
 // Give to the registered ApplePay merchants to allow them manage their ApplePay integration.
 func (sl *scopeList) ApplePayMerchantWrite(accountID string) ScopeBuilder {
-	return appendScope("/accounts/%s/apple-pay.write", accountID)
+	return appendScope("/accounts/%s/apple-pay-merchant.write", accountID)
 }
 
 func (sl *scopeList) ApplePayWrite(accountID string) ScopeBuilder {

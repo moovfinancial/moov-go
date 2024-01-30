@@ -277,7 +277,7 @@ func (s *TransferTestSuite) SetupSuite() {
 	s.paymentMethodSource = respPaymentMethods[0]
 
 	// get payment method of wallet
-	respWallets, err := mc.ListWallets(s.accountID)
+	respWallets, err := mc.ListWallets(BgCtx(), s.accountID)
 	s.NoError(err)
 
 	respPaymentMethods1, err := mc.ListPaymentMethods(context.Background(), s.accountID, moov.WithPaymentMethodSourceID(respWallets[0].WalletID))
@@ -286,8 +286,7 @@ func (s *TransferTestSuite) SetupSuite() {
 	s.paymentMethodDest = respPaymentMethods1[0]
 
 	//	get sample transfer
-	payload := moov.SearchQueryPayload{}
-	respTransfers, err := mc.ListTransfers(payload)
+	respTransfers, err := mc.ListTransfers(BgCtx())
 	s.NoError(err)
 	s.Require().NotEmpty(respTransfers)
 
@@ -345,7 +344,7 @@ func (s *TransferTestSuite) TestCreateTransfer() {
 		FacilitatorFee: facilitatorFee,
 		Description:    description,
 		Metadata:       metadata,
-	}, true)
+	}, moov.WithTransferWaitForRailResponse())
 
 	s.Require().NoError(err, "Error creating transfer")
 	s.Require().Nil(startedTransfer) // We asked it to be synchronous so hopefully is nil
@@ -358,8 +357,7 @@ func (s *TransferTestSuite) TestCreateTransfer() {
 func (s *TransferTestSuite) TestListTransfers() {
 	mc := NewTestClient(s.T())
 
-	payload := moov.SearchQueryPayload{}
-	transfers, err := mc.ListTransfers(payload)
+	transfers, err := mc.ListTransfers(BgCtx())
 	s.NoError(err)
 
 	s.NotEmpty(transfers)
@@ -373,7 +371,7 @@ func (s *TransferTestSuite) TestGetTransfer() {
 		transferID = s.transfer.TransferID
 	}
 
-	transfer, err := mc.GetTransfer(transferID, "")
+	transfer, err := mc.GetTransfer(BgCtx(), transferID)
 	s.NoError(err)
 
 	s.Equal(transferID, transfer.TransferID)
@@ -390,7 +388,9 @@ func (s *TransferTestSuite) TestUpdateTransferMetaData() {
 		transferID = s.transfer.TransferID
 	}
 
-	transfer, err := mc.UpdateTransferMetaData(transferID, "", metadata)
+	transfer, err := mc.UpdateTransferMetaData(BgCtx(), transferID, moov.MetadataPayload{
+		Metadata: metadata,
+	})
 	s.NoError(err, "Error updating transfer metadata")
 
 	s.Equal(transfer.Metadata, metadata)
@@ -414,7 +414,7 @@ func (s *TransferTestSuite) TestTransferOptions() {
 		},
 	}
 
-	options, err := mc.TransferOptions(payload)
+	options, err := mc.TransferOptions(BgCtx(), payload)
 	s.NoError(err)
 
 	// @todo check if dest or origin are not empty?
@@ -430,7 +430,9 @@ func (s *TransferTestSuite) TestRefundTransfer() {
 		transferID = s.transfer.TransferID
 	}
 
-	refund, err := mc.RefundTransfer(transferID, true, 1000)
+	refund, _, err := mc.RefundTransfer(BgCtx(), transferID, moov.RefundPayload{
+		Amount: 1000,
+	}, moov.WithRefundWaitForRailResponse())
 	s.NoError(err)
 
 	s.NotEmpty(refund.RefundID)
@@ -444,7 +446,7 @@ func (s *TransferTestSuite) TestListRefunds() {
 		transferID = s.transfer.TransferID
 	}
 
-	refunds, err := mc.ListRefunds(transferID)
+	refunds, err := mc.ListRefunds(BgCtx(), transferID)
 	s.NoError(err)
 
 	fmt.Println(len(refunds))
@@ -460,7 +462,7 @@ func (s *TransferTestSuite) TestGetRefund() {
 	}
 
 	refundID := "8b491eb3-a262-4eba-a0ca-35983bef3262"
-	refund, err := mc.GetRefund(transferID, refundID)
+	refund, err := mc.GetRefund(BgCtx(), transferID, refundID)
 	s.NoError(err)
 
 	s.Equal(refundID, refund.RefundID)
@@ -474,7 +476,9 @@ func (s *TransferTestSuite) TestReverseTransfer() {
 		transferID = s.transfer.TransferID
 	}
 
-	reverse, err := mc.ReverseTransfer(transferID, 50)
+	reverse, err := mc.ReverseTransfer(BgCtx(), transferID, moov.RefundPayload{
+		Amount: 50,
+	})
 	s.NoError(err)
 
 	s.NotEmpty(reverse.Refund.RefundID)

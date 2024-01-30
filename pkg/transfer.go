@@ -2,10 +2,7 @@ package moov
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
@@ -120,19 +117,7 @@ type Destination struct {
 	CardDetails       CardDetails     `json:"cardDetails,omitempty"`
 }
 
-type SearchQueryPayload struct {
-	AccountIDs    []string  `json:"accountIDs,omitempty"`
-	Status        string    `json:"status,omitempty"`
-	StartDateTime time.Time `json:"startDateTime,omitempty"`
-	EndDateTime   time.Time `json:"endDateTime,omitempty"`
-	GroupID       string    `json:"groupID,omitempty"`
-	Count         int       `json:"count,omitempty"`
-	Skip          int       `json:"skip,omitempty"`
-	Refunded      bool      `json:"refunded,omitempty"`
-	Disputed      bool      `json:"disputed,omitempty"`
-}
-
-type MetaDataPayload struct {
+type MetadataPayload struct {
 	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
@@ -180,13 +165,26 @@ type CreateTransfer struct {
 	Metadata       map[string]string `json:"metadata,omitempty"`
 }
 
+type CreateTransferArgs callArg
+
+func WithTransferWaitForRailResponse() CreateTransferArgs {
+	return WaitFor("rail-response")
+}
+
+// Can be specified to overwrite a randomly generated one.
+func WithTransferIdempotencyKey(key uuid.UUID) CreateTransferArgs {
+	return IdempotencyKey(key.String())
+}
+
 // CreateTransfer creates a new transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
-func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, isSync bool) (*SynchronousTransfer, *AsynchronousTransfer, error) {
-	args := []callArg{AcceptJson(), JsonBody(transfer)}
-	if isSync {
-		args = append(args, WaitFor("rail-response"))
-	}
+func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, options ...CreateTransferArgs) (*SynchronousTransfer, *AsynchronousTransfer, error) {
+	args := prependArgs[CreateTransferArgs](options,
+		// default options
+		AcceptJson(),
+		JsonBody(transfer),
+		WithTransferIdempotencyKey(uuid.New()),
+	)
 
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathTransfers), args...)
 	if err != nil {
@@ -207,279 +205,203 @@ func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, isS
 	}
 }
 
+type ListTransferFilter callArg
+
+func WithTransferAccountIDs(accountIDs []string) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["accoundIDs"] = strings.Join(accountIDs, ",")
+		return nil
+	})
+}
+
+func WithTransferStatus(status string) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["status"] = status
+		return nil
+	})
+}
+
+func WithTransferStartDate(start time.Time) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["startDateTime"] = start.Format(time.RFC3339)
+		return nil
+	})
+}
+
+func WithTransferEndDate(end time.Time) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["endDateTime"] = end.Format(time.RFC3339)
+		return nil
+	})
+}
+
+func WithTransferGroup(groupID string) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["groupID"] = groupID
+		return nil
+	})
+}
+
+func WithTransferRefunded() ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["refunded"] = "true"
+		return nil
+	})
+}
+
+func WithTransferDisputed() ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["disputed"] = "true"
+		return nil
+	})
+}
+
+func WithTransferSkip(skip int) ListTransferFilter {
+	return Skip(skip)
+}
+
+func WithTransferCount(count int) ListTransferFilter {
+	return Count(count)
+}
+
 // ListTransfers lists all transfers
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/listTransfers
-func (c Client) ListTransfers(payload SearchQueryPayload) ([]SynchronousTransfer, error) {
-	var respTransfers []SynchronousTransfer
-
-	values := url.Values{}
-	// Convert time values to ISO8601 format
-	startDateTimeStr := payload.StartDateTime.Format(time.RFC3339)
-	endDateTimeStr := payload.EndDateTime.Format(time.RFC3339)
-
-	// Add non-empty fields to the query string
-	if len(payload.AccountIDs) > 0 {
-		values.Add("accountIDs", strings.Join(payload.AccountIDs, ","))
-	}
-	if payload.Status != "" {
-		values.Add("status", payload.Status)
-	}
-	if !payload.StartDateTime.IsZero() {
-		values.Add("startDateTime", startDateTimeStr)
-	}
-	if !payload.EndDateTime.IsZero() {
-		values.Add("endDateTime", endDateTimeStr)
-	}
-	if payload.GroupID != "" {
-		values.Add("groupID", payload.GroupID)
-	}
-	if payload.Count > 0 {
-		values.Add("count", fmt.Sprint(payload.Count))
-	}
-	if payload.Skip > 0 {
-		values.Add("skip", fmt.Sprint(payload.Skip))
-	}
-	if payload.Refunded {
-		values.Add("refunded", "true")
-	}
-	if payload.Disputed {
-		values.Add("disputed", "true")
-	}
-
-	urlStr := fmt.Sprintf("%s/%s?%s", baseURL, pathTransfers, values.Encode())
-
-	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, urlStr, nil, nil)
+func (c Client) ListTransfers(ctx context.Context, filters ...ListTransferFilter) ([]SynchronousTransfer, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathTransfers),
+		prependArgs(filters, AcceptJson())...)
 	if err != nil {
-		return respTransfers, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK:
-		err = json.Unmarshal(body, &respTransfers)
-		if err != nil {
-			return respTransfers, err
-		}
-		return respTransfers, nil
-	case http.StatusTooManyRequests:
-		return respTransfers, ErrRateLimit
-	}
-	return respTransfers, ErrDefault(statusCode)
+	return CompletedListOrError[SynchronousTransfer](resp)
 }
 
 // GetTransfer retrieves a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/getTransfer
-func (c Client) GetTransfer(transferID string, accountID string) (SynchronousTransfer, error) {
-	var respTransfer SynchronousTransfer
-
-	values := url.Values{}
-	if accountID != "" {
-		values.Add("accountID", accountID)
-	}
-
-	urlStr := fmt.Sprintf("%s/%s/%s?%s", baseURL, pathTransfers, transferID, values.Encode())
-
-	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, urlStr, nil, nil)
+func (c Client) GetTransfer(ctx context.Context, transferID string) (*SynchronousTransfer, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathTransfer, transferID),
+		AcceptJson(),
+	)
 	if err != nil {
-		return respTransfer, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK:
-		err = json.Unmarshal(body, &respTransfer)
-		if err != nil {
-			return respTransfer, err
-		}
-		return respTransfer, nil
-	case http.StatusTooManyRequests:
-		return respTransfer, ErrRateLimit
-	}
-	return respTransfer, ErrDefault(statusCode)
+	return CompletedObjectOrError[SynchronousTransfer](resp)
 }
 
 // UpdateTransferMetaData updates the metadata for a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/patchTransfer
-func (c Client) UpdateTransferMetaData(transferID string, accountID string, metadata map[string]string) (SynchronousTransfer, error) {
-	var respTransfer SynchronousTransfer
-
-	values := url.Values{}
-	if accountID != "" {
-		values.Add("accountID", accountID)
-	}
-	urlStr := fmt.Sprintf("%s/%s/%s?%s", baseURL, pathTransfers, transferID, values.Encode())
-	metaDataPayload := MetaDataPayload{
-		Metadata: metadata,
-	}
-
-	body, statusCode, err := c.GetHTTPResponse(http.MethodPatch, urlStr, metaDataPayload, nil)
+func (c Client) UpdateTransferMetaData(ctx context.Context, transferID string, metadata MetadataPayload) (*SynchronousTransfer, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPatch, pathTransfer, transferID),
+		AcceptJson(),
+		JsonBody(metadata))
 	if err != nil {
-		return respTransfer, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK:
-		err = json.Unmarshal(body, &respTransfer)
-		if err != nil {
-			return respTransfer, err
-		}
-		return respTransfer, nil
-	case http.StatusTooManyRequests:
-		return respTransfer, ErrRateLimit
-	}
-	return respTransfer, ErrDefault(statusCode)
+	return CompletedObjectOrError[SynchronousTransfer](resp)
 }
 
 // TransferOptions lists all transfer options between a source and destination
 // https://docs.moov.io/api/#tag/Transfers/operation/createTransferOptions
-func (c Client) TransferOptions(payload TransferOptionsPayload) (CreatedTransferOptions, error) {
-	var respOptions CreatedTransferOptions
-	urlStr := fmt.Sprintf("%s/%s", baseURL, pathTransferOptions)
-
-	body, statusCode, err := c.GetHTTPResponse(http.MethodPost, urlStr, payload, nil)
+func (c Client) TransferOptions(ctx context.Context, payload TransferOptionsPayload) (*CreatedTransferOptions, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathTransferOptions),
+		AcceptJson(),
+		JsonBody(payload))
 	if err != nil {
-		return respOptions, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK:
-		err = json.Unmarshal(body, &respOptions)
-		if err != nil {
-			return respOptions, err
-		}
-		return respOptions, nil
-	case http.StatusTooManyRequests:
-		return respOptions, ErrRateLimit
-	}
-	return respOptions, ErrDefault(statusCode)
+	return CompletedObjectOrError[CreatedTransferOptions](resp)
+}
+
+type CreateRefundArgs callArg
+
+func WithRefundWaitForRailResponse() CreateTransferArgs {
+	return WaitFor("rail-response")
+}
+
+// Can be specified to overwrite a randomly generated one.
+func WithRefundIdempotencyKey(key uuid.UUID) CreateTransferArgs {
+	return IdempotencyKey(key.String())
 }
 
 // RefundTransfer refunds a transfer
 // https://docs.moov.io/api/#tag/Transfers/operation/refundTransfer
-func (c Client) RefundTransfer(transferID string, isSync bool, amount int) (Refund, error) {
-	var respRefund Refund
+func (c Client) RefundTransfer(ctx context.Context, transferID string, refund RefundPayload, options ...CreateRefundArgs) (*Refund, *Refund, error) {
+	args := prependArgs(options,
+		AcceptJson(),
+		WithRefundIdempotencyKey(uuid.New()),
+		JsonBody(refund),
+	)
 
-	urlStr := fmt.Sprintf("%s/%s/%s/refunds", baseURL, pathTransfers, transferID)
-	uuidV4 := uuid.NewString()
-	header := map[string]string{"X-Idempotency-Key": uuidV4}
-	if isSync {
-		header["X-Wait-For"] = "rail-response"
-	}
-
-	refundPayload := RefundPayload{
-		Amount: amount,
-	}
-	body, statusCode, err := c.GetHTTPResponse(http.MethodPost, urlStr, refundPayload, header)
-
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathRefunds, transferID),
+		args...)
 	if err != nil {
-		return respRefund, err
+		return nil, nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK, http.StatusAccepted:
-		err = json.Unmarshal(body, &respRefund)
-		if err != nil {
-			return respRefund, err
-		}
-		return respRefund, nil
-	case http.StatusBadRequest:
-		var err error
-		_ = json.Unmarshal(body, &err)
-		return respRefund, err
-	case http.StatusConflict:
-		return respRefund, ErrXIdempotencyKey
-	case http.StatusUnprocessableEntity:
-		return respRefund, ErrRequestBody
-	case http.StatusTooManyRequests:
-		return respRefund, ErrRateLimit
+	switch resp.Status() {
+	case StatusCompleted:
+		r, err := CompletedObjectOrError[Refund](resp)
+		return r, nil, err
+	case StatusStarted:
+		r, err := CompletedObjectOrError[Refund](resp)
+		return nil, r, err
+	default:
+		return nil, nil, resp.Error()
 	}
-	return respRefund, ErrDefault(statusCode)
 }
 
 // ListRefunds lists all refunds for a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/getRefunds
-func (c Client) ListRefunds(transferID string) ([]Refund, error) {
-	var respRefunds []Refund
-
-	urlStr := fmt.Sprintf("%s/%s/%s/refunds", baseURL, pathTransfers, transferID)
-
-	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, urlStr, nil, nil)
+func (c Client) ListRefunds(ctx context.Context, transferID string) ([]Refund, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathRefunds, transferID),
+		AcceptJson())
 	if err != nil {
-		return respRefunds, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK:
-		err = json.Unmarshal(body, &respRefunds)
-		if err != nil {
-			return respRefunds, err
-		}
-		return respRefunds, nil
-	case http.StatusTooManyRequests:
-		return respRefunds, ErrRateLimit
-	}
-	return respRefunds, ErrDefault(statusCode)
+	return CompletedListOrError[Refund](resp)
 }
 
 // GetRefund retrieves a refund for a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/getRefund
-func (c Client) GetRefund(transferID string, refundID string) (Refund, error) {
-	var respRefund Refund
-
-	urlStr := fmt.Sprintf("%s/%s/%s/refunds/%s", baseURL, pathTransfers, transferID, refundID)
-
-	body, statusCode, err := c.GetHTTPResponse(http.MethodGet, urlStr, nil, nil)
+func (c Client) GetRefund(ctx context.Context, transferID string, refundID string) (*Refund, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathRefund, transferID, refundID), AcceptJson())
 	if err != nil {
-		return respRefund, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK:
-		err = json.Unmarshal(body, &respRefund)
-		if err != nil {
-			return respRefund, err
-		}
-		return respRefund, nil
-	case http.StatusTooManyRequests:
-		return respRefund, ErrRateLimit
-	}
-	return respRefund, ErrDefault(statusCode)
+	return CompletedObjectOrError[Refund](resp)
+}
+
+type CreateReversalArgs callArg
+
+// Can be specified to overwrite a randomly generated one.
+func WithReversalsIdempotencyKey(key uuid.UUID) CreateTransferArgs {
+	return IdempotencyKey(key.String())
 }
 
 // ReverseTransfer reverses a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/reverseTransfer
-func (c Client) ReverseTransfer(transferID string, amount int) (CanceledTransfer, error) {
-	respTransfer := CanceledTransfer{}
+func (c Client) ReverseTransfer(ctx context.Context, transferID string, refund RefundPayload, options ...CreateReversalArgs) (*CanceledTransfer, error) {
+	args := prependArgs(options,
+		AcceptJson(),
+		WithReversalsIdempotencyKey(uuid.New()),
+		JsonBody(refund),
+	)
 
-	urlStr := fmt.Sprintf("%s/%s/%s/reversals", baseURL, pathTransfers, transferID)
-	uuidV4 := uuid.NewString()
-	header := map[string]string{"X-Idempotency-Key": uuidV4}
-
-	refundPayload := RefundPayload{
-		Amount: amount,
-	}
-
-	body, statusCode, err := c.GetHTTPResponse(http.MethodPost, urlStr, refundPayload, header)
-
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathReversals, transferID), args...)
 	if err != nil {
-		return respTransfer, err
+		return nil, err
 	}
 
-	switch statusCode {
-	case http.StatusOK, http.StatusAccepted:
-		err = json.Unmarshal(body, &respTransfer)
-		if err != nil {
-			return respTransfer, err
-		}
-		return respTransfer, nil
-	case http.StatusBadRequest:
-		var err error
-		_ = json.Unmarshal(body, &err)
-		return respTransfer, err
-	case http.StatusConflict:
-		return respTransfer, ErrXIdempotencyKey
-	case http.StatusUnprocessableEntity:
-		return respTransfer, ErrRequestBody
-	case http.StatusTooManyRequests:
-		return respTransfer, ErrRateLimit
-	}
-	return respTransfer, ErrDefault(statusCode)
+	return CompletedObjectOrError[CanceledTransfer](resp)
 }
