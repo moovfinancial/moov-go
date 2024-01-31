@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"testing"
 
-	moov "github.com/moovfinancial/moov-go/pkg"
+	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/stretchr/testify/require"

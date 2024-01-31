@@ -23,7 +23,7 @@ package main
 
 import (
 	"log"
-	moov "github.com/moovfinancial/moov-go/pkg"
+	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
 func main() {

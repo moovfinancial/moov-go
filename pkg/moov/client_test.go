@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	moov "github.com/moovfinancial/moov-go/pkg"
+	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 
 	"github.com/joho/godotenv"
