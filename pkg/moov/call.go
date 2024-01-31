@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime/multipart"
 )
 
 type CallStatus struct {
@@ -111,6 +112,52 @@ func JsonBody(body any) callArg {
 
 		call.headers["Context-Type"] = "application/json"
 		call.body = bytes.NewBuffer(payload)
+
+		return nil
+	})
+}
+
+type multipartFn func(w *multipart.Writer) error
+
+func MultipartField(key, value string) multipartFn {
+	return func(w *multipart.Writer) error {
+		return w.WriteField(key, value)
+	}
+}
+
+func MultipartFile(key, filename string, file io.Reader) multipartFn {
+	return func(w *multipart.Writer) error {
+		part, err := w.CreateFormFile(key, filename)
+		if err != nil {
+			return err
+		}
+
+		_, err = io.Copy(part, file)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
+func MultipartBody(parts ...multipartFn) callArg {
+	return callBuilderFn(func(call *callBuilder) error {
+		buf := &bytes.Buffer{}
+		w := multipart.NewWriter(buf)
+
+		for _, part := range parts {
+			if err := part(w); err != nil {
+				return err
+			}
+		}
+
+		if err := w.Close(); err != nil {
+			return err
+		}
+
+		call.headers["Content-Type"] = w.FormDataContentType()
+		call.body = buf
 
 		return nil
 	})
