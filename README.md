@@ -1,19 +1,26 @@
-# moov-go
-Golang client for interacting with Moov API server side 
+# Moov - Go Client
+A [Go](http://golang.org) client for the [Moov payments API](https://docs.moov.io/api/). 
 
-### Installation 
+[![License Apache 2][License-Image]]
+
+[License-Url]: https://www.apache.org/licenses/LICENSE-2.0
+
+
+## Installation 
+
+This SDK requires an API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. Note that API Keys for Sandbox and Production are different keys. 
+
 
 ```bash 
 # Go Client 
-go get github.com/moovfinancial/moov-go/pkg
+go get github.com/moovfinancial/moov-go/
 ```
 
-This SDK requires and API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. Note that API Keys for Sandbox and Production are different keys. 
+API Keys can be configured with environmental variables.
 
-After getting API keys, you need to set up on `config.yaml` file
-```
-public_key: public_key
-secret_key: secret_key
+```bash 
+export MOOV_PUBLIC_KEY="public key here"
+export MOOV_SECRET_KEY="secret key here"
 ```
 
 ## Basic Usage 
@@ -23,7 +30,7 @@ package main
 
 import (
 	"log"
-	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/"
 )
 
 func main() {
