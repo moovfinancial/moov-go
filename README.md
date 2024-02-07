@@ -1,14 +1,22 @@
+![Moov Banner Logo](https://github.com/moovfinancial/moov-go/assets/120951/3632d9ea-0c64-40e5-8f9e-b13b28b5e197)
+
+[![GoDoc](https://godoc.org/github.com/moovfinancial/moovgo?status.svg)](https://godoc./github.com/moovfinancial/moov-go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/moovfinancial/moov-go)](https://goreportcard.com/report/github.com/moovfinancial/moov-go)
+[![Apache 2 License](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moovfinancial/moov-go/master/LICENSE)
+[![Twitter](https://img.shields.io/twitter/follow/moov?style=social)](https://twitter.com/moov?lang=en)
+
 # moov-go
-Golang client for interacting with Moov API server side 
 
-### Installation 
+Golang client for interacting with [Moov Financial's API](https://moov.io/product/).
 
-```bash 
-# Go Client 
+### Installation
+
+```bash
+# Go Client
 go get github.com/moovfinancial/moov-go/pkg
 ```
 
-This SDK requires and API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. Note that API Keys for Sandbox and Production are different keys. 
+This SDK requires and API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. Note that API Keys for Sandbox and Production are different keys.
 
 After getting API keys, you need to set up on `config.yaml` file
 ```
@@ -16,9 +24,9 @@ public_key: public_key
 secret_key: secret_key
 ```
 
-## Basic Usage 
+## Basic Usage
 
-```go 
+```go
 package main
 
 import (
@@ -68,7 +76,7 @@ func main() {
 	account, _ = mc.GetAccount("638481a5-5205-406c-84c7-2fc2239105d1")
 	log.Print(account.Profile.Individual.Name.FirstName)
 
-	// Update an account 
+	// Update an account
 	account := Account{
 		AccountID:   "aa19c3a7-4c72-4f64-adfa-9069c80d81cf",
 		AccountType: INDIVIDUAL,
@@ -100,3 +108,7 @@ if err != nil {
 log.Print("LinkPaymentToken: ", linkPaymentToken.AccessToken)
 
 ```
+
+## License
+
+Apache License 2.0 - See [LICENSE](LICENSE) for details.
