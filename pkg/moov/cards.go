@@ -29,6 +29,7 @@ type Card struct {
 	MerchantAccountID  string             `json:"merchantAccountID,omitempty"`
 	CardAccountUpdater CardAccountUpdater `json:"cardAccountUpdater,omitempty"`
 	DomesticPushToCard string             `json:"domesticPushToCard,omitempty"`
+	PaymentMethods     []PaymentMethod    `json:"paymentMethods,omitempty"`
 }
 
 type Expiration struct {
