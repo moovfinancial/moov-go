@@ -9,6 +9,8 @@
 
 Golang client for interacting with [Moov Financial's API](https://moov.io/product/).
 
+If you believe you have identified a security vulnerability please responsibly report the issue as via email to `security@moov.io`. Please do not post it to a public issue tracker.
+
 ### Installation
 
 ```bash
