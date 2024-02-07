@@ -110,7 +110,7 @@ func JsonBody(body any) callArg {
 			return err
 		}
 
-		call.headers["Context-Type"] = "application/json"
+		call.headers["Content-Type"] = "application/json"
 		call.body = bytes.NewBuffer(payload)
 
 		return nil

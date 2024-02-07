@@ -48,7 +48,7 @@ type AccessTokenResponse struct {
 }
 
 // Makes the call for creating the access tokens
-func (c *Client) AccessToken(ctx context.Context, tokenReq AccessTokenRequest, scopes ...ScopeBuilder) (*AccessTokenResponse, error) {
+func (c *Client) accessToken(ctx context.Context, tokenReq AccessTokenRequest, scopes ...ScopeBuilder) (*AccessTokenResponse, error) {
 	if err := tokenReq.WithScopes(scopes...); err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (c *Client) AccessToken(ctx context.Context, tokenReq AccessTokenRequest, s
 }
 
 func (c *Client) RefreshAccessToken(ctx context.Context, refreshToken string) (*AccessTokenResponse, error) {
-	return c.AccessToken(ctx, AccessTokenRequest{
+	return c.accessToken(ctx, AccessTokenRequest{
 		GrantType:    "refresh_token",
 		ClientId:     &c.Credentials.PublicKey,
 		ClientSecret: &c.Credentials.SecretKey,
@@ -80,7 +80,7 @@ func (c *Client) RefreshAccessToken(ctx context.Context, refreshToken string) (*
 // Creates an access token that gives access to the ping endpoint. This allows for testing access tokens from server side
 // or browser communications to ensure everything works.
 func (c *Client) PingAccessToken(ctx context.Context) (*AccessTokenResponse, error) {
-	return c.AccessToken(ctx, AccessTokenRequest{
+	return c.accessToken(ctx, AccessTokenRequest{
 		GrantType:    "client_credentials",
 		ClientId:     &c.Credentials.PublicKey,
 		ClientSecret: &c.Credentials.SecretKey,
@@ -91,7 +91,7 @@ func (c *Client) PingAccessToken(ctx context.Context) (*AccessTokenResponse, err
 // This allows for a browser to create the account directly against Moov without that account information needing to
 // send sensitive information through the clients backend services.
 func (c *Client) AccountCreationToken(ctx context.Context) (*AccessTokenResponse, error) {
-	return c.AccessToken(ctx, AccessTokenRequest{
+	return c.accessToken(ctx, AccessTokenRequest{
 		GrantType:    "client_credentials",
 		ClientId:     &c.Credentials.PublicKey,
 		ClientSecret: &c.Credentials.SecretKey,
@@ -101,8 +101,8 @@ func (c *Client) AccountCreationToken(ctx context.Context) (*AccessTokenResponse
 // Creates an access token to access a connected account.
 // This allows for a browser to access an account directly against Moov servers without that needing to send sensitive
 // information through the clients backend services.
-func (c *Client) AccountAccessToken(ctx context.Context, accountID string, scopes ...ScopeBuilder) (*AccessTokenResponse, error) {
-	return c.AccessToken(ctx, AccessTokenRequest{
+func (c *Client) AccessToken(ctx context.Context, scopes ...ScopeBuilder) (*AccessTokenResponse, error) {
+	return c.accessToken(ctx, AccessTokenRequest{
 		GrantType:    "client_credentials",
 		ClientId:     &c.Credentials.PublicKey,
 		ClientSecret: &c.Credentials.SecretKey,
