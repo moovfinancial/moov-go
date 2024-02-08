@@ -59,7 +59,7 @@ func main() {
 	}
 	fmt.Printf("AccountID: %s \n", completedAccount.AccountID)
 
-	// You can search for all existing accounts with a variety of quary parameter's. We will use this account as the destination to recieve money.
+	// You can search for all existing accounts with a variety of query parameter's. We will use this account as the destination to receive money.
 	accounts, err := mc.ListAccounts(ctx, moov.WithAccountName("Lincoln National Corporation"), moov.WithAccountCount(10))
 	if err != nil {
 		fmt.Println(err)
@@ -142,7 +142,7 @@ func main() {
 	// We showed three ways to get a PaymentMethodID to transfer money from a card to the moov wallet.
 	// The following is a card to wallet transfer but any payment method can be used to transfer money to the moov wallet
 
-	// Amount to be transfered from the card to the wallet.
+	// Amount to be transferred from the card to the wallet.
 	amount := moov.Amount{
 		Currency: "USD",
 		Value:    9900, // $99.00
