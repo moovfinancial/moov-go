@@ -63,6 +63,7 @@ func main() {
 	accounts, err := mc.ListAccounts(ctx, moov.WithAccountName("Lincoln National Corporation"), moov.WithAccountCount(10))
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	var lincolnAccount moov.Account
 	for _, account := range accounts {
@@ -78,6 +79,10 @@ func main() {
 		return
 	}
 	// As of the writing of this example, every account has one and only one wallet
+	if len(lincolnPaymentMethods) == 0 {
+		fmt.Println("No wallet found for Lincoln National Corporation")
+		return
+	}
 	lincolnWallet := lincolnPaymentMethods[0]
 
 	fmt.Printf("Lincoln AccountID: %s \t PaymentMethodID: %s\n", lincolnAccount.AccountID, lincolnWallet.PaymentMethodID)
