@@ -10,32 +10,7 @@
 A [Go](http://golang.org) client for the [Moov payments API](https://docs.moov.io/api/). 
 
 
-## Installation 
-
 This SDK requires an API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. Note that API Keys for Sandbox and Production are different keys. 
-
-
-```bash 
-# Go Client 
-go get github.com/moovfinancial/moov-go/
-```
-
-API Keys can be configured with environmental variables.
-
-# moov-go
-
-Golang client for interacting with [Moov Financial's API](https://moov.io/product/).
-
-If you believe you have identified a security vulnerability please responsibly report the issue as via email to `security@moov.io`. Please do not post it to a public issue tracker.
-
-### Installation
-
-```bash
-# Go Client
-go get github.com/moovfinancial/moov-go/pkg
-```
-
-This SDK requires and API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. Note that API Keys for Sandbox and Production are different keys.
 
 ```bash 
 export MOOV_PUBLIC_KEY="public key here"
@@ -44,7 +19,7 @@ export MOOV_SECRET_KEY="secret key here"
 
 ## Basic Usage
 
-Example flow for linking a card and sending the money to a merchants wallet.
+Example flow for linking a card and sending the money to a merchant's wallet.
 [Checkout Example](./examples/checkout_example.go)
 
 ## License
