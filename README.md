@@ -1,3 +1,11 @@
+![Moov Banner Logo](https://github.com/moovfinancial/moov-go/assets/120951/3632d9ea-0c64-40e5-8f9e-b13b28b5e197)
+
+[![GoDoc](https://godoc.org/github.com/moovfinancial/moovgo?status.svg)](https://godoc./github.com/moovfinancial/moov-go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/moovfinancial/moov-go)](https://goreportcard.com/report/github.com/moovfinancial/moov-go)
+[![Apache 2 License](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moovfinancial/moov-go/master/LICENSE)
+[![Twitter](https://img.shields.io/twitter/follow/moov?style=social)](https://twitter.com/moov?lang=en)
+
+
 # Moov - Go Client
 A [Go](http://golang.org) client for the [Moov payments API](https://docs.moov.io/api/). 
 
@@ -14,12 +22,31 @@ go get github.com/moovfinancial/moov-go/
 
 API Keys can be configured with environmental variables.
 
+# moov-go
+
+Golang client for interacting with [Moov Financial's API](https://moov.io/product/).
+
+If you believe you have identified a security vulnerability please responsibly report the issue as via email to `security@moov.io`. Please do not post it to a public issue tracker.
+
+### Installation
+
+```bash
+# Go Client
+go get github.com/moovfinancial/moov-go/pkg
+```
+
+This SDK requires and API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. Note that API Keys for Sandbox and Production are different keys.
+
 ```bash 
 export MOOV_PUBLIC_KEY="public key here"
 export MOOV_SECRET_KEY="secret key here"
 ```
 
-## Basic Usage 
+## Basic Usage
 
-Checkout flow for linking a card and sending the money to a merchants wallet.
+Example flow for linking a card and sending the money to a merchants wallet.
 [Checkout Example](./examples/checkout_example.go)
+
+## License
+
+Apache License 2.0 - See [LICENSE](LICENSE) for details.
