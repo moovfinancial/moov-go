@@ -71,23 +71,16 @@ func main() {
 			lincolnAccount = account
 		}
 	}
-	// Get the wallet ID for the account
-	wallets, err := mc.ListWallets(ctx, lincolnAccount.AccountID)
+	// Get the paymentMethodID for the Lincoln National wallet
+	lincolnPaymentMethods, err := mc.ListPaymentMethods(ctx, lincolnAccount.AccountID, moov.WithPaymentMethodType(("moov-wallet")))
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	for _, wallet := range wallets {
-		fmt.Printf("WalletID: %s \t Balance: %s \n", wallet.WalletID, wallet.AvailableBalance.ValueDecimal)
-	}
-	// As of writing of this tutorial, only one wallet is allowed per account.
-	lincolnWallet := wallets[0]
-	lincolnPaymentMethods, err := mc.ListPaymentMethods(ctx, lincolnAccount.AccountID, moov.WithPaymentMethodSourceID(lincolnWallet.WalletID), moov.WithPaymentMethodType(("moov-wallet")))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Printf("Lincoln AccountID: %s \t WalletID: %s \t PaymentMethodID: %s\n", lincolnAccount.AccountID, lincolnWallet.WalletID, lincolnPaymentMethods[0].PaymentMethodID)
+	// As of the writing of this example, every account has one and only one wallet
+	lincolnWallet := lincolnPaymentMethods[0]
+
+	fmt.Printf("Lincoln AccountID: %s \t PaymentMethodID: %s\n", lincolnAccount.AccountID, lincolnWallet.PaymentMethodID)
 
 	// To link a card, apple pay, or bank account to an account you can use a Moov drop to stay out of PCI scope.
 	// Create a scoped access token for the account we just created. This token can link every payment type from Moov.js
@@ -99,8 +92,8 @@ func main() {
 	}
 	// Use this token in the card or bank account linking Drop.
 	// Token's allow the browser to link cards and bank accounts to the account directly with Moov.
-	fmt.Println(completedAccount.AccountID) // cardInput.AccountID
-	fmt.Println(token.AccessToken)          // cardInput.AccessToken
+	//fmt.Println(completedAccount.AccountID) // cardInput.AccountID
+	fmt.Println(token.AccessToken) // cardInput.AccessToken
 
 	// The drop's onSuccess event for the card linking drop returns a Card object the cardID and paymentMethodID
 	// The paymentMethodID is used to transfer money from the card to the moov wallet and needs to be sent to the server
