@@ -6,9 +6,12 @@ import (
 )
 
 type PaymentMethod struct {
-	PaymentMethodID   string `json:"paymentMethodID,omitempty"`
-	PaymentMethodType string `json:"paymentMethodType,omitempty"`
-	Wallet            Wallet `json:"wallet,omitempty"`
+	PaymentMethodID   string      `json:"paymentMethodID,omitempty"`
+	PaymentMethodType string      `json:"paymentMethodType,omitempty"`
+	Wallet            Wallet      `json:"wallet,omitempty"`
+	BankAccount       BankAccount `json:"bankAccount,omitempty"`
+	Card              Card        `json:"card,omitempty"`
+	ApplePay          ApplePay    `json:"applePay,omitempty"`
 }
 
 type PaymentMethodListFilter callArg
@@ -16,6 +19,14 @@ type PaymentMethodListFilter callArg
 func WithPaymentMethodSourceID(id string) callArg {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["sourceID"] = id
+		return nil
+	})
+}
+
+// WithPaymentMethodType filters the payment methods by the payment method type. example: moov-wallet, card-payment, ach-debit-collect
+func WithPaymentMethodType(t string) callArg {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["paymentMethodType"] = t
 		return nil
 	})
 }
