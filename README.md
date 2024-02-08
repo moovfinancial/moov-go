@@ -1,10 +1,6 @@
 # Moov - Go Client
 A [Go](http://golang.org) client for the [Moov payments API](https://docs.moov.io/api/). 
 
-[![License Apache 2][License-Image]]
-
-[License-Url]: https://www.apache.org/licenses/LICENSE-2.0
-
 
 ## Installation 
 
@@ -27,5 +23,3 @@ export MOOV_SECRET_KEY="secret key here"
 
 Checkout flow for linking a card and sending the money to a merchants wallet.
 [Checkout Example](./examples/checkout_example.go)
-
-```
