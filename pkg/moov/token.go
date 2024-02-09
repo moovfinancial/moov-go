@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-type AccessTokenRequest struct {
+type accessTokenRequest struct {
 	GrantType string `json:"grant_type"`
 	// If not specified in `Authorization: Basic` it can be specified here
 	ClientId *string `json:"client_id,omitempty"`
@@ -19,7 +19,7 @@ type AccessTokenRequest struct {
 	RefreshToken string `json:"refresh_token,omitempty"`
 }
 
-func (atr *AccessTokenRequest) WithScopes(scopes ...ScopeBuilder) error {
+func (atr *accessTokenRequest) withScopes(scopes ...ScopeBuilder) error {
 	scp, err := buildScopes(scopes...)
 	if err != nil {
 		return err
@@ -47,9 +47,16 @@ type AccessTokenResponse struct {
 	Scope string `json:"scope,omitempty"`
 }
 
+type revokeTokenRequest struct {
+	Token         string  `json:"token"`
+	TokenTypeHint string  `json:"token_type_hint"`
+	ClientID      *string `json:"client_id,omitempty"`
+	ClientSecret  *string `json:"client_secret,omitempty"`
+}
+
 // Makes the call for creating the access tokens
-func (c *Client) accessToken(ctx context.Context, tokenReq AccessTokenRequest, scopes ...ScopeBuilder) (*AccessTokenResponse, error) {
-	if err := tokenReq.WithScopes(scopes...); err != nil {
+func (c *Client) accessToken(ctx context.Context, tokenReq accessTokenRequest, scopes ...ScopeBuilder) (*AccessTokenResponse, error) {
+	if err := tokenReq.withScopes(scopes...); err != nil {
 		return nil, err
 	}
 
@@ -68,8 +75,9 @@ func (c *Client) accessToken(ctx context.Context, tokenReq AccessTokenRequest, s
 	}
 }
 
+// Allows the use of a refresh token to return a new fresh token
 func (c *Client) RefreshAccessToken(ctx context.Context, refreshToken string) (*AccessTokenResponse, error) {
-	return c.accessToken(ctx, AccessTokenRequest{
+	return c.accessToken(ctx, accessTokenRequest{
 		GrantType:    "refresh_token",
 		ClientId:     &c.Credentials.PublicKey,
 		ClientSecret: &c.Credentials.SecretKey,
@@ -77,10 +85,28 @@ func (c *Client) RefreshAccessToken(ctx context.Context, refreshToken string) (*
 	})
 }
 
+// Revokes the token and makes it unusable for follow up calls
+func (c *Client) RevokeAccessToken(ctx context.Context, token string) error {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPost, "/oauth2/revoke"),
+		AcceptJson(),
+		JsonBody(&revokeTokenRequest{
+			Token:         token,
+			TokenTypeHint: "access_token",
+			ClientID:      &c.Credentials.PublicKey,
+			ClientSecret:  &c.Credentials.SecretKey,
+		}))
+	if err != nil {
+		return err
+	}
+
+	return CompletedNilOrError(resp)
+}
+
 // Creates an access token that gives access to the ping endpoint. This allows for testing access tokens from server side
 // or browser communications to ensure everything works.
 func (c *Client) PingAccessToken(ctx context.Context) (*AccessTokenResponse, error) {
-	return c.accessToken(ctx, AccessTokenRequest{
+	return c.accessToken(ctx, accessTokenRequest{
 		GrantType:    "client_credentials",
 		ClientId:     &c.Credentials.PublicKey,
 		ClientSecret: &c.Credentials.SecretKey,
@@ -91,7 +117,7 @@ func (c *Client) PingAccessToken(ctx context.Context) (*AccessTokenResponse, err
 // This allows for a browser to create the account directly against Moov without that account information needing to
 // send sensitive information through the clients backend services.
 func (c *Client) AccountCreationToken(ctx context.Context) (*AccessTokenResponse, error) {
-	return c.accessToken(ctx, AccessTokenRequest{
+	return c.accessToken(ctx, accessTokenRequest{
 		GrantType:    "client_credentials",
 		ClientId:     &c.Credentials.PublicKey,
 		ClientSecret: &c.Credentials.SecretKey,
@@ -102,7 +128,7 @@ func (c *Client) AccountCreationToken(ctx context.Context) (*AccessTokenResponse
 // This allows for a browser to access an account directly against Moov servers without that needing to send sensitive
 // information through the clients backend services.
 func (c *Client) AccessToken(ctx context.Context, scopes ...ScopeBuilder) (*AccessTokenResponse, error) {
-	return c.accessToken(ctx, AccessTokenRequest{
+	return c.accessToken(ctx, accessTokenRequest{
 		GrantType:    "client_credentials",
 		ClientId:     &c.Credentials.PublicKey,
 		ClientSecret: &c.Credentials.SecretKey,
