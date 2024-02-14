@@ -78,6 +78,10 @@ func (sl *scopeList) AccountProfileWrite(accountID string) ScopeBuilder {
 	return appendScope("/accounts/%s/profile.write", accountID)
 }
 
+func (sl *scopeList) AccountProfileDisconnect(accountID string) ScopeBuilder {
+	return appendScope("/accounts/%s/profile.disconnect", accountID)
+}
+
 func (sl *scopeList) AccountRepresentativesRead(accountID string) ScopeBuilder {
 	return appendScope("/accounts/%s/representatives.read", accountID)
 }
