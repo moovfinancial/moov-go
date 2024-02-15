@@ -27,22 +27,7 @@ func TestAccountMarshalResponse(t *testing.T) {
 }
 
 func TestCreateAccountIndividual(t *testing.T) {
-	account := moov.Account{
-		AccountType: moov.INDIVIDUAL,
-		Profile: moov.Profile{
-			Individual: moov.Individual{
-				Name: moov.Name{
-					FirstName: "Wade",
-					LastName:  "Arnold",
-				},
-				Email: "Wade@wadearnold.com",
-				Phone: moov.Phone{
-					Number:      "555-555-5555",
-					CountryCode: "1",
-				},
-			},
-		},
-	}
+	account := testAccount()
 
 	mc := NewTestClient(t)
 
@@ -96,16 +81,36 @@ func TestListAccounts(t *testing.T) {
 	require.NotNil(t, accounts)
 }
 
-/* func TestDeleateAccount(t *testing.T) {
-	mc, err := NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
+func TestDisconnectAccount(t *testing.T) {
+	mc := NewTestClient(t)
+	ctx := BgCtx()
 
-	err = mc.DeleteAccount("30942467-cd58-4a97-9d02-91b2555640c6")
-	if err != nil {
-		t.Fatal(err)
-		assert.Error(t, err)
-	}
+	accnt, _, err := mc.CreateAccount(ctx, testAccount())
+	require.NoError(t, err)
+	require.NotNil(t, accnt)
 
-} */
+	_, err = mc.GetAccount(ctx, accnt.AccountID)
+	require.NoError(t, err)
+
+	err = mc.DisconnectAccount(ctx, accnt.AccountID)
+	require.NoError(t, err)
+}
+
+func testAccount() moov.Account {
+	return moov.Account{
+		AccountType: moov.INDIVIDUAL,
+		Profile: moov.Profile{
+			Individual: moov.Individual{
+				Name: moov.Name{
+					FirstName: "John",
+					LastName:  "Doe",
+				},
+				Email: "noreply@moov.io",
+				Phone: moov.Phone{
+					Number:      "555-555-5555",
+					CountryCode: "1",
+				},
+			},
+		},
+	}
+}
