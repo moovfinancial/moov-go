@@ -365,7 +365,7 @@ func (c Client) CreateAccount(ctx context.Context, account Account) (*Account, *
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, "/accounts"),
 		AcceptJson(),
-		WaitFor("connected"),
+		WaitFor("connection"),
 		JsonBody(account))
 	if err != nil {
 		return nil, nil, err

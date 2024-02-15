@@ -14,7 +14,7 @@ import (
 func init() {
 	// If we don't have the environment variables set due to running in an IDE or directly via the go command, load it up here
 	if _, ok := os.LookupEnv(moov.ENV_MOOV_SECRET_KEY); !ok {
-		godotenv.Load("../secrets.env")
+		godotenv.Load("../../secrets.env")
 	}
 }
 
