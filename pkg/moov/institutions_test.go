@@ -34,7 +34,7 @@ func (s *InstitutionTestSuite) TestListInstitutions() {
 	s.NoError(err)
 
 	s.Greater(len(resp.AchParticipants), 0)
-	s.Len(resp.WireParticipant, 0)
+	s.Len(resp.WireParticipants, 0)
 
 	resp, err = mc.ListInstitutions(ctx, moov.RailAch,
 		moov.WithInstitutionRoutingNumber("021000021"),
@@ -43,5 +43,5 @@ func (s *InstitutionTestSuite) TestListInstitutions() {
 	s.NoError(err)
 
 	s.Greater(len(resp.AchParticipants), 0)
-	s.Len(resp.WireParticipant, 0)
+	s.Len(resp.WireParticipants, 0)
 }
