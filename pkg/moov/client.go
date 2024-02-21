@@ -7,27 +7,27 @@ import (
 )
 
 const (
-	baseURL              = "https://api.moov.io"
-	pathBankAccounts     = "/accounts/%s/bank-accounts"
-	pathMicroDeposits    = "/accounts/%s/bank-accounts/%s/microdeposits"
-	pathCards            = "/accounts/%s/cards"
 	pathApplePay         = "/accounts/%s/apple-pay"
 	pathApplePayDomains  = "/accounts/%s/apple-pay/domains"
 	pathApplePaySessions = "/accounts/%s/apple-pay/sessions"
 	pathApplePayTokens   = "/accounts/%s/apple-pay/tokens" // #nosec G101
-	pathPaymentMethods   = "/accounts/%s/payment-methods"
-	pathWallets          = "/accounts/%s/wallets"
-	pathWallet           = "/accounts/%s/wallets/%s"
-	pathWalletTrans      = "/accounts/%s/wallets/%s/transactions"
-	pathWalletTran       = "/accounts/%s/wallets/%s/transactions/%s"
-	pathTransfers        = "/transfers"
-	pathTransfer         = "/transfers/%s"
-	pathRefunds          = "/transfers/%s/refunds"
-	pathRefund           = "/transfers/%s/refunds/%s"
-	pathReversals        = "/transfers/%s/reversals"
-	pathTransferOptions  = "/transfer-options"
-	pathDisputes         = "/disputes"
+	pathBankAccounts     = "/accounts/%s/bank-accounts"
+	pathCards            = "/accounts/%s/cards"
 	pathDisputeID        = "/disputes/%s"
+	pathDisputes         = "/disputes"
+	pathInstitutions     = "/institutions/%s/search"
+	pathMicroDeposits    = "/accounts/%s/bank-accounts/%s/microdeposits"
+	pathPaymentMethods   = "/accounts/%s/payment-methods"
+	pathRefund           = "/transfers/%s/refunds/%s"
+	pathRefunds          = "/transfers/%s/refunds"
+	pathReversals        = "/transfers/%s/reversals"
+	pathTransfer         = "/transfers/%s"
+	pathTransferOptions  = "/transfer-options"
+	pathTransfers        = "/transfers"
+	pathWallet           = "/accounts/%s/wallets/%s"
+	pathWalletTran       = "/accounts/%s/wallets/%s/transactions/%s"
+	pathWalletTrans      = "/accounts/%s/wallets/%s/transactions"
+	pathWallets          = "/accounts/%s/wallets"
 )
 
 var (
