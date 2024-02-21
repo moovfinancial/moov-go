@@ -25,7 +25,7 @@ func TestVisaSandboxPush(t *testing.T) {
 	}))
 	require.NoError(t, err)
 
-	// sourceAccountID is the account from which we will pull money this
+	// sourceAccountID is the account from which we will pull money. This
 	// account should be properly configured (e.g. MCC should be set)
 	sourceAccountID := "xxxxx"
 
@@ -78,7 +78,7 @@ func TestVisaSandboxPush(t *testing.T) {
 	// Step 4: find (push) payment method for the linked card
 
 	// When we have only one card linked, we can avoid checking that the
-	// payment method is for user's card.
+	// payment method is for user's card and just use the first one.
 	paymentMethods, err := mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("push-to-card"))
 	require.NoError(t, err)
 
@@ -102,7 +102,7 @@ func TestVisaSandboxPush(t *testing.T) {
 
 	// Step 4: create transfer
 	completedTransfer, _, err := mc.CreateTransfer(
-		context.Background(),
+		ctx,
 		moov.CreateTransfer{
 			Source: moov.Source{
 				PaymentMethodID: sourcePaymentMethod.PaymentMethodID,
