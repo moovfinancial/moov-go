@@ -98,12 +98,10 @@ func (r *httpCallResponse) Unmarshal(item any) error {
 	ct := strings.ToLower(r.resp.Header.Get("content-type"))
 
 	if _, ok := item.(*string); ok {
-		item = string(r.body)
 		return nil
 	}
 
 	if _, ok := item.([]byte); ok {
-		item = r.body
 		return nil
 	}
 
@@ -115,15 +113,28 @@ func (r *httpCallResponse) Unmarshal(item any) error {
 	return fmt.Errorf("unknown content-type: %s", ct)
 }
 
+type errorMessage struct {
+	Message string `json:"error"`
+}
+
 func (r *httpCallResponse) Error() error {
 	switch r.Status() {
 	case StatusCompleted, StatusStarted:
 		return nil
 	default:
+		var errMsg errorMessage
+
+		if len(r.body) > 0 {
+			err := json.Unmarshal(r.body, &errMsg)
+			if err != nil {
+				return fmt.Errorf("unmashalling error message from response body: %w", err)
+			}
+		}
 		return &httpCallError{
 			status:     r.Status(),
 			requestId:  r.resp.Header.Get("X-Request-ID"),
 			statusCode: r.resp.StatusCode,
+			message:    errMsg.Message,
 		}
 	}
 }
@@ -141,6 +152,7 @@ type httpCallError struct {
 	status     CallStatus
 	requestId  string
 	statusCode int
+	message    string
 }
 
 func (he *httpCallError) Status() CallStatus {
@@ -156,5 +168,13 @@ func (he *httpCallError) StatusCode() int {
 }
 
 func (he *httpCallError) Error() string {
-	return fmt.Sprintf("error from moov - status: %s http.request_id: %s http.status_code: %d", he.status.Name, he.requestId, he.statusCode)
+	var msg strings.Builder
+
+	msg.WriteString(fmt.Sprintf("error from moov - status: %s http.request_id: %s http.status_code: %d", he.status.Name, he.requestId, he.statusCode))
+
+	if len(he.message) > 0 {
+		msg.WriteString(fmt.Sprintf(" message: %s", he.message))
+	}
+
+	return msg.String()
 }
