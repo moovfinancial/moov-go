@@ -198,6 +198,13 @@ func Count(count int) ListTransferFilter {
 	})
 }
 
+func Limit(limit int) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["limit"] = fmt.Sprintf("%d", limit)
+		return nil
+	})
+}
+
 // Response
 
 type CallResponse interface {
