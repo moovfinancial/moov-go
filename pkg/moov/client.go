@@ -7,7 +7,6 @@ import (
 )
 
 const (
-	baseURL              = "https://api.moov.io"
 	pathBankAccounts     = "/accounts/%s/bank-accounts"
 	pathMicroDeposits    = "/accounts/%s/bank-accounts/%s/microdeposits"
 	pathCards            = "/accounts/%s/cards"

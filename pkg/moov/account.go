@@ -78,7 +78,7 @@ type Address struct {
 	City            string `json:"city,omitempty"`
 	StateOrProvince string `json:"stateOrProvince,omitempty"`
 	PostalCode      string `json:"postalCode,omitempty"`
-	Country         string `json:"country,omitempty"`
+	Country         string `json:"country,omitempty"` // two letter code - e.g. US
 }
 
 func (a Address) jsonValue() interface{} {
