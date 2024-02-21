@@ -98,12 +98,10 @@ func (r *httpCallResponse) Unmarshal(item any) error {
 	ct := strings.ToLower(r.resp.Header.Get("content-type"))
 
 	if _, ok := item.(*string); ok {
-		item = string(r.body)
 		return nil
 	}
 
 	if _, ok := item.([]byte); ok {
-		item = r.body
 		return nil
 	}
 
