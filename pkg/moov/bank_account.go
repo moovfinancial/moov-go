@@ -57,7 +57,10 @@ type ACHStatusUpdates struct {
 }
 
 type BankAccountPayload struct {
-	Account BankAccount `json:"account"`
+	Account   *BankAccount `json:"account,omitempty"`
+	Plaid     *Plaid       `json:"plaid,omitempty"`
+	PlaidLink *PlaidLink   `json:"plaidLink,omitempty"`
+	MX        *MX          `json:"mx,omitempty"`
 }
 
 // Plaid is a direct to plaid integration. Use this if you signed an agreement with Plaid directly.
@@ -78,11 +81,11 @@ type MX struct {
 }
 
 // CreateBankAccount creates a new bank account for the given customer account
-func (c Client) CreateBankAccount(ctx context.Context, accountID string, bankAccount BankAccount) (*BankAccount, error) {
+func (c Client) CreateBankAccount(ctx context.Context, accountID string, payload BankAccountPayload) (*BankAccount, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathBankAccounts, accountID),
 		AcceptJson(),
-		JsonBody(bankAccount))
+		JsonBody(payload))
 	if err != nil {
 		return nil, err
 	}
