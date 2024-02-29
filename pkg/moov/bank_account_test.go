@@ -141,13 +141,22 @@ func (s *BankAccountTestSuite) TestCreateBankAccount() {
 	s.bankAccounts = append(s.bankAccounts, bankAccount.BankAccountID)
 }
 
+func (s *BankAccountTestSuite) TestCreateBankAccountWithPlaid() {
+	mc := NewTestClient(s.T())
+	plaid := moov.Plaid{
+		Token: "fake-token",
+	}
+	result, err := mc.CreateBankAccountWithPlaid(context.Background(), s.accountID, plaid)
+	s.NoError(err)
+	s.NotNil(result)
+	s.Equal("1111222233330000", result.AccountNumber)
+}
 func (s *BankAccountTestSuite) TestGetBankAccount() {
 	mc := NewTestClient(s.T())
 
 	account, err := mc.GetBankAccount(context.Background(), s.accountID, s.bankAccountID)
 	s.NoError(err)
-
-	s.Equal(s.bankAccountID, account.BankAccountID)
+	s.Equal("1111222233330000", account.BankAccountID)
 }
 
 func (s *BankAccountTestSuite) TestDeleteBankAccount() {
