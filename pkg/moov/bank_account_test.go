@@ -85,9 +85,7 @@ func (s *BankAccountTestSuite) SetupSuite() {
 		RoutingNumber:   "273976369",
 	}
 
-	result, err := mc.CreateBankAccount(context.Background(), s.accountID, moov.BankAccountPayload{
-		Account: &bankAccount,
-	})
+	result, err := mc.CreateBankAccount(context.Background(), s.accountID, bankAccount)
 	s.NoError(err)
 	s.NotNil(result)
 	bankAccount = *result
@@ -103,9 +101,7 @@ func (s *BankAccountTestSuite) SetupSuite() {
 		RoutingNumber:   "273976369",
 	}
 
-	result, err = mc.CreateBankAccount(context.Background(), s.accountID, moov.BankAccountPayload{
-		Account: &bankAccountDelete,
-	})
+	result, err = mc.CreateBankAccount(context.Background(), s.accountID, bankAccountDelete)
 	s.NoError(err)
 	s.NotNil(result)
 	bankAccount = *result
@@ -137,9 +133,7 @@ func (s *BankAccountTestSuite) TestCreateBankAccount() {
 
 	mc := NewTestClient(s.T())
 
-	result, err := mc.CreateBankAccount(context.Background(), s.accountID, moov.BankAccountPayload{
-		Account: &bankAccount,
-	})
+	result, err := mc.CreateBankAccount(context.Background(), s.accountID, bankAccount)
 	s.NoError(err)
 	s.NotNil(result)
 

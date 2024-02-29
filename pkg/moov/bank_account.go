@@ -81,7 +81,10 @@ type MX struct {
 }
 
 // CreateBankAccount creates a new bank account for the given customer account
-func (c Client) CreateBankAccount(ctx context.Context, accountID string, payload BankAccountPayload) (*BankAccount, error) {
+func (c Client) CreateBankAccount(ctx context.Context, accountID string, bankAccount BankAccount) (*BankAccount, error) {
+	payload := BankAccountPayload{
+		Account: &bankAccount,
+	}
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathBankAccounts, accountID),
 		AcceptJson(),
@@ -168,10 +171,13 @@ func (c Client) MicroDepositConfirm(ctx context.Context, accountID string, bankA
 
 // CreatePlaidLink creates a new bank account for the given customer account using Plaid processor_token
 func (c Client) CreateBankAccountWithPlaid(ctx context.Context, accountID string, plaid Plaid) (*BankAccount, error) {
+	payload := BankAccountPayload{
+		Plaid: &plaid,
+	}
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathBankAccounts, accountID),
 		AcceptJson(),
-		JsonBody(plaid))
+		JsonBody(payload))
 	if err != nil {
 		return nil, err
 	}
@@ -188,10 +194,13 @@ func (c Client) CreateBankAccountWithPlaid(ctx context.Context, accountID string
 
 // CreateBankAccountWithPlaidLink creates a new bank account for the given customer account using Plaid public_token
 func (c Client) CreateBankAccountWithPlaidLink(ctx context.Context, accountID string, plaid PlaidLink) (*BankAccount, error) {
+	payload := BankAccountPayload{
+		PlaidLink: &plaid,
+	}
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathBankAccounts, accountID),
 		AcceptJson(),
-		JsonBody(plaid))
+		JsonBody(payload))
 	if err != nil {
 		return nil, err
 	}
@@ -208,10 +217,13 @@ func (c Client) CreateBankAccountWithPlaidLink(ctx context.Context, accountID st
 
 // CreateBankAccountWithMX creates a new bank account for the given customer account using MX account
 func (c Client) CreateBankAccountWithMX(ctx context.Context, accountID string, mx MX) (*BankAccount, error) {
+	payload := BankAccountPayload{
+		MX: &mx,
+	}
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathBankAccounts, accountID),
 		AcceptJson(),
-		JsonBody(mx))
+		JsonBody(payload))
 	if err != nil {
 		return nil, err
 	}
