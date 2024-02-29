@@ -153,10 +153,9 @@ func (s *BankAccountTestSuite) TestCreateBankAccountWithPlaid() {
 }
 func (s *BankAccountTestSuite) TestGetBankAccount() {
 	mc := NewTestClient(s.T())
-
 	account, err := mc.GetBankAccount(context.Background(), s.accountID, s.bankAccountID)
 	s.NoError(err)
-	s.Equal("1111222233330000", account.BankAccountID)
+	s.Equal("Sir Test ALot", account.HolderName)
 }
 
 func (s *BankAccountTestSuite) TestDeleteBankAccount() {

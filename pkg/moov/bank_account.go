@@ -106,7 +106,7 @@ func (c Client) CreateBankAccount(ctx context.Context, accountID string, bankAcc
 // GetBankAccount retrieves a bank account for the given customer account
 func (c Client) GetBankAccount(ctx context.Context, accountID string, bankAccountID string) (*BankAccount, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, pathBankAccounts, accountID),
+		Endpoint(http.MethodGet, pathBankAccount, accountID, bankAccountID),
 		AcceptJson())
 	if err != nil {
 		return nil, err
