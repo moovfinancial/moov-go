@@ -60,6 +60,23 @@ type BankAccountPayload struct {
 	Account BankAccount `json:"account"`
 }
 
+// Plaid is a direct to plaid integration. Use this if you signed an agreement with Plaid directly.
+type Plaid struct {
+	// Token is the plaid processor_token
+	Token string `json:"token"`
+}
+
+// PlaidLink is a Moov-managed Plaid integration. Use this if you purchase Plaid through Moov.
+type PlaidLink struct {
+	// PublicToken is the plaid public_token
+	PublicToken string `json:"publicToken"`
+}
+
+// MX is authorization code of a MX account which allows a processor to retrieve a linked payment account.
+type MX struct {
+	AuthorizationCode string `json:"authorizationCode"`
+}
+
 // CreateBankAccount creates a new bank account for the given customer account
 func (c Client) CreateBankAccount(ctx context.Context, accountID string, bankAccount BankAccount) (*BankAccount, error) {
 	resp, err := c.CallHttp(ctx,
@@ -143,5 +160,65 @@ func (c Client) MicroDepositConfirm(ctx context.Context, accountID string, bankA
 		return ErrAmountIncorrect
 	default:
 		return resp.Error()
+	}
+}
+
+// CreatePlaidLink creates a new bank account for the given customer account using Plaid processor_token
+func (c Client) CreateBankAccountWithPlaid(ctx context.Context, accountID string, plaid Plaid) (*BankAccount, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathBankAccounts, accountID),
+		AcceptJson(),
+		JsonBody(plaid))
+	if err != nil {
+		return nil, err
+	}
+
+	switch resp.Status() {
+	case StatusCompleted:
+		return CompletedObjectOrError[BankAccount](resp)
+	case StatusStateConflict:
+		return nil, ErrDuplicateBankAccount
+	default:
+		return nil, resp.Error()
+	}
+}
+
+// CreateBankAccountWithPlaidLink creates a new bank account for the given customer account using Plaid public_token
+func (c Client) CreateBankAccountWithPlaidLink(ctx context.Context, accountID string, plaid PlaidLink) (*BankAccount, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathBankAccounts, accountID),
+		AcceptJson(),
+		JsonBody(plaid))
+	if err != nil {
+		return nil, err
+	}
+
+	switch resp.Status() {
+	case StatusCompleted:
+		return CompletedObjectOrError[BankAccount](resp)
+	case StatusStateConflict:
+		return nil, ErrDuplicateBankAccount
+	default:
+		return nil, resp.Error()
+	}
+}
+
+// CreateBankAccountWithMX creates a new bank account for the given customer account using MX account
+func (c Client) CreateBankAccountWithMX(ctx context.Context, accountID string, mx MX) (*BankAccount, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathBankAccounts, accountID),
+		AcceptJson(),
+		JsonBody(mx))
+	if err != nil {
+		return nil, err
+	}
+
+	switch resp.Status() {
+	case StatusCompleted:
+		return CompletedObjectOrError[BankAccount](resp)
+	case StatusStateConflict:
+		return nil, ErrDuplicateBankAccount
+	default:
+		return nil, resp.Error()
 	}
 }
