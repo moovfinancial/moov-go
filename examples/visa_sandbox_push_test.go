@@ -62,7 +62,7 @@ func TestVisaSandboxPush(t *testing.T) {
 	// You can make the direct call only if you are PCI compliant,
 	// otherwise you need to use the Moov.js library
 	_, err = mc.CreateCard(ctx, account.AccountID, moov.CreateCard{
-		CardNumber: "4111111111111111", // Moov test card for sandbox
+		CardNumber: "4111100010002000", // Moov test card for sandbox
 		CardCvv:    "123",
 		Expiration: moov.Expiration{
 			Month: "12",
