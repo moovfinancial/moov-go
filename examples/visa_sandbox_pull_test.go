@@ -12,7 +12,7 @@ import (
 )
 
 // Pull transfer is a transfer from the user's card to the Moov wallet.
-func TestVisaSandboxPull(t *testing.T) {
+func TestVisaSandboxPullWithRefund(t *testing.T) {
 	// Step 1: create Moov client and set some variables
 
 	// The following code shows how you can configure the moov client with
@@ -115,7 +115,7 @@ func TestVisaSandboxPull(t *testing.T) {
 			},
 			Amount: moov.Amount{
 				Currency: "USD",
-				Value:    97, // $0.99
+				Value:    97, // $0.97
 			},
 			FacilitatorFee: moov.FacilitatorFee{
 				Total: 2, // $0.02
@@ -127,4 +127,18 @@ func TestVisaSandboxPull(t *testing.T) {
 	require.NoError(t, err)
 
 	fmt.Printf("Transfer: %+v\n", completedTransfer.TransferID)
+
+	// Step 5: refund transfer
+	refund, _, err := mc.RefundTransfer(
+		ctx,
+		completedTransfer.TransferID,
+		moov.RefundPayload{
+			Amount: 97,
+		},
+		moov.WithTransferWaitForRailResponse(),
+	)
+	require.NoError(t, err)
+
+	fmt.Printf("Refund: %+v\n", refund.RefundID)
+
 }
