@@ -34,6 +34,7 @@ type AchDetails struct {
 	OriginatingCompanyName  string           `json:"originatingCompanyName,omitempty"`
 	StatusUpdates           ACHStatusUpdates `json:"statusUpdates,omitempty"`
 	DebitHoldPeriod         string           `json:"debitHoldPeriod,omitempty"`
+	SECCode                 string           `json:"secCode,omitempty" validate:"omitempty,oneOf=WEB TEL PPD CCD"`
 }
 
 type Correction struct {
