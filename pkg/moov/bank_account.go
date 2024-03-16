@@ -1,7 +1,9 @@
 package moov
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"time"
@@ -80,15 +82,59 @@ type MX struct {
 	AuthorizationCode string `json:"authorizationCode"`
 }
 
+type CreateBankAccountType callArg
+
+func WithBankAccount(bankAccount BankAccount) CreateBankAccountType {
+	return callBuilderFn((func(call *callBuilder) error {
+		bankAccountJSON, err := json.Marshal(bankAccount)
+		if err != nil {
+			return err
+		}
+		call.body = bytes.NewReader(bankAccountJSON)
+		return nil
+	}))
+}
+
+func WithPlaidLink(plaidLink PlaidLink) CreateBankAccountType {
+	return callBuilderFn((func(call *callBuilder) error {
+		bankAccountJSON, err := json.Marshal(plaidLink)
+		if err != nil {
+			return err
+		}
+		call.body = bytes.NewReader(bankAccountJSON)
+		return nil
+	}))
+}
+
+func WithPlaid(plaid Plaid) CreateBankAccountType {
+	return callBuilderFn((func(call *callBuilder) error {
+		bankAccountJSON, err := json.Marshal(plaid)
+		if err != nil {
+			return err
+		}
+		call.body = bytes.NewReader(bankAccountJSON)
+		return nil
+	}))
+}
+
+func WithMX(mx MX) CreateBankAccountType {
+	return callBuilderFn((func(call *callBuilder) error {
+		bankAccountJSON, err := json.Marshal(mx)
+		if err != nil {
+			return err
+		}
+		call.body = bytes.NewReader(bankAccountJSON)
+		return nil
+	}))
+}
+
 // CreateBankAccount creates a new bank account for the given customer account
-func (c Client) CreateBankAccount(ctx context.Context, accountID string, bankAccount BankAccount) (*BankAccount, error) {
-	payload := BankAccountPayload{
-		Account: &bankAccount,
-	}
+func (c Client) CreateBankAccount(ctx context.Context, accountID string, opts ...CreateBankAccountType) (*BankAccount, error) {
+	args := prependArgs(opts, AcceptJson())
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathBankAccounts, accountID),
 		AcceptJson(),
-		JsonBody(payload))
+		JsonBody(args))
 	if err != nil {
 		return nil, err
 	}
