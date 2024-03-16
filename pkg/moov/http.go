@@ -34,7 +34,6 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 		qry.Add(k, v)
 	}
 	req.URL.RawQuery = qry.Encode()
-
 	for k, v := range call.headers {
 		req.Header.Add(k, v)
 	}
@@ -44,7 +43,13 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 	} else {
 		req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 	}
-
+	/** debug
+	reqDump, err := httputil.DumpRequestOut(req, true)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("REQUEST:\n%s", string(reqDump))
+	**/
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -52,6 +57,8 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(resp.Body)
+	// debug
+	//log.Printf("body: %s \n", body)
 
 	return &httpCallResponse{
 		resp: resp,
