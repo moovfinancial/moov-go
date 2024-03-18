@@ -146,7 +146,29 @@ func (s *BankAccountTestSuite) TestCreateBankAccountWithPlaid() {
 	plaid := moov.Plaid{
 		Token: "fake-token",
 	}
-	result, err := mc.CreateBankAccountWithPlaid(context.Background(), s.accountID, plaid)
+	result, err := mc.CreateBankAccount(context.Background(), s.accountID, moov.WithPlaid(plaid))
+	s.NoError(err)
+	s.NotNil(result)
+	s.Equal("1111222233330000", result.AccountNumber)
+}
+
+func (s *BankAccountTestSuite) TestCreateBankAccountWithPlaidLink() {
+	mc := NewTestClient(s.T())
+	plaidLink := moov.PlaidLink{
+		PublicToken: "fake-public-token",
+	}
+	result, err := mc.CreateBankAccount(context.Background(), s.accountID, moov.WithPlaidLink(plaidLink))
+	s.NoError(err)
+	s.NotNil(result)
+	s.Equal("1111222233330000", result.AccountNumber)
+}
+
+func (s *BankAccountTestSuite) TestCreateBankAccountWithMX() {
+	mc := NewTestClient(s.T())
+	mxToken := moov.MX{
+		AuthorizationCode: "fake-authorization-code",
+	}
+	result, err := mc.CreateBankAccount(context.Background(), s.accountID, moov.WithMX(mxToken))
 	s.NoError(err)
 	s.NotNil(result)
 	s.Equal("1111222233330000", result.AccountNumber)
