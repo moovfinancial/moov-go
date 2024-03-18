@@ -173,6 +173,7 @@ func (s *BankAccountTestSuite) TestCreateBankAccountWithMX() {
 	s.NotNil(result)
 	s.Equal("1111222233330000", result.AccountNumber)
 }
+
 func (s *BankAccountTestSuite) TestGetBankAccount() {
 	mc := NewTestClient(s.T())
 	account, err := mc.GetBankAccount(context.Background(), s.accountID, s.bankAccountID)
