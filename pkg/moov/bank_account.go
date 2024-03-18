@@ -97,7 +97,17 @@ func WithBankAccount(bankAccount BankAccount) CreateBankAccountType {
 
 func WithPlaidLink(plaidLink PlaidLink) CreateBankAccountType {
 	return callBuilderFn((func(call *callBuilder) error {
-		bankAccountJSON, err := json.Marshal(plaidLink)
+		// need to use a map to add the top level "plaidLink" json key. expected format is:
+		//	{
+		// 		"plaidLink": {
+		// 			"publicToken": "insert token"
+		// 		}
+		// 	}
+
+		plaidLinkMap := map[string]PlaidLink{
+			"plaidLink": plaidLink,
+		}
+		bankAccountJSON, err := json.Marshal(plaidLinkMap)
 		if err != nil {
 			return err
 		}
@@ -108,7 +118,17 @@ func WithPlaidLink(plaidLink PlaidLink) CreateBankAccountType {
 
 func WithPlaid(plaid Plaid) CreateBankAccountType {
 	return callBuilderFn((func(call *callBuilder) error {
-		bankAccountJSON, err := json.Marshal(plaid)
+		// need to use a map to add the top level "plaid" json key. expected format is:
+		//	{
+		// 		"plaid": {
+		// 			"token": "insert token"
+		// 		}
+		// 	}
+
+		plaidMap := map[string]Plaid{
+			"plaid": plaid,
+		}
+		bankAccountJSON, err := json.Marshal(plaidMap)
 		if err != nil {
 			return err
 		}
@@ -119,7 +139,17 @@ func WithPlaid(plaid Plaid) CreateBankAccountType {
 
 func WithMX(mx MX) CreateBankAccountType {
 	return callBuilderFn((func(call *callBuilder) error {
-		bankAccountJSON, err := json.Marshal(mx)
+		// need to use a map to add the top level "mx" json key. expected format is:
+		//	{
+		// 		"mx": {
+		// 			"authorizationCode": "testing"
+		// 		}
+		// 	}
+
+		mxMap := map[string]MX{
+			"mx": mx,
+		}
+		bankAccountJSON, err := json.Marshal(mxMap)
 		if err != nil {
 			return err
 		}
