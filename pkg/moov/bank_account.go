@@ -97,7 +97,17 @@ func WithBankAccount(bankAccount BankAccount) CreateBankAccountType {
 
 func WithPlaidLink(plaidLink PlaidLink) CreateBankAccountType {
 	return callBuilderFn((func(call *callBuilder) error {
-		bankAccountJSON, err := json.Marshal(plaidLink)
+		// need to use a map to add the top level "plaidLink" json key. expected format is:
+		//	{
+		// 		"plaidLink": {
+		// 			"publicToken": "insert token"
+		// 		}
+		// 	}
+
+		plaidLinkMap := map[string]PlaidLink{
+			"plaidLink": plaidLink,
+		}
+		bankAccountJSON, err := json.Marshal(plaidLinkMap)
 		if err != nil {
 			return err
 		}
@@ -108,7 +118,17 @@ func WithPlaidLink(plaidLink PlaidLink) CreateBankAccountType {
 
 func WithPlaid(plaid Plaid) CreateBankAccountType {
 	return callBuilderFn((func(call *callBuilder) error {
-		bankAccountJSON, err := json.Marshal(plaid)
+		// need to use a map to add the top level "plaid" json key. expected format is:
+		//	{
+		// 		"plaid": {
+		// 			"token": "insert token"
+		// 		}
+		// 	}
+
+		plaidMap := map[string]Plaid{
+			"plaid": plaid,
+		}
+		bankAccountJSON, err := json.Marshal(plaidMap)
 		if err != nil {
 			return err
 		}
@@ -119,7 +139,17 @@ func WithPlaid(plaid Plaid) CreateBankAccountType {
 
 func WithMX(mx MX) CreateBankAccountType {
 	return callBuilderFn((func(call *callBuilder) error {
-		bankAccountJSON, err := json.Marshal(mx)
+		// need to use a map to add the top level "mx" json key. expected format is:
+		//	{
+		// 		"mx": {
+		// 			"authorizationCode": "testing"
+		// 		}
+		// 	}
+
+		mxMap := map[string]MX{
+			"mx": mx,
+		}
+		bankAccountJSON, err := json.Marshal(mxMap)
 		if err != nil {
 			return err
 		}
@@ -212,74 +242,5 @@ func (c Client) MicroDepositConfirm(ctx context.Context, accountID string, bankA
 		return ErrAmountIncorrect
 	default:
 		return resp.Error()
-	}
-}
-
-// CreatePlaidLink creates a new bank account for the given customer account using Plaid processor_token
-func (c Client) CreateBankAccountWithPlaid(ctx context.Context, accountID string, plaid Plaid) (*BankAccount, error) {
-	payload := BankAccountPayload{
-		Plaid: &plaid,
-	}
-	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathBankAccounts, accountID),
-		AcceptJson(),
-		JsonBody(payload))
-	if err != nil {
-		return nil, err
-	}
-
-	switch resp.Status() {
-	case StatusCompleted:
-		return CompletedObjectOrError[BankAccount](resp)
-	case StatusStateConflict:
-		return nil, ErrDuplicateBankAccount
-	default:
-		return nil, resp.Error()
-	}
-}
-
-// CreateBankAccountWithPlaidLink creates a new bank account for the given customer account using Plaid public_token
-func (c Client) CreateBankAccountWithPlaidLink(ctx context.Context, accountID string, plaid PlaidLink) (*BankAccount, error) {
-	payload := BankAccountPayload{
-		PlaidLink: &plaid,
-	}
-	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathBankAccounts, accountID),
-		AcceptJson(),
-		JsonBody(payload))
-	if err != nil {
-		return nil, err
-	}
-
-	switch resp.Status() {
-	case StatusCompleted:
-		return CompletedObjectOrError[BankAccount](resp)
-	case StatusStateConflict:
-		return nil, ErrDuplicateBankAccount
-	default:
-		return nil, resp.Error()
-	}
-}
-
-// CreateBankAccountWithMX creates a new bank account for the given customer account using MX account
-func (c Client) CreateBankAccountWithMX(ctx context.Context, accountID string, mx MX) (*BankAccount, error) {
-	payload := BankAccountPayload{
-		MX: &mx,
-	}
-	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathBankAccounts, accountID),
-		AcceptJson(),
-		JsonBody(payload))
-	if err != nil {
-		return nil, err
-	}
-
-	switch resp.Status() {
-	case StatusCompleted:
-		return CompletedObjectOrError[BankAccount](resp)
-	case StatusStateConflict:
-		return nil, ErrDuplicateBankAccount
-	default:
-		return nil, resp.Error()
 	}
 }
