@@ -1,7 +1,9 @@
 package moov
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"time"
@@ -80,15 +82,68 @@ type MX struct {
 	AuthorizationCode string `json:"authorizationCode"`
 }
 
+type CreateBankAccountType callArg
+
+func WithBankAccount(bankAccount BankAccount) CreateBankAccountType {
+	return callBuilderFn((func(call *callBuilder) error {
+		bankAccountJSON, err := json.Marshal(bankAccount)
+		if err != nil {
+			return err
+		}
+		call.body = bytes.NewReader(bankAccountJSON)
+		return nil
+	}))
+}
+
+func WithPlaidLink(plaidLink PlaidLink) CreateBankAccountType {
+	return callBuilderFn((func(call *callBuilder) error {
+		plaidLinkMap := map[string]PlaidLink{
+			"plaidLink": plaidLink,
+		}
+		bankAccountJSON, err := json.Marshal(plaidLinkMap)
+		if err != nil {
+			return err
+		}
+		call.body = bytes.NewReader(bankAccountJSON)
+		return nil
+	}))
+}
+
+func WithPlaid(plaid Plaid) CreateBankAccountType {
+	return callBuilderFn((func(call *callBuilder) error {
+		plaidMap := map[string]Plaid{
+			"plaid": plaid,
+		}
+		bankAccountJSON, err := json.Marshal(plaidMap)
+		if err != nil {
+			return err
+		}
+		call.body = bytes.NewReader(bankAccountJSON)
+		return nil
+	}))
+}
+
+func WithMX(mx MX) CreateBankAccountType {
+	return callBuilderFn((func(call *callBuilder) error {
+		mxMap := map[string]MX{
+			"mx": mx,
+		}
+		bankAccountJSON, err := json.Marshal(mxMap)
+		if err != nil {
+			return err
+		}
+		call.body = bytes.NewReader(bankAccountJSON)
+		return nil
+	}))
+}
+
 // CreateBankAccount creates a new bank account for the given customer account
-func (c Client) CreateBankAccount(ctx context.Context, accountID string, bankAccount BankAccount) (*BankAccount, error) {
-	payload := BankAccountPayload{
-		Account: &bankAccount,
-	}
+func (c Client) CreateBankAccount(ctx context.Context, accountID string, opts ...CreateBankAccountType) (*BankAccount, error) {
+	args := prependArgs(opts, AcceptJson())
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathBankAccounts, accountID),
 		AcceptJson(),
-		JsonBody(payload))
+		JsonBody(args))
 	if err != nil {
 		return nil, err
 	}
@@ -166,74 +221,5 @@ func (c Client) MicroDepositConfirm(ctx context.Context, accountID string, bankA
 		return ErrAmountIncorrect
 	default:
 		return resp.Error()
-	}
-}
-
-// CreatePlaidLink creates a new bank account for the given customer account using Plaid processor_token
-func (c Client) CreateBankAccountWithPlaid(ctx context.Context, accountID string, plaid Plaid) (*BankAccount, error) {
-	payload := BankAccountPayload{
-		Plaid: &plaid,
-	}
-	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathBankAccounts, accountID),
-		AcceptJson(),
-		JsonBody(payload))
-	if err != nil {
-		return nil, err
-	}
-
-	switch resp.Status() {
-	case StatusCompleted:
-		return CompletedObjectOrError[BankAccount](resp)
-	case StatusStateConflict:
-		return nil, ErrDuplicateBankAccount
-	default:
-		return nil, resp.Error()
-	}
-}
-
-// CreateBankAccountWithPlaidLink creates a new bank account for the given customer account using Plaid public_token
-func (c Client) CreateBankAccountWithPlaidLink(ctx context.Context, accountID string, plaid PlaidLink) (*BankAccount, error) {
-	payload := BankAccountPayload{
-		PlaidLink: &plaid,
-	}
-	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathBankAccounts, accountID),
-		AcceptJson(),
-		JsonBody(payload))
-	if err != nil {
-		return nil, err
-	}
-
-	switch resp.Status() {
-	case StatusCompleted:
-		return CompletedObjectOrError[BankAccount](resp)
-	case StatusStateConflict:
-		return nil, ErrDuplicateBankAccount
-	default:
-		return nil, resp.Error()
-	}
-}
-
-// CreateBankAccountWithMX creates a new bank account for the given customer account using MX account
-func (c Client) CreateBankAccountWithMX(ctx context.Context, accountID string, mx MX) (*BankAccount, error) {
-	payload := BankAccountPayload{
-		MX: &mx,
-	}
-	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathBankAccounts, accountID),
-		AcceptJson(),
-		JsonBody(payload))
-	if err != nil {
-		return nil, err
-	}
-
-	switch resp.Status() {
-	case StatusCompleted:
-		return CompletedObjectOrError[BankAccount](resp)
-	case StatusStateConflict:
-		return nil, ErrDuplicateBankAccount
-	default:
-		return nil, resp.Error()
 	}
 }
