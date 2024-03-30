@@ -13,6 +13,7 @@ type Dispute struct {
 	Amount                   Amount              `json:"amount,omitempty"`
 	NetworkReasonCode        string              `json:"networkReasonCode,omitempty"`
 	NetworkReasonDescription string              `json:"networkReasonDescription,omitempty"`
+	Phase                    string              `json:"phase,omitempty"`
 	RespondBy                time.Time           `json:"respondBy,omitempty"`
 	Status                   string              `json:"status,omitempty"`
 	Transfer                 SynchronousTransfer `json:"transfer,omitempty"`
