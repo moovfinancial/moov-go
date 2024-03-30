@@ -58,15 +58,24 @@ func TestACHTransferSetup(t *testing.T) {
 
 	// You can manually supply bank account information or pass tokens from
 	// IAV providers Plaid or MX
-	bankAccount := moov.BankAccount{
+	bankAccountPayload := moov.BankAccount{
 		HolderName:      "Jules Jackson",
 		HolderType:      "individual",
 		BankAccountType: "checking",
 		RoutingNumber:   "273976369", // this is a real routing number
 		AccountNumber:   "123456789", // fake it great!
 	}
-	_, err = mc.CreateBankAccount(ctx, account.AccountID, moov.WithBankAccount(bankAccount))
+	bankAccount, err := mc.CreateBankAccount(ctx, account.AccountID, moov.WithBankAccount(bankAccountPayload))
 	require.NoError(t, err)
+
+	// Initiate micro-deposits
+	baErr := mc.MicroDepositInitiate(ctx, account.AccountID, bankAccount.BankAccountID)
+	require.NoError(t, baErr)
+
+	// Verify micro-deposits (later)
+	amounts := []int{0, 0}
+	verifyErr := mc.MicroDepositConfirm(ctx, account.AccountID, bankAccount.BankAccountID, amounts)
+	require.NoError(t, verifyErr)
 
 	// Alternatives:
 	// with Plaid
