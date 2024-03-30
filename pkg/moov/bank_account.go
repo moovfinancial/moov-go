@@ -1,7 +1,9 @@
 package moov
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"time"
@@ -58,15 +60,91 @@ type ACHStatusUpdates struct {
 }
 
 type BankAccountPayload struct {
-	Account BankAccount `json:"account"`
+	Account   *BankAccount `json:"account,omitempty"`
+	Plaid     *Plaid       `json:"plaid,omitempty"`
+	PlaidLink *PlaidLink   `json:"plaidLink,omitempty"`
+	MX        *MX          `json:"mx,omitempty"`
+}
+
+// Plaid is a direct to plaid integration. Use this if you signed an agreement with Plaid directly.
+type Plaid struct {
+	// Token is the plaid processor_token
+	Token string `json:"token"`
+}
+
+// PlaidLink is a Moov-managed Plaid integration. Use this if you purchase Plaid through Moov.
+type PlaidLink struct {
+	// PublicToken is the plaid public_token
+	PublicToken string `json:"publicToken"`
+}
+
+// MX is authorization code of a MX account which allows a processor to retrieve a linked payment account.
+type MX struct {
+	AuthorizationCode string `json:"authorizationCode"`
+}
+
+type CreateBankAccountType callArg
+
+func WithBankAccount(bankAccount BankAccount) CreateBankAccountType {
+	return callBuilderFn((func(call *callBuilder) error {
+		bankAccountJSON, err := json.Marshal(bankAccount)
+		if err != nil {
+			return err
+		}
+		call.body = bytes.NewReader(bankAccountJSON)
+		return nil
+	}))
+}
+
+func WithPlaidLink(plaidLink PlaidLink) CreateBankAccountType {
+	return callBuilderFn((func(call *callBuilder) error {
+		plaidLinkMap := map[string]PlaidLink{
+			"plaidLink": plaidLink,
+		}
+		bankAccountJSON, err := json.Marshal(plaidLinkMap)
+		if err != nil {
+			return err
+		}
+		call.body = bytes.NewReader(bankAccountJSON)
+		return nil
+	}))
+}
+
+func WithPlaid(plaid Plaid) CreateBankAccountType {
+	return callBuilderFn((func(call *callBuilder) error {
+		plaidMap := map[string]Plaid{
+			"plaid": plaid,
+		}
+		bankAccountJSON, err := json.Marshal(plaidMap)
+		if err != nil {
+			return err
+		}
+		call.body = bytes.NewReader(bankAccountJSON)
+		return nil
+	}))
+}
+
+func WithMX(mx MX) CreateBankAccountType {
+	return callBuilderFn((func(call *callBuilder) error {
+		mxMap := map[string]MX{
+			"mx": mx,
+		}
+		bankAccountJSON, err := json.Marshal(mxMap)
+		if err != nil {
+			return err
+		}
+		call.body = bytes.NewReader(bankAccountJSON)
+		return nil
+	}))
 }
 
 // CreateBankAccount creates a new bank account for the given customer account
-func (c Client) CreateBankAccount(ctx context.Context, accountID string, bankAccount BankAccount) (*BankAccount, error) {
+func (c Client) CreateBankAccount(ctx context.Context, accountID string, opts ...CreateBankAccountType) (*BankAccount, error) {
+	args := prependArgs(opts, AcceptJson())
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathBankAccounts, accountID),
 		AcceptJson(),
-		JsonBody(bankAccount))
+		JsonBody(args))
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +162,7 @@ func (c Client) CreateBankAccount(ctx context.Context, accountID string, bankAcc
 // GetBankAccount retrieves a bank account for the given customer account
 func (c Client) GetBankAccount(ctx context.Context, accountID string, bankAccountID string) (*BankAccount, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, pathBankAccounts, accountID),
+		Endpoint(http.MethodGet, pathBankAccount, accountID, bankAccountID),
 		AcceptJson())
 	if err != nil {
 		return nil, err
