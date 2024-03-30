@@ -58,14 +58,34 @@ func TestACHTransferSetup(t *testing.T) {
 
 	// You can manually supply bank account information or pass tokens from
 	// IAV providers Plaid or MX
-	_, err = mc.CreateBankAccount(ctx, account.AccountID, moov.BankAccount{
-		HolderName:      "Wade Arnold",
+	bankAccount := moov.BankAccount{
+		HolderName:      "Jules Jackson",
 		HolderType:      "individual",
 		BankAccountType: "checking",
 		RoutingNumber:   "273976369", // this is a real routing number
 		AccountNumber:   "123456789", // fake it great!
-	})
+	}
+	_, err = mc.CreateBankAccount(ctx, account.AccountID, moov.WithBankAccount(bankAccount))
 	require.NoError(t, err)
+
+	// Alternatives:
+	// with Plaid
+	// plaid := moov.Plaid{
+	// 	Token: "PLAID_TOKEN",
+	// }
+	// result, err := mc.CreateBankAccount(ctx, accountID, moov.WithPlaid(plaid))
+
+	// // with Plaid Link
+	// plaidLink := moov.PlaidLink{
+	// 	PublicToken: "PLAID_PUBLIC_TOKEN",
+	// }
+	// result, err := mc.CreateBankAccount(ctx, accountID, moov.WithPlaidLink(plaidLink))
+
+	// // with MX
+	// mxToken := moov.MX{
+	// 	AuthorizationCode: "MX_AUTHORIZATION_CODE",
+	// }
+	// result, err := mc.CreateBankAccount(ctx, accountID, moov.WithMX(mxToken))
 
 	// Step 4: find (pull) payment method for the linked bank account
 
