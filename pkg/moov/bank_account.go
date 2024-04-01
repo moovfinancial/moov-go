@@ -19,9 +19,9 @@ type BankAccount struct {
 	Fingerprint           string `json:"fingerprint,omitempty"`
 	Status                string `json:"status,omitempty"`
 	HolderName            string `json:"holderName,omitempty"`
-	HolderType            string `json:"holderType,omitempty"`
+	HolderType            string `json:"holderType,omitempty" validate:"omitempty,oneOf=individual business"`
 	BankName              string `json:"bankName,omitempty"`
-	BankAccountType       string `json:"bankAccountType,omitempty"`
+	BankAccountType       string `json:"bankAccountType,omitempty" validate:"omitempty,oneOf=checking savings unknown"`
 	AccountNumber         string `json:"accountNumber,omitempty"`
 	RoutingNumber         string `json:"routingNumber,omitempty"`
 	LastFourAccountNumber string `json:"lastFourAccountNumber,omitempty"`
