@@ -66,7 +66,7 @@ func (c Client) GetBankAccount(ctx context.Context, accountID string, bankAccoun
 
 // DeleteBankAccount deletes a bank account for the given customer account
 func (c Client) DeleteBankAccount(ctx context.Context, accountID string, bankAccountID string) error {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathBankAccounts, accountID))
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathBankAccount, accountID, bankAccountID))
 	if err != nil {
 		return err
 	}
