@@ -1,13 +1,22 @@
 package moov
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
-func ErrorAsCallResponse(err error) *CallResponse {
-	return errorAsA[CallResponse](err)
+func ErrorAsCallResponse(err error) CallResponse {
+	if e := errorAsA[CallResponse](err); e != nil {
+		return *e
+	}
+	return nil
 }
 
-func ErrorAsHttpCallResponse(err error) *HttpCallResponse {
-	return errorAsA[HttpCallResponse](err)
+func ErrorAsHttpCallResponse(err error) HttpCallResponse {
+	if e := errorAsA[HttpCallResponse](err); e != nil {
+		return *e
+	}
+	return nil
 }
 
 func errorAsA[A interface{}](err error) *A {
@@ -43,3 +52,11 @@ var (
 	// ErrURL                      = errors.New("invalid url")
 	// ErrNoCardUpdateFilters = errors.New("no card update filters provided")
 )
+
+func DebugPrintResponse(err error, f func(format string, a ...any) (n int, err error)) {
+	if e := ErrorAsCallResponse(err); e != nil {
+		sb := strings.Builder{}
+		ErrorAsCallResponse(err).Unmarshal(&sb)
+		f("%s", sb.String())
+	}
+}

@@ -34,16 +34,15 @@ func TestVisaSandboxPullWithRefund(t *testing.T) {
 	// Step 2: create account for the user
 
 	// Add new account
-	account, _, err := mc.CreateAccount(ctx, moov.Account{
-		AccountType: moov.INDIVIDUAL,
-		Profile: moov.Profile{
-			Individual: moov.Individual{
+	account, _, err := mc.CreateAccount(ctx, moov.CreateAccount{
+		Profile: moov.CreateProfile{
+			Individual: &moov.CreateIndividualProfile{
 				Name: moov.Name{
 					FirstName: faker.FirstName(),
 					LastName:  faker.LastName(),
 				},
 				Email: faker.Email(),
-				Phone: moov.Phone{
+				Phone: &moov.Phone{
 					Number:      faker.Phonenumber(),
 					CountryCode: "1",
 				},

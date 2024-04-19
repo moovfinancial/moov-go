@@ -6,19 +6,21 @@ import (
 	"time"
 )
 
+type CapabilityID string
+
 const (
-	CAPABILITY_TRANSFERS     = "transfers"
-	CAPABILITY_SEND_FUNDS    = "send-funds"
-	CAPABILITY_COLLECT_FUNDS = "collect-funds"
-	CAPABILITY_WALLET        = "wallet"
-	CAPABILITY_CARD_ISSUING  = "card-issuing"
-	CAPABILITY_ENBABLED      = "enabled"
-	CAPABILITY_DISABLED      = "disabled"
-	CAPABILITY_PENDING       = "pending"
+	CAPABILITY_TRANSFERS     CapabilityID = "transfers"
+	CAPABILITY_SEND_FUNDS    CapabilityID = "send-funds"
+	CAPABILITY_COLLECT_FUNDS CapabilityID = "collect-funds"
+	CAPABILITY_WALLET        CapabilityID = "wallet"
+	CAPABILITY_CARD_ISSUING  CapabilityID = "card-issuing"
+	CAPABILITY_ENBABLED      CapabilityID = "enabled"
+	CAPABILITY_DISABLED      CapabilityID = "disabled"
+	CAPABILITY_PENDING       CapabilityID = "pending"
 )
 
 // Capabilities a list of CAPABILITY_*
-var Capabilities []string
+var Capabilities []CapabilityID
 
 type Capability struct {
 	Capability   string `json:"capability"`
