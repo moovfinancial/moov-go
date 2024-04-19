@@ -3,7 +3,7 @@ package moov
 const (
 	pathPing = "/ping"
 
-	pathOAuth2Token  = "/oauth2/token"
+	pathOAuth2Token  = "/oauth2/token" // #nosec G101
 	pathOAuth2Revoke = "/oauth2/revoke"
 
 	pathAccounts = "/accounts"
@@ -48,4 +48,7 @@ const (
 
 	pathRefunds = "/transfers/%s/refunds"
 	pathRefund  = "/transfers/%s/refunds/%s"
+
+	pathDisputes = "/disputes"
+	pathDispute  = "/disputes/%s"
 )
