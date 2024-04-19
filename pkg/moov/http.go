@@ -60,6 +60,17 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 }
 
 var _ CallResponse = &httpCallResponse{}
+var _ HttpCallResponse = &httpCallResponse{}
+
+type HttpCallResponse interface {
+	error
+
+	Status() CallStatus
+	Unmarshal(item any) error
+
+	RequestId() string
+	StatusCode() int
+}
 
 type httpCallResponse struct {
 	resp *http.Response
@@ -116,46 +127,50 @@ func (r *httpCallResponse) Unmarshal(item any) error {
 	return fmt.Errorf("unknown content-type: %s", ct)
 }
 
-func (r *httpCallResponse) Error() error {
-	switch r.Status() {
-	case StatusCompleted, StatusStarted:
-		return nil
-	default:
-		return &httpCallError{
-			status:     r.Status(),
-			requestId:  r.resp.Header.Get("X-Request-ID"),
-			statusCode: r.resp.StatusCode,
-		}
+func (r *httpCallResponse) StatusCode() int {
+	if r.resp != nil {
+		return r.resp.StatusCode
 	}
+	return 0
 }
 
-var _ HttpCallError = &httpCallError{}
-
-type HttpCallError interface {
-	error
-	Status() CallStatus
-	RequestId() string
-	StatusCode() int
+func (r *httpCallResponse) RequestId() string {
+	if r.resp != nil {
+		return r.resp.Header.Get("X-Request-ID")
+	}
+	return ""
 }
 
-type httpCallError struct {
-	status     CallStatus
-	requestId  string
-	statusCode int
+func (r *httpCallResponse) Error() string {
+	return fmt.Sprintf("error from moov - status: %s http.request_id: %s http.status_code: %d", r.Status().Name, r.RequestId(), r.StatusCode())
 }
 
-func (he *httpCallError) Status() CallStatus {
-	return he.status
-}
+// var _ HttpCallError = &httpCallError{}
+// var _ CallResponseError = &httpCallError{}
 
-func (he *httpCallError) RequestId() string {
-	return he.requestId
-}
+// type httpCallError struct {
+// 	resp *httpCallResponse
 
-func (he *httpCallError) StatusCode() int {
-	return he.statusCode
-}
+// 	requestId  string
+// 	statusCode int
+// }
 
-func (he *httpCallError) Error() string {
-	return fmt.Sprintf("error from moov - status: %s http.request_id: %s http.status_code: %d", he.status.Name, he.requestId, he.statusCode)
-}
+// func (he *httpCallError) Status() CallStatus {
+// 	return he.Status()
+// }
+
+// func (he *httpCallError) Unmarshal(item any) error {
+// 	return he.Unmarshal(item)
+// }
+
+// func (he *httpCallError) RequestId() string {
+// 	return he.requestId
+// }
+
+// func (he *httpCallError) StatusCode() int {
+// 	return he.statusCode
+// }
+
+// func (he *httpCallError) Error() string {
+// 	return fmt.Sprintf("error from moov - status: %s http.request_id: %s http.status_code: %d", he.Status().Name, he.requestId, he.statusCode)
+// }

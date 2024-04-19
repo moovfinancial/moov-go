@@ -16,6 +16,6 @@ func (c Client) Ping(ctx context.Context) error {
 	case StatusCompleted:
 		return nil
 	default:
-		return resp.Error()
+		return resp
 	}
 }

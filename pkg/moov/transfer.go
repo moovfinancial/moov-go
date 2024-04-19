@@ -201,7 +201,7 @@ func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, opt
 	case StatusStateConflict:
 		return nil, nil, ErrXIdempotencyKey
 	default:
-		return nil, nil, resp.Error()
+		return nil, nil, resp
 	}
 }
 
@@ -354,7 +354,7 @@ func (c Client) RefundTransfer(ctx context.Context, transferID string, refund Re
 		r, err := CompletedObjectOrError[Refund](resp)
 		return nil, r, err
 	default:
-		return nil, nil, resp.Error()
+		return nil, nil, resp
 	}
 }
 

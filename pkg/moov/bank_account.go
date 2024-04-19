@@ -153,9 +153,9 @@ func (c Client) CreateBankAccount(ctx context.Context, accountID string, opts ..
 	case StatusCompleted:
 		return CompletedObjectOrError[BankAccount](resp)
 	case StatusStateConflict:
-		return nil, ErrDuplicateBankAccount
+		return nil, errors.Join(ErrDuplicateBankAccount, resp)
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }
 
@@ -221,6 +221,6 @@ func (c Client) MicroDepositConfirm(ctx context.Context, accountID string, bankA
 	case StatusStateConflict:
 		return ErrAmountIncorrect
 	default:
-		return resp.Error()
+		return resp
 	}
 }

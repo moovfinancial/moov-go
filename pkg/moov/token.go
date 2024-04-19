@@ -71,7 +71,7 @@ func (c *Client) accessToken(ctx context.Context, tokenReq accessTokenRequest, s
 	case StatusCompleted:
 		return UnmarshalObjectResponse[AccessTokenResponse](resp)
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }
 

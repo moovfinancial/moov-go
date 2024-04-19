@@ -92,7 +92,7 @@ func (c Client) CreateCard(ctx context.Context, accountID string, card CreateCar
 	case StatusStateConflict:
 		return nil, ErrDuplicateLinkCard
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }
 
@@ -194,7 +194,7 @@ func (c Client) UpdateCard(ctx context.Context, accountID string, cardID string,
 	case StatusFailedValidation:
 		return nil, ErrCardDataInvalid
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }
 

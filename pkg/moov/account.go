@@ -379,7 +379,7 @@ func (c Client) CreateAccount(ctx context.Context, account Account) (*Account, *
 		a, err := UnmarshalObjectResponse[Account](resp)
 		return nil, a, err
 	default:
-		return nil, nil, resp.Error()
+		return nil, nil, resp
 	}
 }
 

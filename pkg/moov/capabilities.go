@@ -58,7 +58,7 @@ func (c Client) RequestCapabilities(ctx context.Context, accountID string, capab
 	case StatusStateConflict:
 		return nil, ErrAccount
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }
 
