@@ -19,19 +19,18 @@ func errorAsA[A interface{}](err error) *A {
 }
 
 var (
-	ErrCredentialsNotSet = errors.New("api credentials not set")
-	ErrAccountNotFound   = errors.New("no account with the specified accountID was found")
-
+	ErrCredentialsNotSet            = errors.New("api credentials not set")
+	ErrAccountNotFound              = errors.New("no account with the specified accountID was found")
+	ErrAlreadyExists                = errors.New("resource already exists")
 	ErrMicroDepositAmountsIncorrect = errors.New("the amounts provided are incorrect or the bank account is in an unexpected state")
+	ErrXIdempotencyKey              = errors.New("attempted to create a transfer using a duplicate X-Idempotency-Key header")
 
-	ErrDuplicateLinkCard    = errors.New("attempted to link card that already exists on the account")
-	ErrCardDataInvalid      = errors.New("the supplied card data appeared invalid or was declined by the issuer")
-	ErrXIdempotencyKey      = errors.New("attempted to create a transfer using a duplicate X-Idempotency-Key header")
-	ErrDuplicateBankAccount = errors.New("duplciate bank account or invalid routing number")
-	ErrNoMicroDeposit       = errors.New("no account with the specified accountID was found or micro-deposits have not been sent for the source")
-	ErrAccount              = errors.New("no account with the specified accountID was found")
-	ErrUpdateCardConflict   = errors.New("attempting to update an existing disabled card")
+	// ErrDuplicateBankAccount = errors.New("duplciate bank account or invalid routing number")
+	// ErrNoMicroDeposit       = errors.New("no account with the specified accountID was found or micro-deposits have not been sent for the source")
+	// ErrAccount              = errors.New("no account with the specified accountID was found")
+	// ErrUpdateCardConflict   = errors.New("attempting to update an existing disabled card")
 
+	// ErrCardDataInvalid      = errors.New("the supplied card data appeared invalid or was declined by the issuer")
 	// ErrRequestBody              = errors.New("request body could not be parsed")
 	// ErrAuthNetwork              = errors.New("network error")
 	// ErrBadRequest               = errors.New("the request body could not be processed")

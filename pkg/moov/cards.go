@@ -85,7 +85,7 @@ func (c Client) CreateCard(ctx context.Context, accountID string, card CreateCar
 	case StatusNotFound:
 		return nil, errors.Join(ErrAccountNotFound, resp)
 	case StatusStateConflict:
-		return nil, errors.Join(ErrDuplicateLinkCard, resp)
+		return nil, errors.Join(ErrAlreadyExists, resp)
 	default:
 		return nil, resp
 	}
@@ -184,10 +184,6 @@ func (c Client) UpdateCard(ctx context.Context, accountID string, cardID string,
 	switch resp.Status() {
 	case StatusCompleted:
 		return UnmarshalObjectResponse[Card](resp)
-	case StatusStateConflict:
-		return nil, errors.Join(ErrUpdateCardConflict, resp)
-	case StatusFailedValidation:
-		return nil, errors.Join(ErrCardDataInvalid, resp)
 	default:
 		return nil, resp
 	}

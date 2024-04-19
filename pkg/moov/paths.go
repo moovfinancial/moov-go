@@ -23,7 +23,7 @@ const (
 	pathBankAccounts = "/accounts/%s/bank-accounts"
 	pathBankAccount  = "/accounts/%s/bank-accounts/%s"
 
-	pathBankAccountMicroDeposits = "/accounts/%s/bank-accounts/%s/microdeposits"
+	pathBankAccountMicroDeposits = "/accounts/%s/bank-accounts/%s/micro-deposits"
 
 	pathWallets = "/accounts/%s/wallets"
 	pathWallet  = "/accounts/%s/wallets/%s"
@@ -44,11 +44,8 @@ const (
 	pathTransfers = "/transfers"
 	pathTransfer  = "/transfers/%s"
 
-	pathTransferReversals = "/transfers/%s/reversals"
+	pathReversals = "/transfers/%s/reversals"
 
 	pathRefunds = "/transfers/%s/refunds"
 	pathRefund  = "/transfers/%s/refunds/%s"
-
-	pathDisputes = "/disputes"
-	pathDispute  = "/disputes/%s"
 )

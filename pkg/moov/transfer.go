@@ -166,6 +166,18 @@ type CreateTransfer struct {
 	Metadata       map[string]string `json:"metadata,omitempty"`
 }
 
+type Dispute struct {
+	DisputeID                string              `json:"disputeID,omitempty"`
+	CreatedOn                time.Time           `json:"createdOn,omitempty"`
+	Amount                   Amount              `json:"amount,omitempty"`
+	NetworkReasonCode        string              `json:"networkReasonCode,omitempty"`
+	NetworkReasonDescription string              `json:"networkReasonDescription,omitempty"`
+	Phase                    string              `json:"phase,omitempty"`
+	RespondBy                time.Time           `json:"respondBy,omitempty"`
+	Status                   string              `json:"status,omitempty"`
+	Transfer                 SynchronousTransfer `json:"transfer,omitempty"`
+}
+
 type CreateTransferArgs callArg
 
 func WithTransferWaitForRailResponse() CreateTransferArgs {
@@ -399,7 +411,7 @@ func (c Client) ReverseTransfer(ctx context.Context, transferID string, refund R
 		JsonBody(refund),
 	)
 
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathTransferReversals, transferID), args...)
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathReversals, transferID), args...)
 	if err != nil {
 		return nil, err
 	}

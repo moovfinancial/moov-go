@@ -148,7 +148,7 @@ func (c Client) CreateBankAccount(ctx context.Context, accountID string, opts ..
 	case StatusCompleted:
 		return CompletedObjectOrError[BankAccount](resp)
 	case StatusStateConflict:
-		return nil, errors.Join(ErrDuplicateBankAccount, resp)
+		return nil, errors.Join(ErrAlreadyExists, resp)
 	default:
 		return nil, resp
 	}
