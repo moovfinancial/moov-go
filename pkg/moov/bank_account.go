@@ -217,9 +217,9 @@ func (c Client) MicroDepositConfirm(ctx context.Context, accountID string, bankA
 	case StatusCompleted:
 		return nil
 	case StatusNotFound:
-		return ErrNoMicroDeposit
+		return errors.Join(ErrNoMicroDeposit, resp)
 	case StatusStateConflict:
-		return ErrAmountIncorrect
+		return errors.Join(ErrAmountIncorrect, resp)
 	default:
 		return resp
 	}

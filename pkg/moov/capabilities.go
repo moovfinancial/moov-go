@@ -56,7 +56,7 @@ func (c Client) RequestCapabilities(ctx context.Context, accountID string, capab
 	case StatusCompleted:
 		return CompletedListOrError[Capability](resp)
 	case StatusStateConflict:
-		return nil, ErrAccount
+		return nil, errors.Join(ErrAccount, resp)
 	default:
 		return nil, resp
 	}

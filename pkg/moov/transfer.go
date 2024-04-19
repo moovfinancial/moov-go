@@ -2,6 +2,7 @@ package moov
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -199,7 +200,7 @@ func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, opt
 		st, err := UnmarshalObjectResponse[AsynchronousTransfer](resp)
 		return nil, st, err
 	case StatusStateConflict:
-		return nil, nil, ErrXIdempotencyKey
+		return nil, nil, errors.Join(ErrXIdempotencyKey, resp)
 	default:
 		return nil, nil, resp
 	}

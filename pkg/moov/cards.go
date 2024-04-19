@@ -88,9 +88,9 @@ func (c Client) CreateCard(ctx context.Context, accountID string, card CreateCar
 	case StatusCompleted:
 		return UnmarshalObjectResponse[Card](resp)
 	case StatusNotFound:
-		return nil, ErrNoAccount
+		return nil, errors.Join(ErrNoAccount, resp)
 	case StatusStateConflict:
-		return nil, ErrDuplicateLinkCard
+		return nil, errors.Join(ErrDuplicateLinkCard, resp)
 	default:
 		return nil, resp
 	}
@@ -190,9 +190,9 @@ func (c Client) UpdateCard(ctx context.Context, accountID string, cardID string,
 	case StatusCompleted:
 		return UnmarshalObjectResponse[Card](resp)
 	case StatusStateConflict:
-		return nil, ErrUpdateCardConflict
+		return nil, errors.Join(ErrUpdateCardConflict, resp)
 	case StatusFailedValidation:
-		return nil, ErrCardDataInvalid
+		return nil, errors.Join(ErrCardDataInvalid, resp)
 	default:
 		return nil, resp
 	}
