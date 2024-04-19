@@ -108,22 +108,3 @@ func TestDisconnectAccount(t *testing.T) {
 
 	require.NoError(t, err)
 }
-
-func createTestAccount() moov.CreateAccount {
-	return moov.CreateAccount{
-		Type: moov.ACCOUNTTYPE_INDIVIDUAL,
-		Profile: moov.CreateProfile{
-			Individual: &moov.CreateIndividualProfile{
-				Name: moov.Name{
-					FirstName: "John",
-					LastName:  "Doe",
-				},
-				Email: "noreply@moov.io",
-				Phone: &moov.Phone{
-					Number:      "555-555-5555",
-					CountryCode: "1",
-				},
-			},
-		},
-	}
-}

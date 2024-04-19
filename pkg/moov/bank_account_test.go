@@ -1,10 +1,7 @@
 package moov_test
 
 import (
-	"context"
-	"crypto/rand"
 	"fmt"
-	"math/big"
 	"testing"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
@@ -24,13 +21,17 @@ func Test_CreateBankAccount_WithBankAccount(t *testing.T) {
 		RoutingNumber: "273976369",
 	}))
 
-	moov.DebugPrintResponse(err, fmt.Printf)
-	require.NoError(t, err)
-	require.NotNil(t, resp)
+	t.Cleanup(func() {
+		if resp != nil {
+			_ = mc.DeleteBankAccount(BgCtx(), account.AccountID, resp.BankAccountID)
+		}
+	})
 
-	defer func() {
-		_ = mc.DeleteBankAccount(BgCtx(), account.AccountID, resp.BankAccountID)
-	}()
+	t.Run("add bank account", func(t *testing.T) {
+		moov.DebugPrintResponse(err, fmt.Printf)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+	})
 
 	t.Run("get bank account", func(t *testing.T) {
 		_, err = mc.GetBankAccount(BgCtx(), account.AccountID, resp.BankAccountID)
@@ -62,24 +63,4 @@ func Test_CreateBankAccount_WithBankAccount(t *testing.T) {
 		moov.DebugPrintResponse(err, fmt.Printf)
 		require.NoError(t, err)
 	})
-}
-
-func getLincolnBank(t *testing.T, mc *moov.Client) moov.Account {
-	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
-	moov.DebugPrintResponse(err, fmt.Printf)
-	require.NoError(t, err)
-
-	for _, account := range accounts {
-		if account.DisplayName == "Lincoln National Corporation" {
-			return account
-		}
-	}
-
-	require.FailNow(t, "bank account test account not found")
-	return moov.Account{}
-}
-
-func randomBankAccountNumber() string {
-	n, _ := rand.Int(rand.Reader, big.NewInt(999999999))
-	return fmt.Sprintf("%d", 100000000+n.Int64())
 }
