@@ -35,5 +35,6 @@ func (c *Credentials) Validate() error {
 	if c.PublicKey == "" || c.SecretKey == "" {
 		return ErrCredentialsNotSet
 	}
+
 	return nil
 }

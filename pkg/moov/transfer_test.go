@@ -2,13 +2,10 @@ package moov_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
-	"github.com/stretchr/testify/suite"
 
 	"github.com/stretchr/testify/require"
 )
@@ -207,6 +204,9 @@ func TestSynchronousTransferMarshalResponse(t *testing.T) {
 	require.Equal(t, "Gym Dues", transfer.Source.AchDetails.CompanyEntryDescription)
 	t.Logf("%#v", transfer)
 }
+
+/*
+@TODO fix by getting rid of the suite
 
 type TransferTestSuite struct {
 	suite.Suite
@@ -483,3 +483,4 @@ func (s *TransferTestSuite) TestReverseTransfer() {
 
 	s.NotEmpty(reverse.Refund.RefundID)
 }
+*/

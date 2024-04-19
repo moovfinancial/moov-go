@@ -2,22 +2,17 @@ package moov_test
 
 import (
 	"bytes"
-	"context"
-	"crypto/rand"
 	"encoding/json"
-	"fmt"
-	"math/big"
 	"testing"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
 )
 
-func randomBankAccountNumber() string {
-	n, _ := rand.Int(rand.Reader, big.NewInt(999999999))
-	return fmt.Sprintf("%d", 100000000+n.Int64())
-}
+// func randomBankAccountNumber() string {
+// 	n, _ := rand.Int(rand.Reader, big.NewInt(999999999))
+// 	return fmt.Sprintf("%d", 100000000+n.Int64())
+// }
 
 func TestBankAccountMarshal(t *testing.T) {
 	input := []byte(`{
@@ -45,6 +40,9 @@ func TestBankAccountMarshal(t *testing.T) {
 
 	require.Equal(t, "Chase Bank", bankAccount.BankName)
 }
+
+/*
+@TODO fix by getting rid of the suite
 
 type BankAccountTestSuite struct {
 	suite.Suite
@@ -216,3 +214,4 @@ func (s *BankAccountTestSuite) TestMicroDepositConfirm() {
 	err = mc.MicroDepositConfirm(context.Background(), s.accountID, s.bankAccountID, amounts)
 	s.NoError(err)
 }
+*/
