@@ -144,33 +144,3 @@ func (r *httpCallResponse) RequestId() string {
 func (r *httpCallResponse) Error() string {
 	return fmt.Sprintf("error from moov - status: %s http.request_id: %s http.status_code: %d", r.Status().Name, r.RequestId(), r.StatusCode())
 }
-
-// var _ HttpCallError = &httpCallError{}
-// var _ CallResponseError = &httpCallError{}
-
-// type httpCallError struct {
-// 	resp *httpCallResponse
-
-// 	requestId  string
-// 	statusCode int
-// }
-
-// func (he *httpCallError) Status() CallStatus {
-// 	return he.Status()
-// }
-
-// func (he *httpCallError) Unmarshal(item any) error {
-// 	return he.Unmarshal(item)
-// }
-
-// func (he *httpCallError) RequestId() string {
-// 	return he.requestId
-// }
-
-// func (he *httpCallError) StatusCode() int {
-// 	return he.statusCode
-// }
-
-// func (he *httpCallError) Error() string {
-// 	return fmt.Sprintf("error from moov - status: %s http.request_id: %s http.status_code: %d", he.Status().Name, he.requestId, he.statusCode)
-// }

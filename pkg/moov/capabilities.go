@@ -7,10 +7,6 @@ import (
 	"time"
 )
 
-var (
-	ErrAccount = errors.New("no account with the specified accountID was found")
-)
-
 const (
 	CAPABILITY_TRANSFERS     = "transfers"
 	CAPABILITY_SEND_FUNDS    = "send-funds"

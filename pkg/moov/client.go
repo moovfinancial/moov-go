@@ -1,7 +1,6 @@
 package moov
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 )
@@ -29,25 +28,6 @@ const (
 	pathWalletTran       = "/accounts/%s/wallets/%s/transactions/%s"
 	pathWalletTrans      = "/accounts/%s/wallets/%s/transactions"
 	pathWallets          = "/accounts/%s/wallets"
-)
-
-var (
-	ErrAuthCredentialsNotSet    = errors.New("API Keys are not set or invalid credentials")
-	ErrRequestBody              = errors.New("request body could not be parsed")
-	ErrAuthNetwork              = errors.New("network error")
-	ErrNoAccount                = errors.New("no account with the specified accountID was found")
-	ErrBadRequest               = errors.New("the request body could not be processed")
-	ErrInvalidBankAccount       = errors.New("the bank account is not a bank account or is already pending verification")
-	ErrAmountIncorrect          = errors.New("the amounts provided are incorrect or the bank account is in an unexpected state")
-	ErrDuplicateLinkCard        = errors.New("attempted to link card that already exists on the account")
-	ErrCardDataInvalid          = errors.New("the supplied card data appeared invalid or was declined by the issuer")
-	ErrDuplicatedApplePayDomain = errors.New("apple Pay domains already registered for this account")
-	ErrDomainsNotVerified       = errors.New("domains not verified with Apple")
-	ErrDomainsNotRegistered     = errors.New("no Apple Pay domains registered for this account were found")
-	ErrLinkingApplePayToken     = errors.New("an error occurred when linking an Apple Pay token")
-	ErrRateLimit                = errors.New("request was refused due to rate limiting")
-	ErrXIdempotencyKey          = errors.New("attempted to create a transfer using a duplicate X-Idempotency-Key header")
-	ErrURL                      = errors.New("invalid URL")
 )
 
 func ErrDefault(code int) error {

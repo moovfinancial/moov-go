@@ -7,11 +7,6 @@ import (
 	"time"
 )
 
-var (
-	ErrNoCardUpdateFilters = errors.New("no card update filters provided")
-	ErrUpdateCardConflict  = errors.New("attempting to update an existing disabled card")
-)
-
 type Card struct {
 	CardID             string             `json:"cardID,omitempty"`
 	Fingerprint        string             `json:"fingerprint,omitempty"`
