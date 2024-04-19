@@ -33,7 +33,8 @@ type Credentials struct {
 
 func (c *Credentials) Validate() error {
 	if c.PublicKey == "" || c.SecretKey == "" {
-		return ErrAuthCredentialsNotSet
+		return ErrCredentialsNotSet
 	}
+
 	return nil
 }

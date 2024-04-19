@@ -7,11 +7,6 @@ import (
 	"time"
 )
 
-var (
-	ErrNoCardUpdateFilters = errors.New("no card update filters provided")
-	ErrUpdateCardConflict  = errors.New("attempting to update an existing disabled card")
-)
-
 type Card struct {
 	CardID             string             `json:"cardID,omitempty"`
 	Fingerprint        string             `json:"fingerprint,omitempty"`
@@ -88,11 +83,11 @@ func (c Client) CreateCard(ctx context.Context, accountID string, card CreateCar
 	case StatusCompleted:
 		return UnmarshalObjectResponse[Card](resp)
 	case StatusNotFound:
-		return nil, ErrNoAccount
+		return nil, errors.Join(ErrAccountNotFound, resp)
 	case StatusStateConflict:
-		return nil, ErrDuplicateLinkCard
+		return nil, errors.Join(ErrAlreadyExists, resp)
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }
 
@@ -110,7 +105,7 @@ func (c Client) ListCards(ctx context.Context, accountID string) ([]Card, error)
 // GetCard retrieves a card for the given customer Moov account
 // https://docs.moov.io/api/#tag/Cards/operation/getCard
 func (c Client) GetCard(ctx context.Context, accountID string, cardID string) (*Card, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, "/accounts/%s/cards/%s", accountID, cardID), AcceptJson())
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathCard, accountID, cardID), AcceptJson())
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +176,7 @@ func (c Client) UpdateCard(ctx context.Context, accountID string, cardID string,
 		return nil, err
 	}
 
-	resp, err := c.CallHttp(ctx, Endpoint("/accounts/%s/cards/%s", accountID, cardID), AcceptJson(), JsonBody(payload))
+	resp, err := c.CallHttp(ctx, Endpoint(pathCard, accountID, cardID), AcceptJson(), JsonBody(payload))
 	if err != nil {
 		return nil, err
 	}
@@ -189,19 +184,15 @@ func (c Client) UpdateCard(ctx context.Context, accountID string, cardID string,
 	switch resp.Status() {
 	case StatusCompleted:
 		return UnmarshalObjectResponse[Card](resp)
-	case StatusStateConflict:
-		return nil, ErrUpdateCardConflict
-	case StatusFailedValidation:
-		return nil, ErrCardDataInvalid
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }
 
 // DisableCard disables a card associated with a Moov account
 // https://docs.moov.io/api/#tag/Cards/operation/deleteCard
 func (c Client) DisableCard(ctx context.Context, accountID string, cardID string) error {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, "/accounts/%s/cards/%s", accountID, cardID))
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathCard, accountID, cardID))
 	if err != nil {
 		return err
 	}

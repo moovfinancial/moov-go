@@ -61,7 +61,7 @@ func (c *Client) accessToken(ctx context.Context, tokenReq accessTokenRequest, s
 	}
 
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, "/oauth2/token"),
+		Endpoint(http.MethodPost, pathOAuth2Token),
 		JsonBody(tokenReq))
 	if err != nil {
 		return nil, err
@@ -71,7 +71,7 @@ func (c *Client) accessToken(ctx context.Context, tokenReq accessTokenRequest, s
 	case StatusCompleted:
 		return UnmarshalObjectResponse[AccessTokenResponse](resp)
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }
 
@@ -88,7 +88,7 @@ func (c *Client) RefreshAccessToken(ctx context.Context, refreshToken string) (*
 // Revokes the token and makes it unusable for follow up calls
 func (c *Client) RevokeAccessToken(ctx context.Context, token string) error {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, "/oauth2/revoke"),
+		Endpoint(http.MethodPost, pathOAuth2Revoke),
 		AcceptJson(),
 		JsonBody(&revokeTokenRequest{
 			Token:         token,

@@ -215,7 +215,7 @@ type CallResponse interface {
 	Unmarshal(item any) error
 
 	// Convert response into an golang error
-	Error() error
+	Error() string
 }
 
 func UnmarshalObjectResponse[A interface{}](resp CallResponse) (*A, error) {
@@ -242,7 +242,7 @@ func CompletedNilOrError(resp CallResponse) error {
 	case StatusCompleted:
 		return nil
 	default:
-		return resp.Error()
+		return resp
 	}
 }
 
@@ -252,7 +252,7 @@ func CompletedObjectOrError[A interface{}](resp CallResponse) (*A, error) {
 	case StatusCompleted:
 		return UnmarshalObjectResponse[A](resp)
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }
 
@@ -262,6 +262,6 @@ func CompletedListOrError[A interface{}](resp CallResponse) ([]A, error) {
 	case StatusCompleted:
 		return UnmarshalListResponse[A](resp)
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/go-faker/faker/v4"
@@ -20,11 +19,7 @@ func TestVisaSandboxPullWithRefund(t *testing.T) {
 	// However, it is recommended to load the credentials from the
 	// configuration file.
 
-	mc, err := moov.NewClient(moov.WithCredentials(moov.Credentials{
-		PublicKey: os.Getenv("MOOV_PUBLIC_KEY"),
-		SecretKey: os.Getenv("MOOV_SECRET_KEY"),
-		Host:      os.Getenv("MOOV_HOST"), // api.moov.io
-	}))
+	mc, err := moov.NewClient(moov.WithCredentials(moov.CredentialsFromEnv()))
 	require.NoError(t, err)
 
 	destinationAccountID := "xxxxx"
@@ -39,16 +34,15 @@ func TestVisaSandboxPullWithRefund(t *testing.T) {
 	// Step 2: create account for the user
 
 	// Add new account
-	account, _, err := mc.CreateAccount(ctx, moov.Account{
-		AccountType: moov.INDIVIDUAL,
-		Profile: moov.Profile{
-			Individual: moov.Individual{
+	account, _, err := mc.CreateAccount(ctx, moov.CreateAccount{
+		Profile: moov.CreateProfile{
+			Individual: &moov.CreateIndividualProfile{
 				Name: moov.Name{
 					FirstName: faker.FirstName(),
 					LastName:  faker.LastName(),
 				},
 				Email: faker.Email(),
-				Phone: moov.Phone{
+				Phone: &moov.Phone{
 					Number:      faker.Phonenumber(),
 					CountryCode: "1",
 				},

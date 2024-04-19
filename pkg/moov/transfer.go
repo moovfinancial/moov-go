@@ -2,6 +2,7 @@ package moov
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -97,6 +98,38 @@ type Source struct {
 	AchDetails        AchDetails      `json:"achDetails,omitempty"`
 	CardDetails       CardDetails     `json:"cardDetails,omitempty"`
 	TransferID        string          `json:"transferID,omitempty"`
+}
+
+type AchDetails struct {
+	Status                  string           `json:"status,omitempty"`
+	TraceNumber             string           `json:"traceNumber,omitempty"`
+	Return                  Return           `json:"return,omitempty"`
+	Correction              Correction       `json:"correction,omitempty"`
+	CompanyEntryDescription string           `json:"companyEntryDescription,omitempty"`
+	OriginatingCompanyName  string           `json:"originatingCompanyName,omitempty"`
+	StatusUpdates           ACHStatusUpdates `json:"statusUpdates,omitempty"`
+	DebitHoldPeriod         string           `json:"debitHoldPeriod,omitempty"`
+	SECCode                 string           `json:"secCode,omitempty" validate:"omitempty,oneOf=WEB TEL PPD CCD"`
+}
+
+type Return struct {
+	Code        string `json:"code,omitempty"`
+	Reason      string `json:"reason,omitempty"`
+	Description string `json:"description,omitempty"`
+}
+
+type Correction struct {
+	Code        string `json:"code,omitempty"`
+	Reason      string `json:"reason,omitempty"`
+	Description string `json:"description,omitempty"`
+}
+
+type ACHStatusUpdates struct {
+	Initiated  time.Time `json:"initiated,omitempty"`
+	Originated time.Time `json:"originated,omitempty"`
+	Corrected  time.Time `json:"corrected,omitempty"`
+	Returned   time.Time `json:"returned,omitempty"`
+	Completed  time.Time `json:"completed,omitempty"`
 }
 
 type TransferAccount struct {
@@ -199,9 +232,9 @@ func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, opt
 		st, err := UnmarshalObjectResponse[AsynchronousTransfer](resp)
 		return nil, st, err
 	case StatusStateConflict:
-		return nil, nil, ErrXIdempotencyKey
+		return nil, nil, errors.Join(ErrXIdempotencyKey, resp)
 	default:
-		return nil, nil, resp.Error()
+		return nil, nil, resp
 	}
 }
 
@@ -354,7 +387,7 @@ func (c Client) RefundTransfer(ctx context.Context, transferID string, refund Re
 		r, err := CompletedObjectOrError[Refund](resp)
 		return nil, r, err
 	default:
-		return nil, nil, resp.Error()
+		return nil, nil, resp
 	}
 }
 

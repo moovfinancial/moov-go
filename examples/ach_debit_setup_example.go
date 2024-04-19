@@ -40,10 +40,9 @@ func TestACHTransferSetup(t *testing.T) {
 	// Step 2: create account for the user
 
 	// Add new account
-	account, _, err := mc.CreateAccount(ctx, moov.Account{
-		AccountType: moov.INDIVIDUAL,
-		Profile: moov.Profile{
-			Individual: moov.Individual{
+	account, _, err := mc.CreateAccount(ctx, moov.CreateAccount{
+		Profile: moov.CreateProfile{
+			Individual: &moov.CreateIndividualProfile{
 				Name: moov.Name{
 					FirstName: faker.FirstName(),
 					LastName:  faker.LastName(),
@@ -58,12 +57,12 @@ func TestACHTransferSetup(t *testing.T) {
 
 	// You can manually supply bank account information or pass tokens from
 	// IAV providers Plaid or MX
-	bankAccountPayload := moov.BankAccount{
-		HolderName:      "Jules Jackson",
-		HolderType:      "individual",
-		BankAccountType: "checking",
-		RoutingNumber:   "273976369", // this is a real routing number
-		AccountNumber:   "123456789", // fake it great!
+	bankAccountPayload := moov.BankAccountRequest{
+		HolderName:    "Jules Jackson",
+		HolderType:    moov.HolderType_Individual,
+		AccountType:   moov.BankAccountType_Checking,
+		RoutingNumber: "273976369", // this is a real routing number
+		AccountNumber: "123456789", // fake it great!
 	}
 	bankAccount, err := mc.CreateBankAccount(ctx, account.AccountID, moov.WithBankAccount(bankAccountPayload))
 	require.NoError(t, err)

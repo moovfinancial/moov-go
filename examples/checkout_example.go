@@ -37,16 +37,15 @@ func main() {
 	fmt.Printf("AccountCreationToken: %s \n", token.AccessToken)
 
 	// Create a new moov account server side
-	account := moov.Account{
-		AccountType: moov.INDIVIDUAL,
-		Profile: moov.Profile{
-			Individual: moov.Individual{
+	account := moov.CreateAccount{
+		Profile: moov.CreateProfile{
+			Individual: &moov.CreateIndividualProfile{
 				Name: moov.Name{
 					FirstName: "Wade",
 					LastName:  "Arnold",
 				},
 				Email: "wade@arnold.com",
-				Phone: moov.Phone{
+				Phone: &moov.Phone{
 					Number:      "555-555-5555",
 					CountryCode: "1",
 				},

@@ -96,7 +96,7 @@ func (c Client) CreateApplePayDomain(ctx context.Context, accountID string, doma
 	case StatusCompleted:
 		return CompletedObjectOrError[ApplePayDomainsResponse](resp)
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }
 
@@ -147,7 +147,7 @@ func (c Client) StartApplePaySession(ctx context.Context, accountID string, req 
 	case StatusCompleted:
 		return UnmarshalObjectResponse[string](resp)
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }
 
@@ -166,6 +166,6 @@ func (c Client) LinkApplePayToken(ctx context.Context, accountID string, req Lin
 	case StatusCompleted:
 		return UnmarshalObjectResponse[LinkedApplePayPaymentMethod](resp)
 	default:
-		return nil, resp.Error()
+		return nil, resp
 	}
 }

@@ -106,7 +106,7 @@ func (c Client) ListDisputes(ctx context.Context, filters ...DisputeListFilter) 
 // GetDispute retrieves a dispute for the given dispute id
 // https://docs.moov.io/api/money-movement/disputes/get/
 func (c Client) GetDispute(ctx context.Context, disputeID string) (*Dispute, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathDisputeID, disputeID), AcceptJson())
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathDispute, disputeID), AcceptJson())
 	if err != nil {
 		return nil, err
 	}

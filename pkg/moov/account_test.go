@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
@@ -27,11 +28,13 @@ func TestAccountMarshalResponse(t *testing.T) {
 }
 
 func TestCreateAccountIndividual(t *testing.T) {
-	account := testAccount()
+	account := createTestAccount()
 
 	mc := NewTestClient(t)
 
 	completed, started, err := mc.CreateAccount(context.Background(), account)
+	moov.DebugPrintResponse(err, fmt.Printf)
+
 	require.NoError(t, err)
 	require.NotNil(t, completed)
 	require.Nil(t, started)
@@ -41,8 +44,9 @@ func TestGetAccount(t *testing.T) {
 	mc := NewTestClient(t)
 
 	account, err := mc.GetAccount(context.Background(), "638481a5-5205-406c-84c7-2fc2239105d1")
-	require.NoError(t, err)
 
+	moov.DebugPrintResponse(err, fmt.Printf)
+	require.NoError(t, err)
 	require.Equal(t, "638481a5-5205-406c-84c7-2fc2239105d1", account.AccountID)
 }
 
@@ -53,13 +57,13 @@ func TestUpdateAccount(t *testing.T) {
 		AccountID:   "aa19c3a7-4c72-4f64-adfa-9069c80d81cf",
 		AccountType: moov.INDIVIDUAL,
 		Profile: moov.Profile{
-			Individual: moov.Individual{
+			Individual: &moov.Individual{
 				Name: moov.Name{
 					FirstName: "David",
 					LastName:  "Arnold",
 				},
 				Email: "Wade@arnold.com",
-				Phone: moov.Phone{
+				Phone: &moov.Phone{
 					Number:      "333-333-3333",
 					CountryCode: "1",
 				},
@@ -68,8 +72,9 @@ func TestUpdateAccount(t *testing.T) {
 	}
 
 	result, err := mc.UpdateAccount(context.Background(), account)
-	require.NoError(t, err)
 
+	moov.DebugPrintResponse(err, fmt.Printf)
+	require.NoError(t, err)
 	require.Equal(t, "David", result.Profile.Individual.Name.FirstName)
 }
 
@@ -77,6 +82,8 @@ func TestListAccounts(t *testing.T) {
 	mc := NewTestClient(t)
 
 	accounts, err := mc.ListAccounts(context.Background())
+	moov.DebugPrintResponse(err, fmt.Printf)
+
 	require.NoError(t, err)
 	require.NotNil(t, accounts)
 }
@@ -85,32 +92,19 @@ func TestDisconnectAccount(t *testing.T) {
 	mc := NewTestClient(t)
 	ctx := BgCtx()
 
-	accnt, _, err := mc.CreateAccount(ctx, testAccount())
+	accnt, _, err := mc.CreateAccount(ctx, createTestAccount())
+	moov.DebugPrintResponse(err, fmt.Printf)
+
 	require.NoError(t, err)
 	require.NotNil(t, accnt)
 
 	_, err = mc.GetAccount(ctx, accnt.AccountID)
+	moov.DebugPrintResponse(err, fmt.Printf)
+
 	require.NoError(t, err)
 
 	err = mc.DisconnectAccount(ctx, accnt.AccountID)
-	require.NoError(t, err)
-}
+	moov.DebugPrintResponse(err, fmt.Printf)
 
-func testAccount() moov.Account {
-	return moov.Account{
-		AccountType: moov.INDIVIDUAL,
-		Profile: moov.Profile{
-			Individual: moov.Individual{
-				Name: moov.Name{
-					FirstName: "John",
-					LastName:  "Doe",
-				},
-				Email: "noreply@moov.io",
-				Phone: moov.Phone{
-					Number:      "555-555-5555",
-					CountryCode: "1",
-				},
-			},
-		},
-	}
+	require.NoError(t, err)
 }
