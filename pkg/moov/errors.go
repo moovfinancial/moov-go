@@ -57,6 +57,6 @@ func DebugPrintResponse(err error, f func(format string, a ...any) (n int, err e
 	if e := ErrorAsCallResponse(err); e != nil {
 		sb := strings.Builder{}
 		ErrorAsCallResponse(err).Unmarshal(&sb)
-		f("%s", sb.String())
+		f("[%s]", sb.String())
 	}
 }

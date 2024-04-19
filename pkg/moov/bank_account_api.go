@@ -1,9 +1,7 @@
 package moov
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 )
@@ -11,55 +9,27 @@ import (
 type CreateBankAccountType callArg
 
 func WithBankAccount(bankAccount BankAccountRequest) CreateBankAccountType {
-	return callBuilderFn((func(call *callBuilder) error {
-		bankAccountJSON, err := json.Marshal(createBankAccount{
-			Account: &bankAccount,
-		})
-		if err != nil {
-			return err
-		}
-		call.body = bytes.NewReader(bankAccountJSON)
-		return nil
-	}))
+	return JsonBody(createBankAccount{
+		Account: &bankAccount,
+	})
 }
 
 func WithPlaid(plaid PlaidRequest) CreateBankAccountType {
-	return callBuilderFn((func(call *callBuilder) error {
-		bankAccountJSON, err := json.Marshal(createBankAccount{
-			Plaid: &plaid,
-		})
-		if err != nil {
-			return err
-		}
-		call.body = bytes.NewReader(bankAccountJSON)
-		return nil
-	}))
+	return JsonBody(createBankAccount{
+		Plaid: &plaid,
+	})
 }
 
 func WithPlaidLink(plaidLink PlaidLinkRequest) CreateBankAccountType {
-	return callBuilderFn((func(call *callBuilder) error {
-		bankAccountJSON, err := json.Marshal(createBankAccount{
-			PlaidLink: &plaidLink,
-		})
-		if err != nil {
-			return err
-		}
-		call.body = bytes.NewReader(bankAccountJSON)
-		return nil
-	}))
+	return JsonBody(createBankAccount{
+		PlaidLink: &plaidLink,
+	})
 }
 
 func WithMX(mx MXRequest) CreateBankAccountType {
-	return callBuilderFn((func(call *callBuilder) error {
-		bankAccountJSON, err := json.Marshal(createBankAccount{
-			MX: &mx,
-		})
-		if err != nil {
-			return err
-		}
-		call.body = bytes.NewReader(bankAccountJSON)
-		return nil
-	}))
+	return JsonBody(createBankAccount{
+		MX: &mx,
+	})
 }
 
 // CreateBankAccount creates a new bank account for the given customer account
@@ -67,8 +37,7 @@ func (c Client) CreateBankAccount(ctx context.Context, accountID string, opts ..
 	args := prependArgs(opts, AcceptJson())
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathBankAccounts, accountID),
-		AcceptJson(),
-		JsonBody(args))
+		args...)
 	if err != nil {
 		return nil, err
 	}
