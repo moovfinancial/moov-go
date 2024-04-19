@@ -55,7 +55,7 @@ func (c Client) UploadFile(ctx context.Context, accountID string, upload UploadF
 	}
 
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, "/accounts/%s/files", accountID),
+		Endpoint(http.MethodPost, pathFiles, accountID),
 		AcceptJson(),
 		MultipartBody(
 			MultipartField("filePurpose", string(upload.FilePurpose)),
@@ -71,7 +71,7 @@ func (c Client) UploadFile(ctx context.Context, accountID string, upload UploadF
 
 func (c Client) ListFiles(ctx context.Context, accountID string) ([]File, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, "/accounts/%s/files", accountID),
+		Endpoint(http.MethodGet, pathFiles, accountID),
 		AcceptJson())
 	if err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func (c Client) ListFiles(ctx context.Context, accountID string) ([]File, error)
 
 func (c Client) GetFile(ctx context.Context, accountID string, fileID string) (*File, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, "/accounts/%s/files/%s", accountID, fileID),
+		Endpoint(http.MethodGet, pathFile, accountID, fileID),
 		AcceptJson())
 	if err != nil {
 		return nil, err

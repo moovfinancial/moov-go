@@ -399,7 +399,7 @@ func (c Client) ReverseTransfer(ctx context.Context, transferID string, refund R
 		JsonBody(refund),
 	)
 
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathReversals, transferID), args...)
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathTransferReversals, transferID), args...)
 	if err != nil {
 		return nil, err
 	}

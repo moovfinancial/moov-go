@@ -190,7 +190,7 @@ func (c Client) ListBankAccounts(ctx context.Context, accountID string) ([]BankA
 
 // MicroDepositInitiate creates a new micro deposit verification for the given bank account
 func (c Client) MicroDepositInitiate(ctx context.Context, accountID string, bankAccountID string) error {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathMicroDeposits, accountID, bankAccountID))
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathBankAccountMicroDeposits, accountID, bankAccountID))
 	if err != nil {
 		return err
 	}
@@ -201,7 +201,7 @@ func (c Client) MicroDepositInitiate(ctx context.Context, accountID string, bank
 // MicroDepositConfirm confirms a micro deposit verification for the given bank account
 func (c Client) MicroDepositConfirm(ctx context.Context, accountID string, bankAccountID string, amounts []int) error {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPut, pathMicroDeposits, accountID, bankAccountID),
+		Endpoint(http.MethodPut, pathBankAccountMicroDeposits, accountID, bankAccountID),
 		AcceptJson(),
 		JsonBody(map[string][]int{"amounts": amounts}))
 	if err != nil {
@@ -211,10 +211,8 @@ func (c Client) MicroDepositConfirm(ctx context.Context, accountID string, bankA
 	switch resp.Status() {
 	case StatusCompleted:
 		return nil
-	case StatusNotFound:
-		return errors.Join(ErrNoMicroDeposit, resp)
 	case StatusStateConflict:
-		return errors.Join(ErrAmountIncorrect, resp)
+		return errors.Join(ErrMicroDepositAmountsIncorrect, resp)
 	default:
 		return resp
 	}

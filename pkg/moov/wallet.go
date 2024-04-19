@@ -140,7 +140,7 @@ func WithCompletedEndDateTime(completedEndDateTime time.Time) ListTransactionFil
 // https://docs.moov.io/api/index.html#tag/Wallet-transactions
 func (c Client) ListWalletTransactions(ctx context.Context, accountID string, walletID string, opts ...ListTransactionFilter) ([]Transaction, error) {
 	args := prependArgs(opts, AcceptJson())
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWalletTrans, accountID, walletID), args...)
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWalletTransactions, accountID, walletID), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (c Client) ListWalletTransactions(ctx context.Context, accountID string, wa
 // GetWalletTransaction retrieves a transaction for the given wallet id and transaction id
 // https://docs.moov.io/api/index.html#tag/Wallet-transactions/operation/getWalletTransaction
 func (c Client) GetWalletTransaction(ctx context.Context, accountID string, walletID string, transactionID string) (*Transaction, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWalletTran, accountID, walletID, transactionID), AcceptJson())
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWalletTransaction, accountID, walletID, transactionID), AcceptJson())
 	if err != nil {
 		return nil, err
 	}

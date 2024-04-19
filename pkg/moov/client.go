@@ -1,38 +1,8 @@
 package moov
 
 import (
-	"fmt"
 	"net/http"
 )
-
-const (
-	pathApplePay         = "/accounts/%s/apple-pay"
-	pathApplePayDomains  = "/accounts/%s/apple-pay/domains"
-	pathApplePaySessions = "/accounts/%s/apple-pay/sessions"
-	pathApplePayTokens   = "/accounts/%s/apple-pay/tokens" // #nosec G101
-	pathBankAccount      = "/accounts/%s/bank-accounts/%s"
-	pathBankAccounts     = "/accounts/%s/bank-accounts"
-	pathCards            = "/accounts/%s/cards"
-	pathDisputeID        = "/disputes/%s"
-	pathDisputes         = "/disputes"
-	pathInstitutions     = "/institutions/%s/search"
-	pathMicroDeposits    = "/accounts/%s/bank-accounts/%s/microdeposits"
-	pathPaymentMethods   = "/accounts/%s/payment-methods"
-	pathRefund           = "/transfers/%s/refunds/%s"
-	pathRefunds          = "/transfers/%s/refunds"
-	pathReversals        = "/transfers/%s/reversals"
-	pathTransfer         = "/transfers/%s"
-	pathTransferOptions  = "/transfer-options"
-	pathTransfers        = "/transfers"
-	pathWallet           = "/accounts/%s/wallets/%s"
-	pathWalletTran       = "/accounts/%s/wallets/%s/transactions/%s"
-	pathWalletTrans      = "/accounts/%s/wallets/%s/transactions"
-	pathWallets          = "/accounts/%s/wallets"
-)
-
-func ErrDefault(code int) error {
-	return fmt.Errorf("empty response for unauthorized or any other returned http status code (%d)", code)
-}
 
 type Client struct {
 	Credentials Credentials

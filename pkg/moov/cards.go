@@ -83,7 +83,7 @@ func (c Client) CreateCard(ctx context.Context, accountID string, card CreateCar
 	case StatusCompleted:
 		return UnmarshalObjectResponse[Card](resp)
 	case StatusNotFound:
-		return nil, errors.Join(ErrNoAccount, resp)
+		return nil, errors.Join(ErrAccountNotFound, resp)
 	case StatusStateConflict:
 		return nil, errors.Join(ErrDuplicateLinkCard, resp)
 	default:
@@ -105,7 +105,7 @@ func (c Client) ListCards(ctx context.Context, accountID string) ([]Card, error)
 // GetCard retrieves a card for the given customer Moov account
 // https://docs.moov.io/api/#tag/Cards/operation/getCard
 func (c Client) GetCard(ctx context.Context, accountID string, cardID string) (*Card, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, "/accounts/%s/cards/%s", accountID, cardID), AcceptJson())
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathCard, accountID, cardID), AcceptJson())
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (c Client) UpdateCard(ctx context.Context, accountID string, cardID string,
 		return nil, err
 	}
 
-	resp, err := c.CallHttp(ctx, Endpoint("/accounts/%s/cards/%s", accountID, cardID), AcceptJson(), JsonBody(payload))
+	resp, err := c.CallHttp(ctx, Endpoint(pathCard, accountID, cardID), AcceptJson(), JsonBody(payload))
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +196,7 @@ func (c Client) UpdateCard(ctx context.Context, accountID string, cardID string,
 // DisableCard disables a card associated with a Moov account
 // https://docs.moov.io/api/#tag/Cards/operation/deleteCard
 func (c Client) DisableCard(ctx context.Context, accountID string, cardID string) error {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, "/accounts/%s/cards/%s", accountID, cardID))
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathCard, accountID, cardID))
 	if err != nil {
 		return err
 	}

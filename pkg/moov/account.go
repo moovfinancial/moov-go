@@ -363,7 +363,7 @@ func (a Account) MarshalJSON() ([]byte, error) {
 // CreateAccount creates a new account.
 func (c Client) CreateAccount(ctx context.Context, account Account) (*Account, *Account, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, "/accounts"),
+		Endpoint(http.MethodPost, pathAccounts),
 		AcceptJson(),
 		WaitFor("connection"),
 		JsonBody(account))
@@ -386,7 +386,7 @@ func (c Client) CreateAccount(ctx context.Context, account Account) (*Account, *
 // GetAccount returns an account based on accountID.
 func (c Client) GetAccount(ctx context.Context, accountID string) (*Account, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, "/accounts/%s", accountID),
+		Endpoint(http.MethodGet, pathAccount, accountID),
 		AcceptJson())
 	if err != nil {
 		return nil, err
@@ -398,7 +398,7 @@ func (c Client) GetAccount(ctx context.Context, accountID string) (*Account, err
 // UpdateAccount updates an account.
 func (c Client) UpdateAccount(ctx context.Context, account Account) (*Account, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPatch, "/accounts/%s", account.AccountID),
+		Endpoint(http.MethodPatch, pathAccount, account.AccountID),
 		AcceptJson(),
 		JsonBody(account))
 	if err != nil {
@@ -478,7 +478,7 @@ func WithAccountSkip(skip int) ListAccountFilter {
 // ListAccounts returns a list of accounts.
 func (c Client) ListAccounts(ctx context.Context, opts ...ListAccountFilter) ([]Account, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, "/accounts"),
+		Endpoint(http.MethodGet, pathAccounts),
 		prependArgs(opts, AcceptJson())...)
 	if err != nil {
 		return nil, err
@@ -489,7 +489,7 @@ func (c Client) ListAccounts(ctx context.Context, opts ...ListAccountFilter) ([]
 
 func (c Client) DisconnectAccount(ctx context.Context, accountID string) error {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodDelete, "/accounts/%s", accountID),
+		Endpoint(http.MethodDelete, pathAccount, accountID),
 		AcceptJson())
 	if err != nil {
 		return err

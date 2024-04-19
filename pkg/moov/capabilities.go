@@ -41,7 +41,7 @@ type Capability struct {
 // RequestCapabilities adds a new capability for the given account
 func (c Client) RequestCapabilities(ctx context.Context, accountID string, capabilities []Capability) ([]Capability, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, "/accounts/%s/capabilities", accountID),
+		Endpoint(http.MethodPost, pathCapabilities, accountID),
 		AcceptJson(),
 		JsonBody(capabilities))
 	if err != nil {
@@ -61,7 +61,7 @@ func (c Client) RequestCapabilities(ctx context.Context, accountID string, capab
 // ListCapabilities returns the capabilities for the given account
 func (c Client) ListCapabilities(ctx context.Context, accountID string) ([]Capability, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, "/accounts/%s/capabilities", accountID),
+		Endpoint(http.MethodGet, pathCapabilities, accountID),
 		AcceptJson())
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func (c Client) ListCapabilities(ctx context.Context, accountID string) ([]Capab
 // GetCapability returns a given capability for a given account
 func (c Client) GetCapability(ctx context.Context, accountID string, capability string) (*Capability, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, "/accounts/%s/capabilities/%s", accountID, capability),
+		Endpoint(http.MethodGet, pathCapability, accountID, capability),
 		AcceptJson())
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (c Client) GetCapability(ctx context.Context, accountID string, capability 
 
 // DisableCapability disables a specific capability
 func (c Client) DisableCapability(ctx context.Context, accountID string, capability string) error {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, "/accounts/%s/capabilities/%s", accountID, capability))
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathCapability, accountID, capability))
 	if err != nil {
 		return err
 	}

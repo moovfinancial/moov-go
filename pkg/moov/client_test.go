@@ -40,5 +40,5 @@ func Test_Client(t *testing.T) {
 
 func Test_Client_InvalidCredentials(t *testing.T) {
 	_, err := moov.NewClient(moov.WithCredentials(moov.Credentials{}))
-	require.Equal(t, moov.ErrAuthCredentialsNotSet, err)
+	require.Equal(t, moov.ErrCredentialsNotSet, err)
 }

@@ -7,7 +7,7 @@ import (
 
 // Ping calls the ping endpoint to make sure we have valid credentials
 func (c Client) Ping(ctx context.Context) error {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, "/ping"))
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathPing))
 	if err != nil {
 		return err
 	}
