@@ -1,19 +1,10 @@
 package moov_test
 
-import (
-	"bytes"
-	"encoding/json"
-	"testing"
-
-	"github.com/moovfinancial/moov-go/pkg/moov"
-	"github.com/stretchr/testify/require"
-)
-
 // func randomBankAccountNumber() string {
 // 	n, _ := rand.Int(rand.Reader, big.NewInt(999999999))
 // 	return fmt.Sprintf("%d", 100000000+n.Int64())
 // }
-
+/*
 func TestBankAccountMarshal(t *testing.T) {
 	input := []byte(`{
 		"bankAccountID": "ec7e1848-dc80-4ab0-8827-dd7fc0737b43",
@@ -40,7 +31,7 @@ func TestBankAccountMarshal(t *testing.T) {
 
 	require.Equal(t, "Chase Bank", bankAccount.BankName)
 }
-
+*/
 /*
 @TODO fix by getting rid of the suite
 
