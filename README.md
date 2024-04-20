@@ -17,10 +17,10 @@ export MOOV_PUBLIC_KEY="public key here"
 export MOOV_SECRET_KEY="secret key here"
 ```
 
-## Basic Usage
+## Examples Usage
 
-Example flow for linking a card and sending the money to a merchant's wallet.
-[Checkout Example](./examples/checkout_example.go)
+Examples exist for ach, card acquiring, and debit push/pull. 
+[Examples](./examples/README.md)
 
 ## License
 

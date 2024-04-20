@@ -11,7 +11,7 @@ import (
 )
 
 // Pull transfer is a transfer from the user's card to the Moov wallet.
-func TestVisaSandboxPullWithRefund(t *testing.T) {
+func TestDebitPullWithRefund(t *testing.T) {
 	// Step 1: create Moov client and set some variables
 
 	// The following code shows how you can configure the moov client with
