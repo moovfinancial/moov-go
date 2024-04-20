@@ -163,6 +163,12 @@ func MultipartBody(parts ...multipartFn) callArg {
 	})
 }
 
+func noop() callArg {
+	return callBuilderFn(func(call *callBuilder) error {
+		return nil
+	})
+}
+
 func AcceptJson() callArg {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.headers["Accept"] = "application/json"

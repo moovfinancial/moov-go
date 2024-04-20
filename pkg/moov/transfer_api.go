@@ -10,36 +10,56 @@ import (
 	"github.com/google/uuid"
 )
 
-type CreateTransferArgs callArg
+type CreateTransferArgs func(t *createTransferBuilder) callArg
+type createTransferBuilder struct {
+	synchronous    bool
+	idempotencyKey string
+}
 
 func WithTransferWaitForRailResponse() CreateTransferArgs {
-	return WaitFor("rail-response")
+	return func(t *createTransferBuilder) callArg {
+		t.synchronous = true
+		return WaitFor("rail-response")
+	}
 }
 
 // Can be specified to overwrite a randomly generated one.
 func WithTransferIdempotencyKey(key uuid.UUID) CreateTransferArgs {
-	return IdempotencyKey(key.String())
+	return func(t *createTransferBuilder) callArg {
+		t.idempotencyKey = key.String()
+		return IdempotencyKey(t.idempotencyKey)
+	}
 }
 
 // CreateTransfer creates a new transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
 func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, options ...CreateTransferArgs) (*Transfer, *TransferStarted, error) {
-	args := prependArgs[CreateTransferArgs](options,
-		// default options
+
+	builder := &createTransferBuilder{}
+	callArgs := []callArg{
 		AcceptJson(),
 		JsonBody(transfer),
-		WithTransferIdempotencyKey(uuid.New()),
-	)
+		WithTransferIdempotencyKey(uuid.New())(builder),
+	}
 
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathTransfers), args...)
+	for _, opt := range options {
+		callArgs = append(callArgs, opt(builder))
+	}
+
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathTransfers), callArgs...)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	switch resp.Status() {
 	case StatusCompleted:
-		st, err := UnmarshalObjectResponse[Transfer](resp)
-		return st, nil, err
+		if builder.synchronous {
+			st, err := UnmarshalObjectResponse[Transfer](resp)
+			return st, nil, err
+		} else {
+			st, err := UnmarshalObjectResponse[TransferStarted](resp)
+			return nil, st, err
+		}
 	case StatusStarted:
 		st, err := UnmarshalObjectResponse[TransferStarted](resp)
 		return nil, st, err
@@ -165,18 +185,18 @@ func (c Client) PatchTransfer(ctx context.Context, transferID string, patches ..
 
 type CreateRefundArgs callArg
 
-func WithRefundWaitForRailResponse() CreateTransferArgs {
+func WithRefundWaitForRailResponse() CreateRefundArgs {
 	return WaitFor("rail-response")
 }
 
 // Can be specified to overwrite a randomly generated one.
-func WithRefundIdempotencyKey(key uuid.UUID) CreateTransferArgs {
+func WithRefundIdempotencyKey(key uuid.UUID) CreateRefundArgs {
 	return IdempotencyKey(key.String())
 }
 
 // RefundTransfer refunds a transfer
 // https://docs.moov.io/api/#tag/Transfers/operation/refundTransfer
-func (c Client) RefundTransfer(ctx context.Context, transferID string, refund CreateRefund, options ...CreateRefundArgs) (*Refund, *AsynchronousRefund, error) {
+func (c Client) RefundTransfer(ctx context.Context, transferID string, refund CreateRefund, options ...CreateRefundArgs) (*Refund, *RefundStarted, error) {
 	args := prependArgs(options,
 		AcceptJson(),
 		WithRefundIdempotencyKey(uuid.New()),
@@ -195,7 +215,7 @@ func (c Client) RefundTransfer(ctx context.Context, transferID string, refund Cr
 		r, err := CompletedObjectOrError[Refund](resp)
 		return r, nil, err
 	case StatusStarted:
-		r, err := CompletedObjectOrError[AsynchronousRefund](resp)
+		r, err := CompletedObjectOrError[RefundStarted](resp)
 		return nil, r, err
 	default:
 		return nil, nil, resp
@@ -229,7 +249,7 @@ func (c Client) GetRefund(ctx context.Context, transferID string, refundID strin
 type CreateReversalArgs callArg
 
 // Can be specified to overwrite a randomly generated one.
-func WithReversalsIdempotencyKey(key uuid.UUID) CreateTransferArgs {
+func WithReversalsIdempotencyKey(key uuid.UUID) CreateReversalArgs {
 	return IdempotencyKey(key.String())
 }
 

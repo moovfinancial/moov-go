@@ -11,6 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const FACILITATOR_ID = "5352b013-ae58-4a63-8a3f-97f316a917cf"
+
 func getLincolnBank(t *testing.T, mc *moov.Client) *moov.Account {
 	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
 	moov.DebugPrintResponse(err, fmt.Printf)
@@ -60,6 +62,28 @@ func createTestBusinessAccount() moov.CreateAccount {
 			},
 		},
 	}
+}
+
+func paymentMethodsFromOptions(t *testing.T, options *moov.TransferOptions, sourceType moov.PaymentMethodType, destType moov.PaymentMethodType) (string, string) {
+	sourceId := ""
+	destId := ""
+	for _, pm := range options.SourceOptions {
+		if pm.PaymentMethodType == sourceType {
+			sourceId = pm.PaymentMethodID
+			break
+		}
+	}
+	for _, pm := range options.DestinationOptions {
+		if pm.PaymentMethodType == destType {
+			destId = pm.PaymentMethodID
+			break
+		}
+	}
+
+	require.NotEmpty(t, sourceId, "unable to find source payment method for type")
+	require.NotEmpty(t, destId, "unable to find destination payment method for type")
+
+	return sourceId, destId
 }
 
 func NoResponseError(t *testing.T, err error) {

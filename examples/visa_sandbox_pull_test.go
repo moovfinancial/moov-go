@@ -129,7 +129,7 @@ func TestVisaSandboxPullWithRefund(t *testing.T) {
 		moov.CreateRefund{
 			Amount: 97,
 		},
-		moov.WithTransferWaitForRailResponse(),
+		moov.WithRefundWaitForRailResponse(),
 	)
 	require.NoError(t, err)
 

@@ -285,7 +285,7 @@ type CreateRefund struct {
 	Amount int64 `json:"amount,omitempty"`
 }
 
-type AsynchronousRefund struct {
+type RefundStarted struct {
 	Transfer
 	RefundedTransferID string `otel:"refunded_transfer_id,omitempty"` // original transfer id
 }
