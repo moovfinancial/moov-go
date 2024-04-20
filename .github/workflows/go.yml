@@ -9,6 +9,32 @@ env:
   MOOV_SECRET_KEY: ${{ secrets.MOOV_SECRET_KEY }}
   
 jobs:
+
+  lint:
+    name: Go Linting
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v5
+      with:
+        go-version: stable
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v4
+
+    - name: Setup
+      run: make setup
+
+    - name: Lint
+      run: make check
+      env:
+        SKIP_TESTS: yes
+
+    - name: Upload Code Coverage
+      if: runner.os == 'Linux'
+      run: bash <(curl -s https://codecov.io/bash)
+
   build:
     name: Go Build (CGO)
     runs-on: ${{ matrix.os }}
@@ -34,6 +60,8 @@ jobs:
 
     - name: Check
       run: make check
+      env:
+        SKIP_LINTERS: yes
 
     - name: Upload Code Coverage
       if: runner.os == 'Linux'
