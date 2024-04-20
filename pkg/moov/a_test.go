@@ -33,7 +33,7 @@ func randomBankAccountNumber() string {
 
 func createTestIndividualAccount() moov.CreateAccount {
 	return moov.CreateAccount{
-		Type: moov.ACCOUNTTYPE_INDIVIDUAL,
+		Type: moov.AccountType_Individual,
 		Profile: moov.CreateProfile{
 			Individual: &moov.CreateIndividualProfile{
 				Name: moov.Name{
@@ -52,11 +52,11 @@ func createTestIndividualAccount() moov.CreateAccount {
 
 func createTestBusinessAccount() moov.CreateAccount {
 	return moov.CreateAccount{
-		Type: moov.ACCOUNTTYPE_BUSINESS,
+		Type: moov.AccountType_Business,
 		Profile: moov.CreateProfile{
 			Business: &moov.CreateBusinessProfile{
 				Name: "John Does Hobbies",
-				Type: moov.BUSINESSTYPE_LLC,
+				Type: moov.BusinessType_Llc,
 			},
 		},
 	}

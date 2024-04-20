@@ -111,8 +111,8 @@ type AccountType string
 
 // List of AccountType
 const (
-	ACCOUNTTYPE_INDIVIDUAL AccountType = "individual"
-	ACCOUNTTYPE_BUSINESS   AccountType = "business"
+	AccountType_Individual AccountType = "individual"
+	AccountType_Business   AccountType = "business"
 )
 
 // Profile Describes a Moov account profile.
@@ -185,15 +185,15 @@ type BusinessType string
 
 // List of BusinessType
 const (
-	BUSINESSTYPE_SOLE_PROPRIETORSHIP        BusinessType = "soleProprietorship"
-	BUSINESSTYPE_UNINCORPORATED_ASSOCIATION BusinessType = "unincorporatedAssociation"
-	BUSINESSTYPE_TRUST                      BusinessType = "trust"
-	BUSINESSTYPE_PUBLIC_CORPORATION         BusinessType = "publicCorporation"
-	BUSINESSTYPE_PRIVATE_CORPORATION        BusinessType = "privateCorporation"
-	BUSINESSTYPE_LLC                        BusinessType = "llc"
-	BUSINESSTYPE_PARTNERSHIP                BusinessType = "partnership"
-	BUSINESSTYPE_UNINCORPORATED_NON_PROFIT  BusinessType = "unincorporatedNonProfit"
-	BUSINESSTYPE_INCORPORATED_NON_PROFIT    BusinessType = "incorporatedNonProfit"
+	BusinessType_SoleProprietorship        BusinessType = "soleProprietorship"
+	BusinessType_UnincorporatedAssociation BusinessType = "unincorporatedAssociation"
+	BusinessType_Trust                     BusinessType = "trust"
+	BusinessType_PublicCorporation         BusinessType = "publicCorporation"
+	BusinessType_PrivateCorporation        BusinessType = "privateCorporation"
+	BusinessType_Llc                       BusinessType = "llc"
+	BusinessType_Partnership               BusinessType = "partnership"
+	BusinessType_UnincorporatedNonProfit   BusinessType = "unincorporatedNonProfit"
+	BusinessType_IncorporatedNonProfit     BusinessType = "incorporatedNonProfit"
 )
 
 // Representative Describes a business representative.
@@ -252,12 +252,12 @@ type AccountVerificationStatus string
 
 // List of AccountVerificationStatus
 const (
-	ACCOUNTVERIFICATIONSTATUS_UNVERIFIED AccountVerificationStatus = "unverified"
-	ACCOUNTVERIFICATIONSTATUS_PENDING    AccountVerificationStatus = "pending"
-	ACCOUNTVERIFICATIONSTATUS_RESUBMIT   AccountVerificationStatus = "resubmit"
-	ACCOUNTVERIFICATIONSTATUS_REVIEW     AccountVerificationStatus = "review"
-	ACCOUNTVERIFICATIONSTATUS_VERIFIED   AccountVerificationStatus = "verified"
-	ACCOUNTVERIFICATIONSTATUS_FAILED     AccountVerificationStatus = "failed"
+	AccountVerificationStatus_Unverified AccountVerificationStatus = "unverified"
+	AccountVerificationStatus_Pending    AccountVerificationStatus = "pending"
+	AccountVerificationStatus_Resubmit   AccountVerificationStatus = "resubmit"
+	AccountVerificationStatus_Review     AccountVerificationStatus = "review"
+	AccountVerificationStatus_Verified   AccountVerificationStatus = "verified"
+	AccountVerificationStatus_Failed     AccountVerificationStatus = "failed"
 )
 
 // VerificationStatus This field is deprecated but available for use until February 2023.
@@ -265,10 +265,10 @@ type VerificationStatus string
 
 // List of VerificationStatus
 const (
-	VERIFICATIONSTATUS_UNVERIFIED VerificationStatus = "unverified"
-	VERIFICATIONSTATUS_PENDING    VerificationStatus = "pending"
-	VERIFICATIONSTATUS_VERIFIED   VerificationStatus = "verified"
-	VERIFICATIONSTATUS_ERRORED    VerificationStatus = "errored"
+	VerificationStatus_Unverified VerificationStatus = "unverified"
+	VerificationStatus_Pending    VerificationStatus = "pending"
+	VerificationStatus_Verified   VerificationStatus = "verified"
+	VerificationStatus_Errored    VerificationStatus = "errored"
 )
 
 // VerificationStatusDetails This field is deprecated but available for use until February 2023.
@@ -276,16 +276,16 @@ type VerificationStatusDetails string
 
 // List of VerificationStatusDetails
 const (
-	VERIFICATIONSTATUSDETAILS_FAILED_AUTO_VERIFY                       VerificationStatusDetails = "failedAutoVerify"
-	VERIFICATIONSTATUSDETAILS_DOC_DOB_MISMATCH                         VerificationStatusDetails = "docDobMismatch"
-	VERIFICATIONSTATUSDETAILS_DOC_NAME_MISMATCH                        VerificationStatusDetails = "docNameMismatch"
-	VERIFICATIONSTATUSDETAILS_DOC_ADDRESS_MISMATCH                     VerificationStatusDetails = "docAddressMismatch"
-	VERIFICATIONSTATUSDETAILS_DOC_NUMBER_MISMATCH                      VerificationStatusDetails = "docNumberMismatch"
-	VERIFICATIONSTATUSDETAILS_DOC_INCOMPLETE                           VerificationStatusDetails = "docIncomplete"
-	VERIFICATIONSTATUSDETAILS_DOC_FAILED_RISK                          VerificationStatusDetails = "docFailedRisk"
-	VERIFICATIONSTATUSDETAILS_POTENTIAL_ACCOUNT_SANCTIONS_MATCH        VerificationStatusDetails = "potentialAccountSanctionsMatch"
-	VERIFICATIONSTATUSDETAILS_POTENTIAL_REPRESENTATIVE_SANCTIONS_MATCH VerificationStatusDetails = "potentialRepresentativeSanctionsMatch"
-	VERIFICATIONSTATUSDETAILS_FAILED_OTHER                             VerificationStatusDetails = "failedOther"
+	VerificationStatusDetails_FailedAutoVerify                      VerificationStatusDetails = "failedAutoVerify"
+	VerificationStatusDetails_DocumentDobMismatch                   VerificationStatusDetails = "docDobMismatch"
+	VerificationStatusDetails_DocumentNameMismatch                  VerificationStatusDetails = "docNameMismatch"
+	VerificationStatusDetails_DocumentAddressMismatch               VerificationStatusDetails = "docAddressMismatch"
+	VerificationStatusDetails_DocumentNumberMismatch                VerificationStatusDetails = "docNumberMismatch"
+	VerificationStatusDetails_DocumentIncomplete                    VerificationStatusDetails = "docIncomplete"
+	VerificationStatusDetails_DocumentFailedRisk                    VerificationStatusDetails = "docFailedRisk"
+	VerificationStatusDetails_PotentialAccountSanctionsMatch        VerificationStatusDetails = "potentialAccountSanctionsMatch"
+	VerificationStatusDetails_PotentialRepresentativeSanctionsMatch VerificationStatusDetails = "potentialRepresentativeSanctionsMatch"
+	VerificationStatusDetails_FailedOther                           VerificationStatusDetails = "failedOther"
 )
 
 // Document Describes an uploaded file.

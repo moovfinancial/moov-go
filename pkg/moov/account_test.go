@@ -55,7 +55,7 @@ func TestUpdateAccount(t *testing.T) {
 
 	account := moov.Account{
 		AccountID:   "aa19c3a7-4c72-4f64-adfa-9069c80d81cf",
-		AccountType: moov.ACCOUNTTYPE_INDIVIDUAL,
+		AccountType: moov.AccountType_Individual,
 		Profile: moov.Profile{
 			Individual: &moov.Individual{
 				Name: moov.Name{
