@@ -31,7 +31,7 @@ func randomBankAccountNumber() string {
 	return fmt.Sprintf("%d", 100000000+n.Int64())
 }
 
-func createTestAccount() moov.CreateAccount {
+func createTestIndividualAccount() moov.CreateAccount {
 	return moov.CreateAccount{
 		Type: moov.ACCOUNTTYPE_INDIVIDUAL,
 		Profile: moov.CreateProfile{
@@ -48,4 +48,38 @@ func createTestAccount() moov.CreateAccount {
 			},
 		},
 	}
+}
+
+func createTestBusinessAccount() moov.CreateAccount {
+	return moov.CreateAccount{
+		Type: moov.ACCOUNTTYPE_BUSINESS,
+		Profile: moov.CreateProfile{
+			Business: &moov.CreateBusinessProfile{
+				Name: "John Does Hobbies",
+				Type: moov.BUSINESSTYPE_LLC,
+			},
+		},
+	}
+}
+
+func NoResponseError(t *testing.T, err error) {
+	moov.DebugPrintResponse(err, fmt.Printf)
+	require.NoError(t, err)
+}
+
+func CreateTemporaryTestAccount(t *testing.T, mc *moov.Client, create moov.CreateAccount) *moov.Account {
+	account, started, err := mc.CreateAccount(context.Background(), create)
+	moov.DebugPrintResponse(err, fmt.Printf)
+
+	require.NoError(t, err)
+	require.NotNil(t, account)
+	require.Nil(t, started)
+
+	t.Cleanup(func() {
+		if account != nil {
+			mc.DisconnectAccount(BgCtx(), account.AccountID)
+		}
+	})
+
+	return account
 }

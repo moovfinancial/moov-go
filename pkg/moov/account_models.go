@@ -4,25 +4,6 @@ import (
 	"time"
 )
 
-const (
-	INDIVIDUAL                               = "individual"
-	BUSINESS                                 = "business"
-	BUSINESS_TYPE_SOLEPROPRIETORSHIOP        = "soleProprietorship"
-	BUSINESS_TYPE_UNINCORPORATED_ASSOCIATION = "unincorporatedAssociation"
-	BUSINESS_TYPE_TRUST                      = "trust"
-	BUSINESS_TYPE_PUBLIC_CORPORATION         = "publicCorporation"
-	BUSINESS_TYPE_PRIVATE_CORPORATION        = "privateCorporation"
-	BUSINESS_TYPE_LLC                        = "llc"
-	BUSINESS_TYPE_PARTNERSHIP                = "partnership"
-	BUSINESS_TYPE_UNINCORPORATED_NONPROFIT   = "unincorporatedNonProfit"
-	BUSINESS_TYPE_INCORPORATED_NONPROFIT     = "incorporatedNonProfit"
-	CAPABILITIES_TRANSFERS                   = "transfers"
-	CAPABILITIES_WALLET                      = "wallet"
-	CAPABILITIES_SEND_FUNDS                  = "send-funds"
-	CAPABILITIES_COLLECT_FUNDS               = "collect-funds"
-	CAPABILITIES_CARD_ISSUING                = "card-issuing"
-)
-
 type CreateAccount struct {
 	Type                  AccountType            `json:"accountType"`
 	Profile               CreateProfile          `json:"profile"`
@@ -31,7 +12,7 @@ type CreateAccount struct {
 	ForeignID             string                 `json:"foreignID,omitempty"`
 	CustomerSupport       *CustomerSupport       `json:"customerSupport,omitempty"`
 	AccountSettings       *AccountSettings       `json:"settings,omitempty"`
-	RequestedCapabilities []CapabilityID         `json:"capabilities,omitempty"`
+	RequestedCapabilities []CapabilityName       `json:"capabilities,omitempty"`
 }
 
 type CreateProfile struct {
