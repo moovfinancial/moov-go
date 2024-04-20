@@ -19,7 +19,7 @@ func Test_CreateBankAccount_WithBankAccount(t *testing.T) {
 		AccountType:   moov.BankAccountType_Checking,
 		AccountNumber: randomBankAccountNumber(),
 		RoutingNumber: "273976369",
-	}))
+	}), moov.WaitForPaymentMethod())
 
 	t.Cleanup(func() {
 		if resp != nil {
@@ -27,10 +27,13 @@ func Test_CreateBankAccount_WithBankAccount(t *testing.T) {
 		}
 	})
 
-	t.Run("add bank account", func(t *testing.T) {
+	t.Run("add bank account and wait for payment methods", func(t *testing.T) {
 		moov.DebugPrintResponse(err, fmt.Printf)
 		require.NoError(t, err)
 		require.NotNil(t, resp)
+
+		// We told it to wait for the payment methods to be created, so this shouldn't be empty
+		require.NotEmpty(t, resp.PaymentMethods)
 	})
 
 	t.Run("get bank account", func(t *testing.T) {

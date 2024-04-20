@@ -66,6 +66,10 @@ type BankAccount struct {
 	UpdatedOn             time.Time               `json:"updatedOn,omitempty"`
 	StatusReason          BankAccountStatusReason `json:"statusReason,omitempty"`
 	ExceptionDetails      *ExceptionDetails       `json:"exceptionDetails,omitempty"`
+
+	// Includes any payment methods generated for a newly created bank account, removing the need to  call the List Payment Methods endpoint following a successful Create BankAccount request.
+	// **NOTE: This field is only populated for Create BankAccount requests made with the `X-Wait-For` header.**
+	PaymentMethods []BasicPaymentMethod `json:"paymentMethods,omitempty"`
 }
 
 // BankAccountStatus The bank account status.

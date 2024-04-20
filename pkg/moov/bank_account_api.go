@@ -32,6 +32,10 @@ func WithMX(mx MXRequest) CreateBankAccountType {
 	})
 }
 
+func WaitForPaymentMethod() callArg {
+	return WaitFor("payment-method")
+}
+
 // CreateBankAccount creates a new bank account for the given customer account
 func (c Client) CreateBankAccount(ctx context.Context, accountID string, opts ...CreateBankAccountType) (*BankAccount, error) {
 	args := prependArgs(opts, AcceptJson())

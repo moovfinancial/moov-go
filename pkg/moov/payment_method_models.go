@@ -11,6 +11,13 @@ type PaymentMethod struct {
 	ApplePay          *ApplePayPaymentMethod    `json:"applePay,omitempty"`
 }
 
+// BasicPaymentMethod struct for BasicPaymentMethod
+type BasicPaymentMethod struct {
+	// UUID v4
+	PaymentMethodID   string            `json:"paymentMethodID,omitempty"`
+	PaymentMethodType PaymentMethodType `json:"paymentMethodType,omitempty"`
+}
+
 // PaymentMethodType The payment method type that represents a payment rail and directionality
 type PaymentMethodType string
 
@@ -144,10 +151,3 @@ const (
 	DomesticPullFromCard_Supported    DomesticPullFromCard = "supported"
 	DomesticPullFromCard_Unknown      DomesticPullFromCard = "unknown"
 )
-
-// BasicPaymentMethod struct for BasicPaymentMethod
-type BasicPaymentMethod struct {
-	// UUID v4
-	PaymentMethodID   string            `json:"paymentMethodID,omitempty"`
-	PaymentMethodType PaymentMethodType `json:"paymentMethodType,omitempty"`
-}
