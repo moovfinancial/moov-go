@@ -5,15 +5,6 @@ import (
 	"net/http"
 )
 
-type PaymentMethod struct {
-	PaymentMethodID   string      `json:"paymentMethodID,omitempty"`
-	PaymentMethodType string      `json:"paymentMethodType,omitempty"`
-	Wallet            Wallet      `json:"wallet,omitempty"`
-	BankAccount       BankAccount `json:"bankAccount,omitempty"`
-	Card              Card        `json:"card,omitempty"`
-	ApplePay          ApplePay    `json:"applePay,omitempty"`
-}
-
 type PaymentMethodListFilter callArg
 
 func WithPaymentMethodSourceID(id string) callArg {
@@ -48,7 +39,7 @@ func (c Client) ListPaymentMethods(ctx context.Context, accountID string, opts .
 // https://docs.moov.io/api/index.html#tag/Payment-methods/operation/getPaymentMethod
 func (c Client) GetPaymentMethod(ctx context.Context, accountID string, paymentMethodID string) (*PaymentMethod, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, pathPaymentMethods, accountID),
+		Endpoint(http.MethodGet, pathPaymentMethod, accountID, paymentMethodID),
 		AcceptJson())
 	if err != nil {
 		return nil, err

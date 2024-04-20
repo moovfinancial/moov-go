@@ -11,19 +11,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func getLincolnBank(t *testing.T, mc *moov.Client) moov.Account {
+func getLincolnBank(t *testing.T, mc *moov.Client) *moov.Account {
 	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
 	moov.DebugPrintResponse(err, fmt.Printf)
 	require.NoError(t, err)
 
 	for _, account := range accounts {
 		if account.DisplayName == "Lincoln National Corporation" {
-			return account
+			return &account
 		}
 	}
 
 	require.FailNow(t, "bank account test account not found")
-	return moov.Account{}
+	return nil
 }
 
 func randomBankAccountNumber() string {
