@@ -124,10 +124,10 @@ func TestACHTransferSetup(t *testing.T) {
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,
 		moov.CreateTransfer{
-			Source: moov.Source{
+			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: pullPaymentMethod.PaymentMethodID,
 			},
-			Destination: moov.Destination{
+			Destination: moov.CreateTransfer_Destination{
 				PaymentMethodID: destinationPaymentMethod.PaymentMethodID,
 			},
 			Amount: moov.Amount{

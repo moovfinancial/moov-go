@@ -147,18 +147,18 @@ func main() {
 		Value:    9900, // $99.00
 	}
 
-	source := moov.Source{
+	source := moov.CreateTransfer_Source{
 		PaymentMethodID: cardPaymentMethodID,
-		CardDetails: moov.CardDetails{
+		CardDetails: &moov.CreateTransfer_CardDetailsSource{
 			DynamicDescriptor: "WhlBdy *Yoga 11-12",
-			TransactionSource: "first-recurring",
+			TransactionSource: moov.PtrOf(moov.TransactionSource_FirstRecurring),
 		},
 	}
-	destination := moov.Destination{
+	destination := moov.CreateTransfer_Destination{
 		PaymentMethodID: lincolnPaymentMethods[0].PaymentMethodID,
 	}
-	facilitatorFee := moov.FacilitatorFee{
-		Total: 8, // $0.08
+	facilitatorFee := moov.CreateTransfer_FacilitatorFee{
+		Total: moov.PtrOf(int64(8)), // $0.08
 	}
 	description := "Pay Instructor for May 15 Class"
 

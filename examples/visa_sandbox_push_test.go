@@ -98,12 +98,12 @@ func TestVisaSandboxPush(t *testing.T) {
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,
 		moov.CreateTransfer{
-			Source: moov.Source{
+			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: sourcePaymentMethod.PaymentMethodID,
 			},
-			Destination: moov.Destination{
+			Destination: moov.CreateTransfer_Destination{
 				PaymentMethodID: pushPaymentMethod.PaymentMethodID,
-				CardDetails: moov.CardDetails{
+				CardDetails: &moov.CreateTransfer_CardDetailsDestination{
 					DynamicDescriptor: "Test transfer",
 				},
 			},
@@ -111,8 +111,8 @@ func TestVisaSandboxPush(t *testing.T) {
 				Currency: "USD",
 				Value:    99, // $0.99
 			},
-			FacilitatorFee: moov.FacilitatorFee{
-				Total: 2, // $0.02
+			FacilitatorFee: moov.CreateTransfer_FacilitatorFee{
+				Total: moov.PtrOf(int64(2)), // $0.02
 			},
 			Description: "Push to card",
 		},

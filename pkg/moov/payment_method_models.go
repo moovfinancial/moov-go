@@ -1,7 +1,5 @@
 package moov
 
-import "time"
-
 // PaymentMethod A method of moving money
 type PaymentMethod struct {
 	// UUID v4
@@ -36,23 +34,7 @@ type WalletPaymentMethod struct {
 	WalletID string `json:"walletID,omitempty"`
 }
 
-// BankAccountPaymentMethod Describes a bank account on a Moov account.
-type BankAccountPaymentMethod struct {
-	// UUID v4
-	BankAccountID string `json:"bankAccountID,omitempty"`
-	// Once the bank account is linked, we don't reveal the full bank account number. The fingerprint acts as a way to identify whether two linked bank accounts are the same.
-	Fingerprint           string                  `json:"fingerprint,omitempty"`
-	Status                BankAccountStatus       `json:"status,omitempty"`
-	HolderName            string                  `json:"holderName,omitempty"`
-	HolderType            HolderType              `json:"holderType,omitempty"`
-	BankName              string                  `json:"bankName,omitempty"`
-	BankAccountType       BankAccountType         `json:"bankAccountType,omitempty"`
-	RoutingNumber         string                  `json:"routingNumber,omitempty"`
-	LastFourAccountNumber string                  `json:"lastFourAccountNumber,omitempty"`
-	UpdatedOn             time.Time               `json:"updatedOn,omitempty"`
-	StatusReason          BankAccountStatusReason `json:"statusReason,omitempty"`
-	ExceptionDetails      *ExceptionDetails       `json:"exceptionDetails,omitempty"`
-}
+type BankAccountPaymentMethod BankAccount
 
 // Card Describes a card on a Moov account.
 type CardPaymentMethod struct {

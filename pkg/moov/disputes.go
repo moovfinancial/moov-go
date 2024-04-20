@@ -8,15 +8,15 @@ import (
 )
 
 type Dispute struct {
-	DisputeID                string              `json:"disputeID,omitempty"`
-	CreatedOn                time.Time           `json:"createdOn,omitempty"`
-	Amount                   Amount              `json:"amount,omitempty"`
-	NetworkReasonCode        string              `json:"networkReasonCode,omitempty"`
-	NetworkReasonDescription string              `json:"networkReasonDescription,omitempty"`
-	Phase                    string              `json:"phase,omitempty"`
-	RespondBy                time.Time           `json:"respondBy,omitempty"`
-	Status                   string              `json:"status,omitempty"`
-	Transfer                 SynchronousTransfer `json:"transfer,omitempty"`
+	DisputeID                string    `json:"disputeID,omitempty"`
+	CreatedOn                time.Time `json:"createdOn,omitempty"`
+	Amount                   Amount    `json:"amount,omitempty"`
+	NetworkReasonCode        string    `json:"networkReasonCode,omitempty"`
+	NetworkReasonDescription string    `json:"networkReasonDescription,omitempty"`
+	Phase                    string    `json:"phase,omitempty"`
+	RespondBy                time.Time `json:"respondBy,omitempty"`
+	Status                   string    `json:"status,omitempty"`
+	Transfer                 Transfer  `json:"transfer,omitempty"`
 }
 
 type DisputeListFilter callArg

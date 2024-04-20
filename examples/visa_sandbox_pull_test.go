@@ -98,21 +98,21 @@ func TestVisaSandboxPullWithRefund(t *testing.T) {
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,
 		moov.CreateTransfer{
-			Source: moov.Source{
+			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: pullPaymentMethod.PaymentMethodID,
-				CardDetails: moov.CardDetails{
+				CardDetails: &moov.CreateTransfer_CardDetailsSource{
 					DynamicDescriptor: "Test pull transfer",
 				},
 			},
-			Destination: moov.Destination{
+			Destination: moov.CreateTransfer_Destination{
 				PaymentMethodID: destinationPaymentMethod.PaymentMethodID,
 			},
 			Amount: moov.Amount{
 				Currency: "USD",
 				Value:    97, // $0.97
 			},
-			FacilitatorFee: moov.FacilitatorFee{
-				Total: 2, // $0.02
+			FacilitatorFee: moov.CreateTransfer_FacilitatorFee{
+				Total: moov.PtrOf(int64(2)), // $0.02
 			},
 			Description: "Pull from card",
 		},
@@ -126,7 +126,7 @@ func TestVisaSandboxPullWithRefund(t *testing.T) {
 	refund, _, err := mc.RefundTransfer(
 		ctx,
 		completedTransfer.TransferID,
-		moov.RefundPayload{
+		moov.CreateRefund{
 			Amount: 97,
 		},
 		moov.WithTransferWaitForRailResponse(),

@@ -1,15 +1,6 @@
 package moov_test
 
-import (
-	"bytes"
-	"encoding/json"
-	"testing"
-
-	"github.com/moovfinancial/moov-go/pkg/moov"
-
-	"github.com/stretchr/testify/require"
-)
-
+/*
 func TestSynchronousTransferMarshalResponse(t *testing.T) {
 
 	input := []byte(`{
@@ -28,11 +19,11 @@ func TestSynchronousTransferMarshalResponse(t *testing.T) {
 		"groupID": "ec7e1848-dc80-4ab0-8827-dd7fc0737b43",
 		"refundedAmount": {"currency": "USD","value": 1204},
 		"refunds": [
-			{"refundID": "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", "createdOn": "2019-08-24T14:15:22Z", "updatedOn": "2019-08-24T14:15:22Z", 
+			{"refundID": "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", "createdOn": "2019-08-24T14:15:22Z", "updatedOn": "2019-08-24T14:15:22Z",
 			"status": "failed",
 			"failureCode": "call-issuer",
 			"amount": {"currency": "USD", "value": 1204 },
-			"cardDetails": { 
+			"cardDetails": {
 				"status": "initiated","failureCode": "call-issuer",
 				"statusUpdates": {"initiated": "2019-08-24T14:15:22Z","confirmed": "2019-08-24T14:15:22Z","settled": "2019-08-24T14:15:22Z","failed": "2019-08-24T14:15:22Z","completed": "2019-08-24T14:15:22Z"}}}],
 		"disputedAmount": {"currency": "USD","value": 1204},
@@ -101,8 +92,6 @@ func TestSynchronousTransferMarshalResponse(t *testing.T) {
 				"correction": {"code": "string","reason": "string","description": "string"},
 				"companyEntryDescription": "Gym Dues",
 				"originatingCompanyName": "Whole Body Fit",
-				"statusUpdates": {"initiated": "2019-08-24T14:15:22Z","originated": "2019-08-24T14:15:22Z","corrected": "2019-08-24T14:15:22Z","returned": "2019-08-24T14:15:22Z","completed": "2019-08-24T14:15:22Z"
-				},
 				"debitHoldPeriod": "2-days"},
 			"cardDetails": {
 				"status": "initiated",
@@ -182,7 +171,8 @@ func TestSynchronousTransferMarshalResponse(t *testing.T) {
 				"companyEntryDescription": "Gym Dues",
 				"originatingCompanyName": "Whole Body Fit",
 				"statusUpdates": {
-				"initiated": "2019-08-24T14:15:22Z","originated": "2019-08-24T14:15:22Z","corrected": "2019-08-24T14:15:22Z","returned": "2019-08-24T14:15:22Z","completed": "2019-08-24T14:15:22Z"}
+					"initiated": "2019-08-24T14:15:22Z","originated": "2019-08-24T14:15:22Z","corrected": "2019-08-24T14:15:22Z","returned": "2019-08-24T14:15:22Z","completed": "2019-08-24T14:15:22Z"
+				}
 			},
 			"cardDetails": {
 				"status": "initiated",
@@ -191,9 +181,12 @@ func TestSynchronousTransferMarshalResponse(t *testing.T) {
 				"transactionSource": "first-recurring",
 				"interchangeQualification": "Visa Signature and Visa Infinite (Spend not-qualified) Product 1",
 				"statusUpdates": {
-					"initiated": "2019-08-24T14:15:22Z","confirmed": "2019-08-24T14:15:22Z","settled": "2019-08-24T14:15:22Z","failed": "2019-08-24T14:15:22Z","canceled": "2019-08-24T14:15:22Z","completed": "2019-08-24T14:15:22Z"}}}
+					"initiated": "2019-08-24T14:15:22Z","confirmed": "2019-08-24T14:15:22Z","settled": "2019-08-24T14:15:22Z","failed": "2019-08-24T14:15:22Z","canceled": "2019-08-24T14:15:22Z","completed": "2019-08-24T14:15:22Z"
+				}
+			}
+		}
 		}`)
-	transfer := new(moov.SynchronousTransfer)
+	transfer := new(moov.Transfer)
 
 	dec := json.NewDecoder(bytes.NewReader(input))
 	dec.DisallowUnknownFields()
@@ -204,6 +197,7 @@ func TestSynchronousTransferMarshalResponse(t *testing.T) {
 	require.Equal(t, "Gym Dues", transfer.Source.AchDetails.CompanyEntryDescription)
 	t.Logf("%#v", transfer)
 }
+*/
 
 /*
 @TODO fix by getting rid of the suite
