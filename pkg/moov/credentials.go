@@ -6,7 +6,7 @@ import (
 
 const ENV_MOOV_HOST = "MOOV_HOST"
 const ENV_MOOV_PUBLIC_KEY = "MOOV_PUBLIC_KEY"
-const ENV_MOOV_SECRET_KEY = "MOOV_SECRET_KEY" //nolint:gosec
+const ENV_MOOV_SECRET_KEY = "MOOV_SECRET_KEY" // #nosec G101
 
 func CredentialsDefault() Credentials {
 	return Credentials{}

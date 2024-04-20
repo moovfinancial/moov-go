@@ -22,7 +22,7 @@ const (
 	PaymentMethodType_AchDebitFund      PaymentMethodType = "ach-debit-fund"
 	PaymentMethodType_AchDebitCollect   PaymentMethodType = "ach-debit-collect"
 	PaymentMethodType_AchCreditStandard PaymentMethodType = "ach-credit-standard"
-	PaymentMethodType_AchCreditSameDay  PaymentMethodType = "ach-credit-same-day"
+	PaymentMethodType_AchCreditSameDay  PaymentMethodType = "ach-credit-same-day" // #nosec G101
 	PaymentMethodType_RtpCredit         PaymentMethodType = "rtp-credit"
 	PaymentMethodType_CardPayment       PaymentMethodType = "card-payment"
 	PaymentMethodType_ApplePay          PaymentMethodType = "apple-pay"
