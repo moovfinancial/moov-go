@@ -163,7 +163,7 @@ func MultipartBody(parts ...multipartFn) callArg {
 	})
 }
 
-func noop() callArg {
+func NoopArg() callArg {
 	return callBuilderFn(func(call *callBuilder) error {
 		return nil
 	})
