@@ -1,90 +1,63 @@
 package moov_test
 
 import (
-	"bytes"
-	"encoding/json"
 	"testing"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
 
-func TestPaymentMethodMarshal(t *testing.T) {
-	input := []byte(`{
-		  "paymentMethodID": "ec7e1848-dc80-4ab0-8827-dd7fc0737b43",
-		  "paymentMethodType": "moov-wallet",
-		  "wallet": {
-			"walletID": "ec7e1848-dc80-4ab0-8827-dd7fc0737b43"
-		  }
-		}`)
+func Test_PaymentMethods(t *testing.T) {
+	mc := NewTestClient(t)
 
-	paymentMethod := new(moov.PaymentMethod)
+	account := getLincolnBank(t, mc)
 
-	dec := json.NewDecoder(bytes.NewReader(input))
-	dec.DisallowUnknownFields()
+	paymentMethods, err := mc.ListPaymentMethods(BgCtx(), account.AccountID)
 
-	err := dec.Decode(&paymentMethod)
-	require.NoError(t, err)
+	t.Run("list", func(t *testing.T) {
+		NoResponseError(t, err)
+		require.NotEmpty(t, paymentMethods)
+	})
 
-	require.Equal(t, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", paymentMethod.PaymentMethodID)
-}
+	t.Run("list with method type filter", func(t *testing.T) {
+		filtered, err := mc.ListPaymentMethods(BgCtx(),
+			account.AccountID,
+			moov.WithPaymentMethodType(string(paymentMethods[0].PaymentMethodType)),
+		)
+		NoResponseError(t, err)
+		require.NotEmpty(t, filtered)
+	})
 
-/*
-@TODO fix by getting rid of the suite
+	t.Run("list with sourceId filter", func(t *testing.T) {
 
-type PaymentMethodTestSuite struct {
-	suite.Suite
-	// values for testing will be set in init()
-	accountID       string
-	paymentMethodID string
-}
+		// find any sourceId we can look up an account by
+		sourceId := ""
+		for _, pm := range paymentMethods {
+			if sourceId != "" {
+				continue
+			}
 
-// listen for 'go test' command --> run test methods
-func TestPaymentMethodSuite(t *testing.T) {
-	suite.Run(t, new(PaymentMethodTestSuite))
-}
-
-func (s *PaymentMethodTestSuite) SetupSuite() {
-	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
-	mc := NewTestClient(s.T())
-
-	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
-	s.NoError(err)
-
-	defaultAccountName := "Daniella Singh"
-	for _, account := range accounts {
-		if account.DisplayName == defaultAccountName {
-			// set the accountID for testing
-			s.accountID = account.AccountID
+			if pm.Wallet != nil {
+				sourceId = pm.Wallet.WalletID
+			} else if pm.ApplePay != nil {
+				sourceId = pm.BankAccount.BankAccountID
+			} else if pm.Card != nil {
+				sourceId = pm.Card.CardID
+			}
 		}
-	}
+		require.NotEmpty(t, sourceId)
+
+		filtered, err := mc.ListPaymentMethods(BgCtx(),
+			account.AccountID,
+			moov.WithPaymentMethodSourceID(sourceId),
+		)
+		NoResponseError(t, err)
+		require.NotEmpty(t, filtered)
+	})
+
+	t.Run("get", func(t *testing.T) {
+		cap, err := mc.GetPaymentMethod(BgCtx(), account.AccountID, paymentMethods[0].PaymentMethodID)
+		NoResponseError(t, err)
+		require.NotNil(t, cap)
+	})
 }
-
-func (s *PaymentMethodTestSuite) TearDownSuite() {
-}
-
-func (s *PaymentMethodTestSuite) TestListPaymentMethods() {
-	mc := NewTestClient(s.T())
-
-	paymentMethods, err := mc.ListPaymentMethods(context.Background(), s.accountID)
-	s.NoError(err)
-
-	s.Require().NotNil(paymentMethods)
-
-	s.paymentMethodID = paymentMethods[0].PaymentMethodID
-}
-
-func (s *PaymentMethodTestSuite) TestGetPaymentMethod() {
-	mc := NewTestClient(s.T())
-
-	paymentMethodID := s.paymentMethodID
-	if paymentMethodID == "" {
-		paymentMethodID = "2ce45e4e-8d96-45e4-8658-5767423e098d"
-	}
-
-	paymentMethod, err := mc.GetPaymentMethod(context.Background(), s.accountID, paymentMethodID)
-	s.NoError(err)
-
-	s.Equal(paymentMethodID, paymentMethod.PaymentMethodID)
-}
-*/

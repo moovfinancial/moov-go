@@ -11,19 +11,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func getLincolnBank(t *testing.T, mc *moov.Client) moov.Account {
+func getLincolnBank(t *testing.T, mc *moov.Client) *moov.Account {
 	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
 	moov.DebugPrintResponse(err, fmt.Printf)
 	require.NoError(t, err)
 
 	for _, account := range accounts {
 		if account.DisplayName == "Lincoln National Corporation" {
-			return account
+			return &account
 		}
 	}
 
 	require.FailNow(t, "bank account test account not found")
-	return moov.Account{}
+	return nil
 }
 
 func randomBankAccountNumber() string {
@@ -31,9 +31,9 @@ func randomBankAccountNumber() string {
 	return fmt.Sprintf("%d", 100000000+n.Int64())
 }
 
-func createTestAccount() moov.CreateAccount {
+func createTestIndividualAccount() moov.CreateAccount {
 	return moov.CreateAccount{
-		Type: moov.ACCOUNTTYPE_INDIVIDUAL,
+		Type: moov.AccountType_Individual,
 		Profile: moov.CreateProfile{
 			Individual: &moov.CreateIndividualProfile{
 				Name: moov.Name{
@@ -48,4 +48,38 @@ func createTestAccount() moov.CreateAccount {
 			},
 		},
 	}
+}
+
+func createTestBusinessAccount() moov.CreateAccount {
+	return moov.CreateAccount{
+		Type: moov.AccountType_Business,
+		Profile: moov.CreateProfile{
+			Business: &moov.CreateBusinessProfile{
+				Name: "John Does Hobbies",
+				Type: moov.BusinessType_Llc,
+			},
+		},
+	}
+}
+
+func NoResponseError(t *testing.T, err error) {
+	moov.DebugPrintResponse(err, fmt.Printf)
+	require.NoError(t, err)
+}
+
+func CreateTemporaryTestAccount(t *testing.T, mc *moov.Client, create moov.CreateAccount) *moov.Account {
+	account, started, err := mc.CreateAccount(context.Background(), create)
+	moov.DebugPrintResponse(err, fmt.Printf)
+
+	require.NoError(t, err)
+	require.NotNil(t, account)
+	require.Nil(t, started)
+
+	t.Cleanup(func() {
+		if account != nil {
+			mc.DisconnectAccount(BgCtx(), account.AccountID)
+		}
+	})
+
+	return account
 }

@@ -16,6 +16,7 @@ const (
 	pathFile  = "/accounts/%s/files/%s"
 
 	pathPaymentMethods = "/accounts/%s/payment-methods"
+	pathPaymentMethod  = "/accounts/%s/payment-methods/%s"
 
 	pathCards = "/accounts/%s/cards"
 	pathCard  = "/accounts/%s/cards/%s"
