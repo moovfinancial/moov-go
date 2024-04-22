@@ -8,9 +8,10 @@ on:
 env:
   MOOV_PUBLIC_KEY: ${{ secrets.MOOV_PUBLIC_KEY }}
   MOOV_SECRET_KEY: ${{ secrets.MOOV_SECRET_KEY }}
+  PLAID_CLIENT_ID: ${{ secrets.PLAID_CLIENT_ID }}
+  PLAID_SECRET: ${{ secrets.PLAID_SECRET }}
 
 jobs:
-
   lint:
     name: Go Linting
     runs-on: ubuntu-latest
