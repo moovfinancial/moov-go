@@ -229,7 +229,6 @@ func UnmarshalObjectResponse[A interface{}](resp CallResponse) (*A, error) {
 	if err := resp.Unmarshal(item); err != nil {
 		return nil, err
 	}
-
 	return item, nil
 }
 

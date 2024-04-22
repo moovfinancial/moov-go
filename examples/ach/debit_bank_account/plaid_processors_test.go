@@ -2,7 +2,6 @@ package debit_bank_account
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"testing"
 
@@ -12,7 +11,7 @@ import (
 )
 
 // Sets up an account with linked bank account to be debited via ACH
-func TestACHTransferSetup(t *testing.T) {
+func TestPlaidProcessorExample(t *testing.T) {
 	// Step 1: create Moov client and set some variables
 
 	// The following code shows how you can configure the moov client with
@@ -20,15 +19,11 @@ func TestACHTransferSetup(t *testing.T) {
 	// However, it is recommended to load the credentials from the
 	// configuration file.
 
-	mc, err := moov.NewClient(moov.WithCredentials(moov.Credentials{
-		PublicKey: os.Getenv("MOOV_PUBLIC_KEY"),
-		SecretKey: os.Getenv("MOOV_SECRET_KEY"),
-		Host:      os.Getenv("MOOV_HOST"), // api.moov.io
-	}))
+	mc, err := moov.NewClient() // reads credentials from Environmental variables
 	require.NoError(t, err)
 
 	// The account we'll send funds to
-	destinationAccountID := "xxxxx"
+	destinationAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9" // example
 
 	// Create a new context or use an existing one
 	ctx := context.Background()
@@ -41,6 +36,7 @@ func TestACHTransferSetup(t *testing.T) {
 
 	// Add new account
 	account, _, err := mc.CreateAccount(ctx, moov.CreateAccount{
+		Type: moov.AccountType_Individual,
 		Profile: moov.CreateProfile{
 			Individual: &moov.CreateIndividualProfile{
 				Name: moov.Name{
@@ -53,58 +49,24 @@ func TestACHTransferSetup(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	// Step 3: add (link) user's bank account
-
-	// You can manually supply bank account information or pass tokens from
-	// IAV providers Plaid or MX
-	bankAccountPayload := moov.BankAccountRequest{
-		HolderName:    "Jules Jackson",
-		HolderType:    moov.HolderType_Individual,
-		AccountType:   moov.BankAccountType_Checking,
-		RoutingNumber: "273976369", // this is a real routing number
-		AccountNumber: "123456789", // fake it great!
+	// Step 3: add (link) user's bank account with Plaid Processor
+	//
+	// See https://plaid.com/docs/auth/partnerships/moov/ for Plaid's documentation
+	// See https://docs.moov.io/guides/sources/bank-accounts/plaid/ for Moov's documentation
+	plaid := moov.PlaidRequest{
+		Token: os.Getenv("PLAID_PROCESSOR_TOKEN"),
 	}
-	bankAccount, err := mc.CreateBankAccount(ctx, account.AccountID, moov.WithBankAccount(bankAccountPayload))
+	bankAccount, err := mc.CreateBankAccount(ctx, account.AccountID, moov.WithPlaid(plaid), moov.WaitForPaymentMethod())
 	require.NoError(t, err)
 
-	// Initiate micro-deposits
-	baErr := mc.MicroDepositInitiate(ctx, account.AccountID, bankAccount.BankAccountID)
-	require.NoError(t, baErr)
-
-	// Verify micro-deposits (later)
-	amounts := []int{0, 0}
-	verifyErr := mc.MicroDepositConfirm(ctx, account.AccountID, bankAccount.BankAccountID, amounts)
-	require.NoError(t, verifyErr)
-
-	// Alternatives:
-	// with Plaid
-	// plaid := moov.Plaid{
-	// 	Token: "PLAID_TOKEN",
-	// }
-	// result, err := mc.CreateBankAccount(ctx, accountID, moov.WithPlaid(plaid))
-
-	// // with Plaid Link
-	// plaidLink := moov.PlaidLink{
-	// 	PublicToken: "PLAID_PUBLIC_TOKEN",
-	// }
-	// result, err := mc.CreateBankAccount(ctx, accountID, moov.WithPlaidLink(plaidLink))
-
-	// // with MX
-	// mxToken := moov.MX{
-	// 	AuthorizationCode: "MX_AUTHORIZATION_CODE",
-	// }
-	// result, err := mc.CreateBankAccount(ctx, accountID, moov.WithMX(mxToken))
+	t.Logf("BankAccountID: %v", bankAccount.BankAccountID)
 
 	// Step 4: find (pull) payment method for the linked bank account
 
 	// When we have only one bank account linked, we can avoid checking that the
 	// payment method is for user's bank account and just use the first one.
-	paymentMethods, err := mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("ach-debit-fund"))
+	paymentMethods, err := mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("ach-debit-collect"))
 	require.NoError(t, err)
-
-	// We expect to have only one `ach-debit-fund` payment method as we added
-	// only one bank account
-	require.Len(t, paymentMethods, 1)
 
 	pullPaymentMethod := paymentMethods[0]
 
@@ -132,7 +94,7 @@ func TestACHTransferSetup(t *testing.T) {
 			},
 			Amount: moov.Amount{
 				Currency: "USD",
-				Value:    5000, // $50.00
+				Value:    2717, // $27.17
 			},
 		},
 		// not required since ACH is processed in batches,
@@ -141,6 +103,8 @@ func TestACHTransferSetup(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	fmt.Printf("Transfer: %+v\n", completedTransfer.TransferID)
-
+	t.Logf("Transfer %s created", completedTransfer.TransferID)
+	t.Logf("Amount: %#v", completedTransfer.Amount)
+	t.Logf("Status: %v", completedTransfer.Status)
+	t.Logf("CreatedOn: %v", completedTransfer.CreatedOn)
 }
