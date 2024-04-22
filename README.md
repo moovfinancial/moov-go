@@ -1,6 +1,6 @@
 ![Moov Banner Logo](https://github.com/moovfinancial/moov-go/assets/120951/3632d9ea-0c64-40e5-8f9e-b13b28b5e197)
 
-[![GoDoc](https://godoc.org/github.com/moovfinancial/moovgo?status.svg)](https://godoc./github.com/moovfinancial/moov-go)
+[![GoDoc](https://pkg.go.dev/badge/github.com/moovfinancial/moovgo?utm_source=godoc)](https://pkg.go.dev/github.com/moovfinancial/moov-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/moovfinancial/moov-go)](https://goreportcard.com/report/github.com/moovfinancial/moov-go)
 [![Apache 2 License](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moovfinancial/moov-go/master/LICENSE)
 [![Twitter](https://img.shields.io/twitter/follow/moov?style=social)](https://twitter.com/moov?lang=en)
