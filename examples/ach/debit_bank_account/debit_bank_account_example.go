@@ -1,4 +1,4 @@
-package main
+package debit_bank_account
 
 import (
 	"context"
