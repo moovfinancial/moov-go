@@ -7,18 +7,14 @@ endif
 build:
 	go build ./...
 
-.PHONY: setup
-setup:
-	echo "TODO: add any needed commands"
-
 .PHONY: check
 check:
 ifeq ($(OS),Windows_NT)
-	@echo "Skipping checks on Windows, currently unsupported."
+	go test ./...
 else
 	@wget -O lint-project.sh https://raw.githubusercontent.com/moov-io/infra/master/go/lint-project.sh
 	@chmod +x ./lint-project.sh
-	COVER_THRESHOLD=35.0 GOTEST_PKGS=./pkg/... ./lint-project.sh
+	COVER_THRESHOLD=35.0 GOTEST_PKGS=./... ./lint-project.sh
 endif
 
 .PHONY: clean
