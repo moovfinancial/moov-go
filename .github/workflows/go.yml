@@ -2,12 +2,13 @@ name: Go
 
 on:
   push:
+    branches: [ main ]
   pull_request:
 
 env:
   MOOV_PUBLIC_KEY: ${{ secrets.MOOV_PUBLIC_KEY }}
   MOOV_SECRET_KEY: ${{ secrets.MOOV_SECRET_KEY }}
-  
+
 jobs:
 
   lint:
@@ -22,9 +23,6 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
-
-    - name: Setup
-      run: make setup
 
     - name: Lint
       run: make check
@@ -54,9 +52,6 @@ jobs:
     - name: Install make (Windows)
       if: runner.os == 'Windows'
       run: choco install -y make mingw
-
-    - name: Setup
-      run: make setup
 
     - name: Check
       run: make check
