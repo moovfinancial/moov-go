@@ -1,20 +1,40 @@
-![Moov Banner Logo](https://github.com/moovfinancial/moov-go/assets/120951/3632d9ea-0c64-40e5-8f9e-b13b28b5e197)
+![Moov Logo](https://github.com/moovfinancial/moov-go/assets/120951/3632d9ea-0c64-40e5-8f9e-b13b28b5e197)
 
 [![GoDoc](https://godoc.org/github.com/moovfinancial/moovgo?status.svg)](https://godoc./github.com/moovfinancial/moov-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/moovfinancial/moov-go)](https://goreportcard.com/report/github.com/moovfinancial/moov-go)
 [![Apache 2 License](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moovfinancial/moov-go/master/LICENSE)
-[![Twitter](https://img.shields.io/twitter/follow/moov?style=social)](https://twitter.com/moov?lang=en)
+[![X](https://img.shields.io/twitter/follow/moov?style=social)](https://twitter.com/moov?lang=en)
 
 
 # Moov - Go Client
-A [Go](http://golang.org) client for the [Moov payments API](https://docs.moov.io/api/). 
+The official [Go](http://golang.org) client for the [Moov payments API](https://docs.moov.io/api/). 
 
+## Installation
 
-This SDK requires an API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. Note that API Keys for Sandbox and Production are different keys. 
+```go
+import (
+	"github.com/moovfinancial/moov-go/pkg/moov"
+)
+```
+
+This SDK requires an API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. 
+
+> [!NOTE]  
+> Note that API Keys for Sandbox and Production are different keys. 
 
 ```bash 
 export MOOV_PUBLIC_KEY="public key here"
 export MOOV_SECRET_KEY="secret key here"
+```
+
+In your Go program, create a new Moov client initiated with your public and secret keys.
+
+```go
+mc, err := moov.NewClient(moov.WithCredentials(moov.Credentials{
+  PublicKey: os.Getenv("MOOV_PUBLIC_KEY"),
+  SecretKey: os.Getenv("MOOV_SECRET_KEY"),
+  Host:      os.Getenv("MOOV_HOST"), // api.moov.io
+}))
 ```
 
 ## Examples Usage
