@@ -2,8 +2,6 @@ package debit_bank_account
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/go-faker/faker/v4"
@@ -12,7 +10,7 @@ import (
 )
 
 // Sets up an account with linked bank account to be debited via ACH
-func TestACHTransferSetup(t *testing.T) {
+func TestMicroDepositExample(t *testing.T) {
 	// Step 1: create Moov client and set some variables
 
 	// The following code shows how you can configure the moov client with
@@ -20,15 +18,11 @@ func TestACHTransferSetup(t *testing.T) {
 	// However, it is recommended to load the credentials from the
 	// configuration file.
 
-	mc, err := moov.NewClient(moov.WithCredentials(moov.Credentials{
-		PublicKey: os.Getenv("MOOV_PUBLIC_KEY"),
-		SecretKey: os.Getenv("MOOV_SECRET_KEY"),
-		Host:      os.Getenv("MOOV_HOST"), // api.moov.io
-	}))
+	mc, err := moov.NewClient() // reads credentials from Environmental variables
 	require.NoError(t, err)
 
 	// The account we'll send funds to
-	destinationAccountID := "xxxxx"
+	destinationAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9" // example
 
 	// Create a new context or use an existing one
 	ctx := context.Background()
@@ -41,6 +35,7 @@ func TestACHTransferSetup(t *testing.T) {
 
 	// Add new account
 	account, _, err := mc.CreateAccount(ctx, moov.CreateAccount{
+		Type: moov.AccountType_Individual,
 		Profile: moov.CreateProfile{
 			Individual: &moov.CreateIndividualProfile{
 				Name: moov.Name{
@@ -64,7 +59,7 @@ func TestACHTransferSetup(t *testing.T) {
 		RoutingNumber: "273976369", // this is a real routing number
 		AccountNumber: "123456789", // fake it great!
 	}
-	bankAccount, err := mc.CreateBankAccount(ctx, account.AccountID, moov.WithBankAccount(bankAccountPayload))
+	bankAccount, err := mc.CreateBankAccount(ctx, account.AccountID, moov.WithBankAccount(bankAccountPayload), moov.WaitForPaymentMethod())
 	require.NoError(t, err)
 
 	// Initiate micro-deposits
@@ -72,34 +67,15 @@ func TestACHTransferSetup(t *testing.T) {
 	require.NoError(t, baErr)
 
 	// Verify micro-deposits (later)
-	amounts := []int{0, 0}
+	amounts := []int{0, 0} // Sandbox amounts are always [0, 0]
 	verifyErr := mc.MicroDepositConfirm(ctx, account.AccountID, bankAccount.BankAccountID, amounts)
 	require.NoError(t, verifyErr)
-
-	// Alternatives:
-	// with Plaid
-	// plaid := moov.Plaid{
-	// 	Token: "PLAID_TOKEN",
-	// }
-	// result, err := mc.CreateBankAccount(ctx, accountID, moov.WithPlaid(plaid))
-
-	// // with Plaid Link
-	// plaidLink := moov.PlaidLink{
-	// 	PublicToken: "PLAID_PUBLIC_TOKEN",
-	// }
-	// result, err := mc.CreateBankAccount(ctx, accountID, moov.WithPlaidLink(plaidLink))
-
-	// // with MX
-	// mxToken := moov.MX{
-	// 	AuthorizationCode: "MX_AUTHORIZATION_CODE",
-	// }
-	// result, err := mc.CreateBankAccount(ctx, accountID, moov.WithMX(mxToken))
 
 	// Step 4: find (pull) payment method for the linked bank account
 
 	// When we have only one bank account linked, we can avoid checking that the
 	// payment method is for user's bank account and just use the first one.
-	paymentMethods, err := mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("ach-debit-fund"))
+	paymentMethods, err := mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("ach-debit-collect"))
 	require.NoError(t, err)
 
 	// We expect to have only one `ach-debit-fund` payment method as we added
@@ -132,7 +108,7 @@ func TestACHTransferSetup(t *testing.T) {
 			},
 			Amount: moov.Amount{
 				Currency: "USD",
-				Value:    5000, // $50.00
+				Value:    4328, // $43.28
 			},
 		},
 		// not required since ACH is processed in batches,
@@ -141,6 +117,8 @@ func TestACHTransferSetup(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	fmt.Printf("Transfer: %+v\n", completedTransfer.TransferID)
-
+	t.Logf("Transfer %s created", completedTransfer.TransferID)
+	t.Logf("Amount: %#v", completedTransfer.Amount)
+	t.Logf("Status: %v", completedTransfer.Status)
+	t.Logf("CreatedOn: %v", completedTransfer.CreatedOn)
 }
