@@ -3,6 +3,7 @@ package moov_test
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
@@ -11,18 +12,23 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func init() {
-	// If we don't have the environment variables set due to running in an IDE or directly via the go command, load it up here
-	if _, ok := os.LookupEnv(moov.ENV_MOOV_SECRET_KEY); !ok {
-		godotenv.Load("../../secrets.env")
-	}
-}
-
 func BgCtx() context.Context {
 	return context.Background()
 }
 
-func NewTestClient(t require.TestingT, c ...moov.ClientConfigurable) *moov.Client {
+func NewTestClient(t testing.TB, c ...moov.ClientConfigurable) *moov.Client {
+	// If we have a secrets.env file written read that and populate the test environment
+	secretsPath := filepath.Join("..", "..", "secrets.env")
+
+	if _, err := os.Stat(secretsPath); err == nil {
+		secrets, err := godotenv.Read(secretsPath)
+		require.NoError(t, err)
+
+		for k, v := range secrets {
+			t.Setenv(k, v)
+		}
+	}
+
 	mc, err := moov.NewClient(c...)
 	require.NoError(t, err)
 
