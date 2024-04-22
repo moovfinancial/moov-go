@@ -1,4 +1,4 @@
-package main
+package debit_card_push
 
 import (
 	"context"
