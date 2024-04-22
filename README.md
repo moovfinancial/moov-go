@@ -7,20 +7,19 @@
 
 
 # Moov - Go Client
-A [Go](http://golang.org) client for the [Moov payments API](https://docs.moov.io/api/). 
+A [Go](http://golang.org) client for the [Moov payments API](https://docs.moov.io/api/).
 
 
-This SDK requires an API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. Note that API Keys for Sandbox and Production are different keys. 
+This SDK requires an API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account. Note that API Keys for Sandbox and Production are different keys.
 
-```bash 
+```bash
 export MOOV_PUBLIC_KEY="public key here"
 export MOOV_SECRET_KEY="secret key here"
 ```
 
 ## Examples Usage
 
-Examples exist for ach, card acquiring, and debit push/pull. 
-[Examples](./examples/README.md)
+Checkout the [examples](./examples/README.md) exist for [ach](./examples/ach/), [card acquiring](./examples/card_acquiring/), debit [push](./examples/debit_card_push/)/[pull](./examples/debit_card_pull/), and [rtp](./examples/rtp/).
 
 ## License
 
