@@ -2,6 +2,7 @@ package moov_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"testing"
 
@@ -30,85 +31,50 @@ func TestWalletMarshal(t *testing.T) {
 	require.Equal(t, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", wallet.WalletID)
 }
 
-/*
-@TODO fix by getting rid of the suite
+func TestListWallet(t *testing.T) {
+	mc := NewTestClient(t)
 
-type WalletTestSuite struct {
-	suite.Suite
-	// values for testing will be set in init()
-	accountID           string
-	walletID            string
-	walletTransactionID string
+	wallets, err := mc.ListWallets(context.Background(), "ebbf46c6-122a-4367-bc45-7dd555e1d3b9")
+	NoResponseError(t, err)
+	require.NotNil(t, wallets)
+
+	for i := range wallets {
+		t.Logf("wallet[%d]: %#v", i, wallets[i])
+	}
 }
 
-// listen for 'go test' command --> run test methods
-func TestWalletSuite(t *testing.T) {
-	suite.Run(t, new(WalletTestSuite))
+func TestGetWallet(t *testing.T) {
+	mc := NewTestClient(t)
+
+	accountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
+	walletID := "4dbac313-d505-4d51-a0fe-c11787916fcf"
+
+	wallet, err := mc.GetWallet(context.Background(), accountID, walletID)
+	NoResponseError(t, err)
+	require.NotNil(t, wallet)
+
+	require.Equal(t, walletID, wallet.WalletID)
 }
 
-func (s *WalletTestSuite) SetupSuite() {
-	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
-	mc := NewTestClient(s.T())
+func TestListWalletTransactions(t *testing.T) {
+	mc := NewTestClient(t)
 
-	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
-	s.NoError(err)
+	accountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
+	walletID := "4dbac313-d505-4d51-a0fe-c11787916fcf"
 
-	defaultAccountName := "Lincoln National Corporation"
-	for _, account := range accounts {
-		if account.DisplayName == defaultAccountName {
-			// set the accountID for testing
-			s.accountID = account.AccountID
+	transactions, err := mc.ListWalletTransactions(context.Background(), accountID, walletID)
+	NoResponseError(t, err)
+	require.NotEmpty(t, transactions)
+
+	for i := range transactions {
+		// Only check the first few transactions
+		if i > 5 {
+			break
 		}
+		require.Equal(t, walletID, transactions[i].WalletID)
+
+		txn, err := mc.GetWalletTransaction(context.Background(), accountID, walletID, transactions[i].TransactionID)
+		NoResponseError(t, err)
+		require.Equal(t, transactions[i].TransactionID, txn.TransactionID)
 	}
-	wallets, err := mc.ListWallets(BgCtx(), s.accountID)
-	s.NoError(err)
-
-	for _, wallet := range wallets {
-		s.walletID = wallet.WalletID
-	}
-	s.Assert().NotEmpty(s.accountID)
-
-	transactions, err := mc.ListWalletTransactions(BgCtx(), s.accountID, s.walletID, moov.WithTransactionCount(1))
-	s.NoError(err)
-	for _, transaction := range transactions {
-		s.walletTransactionID = transaction.TransactionID
-	}
-	s.Assert().NotEmpty(s.walletTransactionID)
 }
-
-func (s *WalletTestSuite) TearDownSuite() {}
-
-func (s *WalletTestSuite) TestListWallets() {
-	mc := NewTestClient(s.T())
-
-	wallets, err := mc.ListWallets(BgCtx(), s.accountID)
-	s.NoError(err)
-	// range over wallets and print walletID
-	for _, wallet := range wallets {
-		log.Printf("Wallet: %s", wallet.WalletID)
-	}
-	s.Require().NotEmpty(wallets)
-}
-
-func (s *WalletTestSuite) TestGetWallet() {
-	mc := NewTestClient(s.T())
-	wallet, err := mc.GetWallet(BgCtx(), s.accountID, s.walletID)
-	s.NoError(err)
-	s.Equal(s.walletID, wallet.WalletID)
-}
-
-func (s *WalletTestSuite) TestListWalletTransactions() {
-	mc := NewTestClient(s.T())
-	walletTransactions, err := mc.ListWalletTransactions(BgCtx(), s.accountID, s.walletID, moov.WithTransactionStatus("completed"), moov.WithTransactionCount(50))
-	s.NoError(err)
-	s.NotNil(walletTransactions)
-	s.Greater(len(walletTransactions), 3)
-}
-
-func (s *WalletTestSuite) TestGetWalletTransaction() {
-	mc := NewTestClient(s.T())
-	walletTran, err := mc.GetWalletTransaction(BgCtx(), s.accountID, s.walletID, s.walletTransactionID)
-	s.NoError(err)
-	s.Equal(s.walletTransactionID, walletTran.TransactionID)
-}
-*/
