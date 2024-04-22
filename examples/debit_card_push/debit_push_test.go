@@ -22,7 +22,7 @@ func TestVisaSandboxPush(t *testing.T) {
 
 	// sourceAccountID is the account from which we will pull money. This
 	// account should be properly configured (e.g. MCC should be set)
-	sourceAccountID := "xxxxx"
+	sourceAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9" // example
 
 	// Create a new context or use an existing one
 	ctx := context.Background()
@@ -35,6 +35,7 @@ func TestVisaSandboxPush(t *testing.T) {
 
 	// Add new account
 	account, _, err := mc.CreateAccount(ctx, moov.CreateAccount{
+		Type: moov.AccountType_Individual,
 		Profile: moov.CreateProfile{
 			Individual: &moov.CreateIndividualProfile{
 				Name: moov.Name{
