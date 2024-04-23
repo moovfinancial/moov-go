@@ -2,7 +2,6 @@ package debit_card_pull
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/go-faker/faker/v4"
@@ -83,7 +82,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 
 	pullPaymentMethod := paymentMethods[0]
 
-	// Step 3: configure destination payment method
+	// Step 5: configure destination payment method
 
 	// We can pull money from the card ("pull-from-card" payment method),
 	// and to the Moov wallet ("moov-wallet" payment method).
@@ -95,7 +94,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 	// This is the source payment method (Moov wallet)
 	destinationPaymentMethod := paymentMethods[0]
 
-	// Step 4: create transfer
+	// Step 6: create transfer
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,
 		moov.CreateTransfer{
@@ -121,9 +120,13 @@ func TestDebitPullWithRefund(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	fmt.Printf("Transfer: %+v\n", completedTransfer.TransferID)
+	t.Logf("Transfer %s created", completedTransfer.TransferID)
+	t.Logf("Amount: %#v", completedTransfer.Amount)
+	t.Logf("Status: %v", completedTransfer.Status)
+	t.Logf("CreatedOn: %v", completedTransfer.CreatedOn)
+	t.Log("")
 
-	// Step 5: refund transfer
+	// Step 7: refund transfer
 	refund, _, err := mc.RefundTransfer(
 		ctx,
 		completedTransfer.TransferID,
@@ -134,6 +137,9 @@ func TestDebitPullWithRefund(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	fmt.Printf("Refund: %+v\n", refund.RefundID)
-
+	t.Logf("Transfer %s created", refund.RefundID)
+	t.Logf("Refund %s", refund.RefundID)
+	t.Logf("Amount: %#v", refund.Amount)
+	t.Logf("Status: %v", refund.Status)
+	t.Logf("CreatedOn: %v", refund.CreatedOn)
 }
