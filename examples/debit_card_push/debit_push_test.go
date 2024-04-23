@@ -83,7 +83,7 @@ func TestVisaSandboxPush(t *testing.T) {
 
 	pushPaymentMethod := paymentMethods[0]
 
-	// Step 3: configure source payment method
+	// Step 5: configure source payment method
 
 	// We can pull money from the Moov wallet ("moov-wallet" payment
 	// methoD) and push it to the card ("push-to-card" payment method).
@@ -95,7 +95,7 @@ func TestVisaSandboxPush(t *testing.T) {
 	// This is the source payment method (Moov wallet)
 	sourcePaymentMethod := paymentMethods[0]
 
-	// Step 4: create transfer
+	// Step 6: create transfer
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,
 		moov.CreateTransfer{
