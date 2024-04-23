@@ -74,7 +74,7 @@ func TestRTPCreditExample(t *testing.T) {
 	destinationPaymentMethod := destinationPaymentMethods[0]
 
 	// Step 6: create transfer
-	_, completedAsyncTransfer, err := mc.CreateTransfer(
+	_, completedAsyncTransfer, err := mc.createTransfer(
 		ctx,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{

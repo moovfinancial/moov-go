@@ -96,7 +96,7 @@ func main() {
 	}
 	// Use this token in the card or bank account linking Drop.
 	// Token's allow the browser to link cards and bank accounts to the account directly with Moov.
-	//fmt.Println(completedAccount.AccountID) // cardInput.AccountID
+	// fmt.Println(completedAccount.AccountID) // cardInput.AccountID
 	fmt.Println(token.AccessToken) // cardInput.AccessToken
 
 	// The drop's onSuccess event for the card linking drop returns a Card object the cardID and paymentMethodID
@@ -163,13 +163,13 @@ func main() {
 	description := "Pay Instructor for May 15 Class"
 
 	// Create a transfer from the card to the wallet
-	completedTransfer, _, err := mc.CreateTransfer(context.Background(), moov.CreateTransfer{
+	completedTransfer, _, err := mc.createTransfer(context.Background(), moov.CreateTransfer{
 		Source:         source,
 		Destination:    destination,
 		Amount:         amount,
 		FacilitatorFee: facilitatorFee,
 		Description:    description,
-	}, moov.WithTransferWaitForRailResponse())
+	}, moov.withTransferWaitFor())
 	if err != nil {
 		fmt.Println(err)
 		return

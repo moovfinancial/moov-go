@@ -5,8 +5,9 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
-	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
+
+	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
 // Pull transfer is a transfer from the user's card to the Moov wallet.
@@ -95,7 +96,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 	destinationPaymentMethod := paymentMethods[0]
 
 	// Step 6: create transfer
-	completedTransfer, _, err := mc.CreateTransfer(
+	completedTransfer, _, err := mc.createTransfer(
 		ctx,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
@@ -116,7 +117,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 			},
 			Description: "Pull from card",
 		},
-		moov.WithTransferWaitForRailResponse(),
+		moov.withTransferWaitFor(),
 	)
 	require.NoError(t, err)
 

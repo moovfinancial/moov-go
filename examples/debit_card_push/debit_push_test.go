@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
-	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
+
+	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
 func TestVisaSandboxPush(t *testing.T) {
@@ -96,7 +97,7 @@ func TestVisaSandboxPush(t *testing.T) {
 	sourcePaymentMethod := paymentMethods[0]
 
 	// Step 6: create transfer
-	completedTransfer, _, err := mc.CreateTransfer(
+	completedTransfer, _, err := mc.createTransfer(
 		ctx,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
@@ -117,7 +118,7 @@ func TestVisaSandboxPush(t *testing.T) {
 			},
 			Description: "Push to card",
 		},
-		moov.WithTransferWaitForRailResponse(),
+		moov.withTransferWaitFor(),
 	)
 	require.NoError(t, err)
 

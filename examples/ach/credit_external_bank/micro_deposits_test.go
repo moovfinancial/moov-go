@@ -5,8 +5,9 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
-	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
+
+	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
 // Sets up an account with linked bank account to be debited via ACH
@@ -96,7 +97,7 @@ func TestMicroDepositExample(t *testing.T) {
 	destinationPaymentMethod := paymentMethods[0]
 
 	// Step 6: create transfer
-	completedTransfer, _, err := mc.CreateTransfer(
+	completedTransfer, _, err := mc.createTransfer(
 		ctx,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
@@ -112,7 +113,7 @@ func TestMicroDepositExample(t *testing.T) {
 		},
 		// not required since ACH is processed in batches,
 		// but useful in getting the full transfer model
-		moov.WithTransferWaitForRailResponse(),
+		moov.withTransferWaitFor(),
 	)
 	require.NoError(t, err)
 

@@ -3,6 +3,7 @@ package moov
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -16,10 +17,10 @@ type createTransferBuilder struct {
 	idempotencyKey string
 }
 
-func WithTransferWaitForRailResponse() CreateTransferArgs {
+func withTransferWaitFor(waitFor string) CreateTransferArgs {
 	return func(t *createTransferBuilder) callArg {
 		t.synchronous = true
-		return WaitFor("rail-response")
+		return WaitFor(waitFor)
 	}
 }
 
@@ -31,10 +32,36 @@ func WithTransferIdempotencyKey(key uuid.UUID) CreateTransferArgs {
 	}
 }
 
+type CreateTransferTimeoutError struct {
+	TransferStarted TransferStarted
+}
+
+func (e CreateTransferTimeoutError) Error() string {
+	return fmt.Sprintf("created the transfer with transferID=%v, but timeout occured while waiting for the synchronous response with rail-specific details", e.TransferStarted.TransferID)
+}
+
+func (c Client) CreateTransferSync(ctx context.Context, create CreateTransfer, options ...CreateTransferArgs) (*Transfer, error) {
+	options = append(options, withTransferWaitFor("rail-response"))
+	transfer, transferStarted, err := c.createTransfer(ctx, create, options...)
+	if transfer != nil {
+		return transfer, nil
+	} else if transferStarted != nil {
+		return nil, CreateTransferTimeoutError{TransferStarted: *transferStarted}
+	} else {
+		return nil, err
+	}
+
+	return transfer, err
+}
+
+func (c Client) CreateTransferAsync(ctx context.Context, create CreateTransfer, options ...CreateTransferArgs) (*TransferStarted, error) {
+	_, transferStarted, err := c.createTransfer(ctx, create, options...)
+	return transferStarted, err
+}
+
 // CreateTransfer creates a new transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
-func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, options ...CreateTransferArgs) (*Transfer, *TransferStarted, error) {
-
+func (c Client) createTransfer(ctx context.Context, transfer CreateTransfer, options ...CreateTransferArgs) (*Transfer, *TransferStarted, error) {
 	builder := &createTransferBuilder{}
 	callArgs := []callArg{
 		AcceptJson(),

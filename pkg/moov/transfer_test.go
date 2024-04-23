@@ -3,8 +3,9 @@ package moov_test
 import (
 	"testing"
 
-	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
+
+	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
 func Test_Transfers(t *testing.T) {
@@ -29,7 +30,7 @@ func Test_Transfers(t *testing.T) {
 	source, dest := paymentMethodsFromOptions(t, options, moov.PaymentMethodType_AchDebitFund, moov.PaymentMethodType_MoovWallet)
 
 	t.Run("make async transfer", func(t *testing.T) {
-		completed, started, err := mc.CreateTransfer(BgCtx(), moov.CreateTransfer{
+		completed, started, err := mc.createTransfer(BgCtx(), moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: source,
 			},
@@ -49,7 +50,7 @@ func Test_Transfers(t *testing.T) {
 	})
 
 	t.Run("make sync transfer", func(t *testing.T) {
-		completed, started, err := mc.CreateTransfer(BgCtx(), moov.CreateTransfer{
+		completed, started, err := mc.createTransfer(BgCtx(), moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: source,
 			},
@@ -60,7 +61,7 @@ func Test_Transfers(t *testing.T) {
 				Currency: "usd",
 				Value:    1,
 			},
-		}, moov.WithTransferWaitForRailResponse())
+		}, moov.withTransferWaitFor())
 		NoResponseError(t, err)
 
 		// We made an async transfer, so completed should be nil, while started not nil
