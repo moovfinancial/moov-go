@@ -8,11 +8,23 @@ type CreateTransfer struct {
 	Destination    CreateTransfer_Destination    `json:"destination"`
 	Amount         Amount                        `json:"amount"`
 	FacilitatorFee CreateTransfer_FacilitatorFee `json:"facilitatorFee,omitempty"`
-	// An optional description of the transfer for your own internal use.
+	// Optional: description of the transfer for your own internal use.
 	Description string `json:"description,omitempty"`
 	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
 	Metadata map[string]string `json:"metadata,omitempty"`
+
+	// Optional: return a synchronous response that includes full transfer and rail-specific details.
+	// If empty, returns the asynchronous response.
+	WaitFor CreateTransferWaitFor
+	// Optional: idempotency key associated with the transfer. If empty, the client will set this to a randomly generated UUID.
+	IdempotencyKey string
 }
+
+type CreateTransferWaitFor string
+
+const (
+	CreateTransferWaitForRailResponse = "rail-response"
+)
 
 // CreateTransfer_Source Where funds for a transfer originate. For the source, you must include either a `paymentMethodID` or a `transferID`. A `transferID` is used to create a [transfer group](https://docs.moov.io/guides/money-movement/transfer-groups/), associating the new transfer with a parent transfer.
 type CreateTransfer_Source struct {

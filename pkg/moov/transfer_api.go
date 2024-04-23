@@ -10,40 +10,26 @@ import (
 	"github.com/google/uuid"
 )
 
-type CreateTransferArgs func(t *createTransferBuilder) callArg
-type createTransferBuilder struct {
-	synchronous    bool
-	idempotencyKey string
-}
-
-func WithTransferWaitForRailResponse() CreateTransferArgs {
-	return func(t *createTransferBuilder) callArg {
-		t.synchronous = true
-		return WaitFor("rail-response")
-	}
-}
-
-// Can be specified to overwrite a randomly generated one.
-func WithTransferIdempotencyKey(key uuid.UUID) CreateTransferArgs {
-	return func(t *createTransferBuilder) callArg {
-		t.idempotencyKey = key.String()
-		return IdempotencyKey(t.idempotencyKey)
-	}
-}
-
 // CreateTransfer creates a new transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
-func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, options ...CreateTransferArgs) (*Transfer, *TransferStarted, error) {
-
-	builder := &createTransferBuilder{}
-	callArgs := []callArg{
-		AcceptJson(),
-		JsonBody(transfer),
-		WithTransferIdempotencyKey(uuid.New())(builder),
+func (c Client) CreateTransfer(ctx context.Context, create CreateTransfer) (*Transfer, *TransferStarted, error) {
+	var idempotencyKey string
+	if create.IdempotencyKey != "" {
+		idempotencyKey = create.IdempotencyKey
+	} else {
+		idempotencyKey = uuid.NewString()
 	}
 
-	for _, opt := range options {
-		callArgs = append(callArgs, opt(builder))
+	callArgs := []callArg{
+		AcceptJson(),
+		IdempotencyKey(idempotencyKey),
+		JsonBody(create),
+	}
+
+	var isSync bool
+	if create.WaitFor == CreateTransferWaitForRailResponse {
+		callArgs = append(callArgs, WaitFor(string(create.WaitFor)))
+		isSync = true
 	}
 
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathTransfers), callArgs...)
@@ -53,7 +39,7 @@ func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, opt
 
 	switch resp.Status() {
 	case StatusCompleted:
-		if builder.synchronous {
+		if isSync {
 			st, err := UnmarshalObjectResponse[Transfer](resp)
 			return st, nil, err
 		} else {
@@ -186,7 +172,7 @@ func (c Client) PatchTransfer(ctx context.Context, transferID string, patches ..
 type CreateRefundArgs callArg
 
 func WithRefundWaitForRailResponse() CreateRefundArgs {
-	return WaitFor("rail-response")
+	return WaitFor(WaitForRailResponse)
 }
 
 // Can be specified to overwrite a randomly generated one.
