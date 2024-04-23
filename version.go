@@ -17,9 +17,19 @@ func Version() string {
 		return info.Main.Version
 	}
 	for i := range info.Deps {
-		if info.Deps[i].Path == moduleName {
-			return info.Deps[i].Version
+		mod := runningModule(info.Deps[i])
+
+		if mod.Path == moduleName {
+			return mod.Version
 		}
 	}
 	return "v0.0.0"
+}
+
+func runningModule(mod *debug.Module) *debug.Module {
+	if mod.Replace != nil {
+		return runningModule(mod.Replace)
+	} else {
+		return mod
+	}
 }
