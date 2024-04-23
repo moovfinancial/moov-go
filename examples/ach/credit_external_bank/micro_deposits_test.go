@@ -71,7 +71,7 @@ func TestMicroDepositExample(t *testing.T) {
 	verifyErr := mc.MicroDepositConfirm(ctx, account.AccountID, bankAccount.BankAccountID, amounts)
 	require.NoError(t, verifyErr)
 
-	// Step 4: find credit (push) payment method for the linked bank account
+	// Step 4: find moov-wallet payment method for the linked bank account
 
 	// When we have only one bank account linked, we can avoid checking that the
 	// payment method is for user's bank account and just use the first one.
