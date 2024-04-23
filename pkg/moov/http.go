@@ -8,6 +8,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	moovgo "github.com/moovfinancial/moov-go"
 )
 
 func DefaultHttpClient() *http.Client {
@@ -38,6 +40,7 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 	for k, v := range call.headers {
 		req.Header.Add(k, v)
 	}
+	req.Header.Add("User-Agent", fmt.Sprintf("moov-go/%s", moovgo.Version))
 
 	if call.token != nil {
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", *call.token))
