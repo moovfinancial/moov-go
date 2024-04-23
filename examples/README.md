@@ -11,6 +11,7 @@ export MOOV_SECRET_KEY="secret key here"
 ## ACH
 - [Debit a Bank Account with micro deposits](./ach/debit_bank_account/micro_deposits_test.go)
 - [Link via Plaid Processor Tokens](./ach/debit_bank_account/plaid_processors_test.go)
+- [Credit a Bank Account with micro deposits](./ach/credit_external_bank/micro_deposits_test.go)
 
 ## Card Acquiring
 - [Checkout](./card_acquiring/checkout/checkout_example.go)

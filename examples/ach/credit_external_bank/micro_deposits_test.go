@@ -21,8 +21,8 @@ func TestMicroDepositExample(t *testing.T) {
 	mc, err := moov.NewClient() // reads credentials from Environmental variables
 	require.NoError(t, err)
 
-	// The account we'll send funds to
-	destinationAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9" // example
+	// The account we'll send funds from
+	sourceAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9" // example
 
 	// Create a new context or use an existing one
 	ctx := context.Background()
@@ -71,29 +71,28 @@ func TestMicroDepositExample(t *testing.T) {
 	verifyErr := mc.MicroDepositConfirm(ctx, account.AccountID, bankAccount.BankAccountID, amounts)
 	require.NoError(t, verifyErr)
 
-	// Step 4: find (pull) payment method for the linked bank account
+	// Step 4: find credit (push) payment method for the linked bank account
 
 	// When we have only one bank account linked, we can avoid checking that the
 	// payment method is for user's bank account and just use the first one.
-	paymentMethods, err := mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("ach-debit-collect"))
+	paymentMethods, err := mc.ListPaymentMethods(ctx, sourceAccountID, moov.WithPaymentMethodType("moov-wallet"))
 	require.NoError(t, err)
 
-	// We expect to have only one `ach-debit-fund` payment method as we added
-	// only one bank account
+	// We expect to have only one `moov-wallet` payment method on the connected account
 	require.Len(t, paymentMethods, 1)
 
-	pullPaymentMethod := paymentMethods[0]
+	sourcePaymentMethod := paymentMethods[0]
 
 	// Step 5: configure destination payment method
 
-	// We can pull money from the bank account and send to the
-	// destination Moov wallet ("moov-wallet" payment method).
-	paymentMethods, err = mc.ListPaymentMethods(ctx, destinationAccountID, moov.WithPaymentMethodType("moov-wallet"))
+	// We can send money from the connect account's wallet and send to the destination
+	// bank account over SameDay ACH (ach-credit-same-day) or Standard ACH (ach-credit-standard)
+	paymentMethods, err = mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("ach-credit-same-day"))
 	require.NoError(t, err)
 
 	require.Len(t, paymentMethods, 1)
 
-	// This is the destination payment method (Moov wallet)
+	// This is the destination payment method (Bank Account)
 	destinationPaymentMethod := paymentMethods[0]
 
 	// Step 6: create transfer
@@ -101,14 +100,14 @@ func TestMicroDepositExample(t *testing.T) {
 		ctx,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
-				PaymentMethodID: pullPaymentMethod.PaymentMethodID,
+				PaymentMethodID: sourcePaymentMethod.PaymentMethodID,
 			},
 			Destination: moov.CreateTransfer_Destination{
 				PaymentMethodID: destinationPaymentMethod.PaymentMethodID,
 			},
 			Amount: moov.Amount{
 				Currency: "USD",
-				Value:    4328, // $43.28
+				Value:    2843, // $28.43
 			},
 		},
 		// not required since ACH is processed in batches,

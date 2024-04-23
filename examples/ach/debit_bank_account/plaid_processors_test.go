@@ -82,7 +82,7 @@ func TestPlaidProcessorExample(t *testing.T) {
 
 	pullPaymentMethod := paymentMethods[0]
 
-	// Step 3: configure destination payment method
+	// Step 5: configure destination payment method
 
 	// We can pull money from the bank account and send to the
 	// destination Moov wallet ("moov-wallet" payment method).
@@ -93,7 +93,7 @@ func TestPlaidProcessorExample(t *testing.T) {
 	// This is the destination payment method (Moov wallet)
 	destinationPaymentMethod := paymentMethods[0]
 
-	// Step 4: create transfer
+	// Step 6: create transfer
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,
 		moov.CreateTransfer{
