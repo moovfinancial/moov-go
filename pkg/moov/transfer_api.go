@@ -33,8 +33,7 @@ func WithTransferIdempotencyKey(key uuid.UUID) CreateTransferArgs {
 
 // CreateTransfer creates a new transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
-func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, options ...CreateTransferArgs) (*Transfer, *TransferStarted, error) {
-
+func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, options ...CreateTransferArgs) (*TransferCreated, error) {
 	builder := &createTransferBuilder{}
 	callArgs := []callArg{
 		AcceptJson(),
@@ -48,25 +47,52 @@ func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, opt
 
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathTransfers), callArgs...)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
+	}
+
+	type TransferStarted struct {
+		TransferID string    `json:transferID`
+		CreatedOn  time.Time `json:createdOn`
 	}
 
 	switch resp.Status() {
 	case StatusCompleted:
 		if builder.synchronous {
-			st, err := UnmarshalObjectResponse[Transfer](resp)
-			return st, nil, err
-		} else {
-			st, err := UnmarshalObjectResponse[TransferStarted](resp)
-			return nil, st, err
+			xfr, err := UnmarshalObjectResponse[Transfer](resp)
+			if err != nil {
+				return nil, err
+			}
+
+			out := &TransferCreated{
+				TransferID: xfr.TransferID,
+				CreatedOn:  xfr.CreatedOn,
+				Transfer:   xfr,
+			}
+			return out, nil
+		} else { // async response
+			transferStarted, err := UnmarshalObjectResponse[TransferStarted](resp)
+			if err != nil {
+				return nil, err
+			}
+
+			return &TransferCreated{
+				TransferID: transferStarted.TransferID,
+				CreatedOn:  transferStarted.CreatedOn,
+			}, nil
 		}
 	case StatusStarted:
-		st, err := UnmarshalObjectResponse[TransferStarted](resp)
-		return nil, st, err
+		transferStarted, err := UnmarshalObjectResponse[TransferStarted](resp)
+		if err != nil {
+			return nil, err
+		}
+		return &TransferCreated{
+			TransferID: transferStarted.TransferID,
+			CreatedOn:  transferStarted.CreatedOn,
+		}, nil
 	case StatusStateConflict:
-		return nil, nil, errors.Join(ErrXIdempotencyKey, resp)
+		return nil, errors.Join(ErrXIdempotencyKey, resp)
 	default:
-		return nil, nil, resp
+		return nil, resp
 	}
 }
 

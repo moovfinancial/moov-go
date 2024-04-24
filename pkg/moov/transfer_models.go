@@ -75,11 +75,11 @@ type CreateTransfer_FacilitatorFee struct {
 	MarkupDecimal *string `json:"markupDecimal,omitempty"`
 }
 
-// TransferStarted is where the request to create a transfer was recorded and kicked off but hasn't completed yet
-type TransferStarted struct {
-	// Identifier for the transfer.
+type TransferCreated struct {
 	TransferID string    `json:"transferID,omitempty"`
 	CreatedOn  time.Time `json:"createdOn,omitempty"`
+	// Fully hydrated transfer, can be nil if X-Wait-For was not set to rail-response or timeout occurred.
+	Transfer *Transfer `json:"transfer,omitempty"`
 }
 
 // Transfer struct for Transfer
