@@ -50,6 +50,10 @@ const (
 	pathRefunds = "/transfers/%s/refunds"
 	pathRefund  = "/transfers/%s/refunds/%s"
 
-	pathDisputes = "/disputes"
-	pathDispute  = "/disputes/%s"
+	pathDisputes                  = "/disputes"
+	pathDispute                   = "/disputes/%s"
+	pathDisputeAccept             = "/disputes/%s/accept"
+	pathDisputeUploadEvidenceText = "/disputes/%s/evidence-text"
+	pathDisputeSubmitEvidence     = "/disputes/%s/evidence/submit"
+	pathDisputeUpdateEvidence     = "/disputes/%s/evidence/%s"
 )
