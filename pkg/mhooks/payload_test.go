@@ -31,6 +31,7 @@ func TestNewPayload(t *testing.T) {
 		payload, err := NewPayload(r.Body)
 		require.NoError(t, err)
 
+		//nolint:exhaustive
 		switch payload.EventType {
 		case EventTypeAccountCreated:
 			got, err := payload.AccountCreated()
