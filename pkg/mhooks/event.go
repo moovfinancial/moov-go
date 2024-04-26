@@ -2,14 +2,24 @@ package mhooks
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io"
+	"net/http"
 	"time"
 )
 
-func NewEvent(requestBody io.Reader) (*Event, error) {
+func ParseEvent(r *http.Request, secret string) (*Event, error) {
+	isValid, err := checkSignature(r.Header, secret)
+	if err != nil {
+		return nil, fmt.Errorf("checking webhook signature: %w", err)
+	}
+
+	if !isValid {
+		return nil, errors.New("hashed signature using signing secret does not match value from x-signature header")
+	}
+
 	var event Event
-	err := json.NewDecoder(requestBody).Decode(&event)
+	err = json.NewDecoder(r.Body).Decode(&event)
 	if err != nil {
 		return nil, fmt.Errorf("decoding event: %w", err)
 	}
