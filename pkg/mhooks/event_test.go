@@ -15,7 +15,7 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
-func TestNewPayload(t *testing.T) {
+func TestNewEvent(t *testing.T) {
 	accountCreated := AccountCreated{
 		AccountID: uuid.NewString(),
 	}
@@ -28,19 +28,19 @@ func TestNewPayload(t *testing.T) {
 
 	// Initialize the HTTP handler func for the target webhook URL
 	webhookHandlerFunc := func(w http.ResponseWriter, r *http.Request) {
-		payload, err := NewPayload(r.Body)
+		event, err := NewEvent(r.Body)
 		require.NoError(t, err)
 
 		//nolint:exhaustive
-		switch payload.EventType {
+		switch event.EventType {
 		case EventTypeAccountCreated:
-			got, err := payload.AccountCreated()
+			got, err := event.AccountCreated()
 			require.NoError(t, err)
 
 			t.Logf("Got AccountCreated webhook with accountID=%v", got.AccountID)
 			require.Equal(t, accountCreated, *got)
 		case EventTypeTransferCreated:
-			got, err := payload.TransferCreated()
+			got, err := event.TransferCreated()
 			require.NoError(t, err)
 
 			t.Logf("Got TransferCreated webhook with transferID=%v\n", got.TransferID)
@@ -69,7 +69,7 @@ func TestNewPayload(t *testing.T) {
 			dataBytes, err := json.Marshal(tt.data)
 			require.NoError(t, err)
 
-			payload := Payload{
+			event := Event{
 				EventID:   uuid.NewString(),
 				EventType: tt.eventType,
 				Data:      dataBytes,
@@ -77,7 +77,7 @@ func TestNewPayload(t *testing.T) {
 			}
 
 			var body bytes.Buffer
-			err = json.NewEncoder(&body).Encode(payload)
+			err = json.NewEncoder(&body).Encode(event)
 			require.NoError(t, err)
 
 			req := httptest.NewRequest(http.MethodPost, "/my-awesome-webhook-url", &body)

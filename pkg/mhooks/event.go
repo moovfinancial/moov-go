@@ -1,47 +1,57 @@
 package mhooks
 
-import "github.com/moovfinancial/moov-go/pkg/moov"
-
-type EventType string
-
-const (
-	EventTypeAccountCreated           EventType = "account.created"
-	EventTypeAccountDeleted           EventType = "account.deleted"
-	EventTypeAccountUpdated           EventType = "account.updated"
-	EventTypeBalanceUpdated           EventType = "balance.updated"
-	EventTypeBankAccountCreated       EventType = "bankAccount.created"
-	EventTypeBankAccountDeleted       EventType = "bankAccount.deleted"
-	EventTypeBankAccountUpdated       EventType = "bankAccount.updated"
-	EventTypeCardAutoUpdated          EventType = "card.autoUpdated"
-	EventTypeCapabilityRequested      EventType = "capability.requested"
-	EventTypeCapabilityUpdated        EventType = "capability.updated"
-	EventTypeDisputeCreated           EventType = "dispute.created"
-	EventTypeDisputeUpdated           EventType = "dispute.updated"
-	EventTypeNetworkIDUpdated         EventType = "networkID.updated"
-	EventTypePaymentMethodDisabled    EventType = "paymentMethod.disabled"
-	EventTypePaymentMethodEnabled     EventType = "paymentMethod.enabled"
-	EventTypeRefundCreated            EventType = "refund.created"
-	EventTypeRefundUpdated            EventType = "refund.updated"
-	EventTypeRepresentativeCreated    EventType = "representative.created"
-	EventTypeRepresentativeDeleted    EventType = "representative.deleted"
-	EventTypeRepresentativeUpdated    EventType = "representative.updated"
-	EventTypeTransferCreated          EventType = "transfer.created"
-	EventTypeTransferUpdated          EventType = "transfer.updated"
-	EventTypeWalletTransactionUpdated EventType = "walletTransaction.updated"
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"time"
 )
 
-type AccountCreated struct {
-	// ID of the account
-	AccountID string `json:"accountID"`
+func NewEvent(requestBody io.Reader) (*Event, error) {
+	var event Event
+	err := json.NewDecoder(requestBody).Decode(&event)
+	if err != nil {
+		return nil, fmt.Errorf("decoding event: %w", err)
+	}
+
+	return &event, nil
 }
 
-type TransferCreated struct {
-	// ID of the facilitator account
-	AccountID string `json:"accountID"`
-	// ID of the transfer
-	TransferID string `json:"transferID"`
-	// Status of the transfer
-	Status moov.TransferStatus `json:"status"`
+type Event struct {
+	EventID   string          `json:"eventID"`
+	EventType EventType       `json:"type"`
+	Data      json.RawMessage `json:"data"`
+	CreatedOn time.Time       `json:"createdOn"`
 }
 
-// TODO(vince,4/25/2024): I'll add the rest of the models in upcoming PRs.
+func (p Event) AccountCreated() (*AccountCreated, error) {
+	if p.EventType != EventTypeAccountCreated {
+		return nil, newInvalidEventTypeError(p.EventType, EventTypeAccountCreated)
+	}
+
+	var accountCreated AccountCreated
+	err := json.Unmarshal(p.Data, &accountCreated)
+	if err != nil {
+		return nil, fmt.Errorf("unmarshalling AccountCreated: %w", err)
+	}
+
+	return &accountCreated, nil
+}
+
+func (p Event) TransferCreated() (*TransferCreated, error) {
+	if p.EventType != EventTypeTransferCreated {
+		return nil, newInvalidEventTypeError(p.EventType, EventTypeTransferCreated)
+	}
+
+	var transferCreated TransferCreated
+	err := json.Unmarshal(p.Data, &transferCreated)
+	if err != nil {
+		return nil, fmt.Errorf("unmarshalling TransferCreated: %w", err)
+	}
+
+	return &transferCreated, nil
+}
+
+func newInvalidEventTypeError(expected, got EventType) error {
+	return fmt.Errorf("invalid event type: expected %v but got %v", expected, got)
+}
