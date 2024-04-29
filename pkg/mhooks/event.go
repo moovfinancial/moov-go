@@ -18,10 +18,10 @@ func NewEvent(requestBody io.Reader) (*Event, error) {
 }
 
 type Event struct {
-	EventID   string          `json:"eventID"`
-	EventType EventType       `json:"type"`
-	Data      json.RawMessage `json:"data"`
-	CreatedOn time.Time       `json:"createdOn"`
+	EventID   string    `json:"eventID"`
+	EventType EventType `json:"type"`
+	Data      []byte    `json:"data"`
+	CreatedOn time.Time `json:"createdOn"`
 }
 
 func (p Event) AccountCreated() (*AccountCreated, error) {
