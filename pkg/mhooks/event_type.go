@@ -44,4 +44,22 @@ type TransferCreated struct {
 	Status moov.TransferStatus `json:"status"`
 }
 
+type TransferUpdated struct {
+	// ID of the facilitator account
+	AccountID string `json:"accountID,omitempty"`
+	// ID of the transfer
+	TransferID string `json:"transferID,omitempty"`
+	// Status of the transfer
+	Status      string               `json:"status,omitempty"`
+	Source      PaymentMethodPartial `json:"source,omitempty"`
+	Destination PaymentMethodPartial `json:"destination,omitempty"`
+}
+
+type PaymentMethodPartial struct {
+	// ID of the account
+	AccountID string `json:"accountID,omitempty"`
+	// ID of the payment method
+	PaymentMethodID string `json:"paymentMethodID,omitempty"`
+}
+
 // TODO(vince,4/25/2024): I'll add the rest of the models in upcoming PRs.
