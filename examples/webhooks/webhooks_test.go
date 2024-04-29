@@ -8,6 +8,17 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/mhooks"
 )
 
+func Example() {
+	// handler := mhooks.Thing("", func(event mhooks.Event) error {
+	// 	acc, err := event.AccountCreated()
+	// 	fmt.Println(acc)
+	// 	return err
+	// })
+	// 
+	// err := http.ListenAndServe(":8080", mhooks.ErrorHandler(handler))
+	// log.Fatal(err)
+}
+
 // Example handler func for processing a single event type (AccountCreated)
 func ExampleHandler_SingleEvent() {
 	var handler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {

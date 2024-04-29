@@ -8,6 +8,34 @@ import (
 	"time"
 )
 
+// HandlerFunc defines a std net/http HandlerFunc, but which returns an error.
+type HandlerFunc func(w http.ResponseWriter, r *http.Request) error
+type ErrorHandlerFunc func(h HandlerFunc) http.Handler
+
+// // ErrorHandlerFunc defines a HandlerFunc which accepts an error and displays it.
+// type ErrorHandlerFunc func(w http.ResponseWriter, r *http.Request, err error)
+func Thing(secret string, cb func(Event) error, errHandler func(error)) error {
+	handler := func(w http.ResponseWriter, r *http.Request) error {
+		event, err := ParseEvent(r, secret)
+		if err != nil {
+			return err
+		}
+
+		return cb(*event)
+	}
+
+	return http.ListenAndServe("address", errorHandler(handler, errHandler))
+}
+
+func errorHandler(h HandlerFunc, errFn func(error)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := h(w, r)
+		if err != nil {
+			errFn(err)
+		}
+	})
+}
+
 func ParseEvent(r *http.Request, secret string) (*Event, error) {
 	isValid, err := checkSignature(r.Header, secret)
 	if err != nil {
