@@ -12,31 +12,43 @@ type Wallet struct {
 }
 
 type AvailableBalance struct {
-	Currency     string `json:"currency,omitempty"`
-	Value        int    `json:"value,omitempty"`
-	ValueDecimal string `json:"valueDecimal,omitempty"`
+	// A 3-letter ISO 4217 currency code.
+	Currency string `json:"currency,omitempty" otel:"currency"`
+	// Quantity in the smallest unit of the specified currency. In USD this is cents, so $12.04 is 1204 and $0.99 would be 99.
+	Value int64 `json:"value" otel:"value"`
+	// Same as `value`, but a decimal-formatted numerical string that represents up to 9 decimal place precision.
+	ValueDecimal string `json:"valueDecimal"`
 }
 
 type Transaction struct {
-	WalletID                string    `json:"walletID,omitempty"`
-	TransactionID           string    `json:"transactionID,omitempty"`
-	TransactionType         string    `json:"transactionType,omitempty"`
-	SourceType              string    `json:"sourceType,omitempty"`
-	SourceID                string    `json:"sourceID,omitempty"`
-	Status                  string    `json:"status,omitempty"`
-	Memo                    string    `json:"memo,omitempty"`
-	CreatedOn               time.Time `json:"createdOn,omitempty"`
-	CompletedOn             time.Time `json:"completedOn,omitempty"`
-	Currency                string    `json:"currency,omitempty"`
-	GrossAmount             int       `json:"grossAmount,omitempty"`
-	GrossAmountDecimal      string    `json:"grossAmountDecimal,omitempty"`
-	Fee                     int       `json:"fee,omitempty"`
-	FeeDecimal              string    `json:"feeDecimal,omitempty"`
-	NetAmount               int       `json:"netAmount,omitempty"`
-	NetAmountDecimal        string    `json:"netAmountDecimal,omitempty"`
-	AvailableBalance        int       `json:"availableBalance,omitempty"`
-	AvailableBalanceDecimal string    `json:"availableBalanceDecimal,omitempty"`
+	WalletID                string                  `json:"walletID,omitempty"`
+	TransactionID           string                  `json:"transactionID,omitempty"`
+	TransactionType         string                  `json:"transactionType,omitempty"`
+	SourceType              string                  `json:"sourceType,omitempty"`
+	SourceID                string                  `json:"sourceID,omitempty"`
+	Status                  WalletTransactionStatus `json:"status,omitempty"`
+	Memo                    string                  `json:"memo,omitempty"`
+	CreatedOn               time.Time               `json:"createdOn,omitempty"`
+	CompletedOn             time.Time               `json:"completedOn,omitempty"`
+	Currency                string                  `json:"currency,omitempty"`
+	GrossAmount             int                     `json:"grossAmount,omitempty"`
+	GrossAmountDecimal      string                  `json:"grossAmountDecimal,omitempty"`
+	Fee                     int                     `json:"fee,omitempty"`
+	FeeDecimal              string                  `json:"feeDecimal,omitempty"`
+	NetAmount               int                     `json:"netAmount,omitempty"`
+	NetAmountDecimal        string                  `json:"netAmountDecimal,omitempty"`
+	AvailableBalance        int                     `json:"availableBalance,omitempty"`
+	AvailableBalanceDecimal string                  `json:"availableBalanceDecimal,omitempty"`
 }
+
+type WalletTransactionStatus string
+
+const (
+	WalletTransactionStatus_Pending   WalletTransactionStatus = "pending"
+	WalletTransactionStatus_Completed WalletTransactionStatus = "completed"
+	WalletTransactionStatus_Canceled  WalletTransactionStatus = "canceled"
+	WalletTransactionStatus_Failed    WalletTransactionStatus = "failed"
+)
 
 // ListWallets lists all wallets that are associated with a Moov account
 // https://docs.moov.io/api/index.html#tag/Wallets/operation/listWalletsForAccount
