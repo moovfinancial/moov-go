@@ -63,14 +63,16 @@ func TestRTPCreditACHFallbackExample(t *testing.T) {
 	// Step 5: Attempt to find the rtp-credit payment method
 	destinationPaymentMethods, err := mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("rtp-credit"))
 	require.NoError(t, err)
-	require.Equal(t, 0, len(destinationPaymentMethods))
 
-	// Step 6: Fallback to ACH same-day
-	destinationPaymentMethods, err = mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("ach-credit-same-day"))
-	require.NoError(t, err)
-	require.Greater(t, len(destinationPaymentMethods), 0)
+	if len(destinationPaymentMethods) == 0 {
+		// Step 6: Fallback to ACH same-day
+		destinationPaymentMethods, err = mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("ach-credit-same-day"))
+		require.NoError(t, err)
+		require.Greater(t, len(destinationPaymentMethods), 0)
+	}
 
 	destinationPaymentMethod := destinationPaymentMethods[0]
+	require.Equal(t, moov.PaymentMethodType("ach-credit-same-day"), destinationPaymentMethod.PaymentMethodType)
 
 	// Step 7: create transfer
 	_, completedAsyncTransfer, err := mc.CreateTransfer(
