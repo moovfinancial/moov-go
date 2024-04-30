@@ -44,7 +44,7 @@ type CardAccountUpdater struct {
 }
 
 type CardDetails struct {
-	Status                   string            `json:"status,omitempty"`
+	Status                   string            `json:"status"`
 	FailureCode              string            `json:"failureCode,omitempty"`
 	DynamicDescriptor        string            `json:"dynamicDescriptor,omitempty"`
 	TransactionSource        string            `json:"transactionSource,omitempty"`
