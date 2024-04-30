@@ -34,7 +34,7 @@ var (
 	ErrMicroDepositAmountsIncorrect = errors.New("the amounts provided are incorrect or the bank account is in an unexpected state")
 	ErrXIdempotencyKey              = errors.New("attempted to create a transfer using a duplicate X-Idempotency-Key header")
 
-	// ErrDuplicateBankAccount = errors.New("duplciate bank account or invalid routing number")
+	// ErrDuplicateBankAccount = errors.New("duplicate bank account or invalid routing number")
 	// ErrNoMicroDeposit       = errors.New("no account with the specified accountID was found or micro-deposits have not been sent for the source")
 	// ErrAccount              = errors.New("no account with the specified accountID was found")
 	// ErrUpdateCardConflict   = errors.New("attempting to update an existing disabled card")

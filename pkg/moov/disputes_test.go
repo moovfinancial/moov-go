@@ -7,9 +7,10 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
 func TestDisputesMarshal(t *testing.T) {
@@ -55,7 +56,7 @@ func Test_GetDisputes_NotFound(t *testing.T) {
 	dispute, err := mc.GetDispute(context.Background(), disputeID)
 	require.Nil(t, dispute)
 
-	// find and cast the error into HttpCallError so it can be inspected
+	// find and cast the error into HttpCallError, so it can be inspected
 	var httpErr moov.HttpCallResponse
 	require.ErrorAs(t, err, &httpErr)
 

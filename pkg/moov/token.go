@@ -11,7 +11,7 @@ type accessTokenRequest struct {
 	ClientId *string `json:"client_id,omitempty"`
 	// If not specified in `Authorization: Basic` it can be specified here
 	ClientSecret *string `json:"client_secret,omitempty"`
-	// Scopes that were allowed. Space delimited list of scopes. Take a look at the `ApplicationScope` model to see whats available
+	// Scopes that were allowed. Space delimited list of scopes. Take a look at the `ApplicationScope` model to see what's available
 	Scope string `json:"scope,omitempty"`
 	// Allowed endpoints this token is usable for. Space delimited list of urls.
 	Audience string `json:"audience,omitempty"`
@@ -113,7 +113,7 @@ func (c *Client) PingAccessToken(ctx context.Context) (*AccessTokenResponse, err
 	}, Scopes.Ping())
 }
 
-// Creates a access token that can only be used for creating a new account thats connected to the client.
+// Creates a access token that can only be used for creating a new account that's connected to the client.
 // This allows for a browser to create the account directly against Moov without that account information needing to
 // send sensitive information through the clients backend services.
 func (c *Client) AccountCreationToken(ctx context.Context) (*AccessTokenResponse, error) {

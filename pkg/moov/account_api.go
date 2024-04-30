@@ -57,7 +57,7 @@ func (c Client) UpdateAccount(ctx context.Context, account Account) (*Account, e
 // Func that applies a filter and returns an error if validation fails
 type ListAccountFilter callArg
 
-// WithAccountName if provided, this query will attempt to find matches against the following Account and Profile fields: diplayName, firstName, middleName, lastName, legalBusinessName
+// WithAccountName if provided, this query will attempt to find matches against the following Account and Profile fields: displayName, firstName, middleName, lastName, legalBusinessName
 func WithAccountName(name string) ListAccountFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["name"] = name

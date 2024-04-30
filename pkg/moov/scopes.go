@@ -13,7 +13,7 @@ func (sl *scopeList) AccountsRead() ScopeBuilder {
 	return appendScope("/accounts.read")
 }
 
-// Used for creating a new account thats auto-connected to the facilitator.
+// Used for creating a new account that's auto-connected to the facilitator.
 func (sl *scopeList) AccountsWrite() ScopeBuilder {
 	return appendScope("/accounts.write")
 }
