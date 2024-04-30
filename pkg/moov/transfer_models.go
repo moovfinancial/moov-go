@@ -14,12 +14,13 @@ type CreateTransfer struct {
 	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
-// CreateTransfer_Source Where funds for a transfer originate. For the source, you must include either a `paymentMethodID` or a `transferID`. A `transferID` is used to create a [transfer group](https://docs.moov.io/guides/money-movement/transfer-groups/), associating the new transfer with a parent transfer.
+// CreateTransfer_Source Where funds for a transfer originate. For the source, you must include either a `paymentMethodID` or a `transferID`.
+// A `transferID` is used to create a [transfer group](https://docs.moov.io/guides/money-movement/transfer-groups/), associating the new transfer with a parent transfer.
 type CreateTransfer_Source struct {
 	// UUID v4
-	TransferID string `json:"transferID,omitempty"`
+	TransferID string `json:"transferID"`
 	// UUID v4
-	PaymentMethodID string                            `json:"paymentMethodID,omitempty"`
+	PaymentMethodID string                            `json:"paymentMethodID"`
 	CardDetails     *CreateTransfer_CardDetailsSource `json:"cardDetails,omitempty"`
 	AchDetails      *CreateTransfer_AchDetailsSource  `json:"achDetails,omitempty"`
 }
@@ -67,11 +68,13 @@ type CreateTransfer_AchDetailsBase struct {
 type CreateTransfer_FacilitatorFee struct {
 	// Total facilitator fee in cents. Only either `total` or `totalDecimal` can be set.
 	Total *int64 `json:"total,omitempty"`
-	// Same as `total`, but a decimal-formatted numerical string that represents up to 9 decimal place precision. Only either `total` or `totalDecimal` can be set. Set this field if you expect the fee to be in fractions of a cent.
+	// Same as `total`, but a decimal-formatted numerical string that represents up to 9 decimal place precision.
+	// Only either `total` or `totalDecimal` can be set. Set this field if you expect the fee to be in fractions of a cent.
 	TotalDecimal *string `json:"totalDecimal,omitempty"`
 	// Markup facilitator fee in cents. Only either `markup` or `markupDecimal` can be set.
 	Markup *int64 `json:"markup,omitempty"`
-	// Same as `markup`, but a decimal-formatted numerical string that represents up to 9 decimal place precision. Only either `markup` or `markupDecimal` can be set. Set this field if you expect the fee to be in fractions of a cent.
+	// Same as `markup`, but a decimal-formatted numerical string that represents up to 9 decimal place precision.
+	// Only either `markup` or `markupDecimal` can be set. Set this field if you expect the fee to be in fractions of a cent.
 	MarkupDecimal *string `json:"markupDecimal,omitempty"`
 }
 
@@ -103,7 +106,8 @@ type Transfer struct {
 	MoovFeeDetails *MoovFeeDetails `json:"moovFeeDetails,omitempty"`
 	// ID for all transfers associated with a [transfer group](https://docs.moov.io/guides/money-movement/transfer-groups/).
 	GroupID *string `json:"groupID,omitempty"`
-	// The total refunded amount for a card transfer, representing one refunded amount, or multiple partial refunded amounts. Contains an integer value and its currency. See the `refunds` array for additional details.
+	// The total refunded amount for a card transfer, representing one refunded amount, or multiple partial refunded amounts.
+	//Contains an integer value and its currency. See the `refunds` array for additional details.
 	RefundedAmount *Amount `json:"refundedAmount,omitempty"`
 	// A list of refunds for a card transfer.
 	Refunds []Refund `json:"refunds,omitempty"`
@@ -331,7 +335,11 @@ type TransferOptions struct {
 
 /* ======== enumerations ======== */
 
-// TransactionSource Specifies the nature and initiator of a transaction. Crucial for recurring and merchant-initiated transactions as per card scheme rules. Omit for customer-initiated e-commerce transactions.  - `first-recurring`: Initial transaction in a recurring series or saving a card for future merchant-initiated charges - `recurring`: Regular, merchant-initiated scheduled transactions - `unscheduled`: Non-regular, merchant-initiated transactions like account top-ups
+// TransactionSource Specifies the nature and initiator of a transaction. Crucial for recurring and merchant-initiated transactions as per card scheme rules.
+// Omit for customer-initiated e-commerce transactions.
+// - `first-recurring`: Initial transaction in a recurring series or saving a card for future merchant-initiated charges
+// - `recurring`: Regular, merchant-initiated scheduled transactions
+// - `unscheduled`: Non-regular, merchant-initiated transactions like account top-ups
 type TransactionSource string
 
 // // List of TransactionSource
