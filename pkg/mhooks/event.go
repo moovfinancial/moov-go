@@ -62,6 +62,20 @@ func (p Event) TransferCreated() (*TransferCreated, error) {
 	return &transferCreated, nil
 }
 
+func (p Event) TransferUpdated() (*TransferUpdated, error) {
+	if p.EventType != EventTypeTransferUpdated {
+		return nil, newInvalidEventTypeError(p.EventType, EventTypeTransferUpdated)
+	}
+
+	var transferUpdated TransferUpdated
+	err := json.Unmarshal(p.Data, &transferUpdated)
+	if err != nil {
+		return nil, fmt.Errorf("unmarshalling TransferUpdated: %w", err)
+	}
+
+	return &transferUpdated, nil
+}
+
 func newInvalidEventTypeError(expected, got EventType) error {
 	return fmt.Errorf("invalid event type: expected %v but got %v", expected, got)
 }
