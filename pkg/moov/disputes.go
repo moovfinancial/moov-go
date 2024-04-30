@@ -8,16 +8,38 @@ import (
 )
 
 type Dispute struct {
-	DisputeID                string    `json:"disputeID,omitempty"`
-	CreatedOn                time.Time `json:"createdOn,omitempty"`
-	Amount                   Amount    `json:"amount,omitempty"`
-	NetworkReasonCode        string    `json:"networkReasonCode,omitempty"`
-	NetworkReasonDescription string    `json:"networkReasonDescription,omitempty"`
-	Phase                    string    `json:"phase,omitempty"`
-	RespondBy                time.Time `json:"respondBy,omitempty"`
-	Status                   string    `json:"status,omitempty"`
-	Transfer                 Transfer  `json:"transfer,omitempty"`
+	DisputeID                string        `json:"disputeID,omitempty"`
+	CreatedOn                time.Time     `json:"createdOn,omitempty"`
+	Amount                   Amount        `json:"amount,omitempty"`
+	NetworkReasonCode        string        `json:"networkReasonCode,omitempty"`
+	NetworkReasonDescription string        `json:"networkReasonDescription,omitempty"`
+	Phase                    DisputePhase  `json:"phase,omitempty"`
+	RespondBy                time.Time     `json:"respondBy,omitempty"`
+	Status                   DisputeStatus `json:"status,omitempty"`
+	Transfer                 Transfer      `json:"transfer,omitempty"`
 }
+
+type DisputeStatus string
+
+const (
+	DisputeStatus_ResponseNeeded DisputeStatus = "response-needed"
+	DisputeStatus_Resolved       DisputeStatus = "resolved"
+	DisputeStatus_UnderReview    DisputeStatus = "under-review"
+	DisputeStatus_Closed         DisputeStatus = "closed"
+	DisputeStatus_Accepted       DisputeStatus = "accepted"
+	DisputeStatus_Expired        DisputeStatus = "expired"
+	DisputeStatus_Won            DisputeStatus = "won"
+	DisputeStatus_Lost           DisputeStatus = "lost"
+)
+
+type DisputePhase string
+
+const (
+	DisputePhase_PreDispute DisputePhase = "pre-dispute"
+	DisputePhase_Inquiry    DisputePhase = "inquiry"
+	DisputePhase_Chargeback DisputePhase = "chargeback"
+	DisputePhase_Unknown    DisputePhase = "unknown"
+)
 
 type DisputeListFilter callArg
 

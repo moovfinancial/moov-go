@@ -107,6 +107,16 @@ const (
 	CardType_Unknown CardType = "unknown"
 )
 
+type CardUpdateType string
+
+// List of CardUpdateType
+const (
+	CardUpdateType_AccountClosed     CardUpdateType = "account-closed"
+	CardUpdateType_ContactCardHolder CardUpdateType = "contact-cardholder"
+	CardUpdateType_ExpirationUpdate  CardUpdateType = "expiration-update"
+	CardUpdateType_NumberUpdate      CardUpdateType = "number-update"
+)
+
 // CardExpiration The expiration date of the linked card or token.
 type CardExpiration struct {
 	Month string `json:"month,omitempty"`
