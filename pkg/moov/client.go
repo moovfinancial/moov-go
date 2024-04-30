@@ -11,7 +11,7 @@ type Client struct {
 
 // NewClient returns a moov.Client with credentials read from environment variables.
 func NewClient(configurables ...ClientConfigurable) (*Client, error) {
-	// Default client configuration if no configurables were specificied
+	// Default client configuration if no configurable were specified
 	client := &Client{
 		Credentials: CredentialsFromEnv(),
 		HttpClient:  DefaultHttpClient(),

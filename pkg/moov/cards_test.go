@@ -1,6 +1,6 @@
 package moov_test
 
-// TODO: Create faililng test for other card brands in test mode
+// TODO: Create failing test for other card brands in test mode
 // https://docs.moov.io/guides/get-started/test-mode/#cards
 
 import (
@@ -8,9 +8,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
 func TestCardMarshal(t *testing.T) {

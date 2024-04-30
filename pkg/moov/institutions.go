@@ -55,10 +55,10 @@ var (
 	RailWire Rail = "wire"
 )
 
-type ListInstitutionsFailter callArg
+type ListInstitutionsFilter callArg
 
 // WithInstitutionName filters institutions by their name
-func WithInstitutionName(name string) ListTransactionFilter {
+func WithInstitutionName(name string) ListInstitutionsFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["name"] = name
 		return nil
@@ -66,7 +66,7 @@ func WithInstitutionName(name string) ListTransactionFilter {
 }
 
 // WithInstitutionRoutingNumber filters institutions by their name
-func WithInstitutionRoutingNumber(routingNumber string) ListTransactionFilter {
+func WithInstitutionRoutingNumber(routingNumber string) ListInstitutionsFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["routingNumber"] = routingNumber
 		return nil
@@ -74,7 +74,7 @@ func WithInstitutionRoutingNumber(routingNumber string) ListTransactionFilter {
 }
 
 // WithInstitutionState filters institutions by their state
-func WithInstitutionState(state string) ListTransactionFilter {
+func WithInstitutionState(state string) ListInstitutionsFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["state"] = state
 		return nil
@@ -82,11 +82,11 @@ func WithInstitutionState(state string) ListTransactionFilter {
 }
 
 // WithInstitutionLimit filters institutions by their name
-func WithInstitutionLimit(limit int) ListTransactionFilter {
+func WithInstitutionLimit(limit int) ListInstitutionsFilter {
 	return Limit(limit)
 }
 
-func (c Client) ListInstitutions(ctx context.Context, rail Rail, opts ...ListInstitutionsFailter) (*FinancialInstitutions, error) {
+func (c Client) ListInstitutions(ctx context.Context, rail Rail, opts ...ListInstitutionsFilter) (*FinancialInstitutions, error) {
 	args := prependArgs(opts, AcceptJson())
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathInstitutions, string(rail)), args...)
 	if err != nil {

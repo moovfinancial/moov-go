@@ -128,7 +128,7 @@ type Individual struct {
 	// Email address.
 	Email   string   `json:"email,omitempty"`
 	Address *Address `json:"address,omitempty"`
-	// Indicates whether this individual's birth date has been provided.
+	// Indicates whether this individual's birthdate has been provided.
 	BirthDateProvided bool `json:"birthDateProvided,omitempty"`
 	// Indicates whether a government ID (SSN, ITIN, etc.) has been provided for this individual.
 	GovernmentIDProvided bool `json:"governmentIDProvided,omitempty"`
@@ -136,11 +136,11 @@ type Individual struct {
 
 // Name An individual's name.
 type Name struct {
-	// Name this person was given. This is usually the the same as first name.
+	// Name this person was given. This is usually the same as first name.
 	FirstName string `json:"firstName"`
-	// Name this person was given. This is usually the the same as first name.
+	// Name this person was given. This is usually the same as first name.
 	MiddleName string `json:"middleName,omitempty"`
-	// Family name of this person. This is usually the the same as last name.
+	// Family name of this person. This is usually the same as last name.
 	LastName string `json:"lastName"`
 	// Suffix of a given name.
 	Suffix string `json:"suffix,omitempty"`
@@ -205,7 +205,7 @@ type Representative struct {
 	// Email address.
 	Email   string   `json:"email,omitempty"`
 	Address *Address `json:"address,omitempty"`
-	// Indicates whether this representative's birth date has been provided.
+	// Indicates whether this representative's birthdate has been provided.
 	BirthDateProvided bool `json:"birthDateProvided,omitempty"`
 	// Indicates whether a government ID (SSN, ITIN, etc.) has been provided for this representative.
 	GovernmentIDProvided bool              `json:"governmentIDProvided,omitempty"`
@@ -294,7 +294,7 @@ type Document struct {
 	DocumentID  string `json:"documentID"`
 	Type        string `json:"type"`
 	ContentType string `json:"contentType"`
-	// Optional array of errors encountered dring automated parsing.
+	// Optional array of errors encountered during automated parsing.
 	ParseErrors []string  `json:"parseErrors,omitempty"`
 	UploadedAt  time.Time `json:"uploadedAt"`
 }

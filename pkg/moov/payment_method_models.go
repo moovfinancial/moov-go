@@ -83,8 +83,6 @@ type ApplePayPaymentMethod struct {
 	DynamicLastFour string `json:"dynamicLastFour,omitempty"`
 }
 
-// buuuuunch of card stuff below....
-
 // CardBrand The card brand.
 type CardBrand string
 
@@ -101,7 +99,7 @@ type CardType string
 
 // List of CardType
 const (
-	CardType_Dedit   CardType = "debit"
+	CardType_Debit   CardType = "debit"
 	CardType_Credit  CardType = "credit"
 	CardType_Prepaid CardType = "prepaid"
 	CardType_Unknown CardType = "unknown"
