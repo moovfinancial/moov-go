@@ -30,10 +30,6 @@ jobs:
       env:
         SKIP_TESTS: yes
 
-    - name: Upload Code Coverage
-      if: runner.os == 'Linux'
-      run: bash <(curl -s https://codecov.io/bash)
-
   build:
     name: Go Build (CGO)
     runs-on: ${{ matrix.os }}
@@ -58,7 +54,3 @@ jobs:
       run: make check
       env:
         SKIP_LINTERS: yes
-
-    - name: Upload Code Coverage
-      if: runner.os == 'Linux'
-      run: bash <(curl -s https://codecov.io/bash)
