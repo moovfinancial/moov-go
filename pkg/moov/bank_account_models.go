@@ -104,12 +104,17 @@ const (
 
 // ExceptionDetails Reason for, and details related to, an `errored` or `verificationFailed` bank account status.
 type ExceptionDetails struct {
-	AchReturnCode AchReturnCode `json:"achReturnCode,omitempty"`
+	// AchReturnCode is the return code of an ACH transaction that caused the bank account status to change.
+	AchReturnCode *AchReturnCode `json:"achReturnCode,omitempty"`
+
 	// Details related to an `errored` or `verificationFailed` bank account status.
 	Description string `json:"description,omitempty"`
+
+	// RTPRejectionCode is a rejection code of an RTP transaction that caused the bank account status to change.
+	RTPRejectionCode *RTPRejectionCode `json:"rtpRejectionCode"`
 }
 
-// AchReturnCode The return code of an ACH transaction that caused the bank account status to change.
+// AchReturnCode is the return code of an ACH transaction that caused the bank account status to change.
 type AchReturnCode string
 
 // List of ACHReturnCode
@@ -134,4 +139,18 @@ const (
 	AchReturnCode_R34 AchReturnCode = "R34"
 	AchReturnCode_R38 AchReturnCode = "R38"
 	AchReturnCode_R39 AchReturnCode = "R39"
+)
+
+// RTPRejectionCode is a rejection code of an RTP transaction that caused the bank account status to change.
+type RTPRejectionCode string
+
+// List of RTPRejectionCode
+const (
+	RTPRejectionCode_AC03 RTPRejectionCode = "AC03" // Account Invalid
+	RTPRejectionCode_AC04 RTPRejectionCode = "AC04" // Account Closed
+	RTPRejectionCode_AC06 RTPRejectionCode = "AC06" // Account Blocked
+	RTPRejectionCode_AC14 RTPRejectionCode = "AC14" // Creditor Account Type Invalid
+	RTPRejectionCode_AG01 RTPRejectionCode = "AG01" // Transactions Forbidden On Account
+	RTPRejectionCode_AG03 RTPRejectionCode = "AG03" // Transaction Type Not Supported
+	RTPRejectionCode_MD07 RTPRejectionCode = "MD07" // Customer Deceased
 )
