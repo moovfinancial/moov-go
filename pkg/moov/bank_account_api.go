@@ -32,7 +32,7 @@ func WithMX(mx MXRequest) CreateBankAccountType {
 	})
 }
 
-func WaitForPaymentMethod() callArg {
+func WaitForPaymentMethod() CreateBankAccountType {
 	return WaitFor("payment-method")
 }
 

@@ -7,7 +7,7 @@ import (
 
 type PaymentMethodListFilter callArg
 
-func WithPaymentMethodSourceID(id string) callArg {
+func WithPaymentMethodSourceID(id string) PaymentMethodListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["sourceID"] = id
 		return nil
@@ -15,7 +15,7 @@ func WithPaymentMethodSourceID(id string) callArg {
 }
 
 // WithPaymentMethodType filters the payment methods by the payment method type. example: moov-wallet, card-payment, ach-debit-collect
-func WithPaymentMethodType(t string) callArg {
+func WithPaymentMethodType(t string) PaymentMethodListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["paymentMethodType"] = t
 		return nil

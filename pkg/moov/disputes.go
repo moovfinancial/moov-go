@@ -43,70 +43,70 @@ const (
 
 type DisputeListFilter callArg
 
-func WithDisputeCount(c int) callArg {
+func WithDisputeCount(c int) DisputeListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["count"] = fmt.Sprintf("%d", c)
 		return nil
 	})
 }
 
-func WithDisputeSkip(c int) callArg {
+func WithDisputeSkip(c int) DisputeListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["skip"] = fmt.Sprintf("%d", c)
 		return nil
 	})
 }
 
-func WithDisputeResponseStartDate(t time.Time) callArg {
+func WithDisputeResponseStartDate(t time.Time) DisputeListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["respondStartDateTime"] = t.Format(time.RFC3339)
 		return nil
 	})
 }
 
-func WithDisputeResponseEndDate(t time.Time) callArg {
+func WithDisputeResponseEndDate(t time.Time) DisputeListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["respondEndDateTime"] = t.Format(time.RFC3339)
 		return nil
 	})
 }
 
-func WithDisputeStatus(s string) callArg {
+func WithDisputeStatus(s string) DisputeListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["status"] = s
 		return nil
 	})
 }
 
-func WithDisputeMerchantAccountID(id string) callArg {
+func WithDisputeMerchantAccountID(id string) DisputeListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["merchantAccountID"] = id
 		return nil
 	})
 }
 
-func WithDisputeCardHolderAccountID(id string) callArg {
+func WithDisputeCardHolderAccountID(id string) DisputeListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["cardholderAccountID"] = id
 		return nil
 	})
 }
 
-func WithDisputeStartDate(t time.Time) callArg {
+func WithDisputeStartDate(t time.Time) DisputeListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["startDateTime"] = t.Format(time.RFC3339)
 		return nil
 	})
 }
 
-func WithDisputeEndDate(t time.Time) callArg {
+func WithDisputeEndDate(t time.Time) DisputeListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["endDateTime"] = t.Format(time.RFC3339)
 		return nil
 	})
 }
 
-func WithDisputeOrderBy(orderBy string) callArg {
+func WithDisputeOrderBy(orderBy string) DisputeListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["orderBy"] = orderBy
 		return nil
