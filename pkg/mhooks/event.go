@@ -2,7 +2,6 @@ package mhooks
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -15,7 +14,7 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 	}
 
 	if !isValid {
-		return nil, errors.New("hashed signature using signing secret does not match value from x-signature header")
+		return nil, ErrInvalidSignature
 	}
 
 	var event Event

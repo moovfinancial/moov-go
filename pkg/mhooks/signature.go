@@ -4,8 +4,11 @@ import (
 	"crypto/hmac"
 	"crypto/sha512"
 	"encoding/hex"
+	"errors"
 	"net/http"
 )
+
+var ErrInvalidSignature = errors.New("hashed signature using signing secret does not match value from x-signature header")
 
 func checkSignature(headers http.Header, secret string) (bool, error) {
 	var (

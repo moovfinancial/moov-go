@@ -1,6 +1,7 @@
 package webhooks
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,18 +10,28 @@ import (
 )
 
 // Example handler func for processing a single event type (AccountCreated)
+//
+// The handler will only set a non-200 status if an unexpected error occurs, and 
+// we want the webhook to be retried.
 func ExampleHandler_SingleEvent() {
 	var handler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
 		secret := "your-webhook-signing-secret" // fetched from secure storage
+
 		event, err := mhooks.ParseEvent(r, secret)
-		if err != nil {
+		if errors.Is(err, mhooks.ErrInvalidSignature) {
+			fmt.Printf("parsing event: invalid signature: %v\n", err)
+			w.WriteHeader(200)
+			return
+		} else if err != nil {
+			fmt.Printf("parsing event: %v\n", err)
 			w.WriteHeader(500)
 			return
 		}
 
 		accountCreated, err := event.AccountCreated()
 		if err != nil {
-			w.WriteHeader(500)
+			fmt.Printf("getting AccountCreated from event: %v\n", err)
+			w.WriteHeader(200)
 			return
 		}
 
@@ -33,12 +44,21 @@ func ExampleHandler_SingleEvent() {
 }
 
 // Example handler func for processing multiple event types (TransferCreated or TransferUpdated)
+//
+// The handler will only set a non-200 status if an unexpected error occurs, and 
+// we want the webhook to be retried.
 func ExampleHandler_MultipleEvents() {
 	var handler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
 		secret := "your-webhook-signing-secret" // fetched from secure storage
 		event, err := mhooks.ParseEvent(r, secret)
-		if err != nil {
+		if errors.Is(err, mhooks.ErrInvalidSignature) {
+			fmt.Printf("parsing event: invalid signature: %v\n", err)
+			w.WriteHeader(200)
+			return
+		} else if err != nil {
+			fmt.Printf("parsing event: %v\n", err)
 			w.WriteHeader(500)
+			return
 		}
 
 		//nolint:exhaustive
@@ -46,14 +66,16 @@ func ExampleHandler_MultipleEvents() {
 		case mhooks.EventTypeTransferCreated:
 			got, err := event.TransferCreated()
 			if err != nil {
-				w.WriteHeader(500)
+				fmt.Printf("getting TransferCreated from event: %v\n", err)
+				w.WriteHeader(200)
 				return
 			}
 			fmt.Printf("Got TransferCreated webhook with transferID=%v\n", got.TransferID)
 		case mhooks.EventTypeTransferUpdated:
 			got, err := event.TransferUpdated()
 			if err != nil {
-				w.WriteHeader(500)
+				fmt.Printf("getting TransferUpdated from event: %v\n", err)
+				w.WriteHeader(200)
 				return
 			}
 			fmt.Printf("Got TransferUpdated webhook with transferID=%v\n", got.TransferID)
