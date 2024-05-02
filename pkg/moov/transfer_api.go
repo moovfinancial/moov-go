@@ -16,13 +16,6 @@ type createTransferBuilder struct {
 	idempotencyKey string
 }
 
-func WithTransferWaitForRailResponse() CreateTransferArgs {
-	return func(t *createTransferBuilder) callArg {
-		t.synchronous = true
-		return WaitFor("rail-response")
-	}
-}
-
 // Can be specified to overwrite a randomly generated one.
 func WithTransferIdempotencyKey(key uuid.UUID) CreateTransferArgs {
 	return func(t *createTransferBuilder) callArg {
@@ -33,8 +26,7 @@ func WithTransferIdempotencyKey(key uuid.UUID) CreateTransferArgs {
 
 // CreateTransfer creates a new transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
-func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, options ...CreateTransferArgs) (*Transfer, *TransferStarted, error) {
-
+func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, options ...CreateTransferArgs) CreateTransferBuilder {
 	builder := &createTransferBuilder{}
 	callArgs := []callArg{
 		AcceptJson(),
@@ -46,23 +38,51 @@ func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, opt
 		callArgs = append(callArgs, opt(builder))
 	}
 
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathTransfers), callArgs...)
+	return CreateTransferBuilder{
+		client:   c,
+		ctx:      ctx,
+		endpoint: Endpoint(http.MethodPost, pathTransfers),
+		callArgs: callArgs,
+	}
+}
+
+type CreateTransferBuilder struct {
+	client   Client
+	ctx      context.Context
+	endpoint EndpointArg
+	callArgs []callArg
+}
+
+func (r CreateTransferBuilder) Started() (*TransferStarted, error) {
+	resp, err := r.client.CallHttp(r.ctx, r.endpoint, r.callArgs...)
+	if err != nil {
+		return nil, err
+	}
+
+	switch resp.Status() {
+	case StatusCompleted:
+		st, err := UnmarshalObjectResponse[TransferStarted](resp)
+		return st, err
+	case StatusStateConflict:
+		return nil, errors.Join(ErrXIdempotencyKey, resp)
+	default:
+		return nil, resp
+	}
+}
+
+func (r CreateTransferBuilder) WaitForRailResponse() (*Transfer, *TransferStarted, error) {
+	resp, err := r.client.CallHttp(r.ctx, r.endpoint, append(r.callArgs, WaitFor("rail-response"))...)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	switch resp.Status() {
 	case StatusCompleted:
-		if builder.synchronous {
-			st, err := UnmarshalObjectResponse[Transfer](resp)
-			return st, nil, err
-		} else {
-			st, err := UnmarshalObjectResponse[TransferStarted](resp)
-			return nil, st, err
-		}
+		transfer, err := UnmarshalObjectResponse[Transfer](resp)
+		return transfer, nil, err
 	case StatusStarted:
-		st, err := UnmarshalObjectResponse[TransferStarted](resp)
-		return nil, st, err
+		transferStarted, err := UnmarshalObjectResponse[TransferStarted](resp)
+		return nil, transferStarted, err
 	case StatusStateConflict:
 		return nil, nil, errors.Join(ErrXIdempotencyKey, resp)
 	default:
