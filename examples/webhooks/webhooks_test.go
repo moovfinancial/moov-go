@@ -11,7 +11,7 @@ import (
 
 // Example handler func for processing a single event type (AccountCreated)
 //
-// The handler will only set a non-200 status if an unexpected error occurs, and 
+// The handler will only set a non-200 status if an unexpected error occurs, and
 // we want the webhook to be retried.
 func ExampleHandler_SingleEvent() {
 	var handler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +45,7 @@ func ExampleHandler_SingleEvent() {
 
 // Example handler func for processing multiple event types (TransferCreated or TransferUpdated)
 //
-// The handler will only set a non-200 status if an unexpected error occurs, and 
+// The handler will only set a non-200 status if an unexpected error occurs, and
 // we want the webhook to be retried.
 func ExampleHandler_MultipleEvents() {
 	var handler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
