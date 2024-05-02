@@ -8,6 +8,12 @@ import (
 	"time"
 )
 
+// ParseEvent returns a webhook event with the hydrated payload.
+//
+// Access the event payload by calling the corresponding getter method.
+// For example, if the event.EventType=account.created, call event.AccountCreated().
+//
+// The webhook signature is verified using the provided signing secret.
 func ParseEvent(r *http.Request, secret string) (*Event, error) {
 	isValid, err := checkSignature(r.Header, secret)
 	if err != nil {
