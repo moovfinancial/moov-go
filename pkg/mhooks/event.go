@@ -41,7 +41,7 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 	case EventTypeBankAccountUpdated:
 		eventData = &event.bankAccountUpdated
 	case EventTypeCardAutoUpdated:
-		eventData = &event.capabilityRequested
+		eventData = &event.cardAutoUpdated
 	case EventTypeCapabilityRequested:
 		eventData = &event.capabilityRequested
 	case EventTypeCapabilityUpdated:
