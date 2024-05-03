@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"flag"
 	"testing"
 	"time"
 
@@ -112,6 +113,12 @@ func Test_SubmitDisputeEvidence_Unauthorized(t *testing.T) {
 }
 
 func Test_UpdateDisputeEvidence_Unauthorized(t *testing.T) {
+	var mocked = flag.Bool("mocked", false, "mocked")
+
+	if !*mocked {
+		t.Skip("Skipping ", t.Name(), ", mocking not enabled")
+	}
+
 	creds := moov.CredentialsDefault()
 	creds.Host = "localhost:4010" // use mocking
 	creds.PublicKey = "public"
