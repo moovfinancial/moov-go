@@ -41,6 +41,41 @@ const (
 	DisputePhase_Unknown    DisputePhase = "unknown"
 )
 
+type DisputeEvidence struct {
+	CreatedOn    time.Time `json:"createdOn,omitempty"`
+	Data         string    `json:"data,omitempty"`
+	DisputeID    string    `json:"disputeID,omitempty"`
+	EvidenceID   string    `json:"evidenceID,omitempty"`
+	EvidenceType string    `json:"evidenceType,omitempty"`
+	FileName     string    `json:"fileName,omitempty"`
+	MimeType     string    `json:"mimeType,omitempty"`
+	Size         int       `json:"size,omitempty"`
+	Text         string    `json:"text,omitempty"`
+	UpdatedOn    time.Time `json:"updatedOn,omitempty"`
+}
+
+type DisputeTextEvidenceType string
+
+const (
+	DisputeTextEvidenceType_Receipt               DisputeTextEvidenceType = "receipt"
+	DisputeTextEvidenceType_ProofOfDelivery       DisputeTextEvidenceType = "proof-of-delivery"
+	DisputeTextEvidenceType_CancellationPolicy    DisputeTextEvidenceType = "cancelation-policy"
+	DisputeTextEvidenceType_TermsOfService        DisputeTextEvidenceType = "terms-of-service"
+	DisputeTextEvidenceType_CustomerCommunication DisputeTextEvidenceType = "customer-communication"
+	DisputeTextEvidenceType_GenericEvidence       DisputeTextEvidenceType = "generic-evidence"
+	DisputeTextEvidenceType_CoverLetter           DisputeTextEvidenceType = "cover-letter"
+	DisputeTextEvidenceType_Other                 DisputeTextEvidenceType = "other"
+)
+
+type DisputesEvidenceText struct {
+	Text         string                  `json:"text"`
+	EvidenceType DisputeTextEvidenceType `json:"evidenceType"`
+}
+
+type DisputesEvidenceUpdate struct {
+	EvidenceType DisputeTextEvidenceType `json:"evidenceType"`
+}
+
 type DisputeListFilter callArg
 
 func WithDisputeCount(c int) DisputeListFilter {
@@ -134,4 +169,48 @@ func (c Client) GetDispute(ctx context.Context, disputeID string) (*Dispute, err
 	}
 
 	return CompletedObjectOrError[Dispute](resp)
+}
+
+// AcceptDispute sets the status of the dispute to accepted
+// https://docs.moov.io/api/money-movement/disputes/post/
+func (c Client) AcceptDispute(ctx context.Context, disputeID string) (*Dispute, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeAccept, disputeID), AcceptJson())
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Dispute](resp)
+}
+
+// UploadDisputeEvidence Uploads text as evidence for a dispute.
+// https://docs.moov.io/api/money-movement/disputes/post-text/
+func (c Client) UploadDisputeEvidence(ctx context.Context, disputeID string, evidenceText DisputesEvidenceText) ([]DisputeEvidence, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeUploadEvidenceText, disputeID), AcceptJson(), JsonBody(evidenceText))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[DisputeEvidence](resp)
+}
+
+// SubmitDisputeEvidence Submits evidence for a dispute.
+// https://docs.moov.io/api/money-movement/disputes/post-evidence/
+func (c Client) SubmitDisputeEvidence(ctx context.Context, disputeID string) (*Dispute, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeSubmitEvidence, disputeID), AcceptJson())
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Dispute](resp)
+}
+
+// UpdateDisputeEvidence Updates dispute evidence by ID.
+// https://docs.moov.io/api/money-movement/disputes/patch/
+func (c Client) UpdateDisputeEvidence(ctx context.Context, disputeID string, evidenceID string, evidenceUpdate DisputesEvidenceUpdate) (*DisputeEvidence, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPatch, pathDisputeUpdateEvidence, disputeID, evidenceID), AcceptJson(), JsonBody(evidenceUpdate))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[DisputeEvidence](resp)
 }
