@@ -17,6 +17,17 @@ else
 	COVER_THRESHOLD=35.0 GOTEST_PKGS=./... ./lint-project.sh
 endif
 
+.PHONY: setup
+setup:
+	#mkdir -p specification
+	#wget -O specification/openapi.yaml https://raw.githubusercontent.com/moovfinancial/platform-api/master/go/platform/api/openapi.yaml?token={TOKEN}
+	docker-compose up -d --force-recreate --remove-orphans
+
+.PHONY: teardown
+teardown:
+	-docker-compose down --remove-orphans
+	-docker-compose rm -f -v
+
 .PHONY: clean
 clean:
 	@rm -rf ./bin/ ./tmp/ coverage.txt misspell* staticcheck lint-project.sh

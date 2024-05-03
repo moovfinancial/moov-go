@@ -49,8 +49,15 @@ jobs:
     - name: Install make (Windows)
       if: runner.os == 'Windows'
       run: choco install -y make mingw
+    
+    - name: Setup
+      run: make setup
 
     - name: Check
       run: make check
       env:
         SKIP_LINTERS: yes
+
+   - name: Teardown
+      if: ${{ always() }}
+      run: make teardown
