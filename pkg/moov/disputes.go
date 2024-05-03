@@ -1,6 +1,7 @@
 package moov
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net/http"
@@ -43,7 +44,6 @@ const (
 
 type DisputeEvidence struct {
 	CreatedOn    time.Time `json:"createdOn,omitempty"`
-	Data         string    `json:"data,omitempty"`
 	DisputeID    string    `json:"disputeID,omitempty"`
 	EvidenceID   string    `json:"evidenceID,omitempty"`
 	EvidenceType string    `json:"evidenceType,omitempty"`
@@ -54,26 +54,13 @@ type DisputeEvidence struct {
 	UpdatedOn    time.Time `json:"updatedOn,omitempty"`
 }
 
-type DisputeTextEvidenceType string
-
-const (
-	DisputeTextEvidenceType_Receipt               DisputeTextEvidenceType = "receipt"
-	DisputeTextEvidenceType_ProofOfDelivery       DisputeTextEvidenceType = "proof-of-delivery"
-	DisputeTextEvidenceType_CancellationPolicy    DisputeTextEvidenceType = "cancelation-policy"
-	DisputeTextEvidenceType_TermsOfService        DisputeTextEvidenceType = "terms-of-service"
-	DisputeTextEvidenceType_CustomerCommunication DisputeTextEvidenceType = "customer-communication"
-	DisputeTextEvidenceType_GenericEvidence       DisputeTextEvidenceType = "generic-evidence"
-	DisputeTextEvidenceType_CoverLetter           DisputeTextEvidenceType = "cover-letter"
-	DisputeTextEvidenceType_Other                 DisputeTextEvidenceType = "other"
-)
-
 type DisputesEvidenceText struct {
-	Text         string                  `json:"text"`
-	EvidenceType DisputeTextEvidenceType `json:"evidenceType"`
+	Text         string       `json:"text"`
+	EvidenceType EvidenceType `json:"evidenceType"`
 }
 
 type DisputesEvidenceUpdate struct {
-	EvidenceType DisputeTextEvidenceType `json:"evidenceType"`
+	EvidenceType EvidenceType `json:"evidenceType"`
 }
 
 type DisputeListFilter callArg
@@ -148,6 +135,19 @@ func WithDisputeOrderBy(orderBy string) DisputeListFilter {
 	})
 }
 
+type EvidenceType string
+
+const (
+	EvidenceType_Receipt               EvidenceType = "receipt"
+	EvidenceType_ProofOfDelivery       EvidenceType = "proof-of-delivery"
+	EvidenceType_CancelationPolicy     EvidenceType = "cancelation-policy"
+	EvidenceType_TermsOfService        EvidenceType = "terms-of-service"
+	EvidenceType_CustomerCommunication EvidenceType = "customer-communication"
+	EvidenceType_GenericEvidence       EvidenceType = "generic-evidence"
+	EvidenceType_CoverLetter           EvidenceType = "cover-letter"
+	EvidenceType_Other                 EvidenceType = "other"
+)
+
 // ListDisputes lists of Disputes that are associated with a Moov account
 // https://docs.moov.io/api/money-movement/disputes/list/
 func (c Client) ListDisputes(ctx context.Context, filters ...DisputeListFilter) ([]Dispute, error) {
@@ -185,7 +185,38 @@ func (c Client) AcceptDispute(ctx context.Context, disputeID string) (*Dispute, 
 // UploadDisputeEvidence Uploads text as evidence for a dispute.
 // https://docs.moov.io/api/money-movement/disputes/post-text/
 func (c Client) UploadDisputeEvidence(ctx context.Context, disputeID string, evidenceText DisputesEvidenceText) ([]DisputeEvidence, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeUploadEvidenceText, disputeID), AcceptJson(), JsonBody(evidenceText))
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeEvidenceText, disputeID), AcceptJson(), JsonBody(evidenceText))
+
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[DisputeEvidence](resp)
+}
+
+// DeleteDisputeEvidence deletes a piece of dispute evidence for the given dispute and evidence id
+// https://docs.moov.io/api/money-movement/disputes/delete
+func (c Client) DeleteDisputeEvidence(ctx context.Context, disputeID, evidenceID string) error {
+	_, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathDisputeEvidence, disputeID, evidenceID), AcceptJson())
+	return err
+}
+
+// UploadEvidenceFile uploads a new evidence file for the given dispute id
+// https://docs.moov.io/api/money-movement/disputes/post-file/
+func (c Client) UploadEvidenceFile(ctx context.Context, disputeID string, evidenceType EvidenceType, filename string, file []byte) error {
+	var multiParts []multipartFn
+	multiParts = append(multiParts, MultipartField("evidenceType", string(evidenceType)))
+	multiParts = append(multiParts, MultipartFile("file", filename, bytes.NewReader(file)))
+
+	_, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeEvidenceFile, disputeID), MultipartBody(multiParts...))
+	return err
+}
+
+// ListDisputeEvidence lists all evidence for the given dispute id
+// https://docs.moov.io/api/money-movement/disputes/list-evidence/
+func (c Client) ListDisputeEvidence(ctx context.Context, disputeID string) ([]DisputeEvidence, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathDisputeEvidences, disputeID), AcceptJson())
+
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +238,20 @@ func (c Client) SubmitDisputeEvidence(ctx context.Context, disputeID string) (*D
 // UpdateDisputeEvidence Updates dispute evidence by ID.
 // https://docs.moov.io/api/money-movement/disputes/patch/
 func (c Client) UpdateDisputeEvidence(ctx context.Context, disputeID string, evidenceID string, evidenceUpdate DisputesEvidenceUpdate) (*DisputeEvidence, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPatch, pathDisputeUpdateEvidence, disputeID, evidenceID), AcceptJson(), JsonBody(evidenceUpdate))
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPatch, pathDisputeEvidence, disputeID, evidenceID), AcceptJson(), JsonBody(evidenceUpdate))
+
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[DisputeEvidence](resp)
+}
+
+// GetDisputeEvidence retrieves the piece of dispute evidence for the given dispute and evidence id
+// https://docs.moov.io/api/money-movement/disputes/get-evidence/
+func (c Client) GetDisputeEvidence(ctx context.Context, disputeID, evidenceID string) (*DisputeEvidence, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathDisputeEvidence, disputeID, evidenceID), AcceptJson())
+
 	if err != nil {
 		return nil, err
 	}
