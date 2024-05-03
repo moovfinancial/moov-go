@@ -12,6 +12,8 @@ const (
 	pathCapabilities = "/accounts/%s/capabilities"
 	pathCapability   = "/accounts/%s/capabilities/%s"
 
+	pathUnderwriting = "/accounts/%s/underwriting"
+
 	pathFiles = "/accounts/%s/files"
 	pathFile  = "/accounts/%s/files/%s"
 
