@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/moovfinancial/moov-go/pkg/moov"
@@ -111,19 +112,31 @@ func Test_SubmitDisputeEvidence_Unauthorized(t *testing.T) {
 }
 
 func Test_UpdateDisputeEvidence_Unauthorized(t *testing.T) {
-	mc := NewTestClient(t)
+	creds := moov.CredentialsDefault()
+	creds.Host = "localhost:4010" // use mocking
+	creds.PublicKey = "public"
+	creds.SecretKey = "secret"
+	//mc := NewTestClient(t)
+	mc, err := moov.NewClient(
+		moov.WithCredentials(creds),
+	)
+	require.NoError(t, err)
 
-	// We don't have any disputes to test against! So using a random id to update evidence will return unauthorized since we dont own the resource
 	disputeID := uuid.NewString()
 	evidenceID := uuid.NewString()
 	dispute, err := mc.UpdateDisputeEvidence(context.Background(), disputeID, evidenceID, moov.DisputesEvidenceUpdate{
 		EvidenceType: moov.DisputeTextEvidenceType_Other,
 	})
-	require.Nil(t, dispute)
+	require.NoError(t, err)
 
-	// find and cast the error into HttpCallError so it can be inspected
-	var httpErr moov.HttpCallResponse
-	require.ErrorAs(t, err, &httpErr)
-
-	require.Equal(t, moov.StatusUnauthorized, httpErr.Status())
+	created, err := time.Parse(time.RFC3339Nano, "2019-08-24T14:15:22Z")
+	require.NoError(t, err)
+	require.Equal(t, dispute.CreatedOn, created)
+	require.Equal(t, dispute.DisputeID, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43")
+	require.Equal(t, dispute.EvidenceID, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43")
+	require.Equal(t, dispute.EvidenceType, "receipt")
+	require.Equal(t, dispute.FileName, "string")
+	require.Equal(t, dispute.MimeType, "string")
+	require.Equal(t, dispute.Size, 0)
+	require.Equal(t, dispute.UpdatedOn, created)
 }

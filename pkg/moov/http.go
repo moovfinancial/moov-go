@@ -24,7 +24,7 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 		return nil, err
 	}
 
-	url := fmt.Sprintf("https://%s%s", c.Credentials.Host, call.path)
+	url := fmt.Sprintf("http://%s%s", c.Credentials.Host, call.path)
 
 	req, err := http.NewRequestWithContext(ctx, call.method, url, call.body)
 	if err != nil {

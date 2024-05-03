@@ -19,8 +19,6 @@ endif
 
 .PHONY: setup
 setup:
-	#mkdir -p specification
-	#wget -O specification/openapi.yaml https://raw.githubusercontent.com/moovfinancial/platform-api/master/go/platform/api/openapi.yaml?token={TOKEN}
 	docker-compose up -d --force-recreate --remove-orphans
 
 .PHONY: teardown

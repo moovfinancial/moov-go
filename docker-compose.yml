@@ -5,9 +5,7 @@ services:
     restart: always
     ports:
     - "4010:4010"
-    command: mock -h 0.0.0.0 /prism/openapi.yaml
-    volumes:
-      - ./specification:/prism
+    command: mock -h 0.0.0.0 https://docs.moov.io/openapi/openapi.json
     networks:
     - intranet
 
