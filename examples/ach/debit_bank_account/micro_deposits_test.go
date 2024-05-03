@@ -82,7 +82,7 @@ func TestMicroDepositExample(t *testing.T) {
 	paymentMethods, err := mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("ach-debit-collect"))
 	require.NoError(t, err)
 
-	// We expect to have only one `ach-debit-fund` payment method as we added
+	// We expect to have only one `ach-debit-collect` payment method as we added
 	// only one bank account
 	require.Len(t, paymentMethods, 1)
 
