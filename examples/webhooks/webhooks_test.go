@@ -18,12 +18,12 @@ func ExampleHandler_SingleEvent() {
 		secret := "your-webhook-signing-secret" // fetched from secure storage
 
 		event, err := mhooks.ParseEvent(r, secret)
-		if errors.Is(err, mhooks.ErrInvalidSignature) {
-			fmt.Printf("parsing event: invalid signature: %v\n", err)
-			w.WriteHeader(200)
-			return
-		} else if err != nil {
-			fmt.Printf("parsing event: %v\n", err)
+		if err != nil {
+			msgPrefix := "parsing event: "
+			if errors.Is(err, mhooks.ErrInvalidSignature) {
+				msgPrefix += "invalid signature: "
+			}
+			fmt.Printf("%s %v\n", msgPrefix, err)
 			w.WriteHeader(500)
 			return
 		}
@@ -51,12 +51,12 @@ func ExampleHandler_MultipleEvents() {
 	var handler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
 		secret := "your-webhook-signing-secret" // fetched from secure storage
 		event, err := mhooks.ParseEvent(r, secret)
-		if errors.Is(err, mhooks.ErrInvalidSignature) {
-			fmt.Printf("parsing event: invalid signature: %v\n", err)
-			w.WriteHeader(200)
-			return
-		} else if err != nil {
-			fmt.Printf("parsing event: %v\n", err)
+		if err != nil {
+			msgPrefix := "parsing event: "
+			if errors.Is(err, mhooks.ErrInvalidSignature) {
+				msgPrefix += "invalid signature: "
+			}
+			fmt.Printf("%s %v\n", msgPrefix, err)
 			w.WriteHeader(500)
 			return
 		}
