@@ -119,6 +119,7 @@ func Test_UpdateDisputeEvidence_Unauthorized(t *testing.T) {
 	//mc := NewTestClient(t)
 	mc, err := moov.NewClient(
 		moov.WithCredentials(creds),
+		moov.WithHttpSecure(false),
 	)
 	require.NoError(t, err)
 

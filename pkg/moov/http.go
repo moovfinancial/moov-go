@@ -24,7 +24,12 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 		return nil, err
 	}
 
-	url := fmt.Sprintf("http://%s%s", c.Credentials.Host, call.path)
+	urlTemplate := "https://%s%s" // default secure
+
+	if !c.Secure {
+		urlTemplate = "http://%s%s"
+	}
+	url := fmt.Sprintf(urlTemplate, c.Credentials.Host, call.path)
 
 	req, err := http.NewRequestWithContext(ctx, call.method, url, call.body)
 	if err != nil {
