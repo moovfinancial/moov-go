@@ -58,6 +58,6 @@ jobs:
       env:
         SKIP_LINTERS: yes
 
-   - name: Teardown
+    - name: Teardown
       if: ${{ always() }}
       run: make teardown
