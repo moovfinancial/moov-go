@@ -48,6 +48,8 @@ func TestMicroDepositExample(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	t.Logf("Created Account: %v", account.AccountID)
+
 	// Step 3: add (link) user's bank account
 
 	// You can manually supply bank account information or pass tokens from
@@ -61,6 +63,8 @@ func TestMicroDepositExample(t *testing.T) {
 	}
 	bankAccount, err := mc.CreateBankAccount(ctx, account.AccountID, moov.WithBankAccount(bankAccountPayload), moov.WaitForPaymentMethod())
 	require.NoError(t, err)
+
+	t.Logf("Created Bank Account: %v", bankAccount.BankAccountID)
 
 	// Initiate micro-deposits
 	baErr := mc.MicroDepositInitiate(ctx, account.AccountID, bankAccount.BankAccountID)

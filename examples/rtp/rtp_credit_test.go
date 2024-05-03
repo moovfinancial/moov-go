@@ -53,6 +53,8 @@ func TestRTPCreditExample(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	t.Logf("Created Account: %v", account.AccountID)
+
 	// Step 4: Add (link) a bank account enabled for RTP
 	bankAccountPayload := moov.BankAccountRequest{
 		HolderName:    "Jules Jackson",
@@ -64,7 +66,7 @@ func TestRTPCreditExample(t *testing.T) {
 	bankAccount, err := mc.CreateBankAccount(ctx, account.AccountID, moov.WithBankAccount(bankAccountPayload), moov.WaitForPaymentMethod())
 	require.NoError(t, err)
 
-	t.Logf("BankAccountID: %v", bankAccount.BankAccountID)
+	t.Logf("Created Bank Account: %v", bankAccount.BankAccountID)
 
 	// Step 5: Find the rtp-credit payment method
 	destinationPaymentMethods, err := mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("rtp-credit"))

@@ -55,6 +55,8 @@ func TestPlaidProcessorExample(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	t.Logf("Created Account: %v", account.AccountID)
+
 	// Step 3: add (link) user's bank account with Plaid Processor
 	//
 	// See https://plaid.com/docs/auth/partnerships/moov/ for Plaid's documentation
@@ -71,7 +73,7 @@ func TestPlaidProcessorExample(t *testing.T) {
 	bankAccount, err := mc.CreateBankAccount(ctx, account.AccountID, moov.WithPlaid(plaid), moov.WaitForPaymentMethod())
 	require.NoError(t, err)
 
-	t.Logf("BankAccountID: %v", bankAccount.BankAccountID)
+	t.Logf("Created Bank Account: %v", bankAccount.BankAccountID)
 
 	// Step 4: find (pull) payment method for the linked bank account
 
