@@ -7,18 +7,18 @@ type UpdateUnderwriting struct {
 }
 
 type Underwriting struct {
-	AverageTransactionSize          int64  `json:"averageTransactionSize"`
-	MaxTransactionSize              int64  `json:"maxTransactionSize"`
-	AverageMonthlyTransactionVolume int64  `json:"averageMonthlyTransactionVolume"`
-	Status                          Status `json:"status"`
+	AverageTransactionSize          int64              `json:"averageTransactionSize"`
+	MaxTransactionSize              int64              `json:"maxTransactionSize"`
+	AverageMonthlyTransactionVolume int64              `json:"averageMonthlyTransactionVolume"`
+	Status                          UnderwritingStatus `json:"status"`
 }
 
-type Status string
+type UnderwritingStatus string
 
 const (
-	UnderwritingStatusApproved      Status = "approved"
-	UnderwritingStatusRejected      Status = "rejected"
-	UnderwritingStatusPendingReview Status = "pendingReview"
-	UnderwritingStatusPending       Status = "pending"
-	UnderwritingStatusNotRequested  Status = "notRequested"
+	UnderwritingStatusApproved      UnderwritingStatus = "approved"
+	UnderwritingStatusRejected      UnderwritingStatus = "rejected"
+	UnderwritingStatusPendingReview UnderwritingStatus = "pendingReview"
+	UnderwritingStatusPending       UnderwritingStatus = "pending"
+	UnderwritingStatusNotRequested  UnderwritingStatus = "notRequested"
 )
