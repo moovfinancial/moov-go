@@ -17,6 +17,22 @@ func TestUpsertUnderwriting(t *testing.T) {
 		AverageTransactionSize:          1_000,
 		MaxTransactionSize:              500,
 		AverageMonthlyTransactionVolume: 10_000,
+		VolumeByCustomerType: moov.VolumeByCustomerType{
+			BusinessToBusinessPercentage: 50,
+			ConsumerToBusinessPercentage: 50,
+		},
+		CardVolumeDistribution: moov.CardVolumeDistribution{
+			EcommercePercentage:     50,
+			CardPresentPercentage:   50,
+			MailOrPhonePercentage:   0,
+			DebtRepaymentPercentage: 0,
+		},
+		Fulfillment: moov.Fulfillment{
+			HasPhysicalGoods:     true,
+			IsShippingProduct:    true,
+			ShipmentDurationDays: 3,
+			ReturnPolicy:         moov.WITHIN_THIRTY_DAYS,
+		},
 	}
 
 	t.Run("insert", func(t *testing.T) {
@@ -45,6 +61,22 @@ func TestUpsertUnderwriting(t *testing.T) {
 		AverageTransactionSize:          1_500,
 		MaxTransactionSize:              1_200,
 		AverageMonthlyTransactionVolume: 11_000,
+		VolumeByCustomerType: moov.VolumeByCustomerType{
+			BusinessToBusinessPercentage: 60,
+			ConsumerToBusinessPercentage: 40,
+		},
+		CardVolumeDistribution: moov.CardVolumeDistribution{
+			EcommercePercentage:     60,
+			CardPresentPercentage:   40,
+			MailOrPhonePercentage:   0,
+			DebtRepaymentPercentage: 0,
+		},
+		Fulfillment: moov.Fulfillment{
+			HasPhysicalGoods:     true,
+			IsShippingProduct:    true,
+			ShipmentDurationDays: 3,
+			ReturnPolicy:         moov.WITHIN_THIRTY_DAYS,
+		},
 	}
 
 	t.Run("update", func(t *testing.T) {
