@@ -197,8 +197,11 @@ func (c Client) UploadDisputeEvidence(ctx context.Context, disputeID string, evi
 // DeleteDisputeEvidence deletes a piece of dispute evidence for the given dispute and evidence id
 // https://docs.moov.io/api/money-movement/disputes/delete
 func (c Client) DeleteDisputeEvidence(ctx context.Context, disputeID, evidenceID string) error {
-	_, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathDisputeEvidence, disputeID, evidenceID), AcceptJson())
-	return err
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathDisputeEvidence, disputeID, evidenceID), AcceptJson())
+	if err != nil {
+		return err
+	}
+	return CompletedNilOrError(resp)
 }
 
 // UploadEvidenceFile uploads a new evidence file for the given dispute id
@@ -208,8 +211,11 @@ func (c Client) UploadEvidenceFile(ctx context.Context, disputeID string, eviden
 	multiParts = append(multiParts, MultipartField("evidenceType", string(evidenceType)))
 	multiParts = append(multiParts, MultipartFile("file", filename, bytes.NewReader(file)))
 
-	_, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeEvidenceFile, disputeID), MultipartBody(multiParts...))
-	return err
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeEvidenceFile, disputeID), MultipartBody(multiParts...))
+	if err != nil {
+		return err
+	}
+	return CompletedNilOrError(resp)
 }
 
 // ListDisputeEvidence lists all evidence for the given dispute id
