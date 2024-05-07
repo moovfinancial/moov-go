@@ -43,6 +43,9 @@ func TestUpsertUnderwriting(t *testing.T) {
 		require.Equal(t, create.AverageTransactionSize, actual.AverageTransactionSize)
 		require.Equal(t, create.MaxTransactionSize, actual.MaxTransactionSize)
 		require.Equal(t, create.AverageMonthlyTransactionVolume, actual.AverageMonthlyTransactionVolume)
+		require.Equal(t, create.Fulfillment, actual.Fulfillment)
+		require.Equal(t, create.VolumeByCustomerType, actual.VolumeByCustomerType)
+		require.Equal(t, create.CardVolumeDistribution, actual.CardVolumeDistribution)
 		require.Equal(t, moov.UnderwritingStatusNotRequested, actual.Status)
 	})
 
@@ -54,6 +57,9 @@ func TestUpsertUnderwriting(t *testing.T) {
 		require.Equal(t, create.AverageTransactionSize, actual.AverageTransactionSize)
 		require.Equal(t, create.MaxTransactionSize, actual.MaxTransactionSize)
 		require.Equal(t, create.AverageMonthlyTransactionVolume, actual.AverageMonthlyTransactionVolume)
+		require.Equal(t, create.Fulfillment, actual.Fulfillment)
+		require.Equal(t, create.VolumeByCustomerType, actual.VolumeByCustomerType)
+		require.Equal(t, create.CardVolumeDistribution, actual.CardVolumeDistribution)
 		require.Equal(t, moov.UnderwritingStatusNotRequested, actual.Status)
 	})
 
@@ -75,7 +81,7 @@ func TestUpsertUnderwriting(t *testing.T) {
 			HasPhysicalGoods:     true,
 			IsShippingProduct:    true,
 			ShipmentDurationDays: 3,
-			ReturnPolicy:         moov.WITHIN_THIRTY_DAYS,
+			ReturnPolicy:         moov.EXCHANGE_ONLY,
 		},
 	}
 
@@ -87,6 +93,9 @@ func TestUpsertUnderwriting(t *testing.T) {
 		require.Equal(t, update.AverageTransactionSize, actual.AverageTransactionSize)
 		require.Equal(t, update.MaxTransactionSize, actual.MaxTransactionSize)
 		require.Equal(t, update.AverageMonthlyTransactionVolume, actual.AverageMonthlyTransactionVolume)
+		require.Equal(t, update.Fulfillment, actual.Fulfillment)
+		require.Equal(t, update.VolumeByCustomerType, actual.VolumeByCustomerType)
+		require.Equal(t, update.CardVolumeDistribution, actual.CardVolumeDistribution)
 		require.Equal(t, moov.UnderwritingStatusNotRequested, actual.Status)
 	})
 
@@ -98,6 +107,9 @@ func TestUpsertUnderwriting(t *testing.T) {
 		require.Equal(t, update.AverageTransactionSize, actual.AverageTransactionSize)
 		require.Equal(t, update.MaxTransactionSize, actual.MaxTransactionSize)
 		require.Equal(t, update.AverageMonthlyTransactionVolume, actual.AverageMonthlyTransactionVolume)
+		require.Equal(t, update.Fulfillment, actual.Fulfillment)
+		require.Equal(t, update.VolumeByCustomerType, actual.VolumeByCustomerType)
+		require.Equal(t, update.CardVolumeDistribution, actual.CardVolumeDistribution)
 		require.Equal(t, moov.UnderwritingStatusNotRequested, actual.Status)
 	})
 }
