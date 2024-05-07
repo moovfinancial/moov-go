@@ -19,7 +19,7 @@ func CredentialsFromEnv() Credentials {
 
 	creds.Host = os.Getenv(ENV_MOOV_HOST)
 	if creds.Host == "" {
-		creds.Host = "api.moov-staging.io"
+		creds.Host = "api.moov.io"
 	}
 
 	return creds
