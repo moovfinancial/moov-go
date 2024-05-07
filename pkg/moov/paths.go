@@ -18,6 +18,9 @@ const (
 	pathPaymentMethods = "/accounts/%s/payment-methods"
 	pathPaymentMethod  = "/accounts/%s/payment-methods/%s"
 
+	pathRepresentatives = "/accounts/%s/representatives"
+	pathRepresentative  = "/accounts/%s/representatives/%s"
+
 	pathCards = "/accounts/%s/cards"
 	pathCard  = "/accounts/%s/cards/%s"
 
