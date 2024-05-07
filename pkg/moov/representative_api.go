@@ -11,7 +11,6 @@ func (c Client) CreateRepresentative(ctx context.Context, accountID string, repr
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathRepresentatives, accountID),
 		AcceptJson(),
-		WaitFor("connection"),
 		JsonBody(representative))
 	if err != nil {
 		return nil, err
