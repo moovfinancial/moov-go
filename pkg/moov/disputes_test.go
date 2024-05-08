@@ -150,7 +150,7 @@ func Test_UploadEvidenceFile_DisputeNotFound(t *testing.T) {
 
 	// We don't have any disputes to test against! So using a random id to update evidence will return unauthorized since we dont own the resource
 	disputeID := uuid.NewString()
-	file := []byte("test")
+	file := bytes.NewReader([]byte("test"))
 	err := mc.UploadEvidenceFile(context.Background(), disputeID, moov.EvidenceType_CoverLetter, "test.txt", file)
 	require.Error(t, err)
 

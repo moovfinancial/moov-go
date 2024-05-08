@@ -1,9 +1,9 @@
 package moov
 
 import (
-	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 )
@@ -206,10 +206,10 @@ func (c Client) DeleteDisputeEvidence(ctx context.Context, disputeID, evidenceID
 
 // UploadEvidenceFile uploads a new evidence file for the given dispute id
 // https://docs.moov.io/api/money-movement/disputes/post-file/
-func (c Client) UploadEvidenceFile(ctx context.Context, disputeID string, evidenceType EvidenceType, filename string, file []byte) error {
+func (c Client) UploadEvidenceFile(ctx context.Context, disputeID string, evidenceType EvidenceType, filename string, file io.Reader) error {
 	var multiParts []multipartFn
 	multiParts = append(multiParts, MultipartField("evidenceType", string(evidenceType)))
-	multiParts = append(multiParts, MultipartFile("file", filename, bytes.NewReader(file)))
+	multiParts = append(multiParts, MultipartFile("file", filename, file))
 
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeEvidenceFile, disputeID), MultipartBody(multiParts...))
 	if err != nil {
