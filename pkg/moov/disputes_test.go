@@ -84,7 +84,7 @@ func Test_UploadDisputeEvidence_Unauthorized(t *testing.T) {
 	disputeID := uuid.NewString()
 	dispute, err := mc.UploadDisputeEvidence(context.Background(), disputeID, moov.DisputesEvidenceText{
 		Text:         "Some evidence text",
-		EvidenceType: moov.DisputeTextEvidenceType_GenericEvidence,
+		EvidenceType: moov.EvidenceType_GenericEvidence,
 	})
 	require.Nil(t, dispute)
 
@@ -117,9 +117,75 @@ func Test_UpdateDisputeEvidence_Unauthorized(t *testing.T) {
 	disputeID := uuid.NewString()
 	evidenceID := uuid.NewString()
 	dispute, err := mc.UpdateDisputeEvidence(context.Background(), disputeID, evidenceID, moov.DisputesEvidenceUpdate{
-		EvidenceType: moov.DisputeTextEvidenceType_Other,
+		EvidenceType: moov.EvidenceType_Other,
 	})
 	require.Nil(t, dispute)
+
+	// find and cast the error into HttpCallError so it can be inspected
+	var httpErr moov.HttpCallResponse
+	require.ErrorAs(t, err, &httpErr)
+
+	require.Equal(t, moov.StatusUnauthorized, httpErr.Status())
+}
+
+func Test_DeleteDisputeEvidence_NotFound(t *testing.T) {
+	mc := NewTestClient(t)
+
+	// We don't have any disputes to test against! So using a random id to update evidence will return unauthorized since we dont own the resource
+	disputeID := uuid.NewString()
+	evidenceID := uuid.NewString()
+
+	err := mc.DeleteDisputeEvidence(context.Background(), disputeID, evidenceID)
+	require.Error(t, err)
+
+	// find and cast the error into HttpCallError so it can be inspected
+	var httpErr moov.HttpCallResponse
+	require.ErrorAs(t, err, &httpErr)
+
+	require.Equal(t, moov.StatusUnauthorized, httpErr.Status())
+}
+
+func Test_UploadEvidenceFile_DisputeNotFound(t *testing.T) {
+	mc := NewTestClient(t)
+
+	// We don't have any disputes to test against! So using a random id to update evidence will return unauthorized since we dont own the resource
+	disputeID := uuid.NewString()
+	file := []byte("test")
+	err := mc.UploadEvidenceFile(context.Background(), disputeID, moov.EvidenceType_CoverLetter, "test.txt", file)
+	require.Error(t, err)
+
+	// find and cast the error into HttpCallError so it can be inspected
+	var httpErr moov.HttpCallResponse
+	require.ErrorAs(t, err, &httpErr)
+
+	require.Equal(t, moov.StatusUnauthorized, httpErr.Status())
+}
+
+func Test_ListDisputeEvidence_DisputeNotFound(t *testing.T) {
+	mc := NewTestClient(t)
+
+	// We don't have any disputes to test against! So using a random id to update evidence will return unauthorized since we dont own the resource
+	disputeID := uuid.NewString()
+	evidence, err := mc.ListDisputeEvidence(context.Background(), disputeID)
+	require.Nil(t, evidence)
+	require.Error(t, err)
+
+	// find and cast the error into HttpCallError so it can be inspected
+	var httpErr moov.HttpCallResponse
+	require.ErrorAs(t, err, &httpErr)
+
+	require.Equal(t, moov.StatusUnauthorized, httpErr.Status())
+}
+
+func Test_GetDisputeEvidence_NotFound(t *testing.T) {
+	mc := NewTestClient(t)
+
+	// We don't have any disputes to test against! So using a random id to update evidence will return unauthorized since we dont own the resource
+	disputeID := uuid.NewString()
+	evidenceID := uuid.NewString()
+	evidence, err := mc.GetDisputeEvidence(context.Background(), disputeID, evidenceID)
+	require.Nil(t, evidence)
+	require.Error(t, err)
 
 	// find and cast the error into HttpCallError so it can be inspected
 	var httpErr moov.HttpCallResponse
