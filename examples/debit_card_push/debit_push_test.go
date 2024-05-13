@@ -116,9 +116,7 @@ func TestVisaSandboxPush(t *testing.T) {
 				Total: moov.PtrOf(int64(2)), // $0.02
 			},
 			Description: "Push to card",
-		},
-		moov.WithTransferWaitForRailResponse(),
-	)
+		}).WaitForRailResponse()
 	require.NoError(t, err)
 
 	fmt.Printf("Transfer: %+v\n", completedTransfer.TransferID)

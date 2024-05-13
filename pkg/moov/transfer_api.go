@@ -12,7 +12,6 @@ import (
 
 type CreateTransferArgs func(t *createTransferBuilder) callArg
 type createTransferBuilder struct {
-	synchronous    bool
 	idempotencyKey string
 }
 
@@ -53,6 +52,7 @@ type CreateTransferBuilder struct {
 	callArgs []callArg
 }
 
+// Started kicks off the transfers request and doesn't wait beyond the initial response kicking off the transfer
 func (r CreateTransferBuilder) Started() (*TransferStarted, error) {
 	resp, err := r.client.CallHttp(r.ctx, r.endpoint, r.callArgs...)
 	if err != nil {
@@ -70,6 +70,11 @@ func (r CreateTransferBuilder) Started() (*TransferStarted, error) {
 	}
 }
 
+// Starts a transfer request and then waits for the approval or refusal of the rail before returning the result.
+// This returns 3 results
+// - 1st being a transfer that waited until we got a success or failure from the rail.
+// - 2nd being a transfer that was started but didn't finish before timing out. This response can be retried with the same idempotency key. You may also void or refund using the data from the response.
+// - 3rd being an error in running the transfer which is a terminal state.
 func (r CreateTransferBuilder) WaitForRailResponse() (*Transfer, *TransferStarted, error) {
 	resp, err := r.client.CallHttp(r.ctx, r.endpoint, append(r.callArgs, WaitFor("rail-response"))...)
 	if err != nil {

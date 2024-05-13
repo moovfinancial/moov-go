@@ -74,7 +74,7 @@ func TestRTPCreditExample(t *testing.T) {
 	destinationPaymentMethod := destinationPaymentMethods[0]
 
 	// Step 6: create transfer
-	_, completedAsyncTransfer, err := mc.CreateTransfer(
+	completedAsyncTransfer, err := mc.CreateTransfer(
 		ctx,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
@@ -88,7 +88,7 @@ func TestRTPCreditExample(t *testing.T) {
 				Value:    132, // $1.32
 			},
 		},
-	)
+	).Started()
 	require.NoError(t, err)
 
 	t.Logf("Transfer %s created", completedAsyncTransfer.TransferID)
