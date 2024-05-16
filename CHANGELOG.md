@@ -1,3 +1,23 @@
+## v0.2.0 (Released 2024-05-16)
+
+ADDITIONS
+
+- examples: add webhooks receiver
+- feat: add missing fields for Disputes, add endpoints
+- feat: create CRUD commands for Representatives
+- feat: create CRUD commands for Underwriting
+- webhooks: add mhooks package, new models, and establish pattern
+
+IMPROVEMENTS
+
+- examples/ach: add wallet-to-bank example
+- examples/rtp: add RTP fallback to ACH
+- feat: add RTPRejectionCode on BankAccount ExceptionDetails
+- meta: send moov-go version on User-Agent
+- moov: raise query params to their noun level types
+
+Milestone: https://github.com/moovfinancial/moov-go/issues?q=is%3Aissue+milestone%3Av0.2.0+
+
 ## v0.1.0 (Released 2024-04-23)
 
 INITIAL RELEASE
