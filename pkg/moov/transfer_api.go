@@ -71,10 +71,10 @@ func (r CreateTransferBuilder) Started() (*TransferStarted, error) {
 }
 
 // Starts a transfer request and waits for a response from the rail (e.g. authorized or declined) before returning the result.
-// This returns 3 results
-// - 1st being a transfer that waited until we got a success or failure from the rail.
-// - 2nd being a transfer that was started but didn't finish before timing out. This response can be retried with the same idempotency key. You may also void or refund using the data from the response.
-// - 3rd being an error in running the transfer which is a terminal state.
+// The 3 return values are:
+// 1) A full transfer with rail-specific details as a result of waiting for the response from the rail.
+// 2) A transfer that started but the request timed out waiting for a response from the rail.
+// 3) An error attempting to create the transfer.
 func (r CreateTransferBuilder) WaitForRailResponse() (*Transfer, *TransferStarted, error) {
 	resp, err := r.client.CallHttp(r.ctx, r.endpoint, append(r.callArgs, WaitFor("rail-response"))...)
 	if err != nil {
