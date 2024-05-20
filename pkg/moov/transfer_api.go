@@ -71,7 +71,7 @@ func (r CreateTransferBuilder) Started() (*TransferStarted, error) {
 }
 
 // Starts a transfer request and waits for a response from the rail (e.g. authorized or declined) before returning the result.
-// The 3 return values are:
+// There are three possible return values (and only one will be not-nil):
 // 1) A full transfer with rail-specific details as a result of waiting for the response from the rail.
 // 2) A transfer that started but the request timed out waiting for a response from the rail.
 // 3) An error attempting to create the transfer.
