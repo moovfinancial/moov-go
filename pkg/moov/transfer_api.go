@@ -52,7 +52,7 @@ type CreateTransferBuilder struct {
 	callArgs []callArg
 }
 
-// Started kicks off the transfers request and doesn't wait beyond the initial response kicking off the transfer
+// Started initiates the transfers request and doesn't wait beyond creating the transfer
 func (r CreateTransferBuilder) Started() (*TransferStarted, error) {
 	resp, err := r.client.CallHttp(r.ctx, r.endpoint, r.callArgs...)
 	if err != nil {
