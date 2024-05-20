@@ -12,15 +12,7 @@ import (
 
 type CreateTransferArgs func(t *createTransferBuilder) callArg
 type createTransferBuilder struct {
-	synchronous    bool
 	idempotencyKey string
-}
-
-func WithTransferWaitForRailResponse() CreateTransferArgs {
-	return func(t *createTransferBuilder) callArg {
-		t.synchronous = true
-		return WaitFor("rail-response")
-	}
 }
 
 // Can be specified to overwrite a randomly generated one.
@@ -33,8 +25,7 @@ func WithTransferIdempotencyKey(key uuid.UUID) CreateTransferArgs {
 
 // CreateTransfer creates a new transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
-func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, options ...CreateTransferArgs) (*Transfer, *TransferStarted, error) {
-
+func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, options ...CreateTransferArgs) CreateTransferBuilder {
 	builder := &createTransferBuilder{}
 	callArgs := []callArg{
 		AcceptJson(),
@@ -46,23 +37,57 @@ func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, opt
 		callArgs = append(callArgs, opt(builder))
 	}
 
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathTransfers), callArgs...)
+	return CreateTransferBuilder{
+		client:   c,
+		ctx:      ctx,
+		endpoint: Endpoint(http.MethodPost, pathTransfers),
+		callArgs: callArgs,
+	}
+}
+
+type CreateTransferBuilder struct {
+	client   Client
+	ctx      context.Context
+	endpoint EndpointArg
+	callArgs []callArg
+}
+
+// Started initiates the transfers request and doesn't wait beyond creating the transfer
+func (r CreateTransferBuilder) Started() (*TransferStarted, error) {
+	resp, err := r.client.CallHttp(r.ctx, r.endpoint, r.callArgs...)
+	if err != nil {
+		return nil, err
+	}
+
+	switch resp.Status() {
+	case StatusCompleted:
+		st, err := UnmarshalObjectResponse[TransferStarted](resp)
+		return st, err
+	case StatusStateConflict:
+		return nil, errors.Join(ErrXIdempotencyKey, resp)
+	default:
+		return nil, resp
+	}
+}
+
+// Starts a transfer request and waits for a response from the rail (e.g. authorized or declined) before returning the result.
+// There are three possible return values (and only one will be not-nil):
+// 1) A full transfer with rail-specific details as a result of waiting for the response from the rail.
+// 2) A transfer that started but the request timed out waiting for a response from the rail.
+// 3) An error attempting to create the transfer.
+func (r CreateTransferBuilder) WaitForRailResponse() (*Transfer, *TransferStarted, error) {
+	resp, err := r.client.CallHttp(r.ctx, r.endpoint, append(r.callArgs, WaitFor("rail-response"))...)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	switch resp.Status() {
 	case StatusCompleted:
-		if builder.synchronous {
-			st, err := UnmarshalObjectResponse[Transfer](resp)
-			return st, nil, err
-		} else {
-			st, err := UnmarshalObjectResponse[TransferStarted](resp)
-			return nil, st, err
-		}
+		transfer, err := UnmarshalObjectResponse[Transfer](resp)
+		return transfer, nil, err
 	case StatusStarted:
-		st, err := UnmarshalObjectResponse[TransferStarted](resp)
-		return nil, st, err
+		transferStarted, err := UnmarshalObjectResponse[TransferStarted](resp)
+		return nil, transferStarted, err
 	case StatusStateConflict:
 		return nil, nil, errors.Join(ErrXIdempotencyKey, resp)
 	default:

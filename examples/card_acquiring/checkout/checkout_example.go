@@ -169,7 +169,7 @@ func main() {
 		Amount:         amount,
 		FacilitatorFee: facilitatorFee,
 		Description:    description,
-	}, moov.WithTransferWaitForRailResponse())
+	}).WaitForRailResponse()
 	if err != nil {
 		fmt.Println(err)
 		return

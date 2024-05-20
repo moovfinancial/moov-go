@@ -113,11 +113,7 @@ func TestMicroDepositExample(t *testing.T) {
 				Currency: "USD",
 				Value:    2843, // $28.43
 			},
-		},
-		// not required since ACH is processed in batches,
-		// but useful in getting the full transfer model
-		moov.WithTransferWaitForRailResponse(),
-	)
+		}).WaitForRailResponse()
 	require.NoError(t, err)
 
 	t.Logf("Transfer %s created", completedTransfer.TransferID)
