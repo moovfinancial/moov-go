@@ -3,8 +3,9 @@ package moov_test
 import (
 	"testing"
 
-	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
+
+	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
 func Test_Transfers(t *testing.T) {
@@ -62,7 +63,7 @@ func Test_Transfers(t *testing.T) {
 		}).WaitForRailResponse()
 		NoResponseError(t, err)
 
-		// We made an async transfer, so completed should be nil, while started not nil
+		// We made a sync transfer, so completed should be not nil, while started is nil
 		require.NotNil(t, completed)
 		require.Nil(t, started)
 	})

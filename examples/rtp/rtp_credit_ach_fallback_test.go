@@ -77,7 +77,7 @@ func TestRTPCreditACHFallbackExample(t *testing.T) {
 	require.Equal(t, moov.PaymentMethodType("ach-credit-same-day"), destinationPaymentMethod.PaymentMethodType)
 
 	// Step 7: create transfer
-	_, completedAsyncTransfer, err := mc.CreateTransfer(
+	completedAsyncTransfer, err := mc.CreateTransfer(
 		ctx,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
@@ -90,7 +90,7 @@ func TestRTPCreditACHFallbackExample(t *testing.T) {
 				Currency: "USD",
 				Value:    132, // $1.32
 			},
-		}).WaitForRailResponse()
+		}).Started()
 	require.NoError(t, err)
 
 	t.Logf("Transfer %s created", completedAsyncTransfer.TransferID)
