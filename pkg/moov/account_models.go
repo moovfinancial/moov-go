@@ -85,6 +85,11 @@ type TermsOfServiceManual struct {
 	AcceptanceDate      time.Time `json:"acceptedDate"`
 }
 
+type AccountCapability struct {
+	Capability CapabilityName   `json:"capability,omitempty"`
+	Status     CapabilityStatus `json:"status,omitempty"`
+}
+
 // Account Describes a Moov account.
 type Account struct {
 	Mode Mode `json:"mode,omitempty"`
@@ -94,9 +99,10 @@ type Account struct {
 	DisplayName string      `json:"displayName,omitempty"`
 	Profile     Profile     `json:"profile,omitempty"`
 	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
-	Metadata       map[string]string `json:"metadata,omitempty"`
-	TermsOfService *TermsOfService   `json:"termsOfService,omitempty"`
-	Verification   Verification      `json:"verification,omitempty"`
+	Metadata       map[string]string   `json:"metadata,omitempty"`
+	TermsOfService *TermsOfService     `json:"termsOfService,omitempty"`
+	Capabilities   []AccountCapability `json:"capabilities,omitempty"`
+	Verification   Verification        `json:"verification,omitempty"`
 	// Optional alias from a foreign/external system which can be used to reference this resource.
 	ForeignID       string           `json:"foreignID,omitempty"`
 	CustomerSupport *CustomerSupport `json:"customerSupport,omitempty"`

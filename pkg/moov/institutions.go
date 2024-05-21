@@ -11,17 +11,24 @@ type FinancialInstitutions struct {
 }
 
 type AchParticipant struct {
-	RoutingNumber      string      `json:"routingNumber,omitempty"`
-	OfficeCode         string      `json:"officeCode,omitempty"`
-	ServicingFRBNumber string      `json:"servicingFRBNumber,omitempty"`
-	RecordTypeCode     string      `json:"recordTypeCode,omitempty"`
-	Revised            string      `json:"revised,omitempty"`
-	NewRoutingNumber   string      `json:"newRoutingNumber,omitempty"`
-	CustomerName       string      `json:"customerName,omitempty"`
-	PhoneNumber        string      `json:"phoneNumber,omitempty"`
-	StatusCode         string      `json:"statusCode,omitempty"`
-	ViewCode           string      `json:"viewCode,omitempty"`
-	AchLocation        AchLocation `json:"achLocation,omitempty"`
+	RoutingNumber      string           `json:"routingNumber,omitempty"`
+	OfficeCode         string           `json:"officeCode,omitempty"`
+	ServicingFRBNumber string           `json:"servicingFRBNumber,omitempty"`
+	RecordTypeCode     string           `json:"recordTypeCode,omitempty"`
+	Revised            string           `json:"revised,omitempty"`
+	NewRoutingNumber   string           `json:"newRoutingNumber,omitempty"`
+	CustomerName       string           `json:"customerName,omitempty"`
+	PhoneNumber        string           `json:"phoneNumber,omitempty"`
+	StatusCode         string           `json:"statusCode,omitempty"`
+	ViewCode           string           `json:"viewCode,omitempty"`
+	CleanName          string           `json:"cleanName,omitempty"`
+	AchLocation        AchLocation      `json:"achLocation,omitempty"`
+	Logo               *InstitutionLogo `json:"logo,omitempty"`
+}
+
+type InstitutionLogo struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }
 
 type AchLocation struct {

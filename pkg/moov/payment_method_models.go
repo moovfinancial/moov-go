@@ -125,9 +125,10 @@ type CardExpiration struct {
 
 // CardVerifications The results of submitting cardholder data to a card network for verification.
 type CardVerifications struct {
-	Cvv          CardVerificationResult `json:"cvv,omitempty"`
-	AddressLine1 CardVerificationResult `json:"addressLine1,omitempty"`
-	PostalCode   CardVerificationResult `json:"postalCode,omitempty"`
+	Cvv          CardVerificationResult  `json:"cvv,omitempty"`
+	AddressLine1 CardVerificationResult  `json:"addressLine1,omitempty"`
+	PostalCode   CardVerificationResult  `json:"postalCode,omitempty"`
+	AccountName  AccountNameVerification `json:"accountName,omitempty"`
 }
 
 // CardVerificationResult the model 'CardVerificationResult'
@@ -140,6 +141,13 @@ const (
 	CardVerificationResult_NotChecked  CardVerificationResult = "notChecked"
 	CardVerificationResult_Unavailable CardVerificationResult = "unavailable"
 )
+
+type AccountNameVerification struct {
+	FirstName  CardVerificationResult `json:"firstName,omitempty"`
+	LastName   CardVerificationResult `json:"lastName,omitempty"`
+	MiddleName CardVerificationResult `json:"middleName,omitempty"`
+	FullName   CardVerificationResult `json:"fullName,omitempty"`
+}
 
 // DomesticPushToCard Indicates which level of domestic push-to-card transfer is supported by the card, if any.
 type DomesticPushToCard string
