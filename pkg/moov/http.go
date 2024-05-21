@@ -123,8 +123,10 @@ func (r *httpCallResponse) Unmarshal(item any) error {
 	}
 
 	if strings.Contains(ct, "json") {
-		// content type checking here...
-		return json.Unmarshal(r.body, item)
+		// TODO: content type checking here...
+		dec := json.NewDecoder(bytes.NewReader(r.body))
+		dec.DisallowUnknownFields()
+		return dec.Decode(item)
 	}
 
 	return fmt.Errorf("unknown content-type: %s", ct)
