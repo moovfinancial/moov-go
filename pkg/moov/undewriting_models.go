@@ -36,7 +36,7 @@ type VolumeByCustomerType struct {
 
 type CardVolumeDistribution struct {
 	EcommercePercentage     int32 `json:"ecommercePercentage"`
-	CardPresentPercentage   int32 `json:"cardPresentPercentagePercentage"`
+	CardPresentPercentage   int32 `json:"cardPresentPercentage"`
 	MailOrPhonePercentage   int32 `json:"mailOrPhonePercentage"`
 	DebtRepaymentPercentage int32 `json:"debtRepaymentPercentage"`
 }
