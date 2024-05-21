@@ -57,3 +57,14 @@ jobs:
       run: make check
       env:
         SKIP_LINTERS: yes
+
+    - name: Report Failure
+      uses: tokorom/action-slack-incoming-webhook@main
+      if: github.event_name == 'schedule' && failure()
+      env:
+        INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      with:
+        text: |+
+          moov-go CI Failure
+
+          Github Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
