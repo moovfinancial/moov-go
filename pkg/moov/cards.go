@@ -8,23 +8,27 @@ import (
 )
 
 type Card struct {
-	CardID             string             `json:"cardID,omitempty"`
-	Fingerprint        string             `json:"fingerprint,omitempty"`
-	Brand              string             `json:"brand,omitempty"`
-	CardType           string             `json:"cardType,omitempty"`
-	LastFourCardNumber string             `json:"lastFourCardNumber,omitempty"`
-	Bin                string             `json:"bin,omitempty"`
-	Expiration         Expiration         `json:"expiration,omitempty"`
-	HolderName         string             `json:"holderName,omitempty"`
-	BillingAddress     Address            `json:"billingAddress,omitempty"`
-	CardVerification   CardVerification   `json:"cardVerification,omitempty"`
-	Issuer             string             `json:"issuer,omitempty"`
-	IssuerCountry      string             `json:"issuerCountry,omitempty"`
-	CardOnFile         bool               `json:"cardOnFile,omitempty"`
-	MerchantAccountID  string             `json:"merchantAccountID,omitempty"`
-	CardAccountUpdater CardAccountUpdater `json:"cardAccountUpdater,omitempty"`
-	DomesticPushToCard string             `json:"domesticPushToCard,omitempty"`
-	PaymentMethods     []PaymentMethod    `json:"paymentMethods,omitempty"`
+	CardID               string             `json:"cardID,omitempty"`
+	Fingerprint          string             `json:"fingerprint,omitempty"`
+	Brand                string             `json:"brand,omitempty"`
+	CardCategory         string             `json:"cardCategory,omitempty"`
+	CardType             string             `json:"cardType,omitempty"`
+	LastFourCardNumber   string             `json:"lastFourCardNumber,omitempty"`
+	Bin                  string             `json:"bin,omitempty"`
+	Expiration           Expiration         `json:"expiration,omitempty"`
+	HolderName           string             `json:"holderName,omitempty"`
+	BillingAddress       Address            `json:"billingAddress,omitempty"`
+	CardVerification     CardVerification   `json:"cardVerification,omitempty"`
+	Issuer               string             `json:"issuer,omitempty"`
+	IssuerCountry        string             `json:"issuerCountry,omitempty"`
+	IssuerURL            string             `json:"issuerURL,omitempty"`
+	IssuerPhone          string             `json:"issuerPhone,omitempty"`
+	CardOnFile           bool               `json:"cardOnFile,omitempty"`
+	MerchantAccountID    string             `json:"merchantAccountID,omitempty"`
+	CardAccountUpdater   CardAccountUpdater `json:"cardAccountUpdater,omitempty"`
+	DomesticPushToCard   string             `json:"domesticPushToCard,omitempty"`
+	DomesticPullFromCard string             `json:"domesticPullFromCard,omitempty"`
+	PaymentMethods       []PaymentMethod    `json:"paymentMethods,omitempty"`
 }
 
 type Expiration struct {
@@ -33,9 +37,10 @@ type Expiration struct {
 }
 
 type CardVerification struct {
-	Cvv          string `json:"cvv,omitempty"`
-	AddressLine1 string `json:"addressLine1,omitempty"`
-	PostalCode   string `json:"postalCode,omitempty"`
+	Cvv          string                  `json:"cvv,omitempty"`
+	AddressLine1 string                  `json:"addressLine1,omitempty"`
+	PostalCode   string                  `json:"postalCode,omitempty"`
+	AccountName  AccountNameVerification `json:"accountName,omitempty"`
 }
 
 type CardAccountUpdater struct {
@@ -50,6 +55,7 @@ type CardDetails struct {
 	TransactionSource        string            `json:"transactionSource,omitempty"`
 	InterchangeQualification string            `json:"interchangeQualification,omitempty"`
 	StatusUpdates            CardStatusUpdates `json:"statusUpdates,omitempty"`
+	CompletedOn              *time.Time        `json:"completedOn,omitempty"`
 }
 
 type CardStatusUpdates struct {
