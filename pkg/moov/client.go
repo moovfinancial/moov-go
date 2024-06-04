@@ -1,12 +1,15 @@
 package moov
 
 import (
+	"io"
 	"net/http"
 )
 
 type Client struct {
 	Credentials Credentials
 	HttpClient  *http.Client
+
+	decoder Decoder
 }
 
 // NewClient returns a moov.Client with credentials read from environment variables.
@@ -44,6 +47,15 @@ func WithCredentials(credentials Credentials) ClientConfigurable {
 func WithHttpClient(client *http.Client) ClientConfigurable {
 	return func(c *Client) error {
 		c.HttpClient = client
+		return nil
+	}
+}
+
+type Decoder func(r io.Reader, item any) error
+
+func WithDecoder(dec Decoder) ClientConfigurable {
+	return func(c *Client) error {
+		c.decoder = dec
 		return nil
 	}
 }

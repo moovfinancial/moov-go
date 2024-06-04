@@ -56,9 +56,16 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 
 	body, _ := io.ReadAll(resp.Body)
 
+	decoder := standardDecoder
+	if c.decoder != nil {
+		decoder = c.decoder
+	}
+
 	return &httpCallResponse{
 		resp: resp,
 		body: body,
+
+		decoder: decoder,
 	}, nil
 }
 
@@ -78,6 +85,8 @@ type HttpCallResponse interface {
 type httpCallResponse struct {
 	resp *http.Response
 	body []byte
+
+	decoder Decoder
 }
 
 func (r *httpCallResponse) Status() CallStatus {
@@ -109,6 +118,10 @@ func (r *httpCallResponse) Status() CallStatus {
 	}
 }
 
+func standardDecoder(r io.Reader, item any) error {
+	return json.NewDecoder(r).Decode(item)
+}
+
 func (r *httpCallResponse) Unmarshal(item any) error {
 	ct := strings.ToLower(r.resp.Header.Get("content-type"))
 
@@ -124,9 +137,7 @@ func (r *httpCallResponse) Unmarshal(item any) error {
 
 	if strings.Contains(ct, "json") {
 		// TODO: content type checking here...
-		dec := json.NewDecoder(bytes.NewReader(r.body))
-		dec.DisallowUnknownFields()
-		return dec.Decode(item)
+		return r.decoder(bytes.NewReader(r.body), item)
 	}
 
 	return fmt.Errorf("unknown content-type: %s", ct)
