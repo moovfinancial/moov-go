@@ -2,8 +2,12 @@ package moov_test
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
@@ -29,12 +33,23 @@ func NewTestClient(t testing.TB, c ...moov.ClientConfigurable) *moov.Client {
 		}
 	}
 
+	c = append(c, moov.WithDecoder(strictDecoder))
+
 	mc, err := moov.NewClient(c...)
 	require.NoError(t, err)
 
 	require.NoError(t, mc.Ping(BgCtx()), "Unable to ping with credentials")
 
 	return mc
+}
+
+func strictDecoder(r io.Reader, contentType string, item any) error {
+	if strings.Contains(contentType, "application/json") {
+		dec := json.NewDecoder(r)
+		dec.DisallowUnknownFields()
+		return dec.Decode(item)
+	}
+	return fmt.Errorf("unknown content-type %s", contentType)
 }
 
 func Test_Client(t *testing.T) {
