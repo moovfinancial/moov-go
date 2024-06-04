@@ -51,7 +51,7 @@ func WithHttpClient(client *http.Client) ClientConfigurable {
 	}
 }
 
-type Decoder func(r io.Reader, item any) error
+type Decoder func(r io.Reader, contentType string, item any) error
 
 func WithDecoder(dec Decoder) ClientConfigurable {
 	return func(c *Client) error {

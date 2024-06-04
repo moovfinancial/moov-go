@@ -118,8 +118,11 @@ func (r *httpCallResponse) Status() CallStatus {
 	}
 }
 
-func standardDecoder(r io.Reader, item any) error {
-	return json.NewDecoder(r).Decode(item)
+func standardDecoder(r io.Reader, contentType string, item any) error {
+	if strings.Contains(contentType, "application/json") {
+		return json.NewDecoder(r).Decode(item)
+	}
+	return fmt.Errorf("unknown content-type %s", contentType)
 }
 
 func (r *httpCallResponse) Unmarshal(item any) error {
@@ -135,12 +138,7 @@ func (r *httpCallResponse) Unmarshal(item any) error {
 		return err
 	}
 
-	if strings.Contains(ct, "json") {
-		// TODO: content type checking here...
-		return r.decoder(bytes.NewReader(r.body), item)
-	}
-
-	return fmt.Errorf("unknown content-type: %s", ct)
+	return r.decoder(bytes.NewReader(r.body), ct, item)
 }
 
 func (r *httpCallResponse) StatusCode() int {
