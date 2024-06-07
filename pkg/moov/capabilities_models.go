@@ -3,7 +3,7 @@ package moov
 import "time"
 
 type requestCapabilities struct {
-	Capabilities []CapabilityName `json:"capabilities"`
+	Capabilities []CapabilityName `json:"capabilities,omitempty"`
 }
 
 type CapabilityName string
@@ -21,15 +21,15 @@ const (
 
 // Capability Describes an action or set of actions that an account is permitted to perform.
 type Capability struct {
-	Capability CapabilityName `json:"capability"`
+	Capability CapabilityName `json:"capability,omitempty"`
 	// ID of account.
 	AccountID    string           `json:"accountID,omitempty"`
-	Status       CapabilityStatus `json:"status"`
+	Status       CapabilityStatus `json:"status,omitempty"`
 	Requirements Requirement      `json:"requirements,omitempty"`
 	// If status is `disabled`, the reason this capability was disabled.
 	DisabledReason string     `json:"disabledReason,omitempty"`
-	CreatedOn      time.Time  `json:"createdOn"`
-	UpdatedOn      time.Time  `json:"updatedOn"`
+	CreatedOn      time.Time  `json:"createdOn,omitempty"`
+	UpdatedOn      time.Time  `json:"updatedOn,omitempty"`
 	DisabledOn     *time.Time `json:"disabledOn,omitempty"`
 }
 
