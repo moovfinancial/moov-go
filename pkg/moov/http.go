@@ -90,6 +90,10 @@ type httpCallResponse struct {
 }
 
 func (r *httpCallResponse) Status() CallStatus {
+	if r == nil || r.resp == nil {
+		return StatusServerError
+	}
+
 	switch r.resp.StatusCode {
 	case http.StatusOK, http.StatusNoContent:
 		return StatusCompleted
@@ -156,5 +160,22 @@ func (r *httpCallResponse) RequestId() string {
 }
 
 func (r *httpCallResponse) Error() string {
-	return fmt.Sprintf("error from moov - status: %s http.request_id: %s http.status_code: %d", r.Status().Name, r.RequestId(), r.StatusCode())
+	generic := fmt.Sprintf("error from moov - status: %s http.request_id: %s http.status_code: %d", r.Status().Name, r.RequestId(), r.StatusCode())
+
+	switch r.StatusCode() {
+	case http.StatusConflict, http.StatusUnprocessableEntity:
+		// a JSON response like
+		//  {"profile":{"business":{"taxID":{"ein":{"number":"must be a valid employer identification number"}}}}}
+		// gets transformed into
+		//  profile.business.taxID.ein.number: must be a valid employer identification number
+		if json.Valid(r.body) {
+			out := strings.TrimPrefix(string(r.body), `{"`)
+			out = strings.ReplaceAll(out, `":{"`, ".")
+			out = strings.ReplaceAll(out, `":"`, ": ")
+			out = strings.ReplaceAll(out, `"}`, "\n")
+			out = strings.ReplaceAll(out, "}", "")
+			return fmt.Sprintf("%s - %v", generic, strings.TrimSpace(out))
+		}
+	}
+	return generic
 }
