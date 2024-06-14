@@ -53,16 +53,17 @@ type SSN struct {
 }
 
 type CreateBusinessProfile struct {
-	Name          string         `json:"legalBusinessName,omitempty"`
-	DBA           string         `json:"doingBusinessAs,omitempty"`
-	Type          BusinessType   `json:"businessType,omitempty"`
-	Address       *Address       `json:"address,omitempty"`
-	Phone         *Phone         `json:"phone,omitempty"`
-	Email         string         `json:"email,omitempty"`
-	Website       string         `json:"website,omitempty"`
-	Description   string         `json:"description,omitempty"`
-	TaxID         *TaxID         `json:"taxID,omitempty"`
-	IndustryCodes *IndustryCodes `json:"industryCodes,omitempty"`
+	Name             string            `json:"legalBusinessName,omitempty"`
+	DBA              string            `json:"doingBusinessAs,omitempty"`
+	Type             BusinessType      `json:"businessType,omitempty"`
+	Address          *Address          `json:"address,omitempty"`
+	Phone            *Phone            `json:"phone,omitempty"`
+	Email            string            `json:"email,omitempty"`
+	Website          string            `json:"website,omitempty"`
+	Description      string            `json:"description,omitempty"`
+	TaxID            *TaxID            `json:"taxID,omitempty"`
+	IndustryCodes    *IndustryCodes    `json:"industryCodes,omitempty"`
+	PrimaryRegulator *PrimaryRegulator `json:"primaryRegulator,omitempty"`
 }
 
 type TaxID struct {
@@ -180,10 +181,11 @@ type Business struct {
 	Website     string `json:"website,omitempty"`
 	Description string `json:"description,omitempty"`
 	// Indicates whether a tax ID has been provided for this business.
-	TaxIDProvided   bool             `json:"taxIDProvided,omitempty"`
-	Representatives []Representative `json:"representatives,omitempty"`
-	OwnersProvided  bool             `json:"ownersProvided"`
-	IndustryCodes   *IndustryCodes   `json:"industryCodes,omitempty"`
+	TaxIDProvided    bool              `json:"taxIDProvided,omitempty"`
+	Representatives  []Representative  `json:"representatives,omitempty"`
+	OwnersProvided   bool              `json:"ownersProvided"`
+	IndustryCodes    *IndustryCodes    `json:"industryCodes,omitempty"`
+	PrimaryRegulator *PrimaryRegulator `json:"primaryRegulator,omitempty"`
 }
 
 // BusinessType The type of entity represented by this business.
@@ -219,6 +221,17 @@ type IndustryCodes struct {
 	Sic   string `json:"sic,omitempty"`
 	Mcc   string `json:"mcc,omitempty"`
 }
+
+// PrimaryRegulator If the business is a financial institution, this field describes its primary regulator.
+type PrimaryRegulator string
+
+// List of PrimaryRegulator
+const (
+	PrimaryRegulator_OCC  PrimaryRegulator = "OCC"
+	PrimaryRegulator_FDIC PrimaryRegulator = "FDIC"
+	PrimaryRegulator_NCUA PrimaryRegulator = "NCUA"
+	PrimaryRegulator_FRB  PrimaryRegulator = "FRB"
+)
 
 // TermsOfService Describes the acceptance of the Terms of Service.
 type TermsOfService struct {
