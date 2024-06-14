@@ -21,28 +21,28 @@ type ApplePayDomainsResponse struct {
 }
 
 type ApplePaymentDataHeader struct {
-	EphemeralPublicKey string `json:"ephemeralPublicKey"`
-	PublicKeyHash      string `json:"publicKeyHash"`
-	TransactionId      string `json:"transactionId"`
+	EphemeralPublicKey string `json:"ephemeralPublicKey,omitempty"`
+	PublicKeyHash      string `json:"publicKeyHash,omitempty"`
+	TransactionId      string `json:"transactionId,omitempty"`
 }
 
 type ApplePaymentData struct {
-	Version   string                 `json:"version"`
-	Data      string                 `json:"data"`
-	Signature string                 `json:"signature"`
-	Header    ApplePaymentDataHeader `json:"header"`
+	Version   string                 `json:"version,omitempty"`
+	Data      string                 `json:"data,omitempty"`
+	Signature string                 `json:"signature,omitempty"`
+	Header    ApplePaymentDataHeader `json:"header,omitempty"`
 }
 
 type ApplePaymentMethod struct {
-	DisplayName string `json:"displayName"`
-	Network     string `json:"network"`
-	Type        string `json:"type"`
+	DisplayName string `json:"displayName,omitempty"`
+	Network     string `json:"network,omitempty"`
+	Type        string `json:"type,omitempty"`
 }
 
 type ApplePayToken struct {
-	PaymentData           ApplePaymentData   `json:"paymentData"`
-	PaymentMethod         ApplePaymentMethod `json:"paymentMethod"`
-	TransactionIdentifier string             `json:"transactionIdentifier"`
+	PaymentData           ApplePaymentData   `json:"paymentData,omitempty"`
+	PaymentMethod         ApplePaymentMethod `json:"paymentMethod,omitempty"`
+	TransactionIdentifier string             `json:"transactionIdentifier,omitempty"`
 }
 
 type ApplePayBillingContact struct {
@@ -54,20 +54,20 @@ type ApplePayBillingContact struct {
 }
 
 type StartApplePaySession struct {
-	Domain      string `json:"domain"`
-	DisplayName string `json:"displayName"`
+	Domain      string `json:"domain,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
 }
 
 type LinkApplePay struct {
-	Token          ApplePayToken          `json:"token"`
+	Token          ApplePayToken          `json:"token,omitempty"`
 	BillingContact ApplePayBillingContact `json:"billingContact,omitempty"`
 }
 
 type LinkedApplePayPaymentMethod struct {
 	// ID of the payment method
-	PaymentMethodID   string   `json:"paymentMethodID"`
-	PaymentMethodType string   `json:"paymentMethodType"`
-	ApplePay          ApplePay `json:"applePay"`
+	PaymentMethodID   string   `json:"paymentMethodID,omitempty"`
+	PaymentMethodType string   `json:"paymentMethodType,omitempty"`
+	ApplePay          ApplePay `json:"applePay,omitempty"`
 }
 
 type ApplePay struct {

@@ -15,9 +15,9 @@ type AvailableBalance struct {
 	// A 3-letter ISO 4217 currency code.
 	Currency string `json:"currency,omitempty" otel:"currency"`
 	// Quantity in the smallest unit of the specified currency. In USD this is cents, so $12.04 is 1204 and $0.99 would be 99.
-	Value int64 `json:"value" otel:"value"`
+	Value int64 `json:"value,omitempty" otel:"value"`
 	// Same as `value`, but a decimal-formatted numerical string that represents up to 9 decimal place precision.
-	ValueDecimal string `json:"valueDecimal"`
+	ValueDecimal string `json:"valueDecimal,omitempty"`
 }
 
 type Transaction struct {

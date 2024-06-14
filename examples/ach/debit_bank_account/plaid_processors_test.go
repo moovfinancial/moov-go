@@ -123,21 +123,21 @@ func TestPlaidProcessorExample(t *testing.T) {
 }
 
 type plaidLinkTokenRequest struct {
-	ClientID   string `json:"client_id"`
-	Secret     string `json:"secret"`
-	ClientName string `json:"client_name"`
+	ClientID   string `json:"client_id,omitempty"`
+	Secret     string `json:"secret,omitempty"`
+	ClientName string `json:"client_name,omitempty"`
 	User       struct {
-		ClientUserID string `json:"client_user_id"`
-	} `json:"user"`
-	Products     []string `json:"products"`
-	CountryCodes []string `json:"country_codes"`
-	Language     string   `json:"language"`
-	Webhook      string   `json:"webhook"`
-	RedirectURI  string   `json:"redirect_uri"`
+		ClientUserID string `json:"client_user_id,omitempty"`
+	} `json:"user,omitempty"`
+	Products     []string `json:"products,omitempty"`
+	CountryCodes []string `json:"country_codes,omitempty"`
+	Language     string   `json:"language,omitempty"`
+	Webhook      string   `json:"webhook,omitempty"`
+	RedirectURI  string   `json:"redirect_uri,omitempty"`
 }
 
 type plaidLinkTokenResponse struct {
-	LinkToken string `json:"link_token"`
+	LinkToken string `json:"link_token,omitempty"`
 }
 
 func createLinkToken(t testing.TB) string {

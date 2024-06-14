@@ -36,16 +36,16 @@ const (
 )
 
 type File struct {
-	FileID         string      `json:"fileID"`
-	FileName       string      `json:"fileName"`
-	FilePurpose    FilePurpose `json:"filePurpose"`
-	FileStatus     FileStatus  `json:"fileStatus"`
-	DecisionReason *string     `json:"decisionReason"`
-	Size           int         `json:"fileSizeBytes"`
-	Metadata       string      `json:"metadata"`
-	AccountID      string      `json:"accountID"`
-	CreatedOn      time.Time   `json:"createdOn"`
-	UpdatedOn      time.Time   `json:"updatedOn"`
+	FileID         string      `json:"fileID,omitempty"`
+	FileName       string      `json:"fileName,omitempty"`
+	FilePurpose    FilePurpose `json:"filePurpose,omitempty"`
+	FileStatus     FileStatus  `json:"fileStatus,omitempty"`
+	DecisionReason *string     `json:"decisionReason,omitempty"`
+	Size           int         `json:"fileSizeBytes,omitempty"`
+	Metadata       string      `json:"metadata,omitempty"`
+	AccountID      string      `json:"accountID,omitempty"`
+	CreatedOn      time.Time   `json:"createdOn,omitempty"`
+	UpdatedOn      time.Time   `json:"updatedOn,omitempty"`
 }
 
 func (c Client) UploadFile(ctx context.Context, accountID string, upload UploadFile) (*File, error) {

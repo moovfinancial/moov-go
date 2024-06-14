@@ -4,9 +4,9 @@ import "time"
 
 // CreateTransfer struct for CreateTransfer
 type CreateTransfer struct {
-	Source         CreateTransfer_Source         `json:"source"`
-	Destination    CreateTransfer_Destination    `json:"destination"`
-	Amount         Amount                        `json:"amount"`
+	Source         CreateTransfer_Source         `json:"source,omitempty"`
+	Destination    CreateTransfer_Destination    `json:"destination,omitempty"`
+	Amount         Amount                        `json:"amount,omitempty"`
 	FacilitatorFee CreateTransfer_FacilitatorFee `json:"facilitatorFee,omitempty"`
 	// An optional description of the transfer for your own internal use.
 	Description string `json:"description,omitempty"`
@@ -44,7 +44,7 @@ type CreateTransfer_AchDetailsSource struct {
 // CreateTransfer_Destination The final stage of a transfer and the ultimate recipient of the funds.
 type CreateTransfer_Destination struct {
 	// UUID v4
-	PaymentMethodID string                                 `json:"paymentMethodID"`
+	PaymentMethodID string                                 `json:"paymentMethodID,omitempty"`
 	CardDetails     *CreateTransfer_CardDetailsDestination `json:"cardDetails,omitempty"`
 	AchDetails      *CreateTransfer_AchDetailsBase         `json:"achDetails,omitempty"`
 }
@@ -126,7 +126,7 @@ type Amount struct {
 // GetFacilitatorFee Fee you charged your customer for the transfer.
 type GetFacilitatorFee struct {
 	// Total facilitator fee in cents.
-	Total int64 `json:"total"`
+	Total int64 `json:"total,omitempty"`
 	// Same as `total`, but a decimal-formatted numerical string that represents up to 9 decimal place precision.
 	TotalDecimal string `json:"totalDecimal,omitempty"`
 	// Markup facilitator fee in cents.
@@ -144,7 +144,7 @@ type MoovFeeDetails struct {
 	// Network discount fee for American Express. String type represents dollars with up to 9 decimal place precision.
 	Discount string `json:"discount,omitempty"`
 	// Moov processing fee. String type represents dollars with up to 9 decimal place precision.
-	MoovProcessing string `json:"moovProcessing"`
+	MoovProcessing string `json:"moovProcessing,omitempty"`
 }
 
 // Refund Details of a card refund.
@@ -206,8 +206,8 @@ type TransferAccount struct {
 
 // AchDetailsSource struct for AchDetailsSource
 type AchDetailsSource struct {
-	Status      AchStatus     `json:"status"`
-	TraceNumber string        `json:"traceNumber"`
+	Status      AchStatus     `json:"status,omitempty"`
+	TraceNumber string        `json:"traceNumber,omitempty"`
 	Return      *AchException `json:"return,omitempty"`
 	Correction  *AchException `json:"correction,omitempty"`
 	// An optional override of the default NACHA company entry description for a transfer.
@@ -247,8 +247,8 @@ type TransferDestination struct {
 
 // AchDetails ACH specific details about the transaction.
 type AchDetails struct {
-	Status      AchStatus     `json:"status"`
-	TraceNumber string        `json:"traceNumber"`
+	Status      AchStatus     `json:"status,omitempty"`
+	TraceNumber string        `json:"traceNumber,omitempty"`
 	Return      *AchException `json:"return,omitempty"`
 	Correction  *AchException `json:"correction,omitempty"`
 	// An optional override of the default NACHA company entry description for a transfer.
@@ -265,7 +265,7 @@ type AchDetails struct {
 
 // RtpDetails RTP specific details about the transaction.
 type RtpDetails struct {
-	Status RtpStatus `json:"status"`
+	Status RtpStatus `json:"status,omitempty"`
 	// Code returned by rail network on failure.
 	NetworkResponseCode      *string         `json:"networkResponseCode,omitempty"`
 	FailureCode              *RtpFailureCode `json:"failureCode,omitempty"`
@@ -310,9 +310,9 @@ type CreatedCancellation struct {
 
 // CreateTransferOptions struct for CreateTransferOptions
 type CreateTransferOptions struct {
-	Source      CreateTransferOptionsTarget `json:"source"`
-	Destination CreateTransferOptionsTarget `json:"destination"`
-	Amount      Amount                      `json:"amount"`
+	Source      CreateTransferOptionsTarget `json:"source,omitempty"`
+	Destination CreateTransferOptionsTarget `json:"destination,omitempty"`
+	Amount      Amount                      `json:"amount,omitempty"`
 }
 
 // CreateTransferOptionsTarget struct for CreateTransferOptionsTarget

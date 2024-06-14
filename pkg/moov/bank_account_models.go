@@ -38,11 +38,11 @@ const (
 )
 
 type PlaidRequest struct {
-	Token string `json:"token"`
+	Token string `json:"token,omitempty"`
 }
 
 type PlaidLinkRequest struct {
-	PublicToken string `json:"publicToken"`
+	PublicToken string `json:"publicToken,omitempty"`
 }
 
 // MxAuthorizationCode The authorization code of a MX account which allows a processor to retrieve a linked payment account. <br><br> `sandbox` - When linking a bank account to a `sandbox` account using a MX authorization code it will utilize MX's sandbox environment. The MX authorization code provided must be generated from MX's sandbox environment.
@@ -111,7 +111,7 @@ type ExceptionDetails struct {
 	Description string `json:"description,omitempty"`
 
 	// RTPRejectionCode is a rejection code of an RTP transaction that caused the bank account status to change.
-	RTPRejectionCode *RTPRejectionCode `json:"rtpRejectionCode"`
+	RTPRejectionCode *RTPRejectionCode `json:"rtpRejectionCode,omitempty"`
 }
 
 // AchReturnCode is the return code of an ACH transaction that caused the bank account status to change.

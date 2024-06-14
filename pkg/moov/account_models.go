@@ -5,8 +5,8 @@ import (
 )
 
 type CreateAccount struct {
-	Type                  AccountType            `json:"accountType"`
-	Profile               CreateProfile          `json:"profile"`
+	Type                  AccountType            `json:"accountType,omitempty"`
+	Profile               CreateProfile          `json:"profile,omitempty"`
 	Metadata              map[string]string      `json:"metadata,omitempty"`
 	TermsOfService        *TermsOfServicePayload `json:"termsOfService,omitempty"`
 	ForeignID             string                 `json:"foreignID,omitempty"`
@@ -21,9 +21,9 @@ type CreateProfile struct {
 }
 
 type CreateIndividualProfile struct {
-	Name         Name          `json:"name"`
+	Name         Name          `json:"name,omitempty"`
 	Phone        *Phone        `json:"phone,omitempty"`
-	Email        string        `json:"email"`
+	Email        string        `json:"email,omitempty"`
 	Address      *Address      `json:"address,omitempty"`
 	BirthDate    *Date         `json:"birthDate,omitempty"`
 	GovernmentID *GovernmentID `json:"governmentID,omitempty"`
@@ -79,10 +79,10 @@ type TermsOfServicePayload struct {
 }
 
 type TermsOfServiceManual struct {
-	AcceptanceIP        string    `json:"acceptedIP"`
-	AcceptanceDomain    string    `json:"acceptedDomain"`
-	AcceptanceUserAgent string    `json:"acceptedUserAgent"`
-	AcceptanceDate      time.Time `json:"acceptedDate"`
+	AcceptanceIP        string    `json:"acceptedIP,omitempty"`
+	AcceptanceDomain    string    `json:"acceptedDomain,omitempty"`
+	AcceptanceUserAgent string    `json:"acceptedUserAgent,omitempty"`
+	AcceptanceDate      time.Time `json:"acceptedDate,omitempty"`
 }
 
 type AccountCapability struct {
@@ -143,11 +143,11 @@ type Individual struct {
 // Name An individual's name.
 type Name struct {
 	// Name this person was given. This is usually the the same as first name.
-	FirstName string `json:"firstName"`
+	FirstName string `json:"firstName,omitempty"`
 	// Name this person was given. This is usually the the same as first name.
 	MiddleName string `json:"middleName,omitempty"`
 	// Family name of this person. This is usually the the same as last name.
-	LastName string `json:"lastName"`
+	LastName string `json:"lastName,omitempty"`
 	// Suffix of a given name.
 	Suffix string `json:"suffix,omitempty"`
 }
@@ -160,12 +160,12 @@ type Phone struct {
 
 // Address struct for Address
 type Address struct {
-	AddressLine1    string `json:"addressLine1"`
+	AddressLine1    string `json:"addressLine1,omitempty"`
 	AddressLine2    string `json:"addressLine2,omitempty"`
-	City            string `json:"city"`
-	StateOrProvince string `json:"stateOrProvince"`
-	PostalCode      string `json:"postalCode"`
-	Country         string `json:"country"`
+	City            string `json:"city,omitempty"`
+	StateOrProvince string `json:"stateOrProvince,omitempty"`
+	PostalCode      string `json:"postalCode,omitempty"`
+	Country         string `json:"country,omitempty"`
 }
 
 // Business Describes a business.
@@ -182,7 +182,7 @@ type Business struct {
 	// Indicates whether a tax ID has been provided for this business.
 	TaxIDProvided   bool             `json:"taxIDProvided,omitempty"`
 	Representatives []Representative `json:"representatives,omitempty"`
-	OwnersProvided  bool             `json:"ownersProvided"`
+	OwnersProvided  bool             `json:"ownersProvided,omitempty"`
 	IndustryCodes   *IndustryCodes   `json:"industryCodes,omitempty"`
 }
 
@@ -205,12 +205,12 @@ const (
 // Responsibilities Describes the job responsibilities of an individual.
 type Responsibilities struct {
 	// Indicates whether this individual has significant management responsibilities within the business.
-	IsController bool `json:"isController"`
+	IsController bool `json:"isController,omitempty"`
 	// If `true`, this field indicates that the individual has a business ownership stake of at least 25% in the business. If the representative does not own at least 25% of the business, this field should be `false`.
-	IsOwner bool `json:"isOwner"`
+	IsOwner bool `json:"isOwner,omitempty"`
 	// The percentage of ownership this individual has in the business (required if `isOwner` is `true`).
-	OwnershipPercentage int32  `json:"ownershipPercentage"`
-	JobTitle            string `json:"jobTitle"`
+	OwnershipPercentage int32  `json:"ownershipPercentage,omitempty"`
+	JobTitle            string `json:"jobTitle,omitempty"`
 }
 
 // IndustryCodes Describes industry specific identifiers.
@@ -222,14 +222,14 @@ type IndustryCodes struct {
 
 // TermsOfService Describes the acceptance of the Terms of Service.
 type TermsOfService struct {
-	AcceptedDate time.Time `json:"acceptedDate"`
-	AcceptedIP   string    `json:"acceptedIP"`
+	AcceptedDate time.Time `json:"acceptedDate,omitempty"`
+	AcceptedIP   string    `json:"acceptedIP,omitempty"`
 }
 
 // Verification Describes identity verification status and relevant identity verification documents.
 type Verification struct {
 	VerificationStatus AccountVerificationStatus `json:"verificationStatus,omitempty"`
-	Status             VerificationStatus        `json:"status"`
+	Status             VerificationStatus        `json:"status,omitempty"`
 	Details            VerificationStatusDetails `json:"details,omitempty"`
 	Documents          []Document                `json:"documents,omitempty"`
 }
@@ -278,12 +278,12 @@ const (
 // Document Describes an uploaded file.
 type Document struct {
 	// A unique identifier for this document.
-	DocumentID  string `json:"documentID"`
-	Type        string `json:"type"`
-	ContentType string `json:"contentType"`
+	DocumentID  string `json:"documentID,omitempty"`
+	Type        string `json:"type,omitempty"`
+	ContentType string `json:"contentType,omitempty"`
 	// Optional array of errors encountered dring automated parsing.
 	ParseErrors []string  `json:"parseErrors,omitempty"`
-	UploadedAt  time.Time `json:"uploadedAt"`
+	UploadedAt  time.Time `json:"uploadedAt,omitempty"`
 }
 
 // CustomerSupport User-provided information that can be displayed on credit card transactions for customers to use when contacting a customer support team. This data is only allowed on a business account.

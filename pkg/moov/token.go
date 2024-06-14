@@ -6,7 +6,7 @@ import (
 )
 
 type accessTokenRequest struct {
-	GrantType string `json:"grant_type"`
+	GrantType string `json:"grant_type,omitempty"`
 	// If not specified in `Authorization: Basic` it can be specified here
 	ClientId *string `json:"client_id,omitempty"`
 	// If not specified in `Authorization: Basic` it can be specified here
@@ -48,8 +48,8 @@ type AccessTokenResponse struct {
 }
 
 type revokeTokenRequest struct {
-	Token         string  `json:"token"`
-	TokenTypeHint string  `json:"token_type_hint"`
+	Token         string  `json:"token,omitempty"`
+	TokenTypeHint string  `json:"token_type_hint,omitempty"`
 	ClientID      *string `json:"client_id,omitempty"`
 	ClientSecret  *string `json:"client_secret,omitempty"`
 }

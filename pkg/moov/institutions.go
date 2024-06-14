@@ -6,8 +6,8 @@ import (
 )
 
 type FinancialInstitutions struct {
-	AchParticipants  []AchParticipant  `json:"achParticipants"`
-	WireParticipants []WireParticipant `json:"wireParticipants"`
+	AchParticipants  []AchParticipant  `json:"achParticipants,omitempty"`
+	WireParticipants []WireParticipant `json:"wireParticipants,omitempty"`
 }
 
 type AchParticipant struct {
