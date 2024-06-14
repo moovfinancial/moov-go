@@ -2,7 +2,9 @@ package debit_bank_account
 
 import (
 	"context"
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/go-faker/faker/v4"
 	"github.com/moovfinancial/moov-go/pkg/moov"
@@ -58,8 +60,8 @@ func TestMicroDepositExample(t *testing.T) {
 		HolderName:    "Jules Jackson",
 		HolderType:    moov.HolderType_Individual,
 		AccountType:   moov.BankAccountType_Checking,
-		RoutingNumber: "273976369", // this is a real routing number
-		AccountNumber: "123456789", // fake it great!
+		RoutingNumber: "273976369",                          // this is a real routing number
+		AccountNumber: fmt.Sprintf("%d", time.Now().Unix()), // fake account number
 	}
 	bankAccount, err := mc.CreateBankAccount(ctx, account.AccountID, moov.WithBankAccount(bankAccountPayload), moov.WaitForPaymentMethod())
 	require.NoError(t, err)
