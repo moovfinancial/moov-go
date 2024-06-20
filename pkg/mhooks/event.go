@@ -71,12 +71,16 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 		eventData = &event.representativeDeleted
 	case EventTypeRepresentativeUpdated:
 		eventData = &event.representativeUpdated
+	case EventTypeTestPing:
+		eventData = &event.testPing
 	case EventTypeTransferCreated:
 		eventData = &event.transferCreated
 	case EventTypeTransferUpdated:
 		eventData = &event.transferUpdated
 	case EventTypeWalletTransactionUpdated:
 		eventData = &event.walletTransactionUpdated
+	default:
+		return nil, fmt.Errorf("invalid event type: %v", event.EventType)
 	}
 
 	err = json.Unmarshal(event.Data, eventData)
@@ -88,10 +92,10 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 }
 
 type Event struct {
-	EventID   string    `json:"eventID"`
-	EventType EventType `json:"type"`
-	CreatedOn time.Time `json:"createdOn"`
-	Data      []byte    `json:"data"`
+	EventID   string          `json:"eventID"`
+	EventType EventType       `json:"type"`
+	CreatedOn time.Time       `json:"createdOn"`
+	Data      json.RawMessage `json:"data"`
 
 	accountCreated           *AccountCreated
 	accountDeleted           *AccountDeleted
@@ -113,6 +117,7 @@ type Event struct {
 	representativeCreated    *RepresentativeCreated
 	representativeDeleted    *RepresentativeDeleted
 	representativeUpdated    *RepresentativeUpdated
+	testPing                 *TestPing
 	transferCreated          *TransferCreated
 	transferUpdated          *TransferUpdated
 	walletTransactionUpdated *WalletTransactionUpdated
@@ -276,6 +281,14 @@ func (e Event) RepresentativeUpdated() (*RepresentativeUpdated, error) {
 	}
 
 	return e.representativeUpdated, nil
+}
+
+func (e Event) TestPing() (*TestPing, error) {
+	if e.EventType != EventTypeTestPing {
+		return nil, newInvalidEventTypeError(EventTypeTestPing, e.EventType)
+	}
+
+	return e.testPing, nil
 }
 
 func (e Event) TransferCreated() (*TransferCreated, error) {

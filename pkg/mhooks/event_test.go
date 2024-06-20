@@ -21,6 +21,10 @@ func TestParseEvent(t *testing.T) {
 		secret    = "my-webhook-signing-secret"
 		signature = "6231d03752de6963087e6aea1c78a27a0617b6df1c071195f30ed85defe34e02fd0bf3995949fe12dafd747c42de9cfae03b8aafcf69cceba5495f4c7b719d82"
 
+		testPing = TestPing{
+			Ping: true,
+		}
+
 		accountCreated = AccountCreated{
 			AccountID: uuid.NewString(),
 		}
@@ -41,6 +45,12 @@ func TestParseEvent(t *testing.T) {
 
 		//nolint:exhaustive
 		switch event.EventType {
+		case EventTypeTestPing:
+			got, err := event.TestPing()
+			require.NoError(t, err)
+
+			t.Log("Got TestPing webhook")
+			require.Equal(t, testPing, *got)
 		case EventTypeAccountCreated:
 			got, err := event.AccountCreated()
 			require.NoError(t, err)
@@ -53,6 +63,8 @@ func TestParseEvent(t *testing.T) {
 
 			t.Logf("Got TransferCreated webhook with transferID=%v\n", got.TransferID)
 			require.Equal(t, transferCreated, *got)
+		default:
+			require.FailNow(t, "unexpected event type: %v", event.EventType)
 		}
 
 		w.WriteHeader(200)
@@ -62,6 +74,10 @@ func TestParseEvent(t *testing.T) {
 		eventType EventType
 		data      any
 	}{
+		{
+			eventType: EventTypeTestPing,
+			data:      testPing,
+		},
 		{
 			eventType: EventTypeAccountCreated,
 			data:      accountCreated,
