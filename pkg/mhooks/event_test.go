@@ -21,6 +21,10 @@ func TestParseEvent(t *testing.T) {
 		secret    = "my-webhook-signing-secret"
 		signature = "6231d03752de6963087e6aea1c78a27a0617b6df1c071195f30ed85defe34e02fd0bf3995949fe12dafd747c42de9cfae03b8aafcf69cceba5495f4c7b719d82"
 
+		testPing = TestPing{
+			Ping: true,
+		}
+
 		accountCreated = AccountCreated{
 			AccountID: uuid.NewString(),
 		}
@@ -62,6 +66,10 @@ func TestParseEvent(t *testing.T) {
 		eventType EventType
 		data      any
 	}{
+		{
+			eventType: EventTypeTest,
+			data:      testPing,
+		},
 		{
 			eventType: EventTypeAccountCreated,
 			data:      accountCreated,

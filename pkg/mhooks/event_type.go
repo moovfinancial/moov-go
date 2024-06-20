@@ -29,6 +29,7 @@ const (
 	EventTypeRepresentativeCreated    EventType = "representative.created"
 	EventTypeRepresentativeDeleted    EventType = "representative.deleted"
 	EventTypeRepresentativeUpdated    EventType = "representative.updated"
+	EventTypeTest                     EventType = "event.test"
 	EventTypeTransferCreated          EventType = "transfer.created"
 	EventTypeTransferUpdated          EventType = "transfer.updated"
 	EventTypeWalletTransactionUpdated EventType = "walletTransaction.updated"
@@ -196,6 +197,10 @@ type RepresentativeUpdated struct {
 	RepresentativeID string `json:"representativeID"`
 	// ID of the account
 	AccountID string `json:"accountID"`
+}
+
+type TestPing struct {
+	Ping bool `json:"ping"`
 }
 
 type TransferCreated struct {

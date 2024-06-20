@@ -71,6 +71,8 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 		eventData = &event.representativeDeleted
 	case EventTypeRepresentativeUpdated:
 		eventData = &event.representativeUpdated
+	case EventTypeTest:
+		eventData = &event.testPing
 	case EventTypeTransferCreated:
 		eventData = &event.transferCreated
 	case EventTypeTransferUpdated:
@@ -88,10 +90,10 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 }
 
 type Event struct {
-	EventID   string    `json:"eventID"`
-	EventType EventType `json:"type"`
-	CreatedOn time.Time `json:"createdOn"`
-	Data      []byte    `json:"data"`
+	EventID   string          `json:"eventID"`
+	EventType EventType       `json:"type"`
+	CreatedOn time.Time       `json:"createdOn"`
+	Data      json.RawMessage `json:"data"`
 
 	accountCreated           *AccountCreated
 	accountDeleted           *AccountDeleted
@@ -113,6 +115,7 @@ type Event struct {
 	representativeCreated    *RepresentativeCreated
 	representativeDeleted    *RepresentativeDeleted
 	representativeUpdated    *RepresentativeUpdated
+	testPing                 *TestPing
 	transferCreated          *TransferCreated
 	transferUpdated          *TransferUpdated
 	walletTransactionUpdated *WalletTransactionUpdated
