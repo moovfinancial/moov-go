@@ -29,7 +29,7 @@ const (
 	EventTypeRepresentativeCreated    EventType = "representative.created"
 	EventTypeRepresentativeDeleted    EventType = "representative.deleted"
 	EventTypeRepresentativeUpdated    EventType = "representative.updated"
-	EventTypeTest                     EventType = "event.test"
+	EventTypeTestPing                 EventType = "event.test"
 	EventTypeTransferCreated          EventType = "transfer.created"
 	EventTypeTransferUpdated          EventType = "transfer.updated"
 	EventTypeWalletTransactionUpdated EventType = "walletTransaction.updated"

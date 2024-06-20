@@ -71,7 +71,7 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 		eventData = &event.representativeDeleted
 	case EventTypeRepresentativeUpdated:
 		eventData = &event.representativeUpdated
-	case EventTypeTest:
+	case EventTypeTestPing:
 		eventData = &event.testPing
 	case EventTypeTransferCreated:
 		eventData = &event.transferCreated
@@ -79,6 +79,8 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 		eventData = &event.transferUpdated
 	case EventTypeWalletTransactionUpdated:
 		eventData = &event.walletTransactionUpdated
+	default:
+		return nil, fmt.Errorf("invalid event type: %v", event.EventType)
 	}
 
 	err = json.Unmarshal(event.Data, eventData)
@@ -282,8 +284,8 @@ func (e Event) RepresentativeUpdated() (*RepresentativeUpdated, error) {
 }
 
 func (e Event) TestPing() (*TestPing, error) {
-	if e.EventType != EventTypeTest {
-		return nil, newInvalidEventTypeError(EventTypeTest, e.EventType)
+	if e.EventType != EventTypeTestPing {
+		return nil, newInvalidEventTypeError(EventTypeTestPing, e.EventType)
 	}
 
 	return e.testPing, nil

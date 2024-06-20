@@ -45,7 +45,7 @@ func TestParseEvent(t *testing.T) {
 
 		//nolint:exhaustive
 		switch event.EventType {
-		case EventTypeTest:
+		case EventTypeTestPing:
 			got, err := event.TestPing()
 			require.NoError(t, err)
 
@@ -75,7 +75,7 @@ func TestParseEvent(t *testing.T) {
 		data      any
 	}{
 		{
-			eventType: EventTypeTest,
+			eventType: EventTypeTestPing,
 			data:      testPing,
 		},
 		{
