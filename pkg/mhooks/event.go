@@ -281,6 +281,14 @@ func (e Event) RepresentativeUpdated() (*RepresentativeUpdated, error) {
 	return e.representativeUpdated, nil
 }
 
+func (e Event) TestPing() (*TestPing, error) {
+	if e.EventType != EventTypeTest {
+		return nil, newInvalidEventTypeError(EventTypeTest, e.EventType)
+	}
+
+	return e.testPing, nil
+}
+
 func (e Event) TransferCreated() (*TransferCreated, error) {
 	if e.EventType != EventTypeTransferCreated {
 		return nil, newInvalidEventTypeError(EventTypeTransferCreated, e.EventType)

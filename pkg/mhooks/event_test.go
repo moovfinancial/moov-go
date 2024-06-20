@@ -45,6 +45,12 @@ func TestParseEvent(t *testing.T) {
 
 		//nolint:exhaustive
 		switch event.EventType {
+		case EventTypeTest:
+			got, err := event.TestPing()
+			require.NoError(t, err)
+
+			t.Log("Got TestPing webhook")
+			require.Equal(t, testPing, *got)
 		case EventTypeAccountCreated:
 			got, err := event.AccountCreated()
 			require.NoError(t, err)
@@ -57,6 +63,8 @@ func TestParseEvent(t *testing.T) {
 
 			t.Logf("Got TransferCreated webhook with transferID=%v\n", got.TransferID)
 			require.Equal(t, transferCreated, *got)
+		default:
+			require.FailNow(t, "unexpected event type: %v", event.EventType)
 		}
 
 		w.WriteHeader(200)
