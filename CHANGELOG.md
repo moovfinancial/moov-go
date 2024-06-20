@@ -1,4 +1,7 @@
 ## v0.3.0 (Released 2024-06-20)
+BREAKING CHANGES
+
+- transfers: update CreateTransfer to constrain return params based on async vs sync 
 
 ADDITIONS
 
@@ -7,7 +10,6 @@ ADDITIONS
  
 IMPROVEMENTS
 
-- **breaking**: update CreateTransfer to constrain return params based on async vs sync 
 - feat: support webhooks ping event type and payload
 - tests: enforce exact JSON decoding
 - examples: retry list payment methods after bank account verification
