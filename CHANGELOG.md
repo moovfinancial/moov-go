@@ -1,3 +1,21 @@
+## v0.3.0 (Released 2024-06-20)
+
+ADDITIONS
+
+- feat: add primary regulator to business profile
+- examples: add business profile 
+ 
+IMPROVEMENTS
+
+- **breaking**: update CreateTransfer to constrain return params based on async vs sync 
+- feat: support webhooks ping event type and payload
+- tests: enforce exact JSON decoding
+- examples: retry list payment methods after bank account verification
+
+BUG FIXES
+
+- webhooks: fix JSON parsing error when decoding non-base64 encoded data
+
 ## v0.2.0 (Released 2024-05-16)
 
 ADDITIONS
