@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"net/textproto"
+	"strings"
 )
 
 type CallStatus struct {
@@ -125,9 +127,13 @@ func MultipartField(key, value string) multipartFn {
 	}
 }
 
-func MultipartFile(key, filename string, file io.Reader) multipartFn {
+func MultipartFile(key, filename string, file io.Reader, contentType string) multipartFn {
 	return func(w *multipart.Writer) error {
-		part, err := w.CreateFormFile(key, filename)
+		h := make(textproto.MIMEHeader)
+		h.Set("Content-Disposition",
+			fmt.Sprintf(`form-data; name="%s"; filename="%s"`, escapeQuotes(key), escapeQuotes(filename)))
+		h.Set("Content-Type", contentType)
+		part, err := w.CreatePart(h)
 		if err != nil {
 			return err
 		}
@@ -269,4 +275,10 @@ func CompletedListOrError[A interface{}](resp CallResponse) ([]A, error) {
 	default:
 		return nil, resp
 	}
+}
+
+var quoteEscaper = strings.NewReplacer("\\", "\\\\", `"`, "\\\"")
+
+func escapeQuotes(s string) string {
+	return quoteEscaper.Replace(s)
 }

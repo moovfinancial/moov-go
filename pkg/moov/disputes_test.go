@@ -151,7 +151,7 @@ func Test_UploadEvidenceFile_DisputeNotFound(t *testing.T) {
 	// We don't have any disputes to test against! So we can at least check for not found vs other possible errors
 	disputeID := uuid.NewString()
 	file := bytes.NewReader([]byte("test"))
-	err := mc.UploadEvidenceFile(context.Background(), disputeID, moov.EvidenceType_CoverLetter, "test.txt", file)
+	err := mc.UploadEvidenceFile(context.Background(), disputeID, moov.EvidenceType_CoverLetter, "test.pdf", file, "application/pdf")
 	require.Error(t, err)
 
 	// find and cast the error into HttpCallError so it can be inspected
