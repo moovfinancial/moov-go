@@ -60,7 +60,7 @@ func (c Client) UploadFile(ctx context.Context, accountID string, upload UploadF
 		MultipartBody(
 			MultipartField("filePurpose", string(upload.FilePurpose)),
 			MultipartField("metadata", string(mdJson)),
-			MultipartFile("file", upload.Filename, upload.File),
+			MultipartFile("file", upload.Filename, upload.File, "application/octet-stream"),
 		))
 	if err != nil {
 		return nil, err
