@@ -3,9 +3,7 @@ package debit_card_pull
 import (
 	"context"
 	"testing"
-	"time"
 
-	"github.com/go-faker/faker/v4"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
@@ -30,59 +28,14 @@ func TestDebitPullWithRefund(t *testing.T) {
 	require.NoError(t, err)
 
 	// Step 2: create account for the user
-
-	// Add new account
-	account, _, err := mc.CreateAccount(ctx, moov.CreateAccount{
-		Type: moov.AccountType_Individual,
-		Profile: moov.CreateProfile{
-			Individual: &moov.CreateIndividualProfile{
-				Name: moov.Name{
-					FirstName: faker.FirstName(),
-					LastName:  faker.LastName(),
-				},
-				Email: faker.Email(),
-				Phone: &moov.Phone{
-					Number:      faker.Phonenumber(),
-					CountryCode: "1",
-				},
-				Address: &moov.Address{
-					AddressLine1:    "123 Main Street",
-					AddressLine2:    "Apt 302",
-					City:            "Boulder",
-					StateOrProvince: "CO",
-					PostalCode:      "80301",
-					Country:         "US",
-				},
-				BirthDate: &moov.Date{
-					Year:  1989,
-					Month: 3,
-					Day:   1,
-				},
-				GovernmentID: &moov.GovernmentID{
-					SSN: &moov.SSN{
-						Full:     "000-22-3333",
-						LastFour: "3333",
-					},
-				},
-			},
-		},
-		RequestedCapabilities: []moov.CapabilityName{moov.CapabilityName_Wallet},
-		TermsOfService: &moov.TermsOfServicePayload{
-			Manual: &moov.TermsOfServiceManual{
-				AcceptanceIP:        "192.168.0.1",
-				AcceptanceDomain:    "moov.io",
-				AcceptanceUserAgent: "123",
-				AcceptanceDate:      time.Now(),
-			},
-		},
-	})
-	require.NoError(t, err)
+	// For now just using a known existing account
+	accountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
 
 	// Step 3: add (link) user's card
 
 	// You can make the direct call only if you are PCI compliant,
 	// otherwise you need to use the Moov.js library
-	_, err = mc.CreateCard(ctx, account.AccountID, moov.CreateCard{
+	card, err := mc.CreateCard(ctx, accountID, moov.CreateCard{
 		CardNumber: "4111100010002000", // Moov test card for sandbox
 		CardCvv:    "123",
 		Expiration: moov.Expiration{
@@ -100,7 +53,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 
 	// When we have only one card linked, we can avoid checking that the
 	// payment method is for user's card and just use the first one.
-	paymentMethods, err := mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("pull-from-card"))
+	paymentMethods, err := mc.ListPaymentMethods(ctx, accountID, moov.WithPaymentMethodType("pull-from-card"))
 	require.NoError(t, err)
 
 	// We expect to have only one `pull-to-card` payment method as we added
@@ -113,7 +66,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 
 	// We can pull money from the card ("pull-from-card" payment method),
 	// and to the Moov wallet ("moov-wallet" payment method).
-	paymentMethods, err = mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("moov-wallet"))
+	paymentMethods, err = mc.ListPaymentMethods(ctx, accountID, moov.WithPaymentMethodType("moov-wallet"))
 	require.NoError(t, err)
 
 	require.Len(t, paymentMethods, 1)
@@ -167,4 +120,8 @@ func TestDebitPullWithRefund(t *testing.T) {
 	t.Logf("Amount: %#v", refund.Amount)
 	t.Logf("Status: %v", refund.Status)
 	t.Logf("CreatedOn: %v", refund.CreatedOn)
+
+	// Step 8: disable the card
+	err = mc.DisableCard(ctx, accountID, card.CardID)
+	require.NoError(t, err)
 }
