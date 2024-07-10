@@ -3,6 +3,7 @@ package debit_card_pull
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/go-faker/faker/v4"
 	"github.com/moovfinancial/moov-go/pkg/moov"
@@ -20,8 +21,6 @@ func TestDebitPullWithRefund(t *testing.T) {
 
 	mc, err := moov.NewClient(moov.WithCredentials(moov.CredentialsFromEnv()))
 	require.NoError(t, err)
-
-	destinationAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9" // example
 
 	// Create a new context or use an existing one
 	ctx := context.Background()
@@ -46,6 +45,34 @@ func TestDebitPullWithRefund(t *testing.T) {
 					Number:      faker.Phonenumber(),
 					CountryCode: "1",
 				},
+				Address: &moov.Address{
+					AddressLine1:    "123 Main Street",
+					AddressLine2:    "Apt 302",
+					City:            "Boulder",
+					StateOrProvince: "CO",
+					PostalCode:      "80301",
+					Country:         "US",
+				},
+				BirthDate: &moov.Date{
+					Year:  1989,
+					Month: 3,
+					Day:   1,
+				},
+				GovernmentID: &moov.GovernmentID{
+					SSN: &moov.SSN{
+						Full:     "000-22-3333",
+						LastFour: "3333",
+					},
+				},
+			},
+		},
+		RequestedCapabilities: []moov.CapabilityName{moov.CapabilityName_Wallet},
+		TermsOfService: &moov.TermsOfServicePayload{
+			Manual: &moov.TermsOfServiceManual{
+				AcceptanceIP:        "192.168.0.1",
+				AcceptanceDomain:    "moov.io",
+				AcceptanceUserAgent: "123",
+				AcceptanceDate:      time.Now(),
 			},
 		},
 	})
@@ -86,7 +113,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 
 	// We can pull money from the card ("pull-from-card" payment method),
 	// and to the Moov wallet ("moov-wallet" payment method).
-	paymentMethods, err = mc.ListPaymentMethods(ctx, destinationAccountID, moov.WithPaymentMethodType("moov-wallet"))
+	paymentMethods, err = mc.ListPaymentMethods(ctx, account.AccountID, moov.WithPaymentMethodType("moov-wallet"))
 	require.NoError(t, err)
 
 	require.Len(t, paymentMethods, 1)
