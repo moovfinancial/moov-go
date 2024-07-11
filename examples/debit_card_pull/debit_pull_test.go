@@ -48,6 +48,9 @@ func TestDebitPullWithRefund(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
+	t.Cleanup(func() {
+		_ = mc.DisableCard(ctx, accountID, card.CardID)
+	})
 
 	// Step 4: find (pull) payment method for the linked card
 
@@ -120,8 +123,4 @@ func TestDebitPullWithRefund(t *testing.T) {
 	t.Logf("Amount: %#v", refund.Amount)
 	t.Logf("Status: %v", refund.Status)
 	t.Logf("CreatedOn: %v", refund.CreatedOn)
-
-	// Step 8: disable the card
-	err = mc.DisableCard(ctx, accountID, card.CardID)
-	require.NoError(t, err)
 }
