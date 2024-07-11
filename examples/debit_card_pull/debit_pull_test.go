@@ -54,22 +54,20 @@ func TestDebitPullWithRefund(t *testing.T) {
 
 	// Step 4: find (pull) payment method for the linked card
 
-	// When we have only one card linked, we can avoid checking that the
-	// payment method is for user's card and just use the first one.
-	paymentMethods, err := mc.ListPaymentMethods(ctx, accountID, moov.WithPaymentMethodType("pull-from-card"))
-	require.NoError(t, err)
-
-	// We expect to have only one `pull-to-card` payment method as we added
-	// only one card
-	require.Len(t, paymentMethods, 1)
-
-	pullPaymentMethod := paymentMethods[0]
+	sourcePaymentMethodID := ""
+	for _, pm := range card.PaymentMethods {
+		if pm.PaymentMethodType == moov.PaymentMethodType_PullFromCard {
+			sourcePaymentMethodID = pm.PaymentMethodID
+			break
+		}
+	}
+	require.NotEmpty(t, sourcePaymentMethodID, "no pull from card payment method")
 
 	// Step 5: configure destination payment method
 
 	// We can pull money from the card ("pull-from-card" payment method),
 	// and to the Moov wallet ("moov-wallet" payment method).
-	paymentMethods, err = mc.ListPaymentMethods(ctx, accountID, moov.WithPaymentMethodType("moov-wallet"))
+	paymentMethods, err := mc.ListPaymentMethods(ctx, accountID, moov.WithPaymentMethodType("moov-wallet"))
 	require.NoError(t, err)
 
 	require.Len(t, paymentMethods, 1)
@@ -82,7 +80,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 		ctx,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
-				PaymentMethodID: pullPaymentMethod.PaymentMethodID,
+				PaymentMethodID: sourcePaymentMethodID,
 				CardDetails: &moov.CreateTransfer_CardDetailsSource{
 					DynamicDescriptor: "Test pull transfer",
 				},
