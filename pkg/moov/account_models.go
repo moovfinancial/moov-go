@@ -169,6 +169,16 @@ type Address struct {
 	Country         string `json:"country"`
 }
 
+// AddressPatch is for partial address updates. Only fields that are non-nil will be updated.
+type AddressPatch struct {
+	AddressLine1    *string `json:"addressLine1"`
+	AddressLine2    *string `json:"addressLine2,omitempty"`
+	City            *string `json:"city"`
+	StateOrProvince *string `json:"stateOrProvince"`
+	PostalCode      *string `json:"postalCode"`
+	Country         *string `json:"country"`
+}
+
 // Business Describes a business.
 type Business struct {
 	LegalBusinessName string       `json:"legalBusinessName,omitempty"`

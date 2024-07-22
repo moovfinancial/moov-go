@@ -122,10 +122,10 @@ func (c Client) GetCard(ctx context.Context, accountID string, cardID string) (*
 type CardUpdateFilter func(*cardPatch) error
 
 type cardPatch struct {
-	CardCvv        string     `json:"cardCvv,omitempty"`
-	Expiration     Expiration `json:"expiration,omitempty"`
-	BillingAddress Address    `json:"billingAddress,omitempty"`
-	CardOnFile     bool       `json:"cardOnFile,omitempty"`
+	CardCvv        *string       `json:"cardCvv,omitempty"`
+	Expiration     *Expiration   `json:"expiration,omitempty"`
+	BillingAddress *AddressPatch `json:"billingAddress,omitempty"`
+	CardOnFile     *bool         `json:"cardOnFile,omitempty"`
 }
 
 func applyCardUpdateFilters(opts ...CardUpdateFilter) (*cardPatch, error) {
@@ -140,9 +140,9 @@ func applyCardUpdateFilters(opts ...CardUpdateFilter) (*cardPatch, error) {
 }
 
 // WithCardBillingAddress sets the billing address for the card
-func WithCardBillingAddress(address Address) CardUpdateFilter {
+func WithCardBillingAddress(address AddressPatch) CardUpdateFilter {
 	return func(card *cardPatch) error {
-		card.BillingAddress = address
+		card.BillingAddress = &address
 		return nil
 	}
 }
@@ -150,7 +150,7 @@ func WithCardBillingAddress(address Address) CardUpdateFilter {
 // WithCardExpiration sets the expiration date for the card
 func WithCardExpiration(expiration Expiration) CardUpdateFilter {
 	return func(card *cardPatch) error {
-		card.Expiration = expiration
+		card.Expiration = &expiration
 		return nil
 	}
 }
@@ -158,7 +158,7 @@ func WithCardExpiration(expiration Expiration) CardUpdateFilter {
 // WithCardCvv sets the CVV for the card
 func WithCardCVV(cvv string) CardUpdateFilter {
 	return func(card *cardPatch) error {
-		card.CardCvv = cvv
+		card.CardCvv = &cvv
 		return nil
 	}
 }
@@ -166,13 +166,15 @@ func WithCardCVV(cvv string) CardUpdateFilter {
 // WithCardOnFile sets the card on file for the card boolean
 func WithCardOnFile(cardOnFile bool) CardUpdateFilter {
 	return func(card *cardPatch) error {
-		card.CardOnFile = cardOnFile
+		card.CardOnFile = &cardOnFile
 		return nil
 	}
 }
 
-// UpdateCard Update a linked card and/or resubmit it for verification.
-// If a value is provided for CVV, a new verification ($0 authorization) will be submitted for the card. Updating the expiration date or address will update the information stored on file for the card but will not be verified
+// UpdateCard performs a partial update on a card associated with a Moov account. Only fields that
+// are populated (non-nil) in the request will be updated. If a value is provided for CVV, a new
+// verification ($0 authorization) will be submitted for the card. Updating the expiration date or
+// address will update the information stored on file for the card but will not be verified
 // https://docs.moov.io/api/#tag/Cards/operation/updateCard
 func (c Client) UpdateCard(ctx context.Context, accountID string, cardID string, opt1 CardUpdateFilter, opts ...CardUpdateFilter) (*Card, error) {
 	// Create a new CardPost payload and apply any filters
