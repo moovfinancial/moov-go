@@ -5,8 +5,10 @@ package moov_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/assert"
@@ -62,171 +64,128 @@ func TestCardMarshal(t *testing.T) {
 	assert.Equal(t, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", card.CardID)
 }
 
-/*
-@TODO fix by getting rid of the suite
+func TestCards(t *testing.T) {
+	// Tests full lifecycle of card resource - create, get, update, list, disable
 
-type CardTestSuite struct {
-	suite.Suite
-	accountID    string
-	cardID       string
-	deleteCardID string
-	cards        []string
-}
+	mc := NewTestClient(t)
 
-func TestCardSuite(t *testing.T) {
-	suite.Run(t, new(CardTestSuite))
-}
+	exp := time.Now().UTC().AddDate(0, 7, 0)
+	expMonth := exp.Format("01")
+	expYear := exp.Format("06")
 
-func (s *CardTestSuite) SetupSuite() {
-	// Sandbox accounts have a "Lincoln National Corporation" moov account added by default. Get it's AccountID so we can test against it
-	mc := NewTestClient(s.T())
+	account := CreateTemporaryTestAccount(t, mc, createTestIndividualAccount())
 
-	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
-	s.NoError(err)
-
-	for _, account := range accounts {
-		if account.DisplayName == "Lincoln National Corporation" {
-			// set the accountID for testing
-			s.accountID = account.AccountID
-		}
-	}
-
-	card := moov.CreateCard{
-		CardNumber: "371111111111114",
-		CardCvv:    "1234",
-		Expiration: moov.Expiration{
-			Month: "10",
-			Year:  "28",
-		},
-		HolderName: "Wade Arnold",
-		BillingAddress: moov.Address{
-			AddressLine1:    "123 Main Street",
-			City:            "Golden",
-			StateOrProvince: "CO",
-			PostalCode:      "80401",
-			Country:         "US",
-		},
-	}
-
-	respCard, err := mc.CreateCard(context.Background(), s.accountID, card)
-	s.NoError(err, "Error creating card")
-	s.cardID = respCard.CardID
-	s.deleteCardID = respCard.CardID
-	s.cards = append(s.cards, respCard.CardID)
-}
-
-func (s *CardTestSuite) TearDownSuite() {
-	mc := NewTestClient(s.T())
-
-	// delete the cards we created
-	for _, cardID := range s.cards {
-		if cardID != "" {
-			err := mc.DisableCard(context.Background(), s.accountID, cardID)
-			s.NoError(err)
-		}
-	}
-}
-
-func (s *CardTestSuite) TestCreateCard() {
-	card := moov.CreateCard{
-		CardNumber: "4111111111111111",
-		CardCvv:    "123",
-		Expiration: moov.Expiration{
-			Month: "01",
-			Year:  "28",
-		},
-		HolderName: "Jules Jackson",
-		BillingAddress: moov.Address{
-			AddressLine1:    "123 Main Street",
-			AddressLine2:    "Apt 302",
-			City:            "Boulder",
-			StateOrProvince: "CO",
-			PostalCode:      "80301",
-			Country:         "US",
-		},
-		CardOnFile: false,
-	}
-
-	mc := NewTestClient(s.T())
-
-	respCard, err := mc.CreateCard(context.Background(), s.accountID, card)
-	s.Require().NoError(err, "Error creating card")
-
-	s.Require().NotNil(respCard)
-	s.Require().NotEmpty(s.T(), respCard.CardID)
-
-	s.cardID = respCard.CardID
-	s.cards = append(s.cards, respCard.CardID)
-}
-
-func (s *CardTestSuite) TestListCards() {
-	mc := NewTestClient(s.T())
-
-	cards, err := mc.ListCards(context.Background(), s.accountID)
-	s.NoError(err)
-
-	assert.NotNil(s.T(), cards)
-}
-
-func (s *CardTestSuite) TestGetCard() {
-	mc := NewTestClient(s.T())
-
-	s.Require().NotEmpty(s.cardID)
-
-	card, err := mc.GetCard(context.Background(), s.accountID, s.cardID)
-	s.Require().NoError(err)
-
-	s.Equal(s.cardID, card.CardID)
-}
-
-func (s *CardTestSuite) TestUpdateCardBillingAddress() {
-	mc := NewTestClient(s.T())
 	billingAddress := moov.Address{
-		AddressLine1:    "125 Main Street",
-		AddressLine2:    "Apt 302",
-		City:            "Boulder",
+		AddressLine1:    "123 Main Street",
+		City:            "City",
 		StateOrProvince: "CO",
-		PostalCode:      "80303",
+		PostalCode:      "12345",
 		Country:         "US",
 	}
 
-	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, moov.WithCardBillingAddress(billingAddress))
-	s.NoError(err)
-	s.Equal(billingAddress, updatedCard.BillingAddress)
-	// TODO: This should be "match" but isn't implemented in Moov's test mode and needs a server side fix
-	s.Equal("unavailable", updatedCard.CardVerification.AddressLine1)
+	// Create card
+	card, err := mc.CreateCard(context.Background(), account.AccountID, moov.CreateCard{
+		CardNumber: "4111111111111111",
+		CardCvv:    "123",
+		Expiration: moov.Expiration{
+			Month: expMonth,
+			Year:  expYear,
+		},
+		HolderName:     "john doe",
+		BillingAddress: billingAddress,
+		CardOnFile:     false,
+	})
+	require.NoError(t, err)
+	require.False(t, card.CardOnFile)
+	require.NotEmpty(t, card.PaymentMethods)
+
+	// Get card
+	created, err := mc.GetCard(context.Background(), account.AccountID, card.CardID)
+	require.NoError(t, err)
+	require.Equal(t, card.CardID, created.CardID)
+
+	// Update card
+	updated, err := mc.UpdateCard(context.Background(), account.AccountID, card.CardID,
+		moov.WithCardOnFile(true),
+	)
+	require.NoError(t, err)
+	require.True(t, updated.CardOnFile)
+
+	// make sure other updatable fields didn't get updated unexpectedly
+	require.Equal(t, billingAddress, updated.BillingAddress)
+	require.Equal(t, expMonth, updated.Expiration.Month)
+	require.Equal(t, expYear, updated.Expiration.Year)
+
+	// List cards
+	cards, err := mc.ListCards(context.Background(), account.AccountID)
+	require.NoError(t, err)
+	require.Len(t, cards, 1)
+
+	// Disable card
+	err = mc.DisableCard(context.Background(), account.AccountID, card.CardID)
+	require.NoError(t, err)
+
+	// List cards (omits disabled)
+	cards, err = mc.ListCards(context.Background(), account.AccountID)
+	require.NoError(t, err)
+	require.Len(t, cards, 0)
 }
 
-func (s *CardTestSuite) TestUpdateCardExpiration() {
-	mc := NewTestClient(s.T())
-	exp := moov.Expiration{
-		Month: "01",
-		Year:  "28",
+func TestCard_UpdateBillingAddress(t *testing.T) {
+	mc := NewTestClient(t)
+	tc := newTestCard(t, mc)
+	originalAddress := tc.card.BillingAddress
+
+	// update a single billing address field to ensure the partial update works
+	updatedCard, err := mc.UpdateCard(context.Background(), tc.account.AccountID, tc.card.CardID,
+		moov.WithCardBillingAddress(moov.AddressPatch{AddressLine1: moov.PtrOf("updated street")}),
+	)
+	require.NoError(t, err)
+
+	// make sure only the expected field was updated
+	require.Equal(t, "updated street", updatedCard.BillingAddress.AddressLine1)
+	require.Equal(t, originalAddress.AddressLine2, updatedCard.BillingAddress.AddressLine2)
+	require.Equal(t, originalAddress.City, updatedCard.BillingAddress.City)
+	require.Equal(t, originalAddress.StateOrProvince, updatedCard.BillingAddress.StateOrProvince)
+	require.Equal(t, originalAddress.PostalCode, updatedCard.BillingAddress.PostalCode)
+	require.Equal(t, originalAddress.Country, updatedCard.BillingAddress.Country)
+}
+
+type testCard struct {
+	account moov.Account
+	card    moov.Card
+}
+
+func newTestCard(t *testing.T, mc *moov.Client) testCard {
+	account := CreateTemporaryTestAccount(t, mc, createTestIndividualAccount())
+
+	exp := time.Now().UTC().AddDate(0, 7, 0)
+
+	card, err := mc.CreateCard(context.Background(), account.AccountID, moov.CreateCard{
+		CardNumber: "5555555555554444", // test mode Mastercard PAN
+		CardCvv:    "123",
+		Expiration: moov.Expiration{
+			Month: exp.Format("01"),
+			Year:  exp.Format("06"),
+		},
+		HolderName: "john doe",
+		BillingAddress: moov.Address{
+			AddressLine1:    "123 Main Street",
+			City:            "City",
+			StateOrProvince: "CO",
+			PostalCode:      "12345",
+			Country:         "US",
+		},
+		CardOnFile: false,
+	})
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		require.NoError(t, mc.DisableCard(context.Background(), account.AccountID, card.CardID))
+	})
+
+	return testCard{
+		account: *account,
+		card:    *card,
 	}
-
-	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, moov.WithCardExpiration(exp))
-	s.NoError(err)
-	s.Equal(exp, updatedCard.Expiration)
 }
-
-func (s *CardTestSuite) TestUpdateCardCVV() {
-	mc := NewTestClient(s.T())
-	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, moov.WithCardCVV("987"))
-	s.NoError(err)
-	// TODO: This should be "match" but isn't implemented in Moov's test mode and needs a server side fix
-	s.Equal("unavailable", updatedCard.CardVerification.Cvv)
-}
-
-func (s *CardTestSuite) TestUpdateMultipleFilters() {
-	mc := NewTestClient(s.T())
-	updatedCard, err := mc.UpdateCard(context.Background(), s.accountID, s.cardID, moov.WithCardOnFile(true), moov.WithCardCVV("666"))
-	s.NoError(err)
-	s.True(updatedCard.CardOnFile)
-}
-
-func (s *CardTestSuite) TestDisableCard() {
-	mc := NewTestClient(s.T())
-	err := mc.DisableCard(context.Background(), s.accountID, s.cardID)
-	s.NoError(err)
-}
-*/

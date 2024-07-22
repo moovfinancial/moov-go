@@ -184,7 +184,7 @@ func (c Client) UpdateCard(ctx context.Context, accountID string, cardID string,
 		return nil, err
 	}
 
-	resp, err := c.CallHttp(ctx, Endpoint(pathCard, accountID, cardID), AcceptJson(), JsonBody(payload))
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPatch, pathCard, accountID, cardID), AcceptJson(), JsonBody(payload))
 	if err != nil {
 		return nil, err
 	}
