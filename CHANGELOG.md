@@ -1,13 +1,23 @@
+## v0.4.0 (Released 2024-07-22)
+
+IMPROVEMENTS
+
+- feat: allow custom content type on multipart file
+- fix: Ensure cards patch only updates intended fields
+- test: always cleanup created card
+- test: use known account for pull from card test
+
 ## v0.3.0 (Released 2024-06-20)
+
 BREAKING CHANGES
 
-- transfers: update CreateTransfer to constrain return params based on async vs sync 
+- transfers: update CreateTransfer to constrain return params based on async vs sync
 
 ADDITIONS
 
 - feat: add primary regulator to business profile
-- examples: add business profile 
- 
+- examples: add business profile
+
 IMPROVEMENTS
 
 - feat: support webhooks ping event type and payload
