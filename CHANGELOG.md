@@ -1,3 +1,9 @@
+## v0.4.1 (Released 2024-07-23)
+
+IMPROVEMENTS
+
+- fix: specify http method in patch card endpoint
+
 ## v0.4.0 (Released 2024-07-22)
 
 IMPROVEMENTS
