@@ -32,6 +32,7 @@ var (
 	ErrAccountNotFound              = errors.New("no account with the specified accountID was found")
 	ErrAlreadyExists                = errors.New("resource already exists")
 	ErrMicroDepositAmountsIncorrect = errors.New("the amounts provided are incorrect or the bank account is in an unexpected state")
+	ErrInstantVerificationFailed    = errors.New("attempted verification failed")
 	ErrXIdempotencyKey              = errors.New("attempted to create a transfer using a duplicate X-Idempotency-Key header")
 
 	// ErrDuplicateBankAccount = errors.New("duplciate bank account or invalid routing number")

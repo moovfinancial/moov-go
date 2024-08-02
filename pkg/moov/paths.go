@@ -31,6 +31,8 @@ const (
 
 	pathBankAccountMicroDeposits = "/accounts/%s/bank-accounts/%s/micro-deposits"
 
+	pathBankAccountInstantVerification = "/accounts/%s/bank-accounts/%s/verify"
+
 	pathWallets = "/accounts/%s/wallets"
 	pathWallet  = "/accounts/%s/wallets/%s"
 
