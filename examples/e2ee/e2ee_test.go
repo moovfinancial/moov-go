@@ -48,6 +48,8 @@ func Test_EndToEndEncryption(t *testing.T) {
 	require.NoError(t, err)
 }
 
+// Best to use a library like we do here to handle the encrypted message wrapping and
+// formatting of the token.
 func Encrypt(pub *jose.JSONWebKey, data []byte) (string, error) {
 	crypter, err := jose.NewEncrypter(jose.A256GCM, jose.Recipient{
 		Algorithm: jose.ECDH_ES_A256KW,
