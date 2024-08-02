@@ -63,4 +63,7 @@ const (
 	pathDisputeEvidences      = "/disputes/%s/evidence"
 	pathDisputeEvidence       = "/disputes/%s/evidence/%s"
 	pathDisputeEvidenceFile   = "/disputes/%s/evidence-file"
+
+	pathEndToEndPublicKey = "/end-to-end-keys"
+	pathEndToEndTokenTest = "/debug/end-to-end-token"
 )
