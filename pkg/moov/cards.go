@@ -23,6 +23,8 @@ type Card struct {
 	IssuerCountry        string             `json:"issuerCountry,omitempty"`
 	IssuerURL            string             `json:"issuerURL,omitempty"`
 	IssuerPhone          string             `json:"issuerPhone,omitempty"`
+	Commercial           *bool              `json:"commercial,omitempty"`
+	Regulated            *bool              `json:"regulated,omitempty"`
 	CardOnFile           bool               `json:"cardOnFile,omitempty"`
 	MerchantAccountID    string             `json:"merchantAccountID,omitempty"`
 	CardAccountUpdater   CardAccountUpdater `json:"cardAccountUpdater,omitempty"`
