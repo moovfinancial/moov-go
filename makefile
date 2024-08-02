@@ -24,5 +24,9 @@ clean:
 .PHONY: cover-test cover-web
 cover-test:
 	go test -coverprofile=cover.out ./...
+
 cover-web:
 	go tool cover -html=cover.out
+
+examples-e2ee:
+	go test ./examples/e2ee/...
