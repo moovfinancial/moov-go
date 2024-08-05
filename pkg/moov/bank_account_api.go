@@ -119,3 +119,31 @@ func (c Client) MicroDepositConfirm(ctx context.Context, accountID string, bankA
 		return resp
 	}
 }
+
+func (c Client) InstantVerificationInitiate(ctx context.Context, accountID, bankAccountID string) error {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathBankAccountInstantVerification, accountID, bankAccountID))
+	if err != nil {
+		return err
+	}
+
+	return CompletedNilOrError(resp)
+}
+
+func (c Client) InstantVerificationComplete(ctx context.Context, accountID, bankAccountID, code string) error {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPut, pathBankAccountInstantVerification, accountID, bankAccountID),
+		AcceptJson(),
+		JsonBody(map[string]string{"code": code}))
+	if err != nil {
+		return err
+	}
+
+	switch resp.Status() {
+	case StatusCompleted:
+		return nil
+	case StatusStateConflict:
+		return errors.Join(ErrInstantVerificationFailed, resp)
+	default:
+		return resp
+	}
+}
