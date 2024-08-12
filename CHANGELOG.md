@@ -1,3 +1,16 @@
+## v0.4.3 (Released 2024-08-05)
+
+IMPROVEMENTS
+
+- feat: add support for Instant Micro Deposits (Bank Account Verification)
+
+## v0.4.2 (Released 2024-08-02)
+
+IMPROVEMENTS
+
+- feat: add Commercial and Regulated field on Card
+- feat: add end to end encryption endpoints and example
+
 ## v0.4.1 (Released 2024-07-23)
 
 IMPROVEMENTS
