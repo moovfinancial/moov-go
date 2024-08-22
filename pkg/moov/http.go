@@ -159,16 +159,27 @@ func (r *httpCallResponse) RequestId() string {
 	return ""
 }
 
+type errorResponse struct {
+	Error string `json:"error"`
+}
+
 func (r *httpCallResponse) Error() string {
 	generic := fmt.Sprintf("error from moov - status: %s http.request_id: %s http.status_code: %d", r.Status().Name, r.RequestId(), r.StatusCode())
 
 	switch r.StatusCode() {
-	case http.StatusConflict, http.StatusUnprocessableEntity:
-		// a JSON response like
-		//  {"profile":{"business":{"taxID":{"ein":{"number":"must be a valid employer identification number"}}}}}
-		// gets transformed into
-		//  profile.business.taxID.ein.number: must be a valid employer identification number
+	case http.StatusBadRequest, http.StatusConflict, http.StatusUnprocessableEntity:
+		// Check if the response contains an error in JSON
 		if json.Valid(r.body) {
+			var wrapper errorResponse
+			json.Unmarshal(r.body, &wrapper)
+			if wrapper.Error != "" {
+				return fmt.Sprintf("%s\n  %s", generic, wrapper.Error)
+			}
+
+			// a JSON response like
+			//  {"profile":{"business":{"taxID":{"ein":{"number":"must be a valid employer identification number"}}}}}
+			// gets transformed into
+			//  profile.business.taxID.ein.number: must be a valid employer identification number
 			out := strings.TrimPrefix(string(r.body), `{"`)
 			out = strings.ReplaceAll(out, `":{"`, ".")
 			out = strings.ReplaceAll(out, `":"`, ": ")
