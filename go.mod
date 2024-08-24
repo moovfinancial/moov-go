@@ -3,7 +3,7 @@ module github.com/moovfinancial/moov-go
 go 1.22.5
 
 require (
-	github.com/go-faker/faker/v4 v4.4.2
+	github.com/go-faker/faker/v4 v4.5.0
 	github.com/go-jose/go-jose/v4 v4.0.4
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
