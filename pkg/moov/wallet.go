@@ -148,6 +148,14 @@ func WithCompletedEndDateTime(completedEndDateTime time.Time) ListTransactionFil
 	})
 }
 
+// WithSweepID filters for transactions accrued in a sweep
+func WithSweepID(sweepID string) ListTransactionFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["sweepID"] = sweepID
+		return nil
+	})
+}
+
 // ListWalletTransactions lists all transactions for the given wallet id
 // https://docs.moov.io/api/index.html#tag/Wallet-transactions
 func (c Client) ListWalletTransactions(ctx context.Context, accountID string, walletID string, opts ...ListTransactionFilter) ([]Transaction, error) {
