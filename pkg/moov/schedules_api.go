@@ -3,6 +3,7 @@ package moov
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov/schedules"
 )
@@ -56,4 +57,29 @@ func (c Client) UpdateSchedule(ctx context.Context, accountID string, schedule s
 	}
 
 	return CompletedObjectOrError[schedules.Schedule](resp)
+}
+
+type scheduleOccurrenceFilterArg func() string
+
+func OccurrenceByID(id string) scheduleOccurrenceFilterArg {
+	return func() string { return id }
+}
+
+func OccurrenceLatest() scheduleOccurrenceFilterArg {
+	return func() string { return "latest" }
+}
+
+func OccurrenceLatestToTime(t time.Time) scheduleOccurrenceFilterArg {
+	return func() string { return t.UTC().Format(time.RFC3339) }
+}
+
+func (c Client) GetScheduleOccurrence(ctx context.Context, accountID string, scheduleID string, filter scheduleOccurrenceFilterArg) (*schedules.TransferOccurrence, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathScheduleOccurrence, accountID, scheduleID, filter()),
+		AcceptJson())
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[schedules.TransferOccurrence](resp)
 }

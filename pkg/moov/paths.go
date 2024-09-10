@@ -52,8 +52,9 @@ const (
 	pathTransfers = "/transfers"
 	pathTransfer  = "/transfers/%s"
 
-	pathSchedules = "/accounts/%s/schedules"
-	pathSchedule  = "/accounts/%s/schedules/%s"
+	pathSchedules          = "/accounts/%s/schedules"
+	pathSchedule           = "/accounts/%s/schedules/%s"
+	pathScheduleOccurrence = "/accounts/%s/schedules/%s/occurrences/%s"
 
 	pathReversals = "/transfers/%s/reversals"
 
