@@ -39,6 +39,7 @@ type Transaction struct {
 	NetAmountDecimal        string                  `json:"netAmountDecimal,omitempty"`
 	AvailableBalance        int                     `json:"availableBalance,omitempty"`
 	AvailableBalanceDecimal string                  `json:"availableBalanceDecimal,omitempty"`
+	SweepID                 *string                 `json:"sweepID,omitempty"`
 }
 
 type WalletTransactionStatus string
