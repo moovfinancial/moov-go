@@ -8,6 +8,8 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov/schedules"
 )
 
+// Guide: https://docs.moov.io/guides/money-movement/scheduling/
+// Documentation: https://docs.moov.io/api/money-movement/schedules/create/
 func (c Client) CreateSchedule(ctx context.Context, accountID string, schedule schedules.UpsertSchedule) (*schedules.Schedule, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathSchedules, accountID),
@@ -20,6 +22,8 @@ func (c Client) CreateSchedule(ctx context.Context, accountID string, schedule s
 	return CompletedObjectOrError[schedules.Schedule](resp)
 }
 
+// Guide: https://docs.moov.io/guides/money-movement/scheduling/
+// Documentation: https://docs.moov.io/api/money-movement/schedules/list/
 func (c Client) ListSchedule(ctx context.Context, accountID string) ([]schedules.Schedule, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathSchedules, accountID),
@@ -31,6 +35,8 @@ func (c Client) ListSchedule(ctx context.Context, accountID string) ([]schedules
 	return CompletedListOrError[schedules.Schedule](resp)
 }
 
+// Guide: https://docs.moov.io/guides/money-movement/scheduling/
+// Documentation: https://docs.moov.io/api/money-movement/schedules/get/
 func (c Client) GetSchedule(ctx context.Context, accountID string, scheduleID string) (*schedules.Schedule, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathSchedule, accountID, scheduleID),
@@ -42,6 +48,8 @@ func (c Client) GetSchedule(ctx context.Context, accountID string, scheduleID st
 	return CompletedObjectOrError[schedules.Schedule](resp)
 }
 
+// Guide: https://docs.moov.io/guides/money-movement/scheduling/
+// Documentation: https://docs.moov.io/api/money-movement/schedules/update/
 func (c Client) UpdateSchedule(ctx context.Context, accountID string, scheduleID string, schedule schedules.UpsertSchedule) (*schedules.Schedule, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPut, pathSchedule, accountID, scheduleID),
@@ -54,6 +62,8 @@ func (c Client) UpdateSchedule(ctx context.Context, accountID string, scheduleID
 	return CompletedObjectOrError[schedules.Schedule](resp)
 }
 
+// Guide: https://docs.moov.io/guides/money-movement/scheduling/
+// Documentation: https://docs.moov.io/api/money-movement/schedules/delete/
 func (c Client) CancelSchedule(ctx context.Context, accountID string, scheduleID string) error {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodDelete, pathSchedule, accountID, scheduleID),
@@ -79,6 +89,7 @@ func OccurrenceLatestToTime(t time.Time) scheduleOccurrenceFilterArg {
 	return func() string { return t.UTC().Format(time.RFC3339) }
 }
 
+// Guide: https://docs.moov.io/guides/money-movement/scheduling/
 func (c Client) GetScheduleOccurrence(ctx context.Context, accountID string, scheduleID string, filter scheduleOccurrenceFilterArg) (*schedules.TransferOccurrence, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathScheduleOccurrence, accountID, scheduleID, filter()),

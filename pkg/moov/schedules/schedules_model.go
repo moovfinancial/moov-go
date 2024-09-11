@@ -58,7 +58,9 @@ type RecurTransfer struct {
 	// When changed, should just modify the transfer of the schedules
 	Transfer Transfer `json:"transfer,omitempty"`
 
-	// https://www.rfc-editor.org/rfc/rfc5545#section-3.3.10
+	// This is the recurrence rule that is used to generate occurrences.
+	// Generator available here: https://jkbrzt.github.io/rrule/
+	// You can read the details of the format here: https://www.rfc-editor.org/rfc/rfc5545#section-3.3.10
 	RecurrenceRule string `json:"recurrenceRule,omitempty"`
 
 	// If the recurrence rule ends up being indefinite
