@@ -1,3 +1,11 @@
+
+## v0.4.4 (Released 2024-10-11)
+
+ADDITIONS
+
+- feat: adding in Scheduled Transfers to the client.
+- feat: adding in Wallet Sweeps to the client.
+
 ## v0.4.3 (Released 2024-08-05)
 
 IMPROVEMENTS
