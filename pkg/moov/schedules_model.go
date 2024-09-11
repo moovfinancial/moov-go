@@ -1,4 +1,4 @@
-package schedules
+package moov
 
 import "time"
 
@@ -34,18 +34,18 @@ type Schedule struct {
 	DisabledOn *time.Time `json:"disabledOn,omitempty" `
 }
 
-func (s Schedule) ToUpsertSchedule() UpsertSchedule {
-	upsOccs := make([]UpsertTransferOccurrence, len(s.Occurrences))
+func (s Schedule) ToUpdateSchedule() UpdateSchedule {
+	upsOccs := make([]UpdateTransferOccurrence, len(s.Occurrences))
 	for i, occ := range s.Occurrences {
-		upsOccs[i] = UpsertTransferOccurrence{
-			OccurrenceID: occ.OccurrenceID,
+		upsOccs[i] = UpdateTransferOccurrence{
+			OccurrenceID: &occ.OccurrenceID,
 			Transfer:     occ.Transfer,
 			RunOn:        occ.RunOn,
 			Cancelled:    nil,
 		}
 	}
 
-	return UpsertSchedule{
+	return UpdateSchedule{
 		Description:   s.Description,
 		RecurTransfer: s.RecurTransfer,
 		Occurrences:   upsOccs,
@@ -56,7 +56,7 @@ func (s Schedule) ToUpsertSchedule() UpsertSchedule {
 type RecurTransfer struct {
 	// Transfer values to use to create the transfer based on the recurRule
 	// When changed, should just modify the transfer of the schedules
-	Transfer Transfer `json:"transfer,omitempty"`
+	Transfer ScheduleTransfer `json:"transfer,omitempty"`
 
 	// This is the recurrence rule that is used to generate occurrences.
 	// Generator available here: https://jkbrzt.github.io/rrule/
@@ -77,7 +77,7 @@ type TransferOccurrence struct {
 	Mode string `json:"mode,omitempty"`
 
 	// Transfer details that will be used.
-	Transfer Transfer `json:"transfer,omitempty"`
+	Transfer ScheduleTransfer `json:"transfer,omitempty"`
 
 	// If this scheduled transfer was generated or manually added for say a correction
 	// If a new interval is specified, all un-ran generated transfers will be re-generated
@@ -103,7 +103,7 @@ type TransferOccurrence struct {
 	TransferStatus *string `json:"transferStatus,omitempty"`
 }
 
-type UpsertSchedule struct {
+type CreateSchedule struct {
 	// Description of what this schedule is
 	Description string `json:"description,omitempty"`
 
@@ -111,19 +111,68 @@ type UpsertSchedule struct {
 	RecurTransfer *RecurTransfer `json:"recurTransfer,omitempty"`
 
 	// On creating the schedule we can use these occurrences as they planned the schedule
-	Occurrences []UpsertTransferOccurrence `json:"occurrences,omitempty"`
+	Occurrences []CreateTransferOccurrence `json:"occurrences,omitempty"`
 }
 
-type UpsertTransferOccurrence struct {
+type CreateTransferOccurrence struct {
+	// Transfer details that will be used.
+	Transfer ScheduleTransfer `json:"transfer,omitempty"`
+
+	// Time to kick off the run. Normalize to UTC.
+	RunOn time.Time `json:"runOn,omitempty"`
+}
+
+type UpdateSchedule struct {
+	// Description of what this schedule is
+	Description string `json:"description,omitempty"`
+
+	// If specified will generate Scheduled transfers based on its configuration
+	RecurTransfer *RecurTransfer `json:"recurTransfer,omitempty"`
+
+	// On creating the schedule we can use these occurrences as they planned the schedule
+	Occurrences []UpdateTransferOccurrence `json:"occurrences,omitempty"`
+}
+
+type UpdateTransferOccurrence struct {
 	// Leave empty to add a new occurrence or set to the ID of the occurrence to change.
-	OccurrenceID string `json:"occurrenceID,omitempty"`
+	OccurrenceID *string `json:"occurrenceID,omitempty"`
 
 	// Transfer details that will be used.
-	Transfer Transfer `json:"transfer,omitempty"`
+	Transfer ScheduleTransfer `json:"transfer,omitempty"`
 
 	// Time to kick off the run. Normalize to UTC.
 	RunOn time.Time `json:"runOn,omitempty"`
 
 	// If nil, cancelledOn will be unchanged. If set true, it will be cancelled. If set false and hasn't ran yet will be uncancelled
 	Cancelled *bool `json:"cancelled,omitempty"`
+}
+
+type ScheduleTransfer struct {
+	Description string         `json:"description,omitempty"`
+	Amount      ScheduleAmount `json:"amount,omitempty"`
+
+	PartnerID   string                `json:"partnerAccountID,omitempty"`
+	Source      SchedulePaymentMethod `json:"source,omitempty"`
+	Destination SchedulePaymentMethod `json:"destination,omitempty"`
+}
+
+type ScheduleAmount struct {
+	Value    int64  `json:"value,omitempty"`
+	Currency string `json:"currency,omitempty"`
+}
+
+type SchedulePaymentMethod struct {
+	PaymentMethodID string `json:"paymentMethodID,omitempty"`
+
+	AchDetails  *ScheduleAchDetails  `json:"achDetails,omitempty"`
+	CardDetails *ScheduleCardDetails `json:"cardDetails,omitempty"`
+}
+
+type ScheduleAchDetails struct {
+	CompanyEntryDescription *string `json:"companyEntryDescription,omitempty"`
+	OriginatingCompanyName  *string `json:"originatingCompanyName,omitempty"`
+}
+
+type ScheduleCardDetails struct {
+	DynamicDescriptor *string `json:"dynamicDescriptor,omitempty"`
 }

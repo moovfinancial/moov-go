@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
-	"github.com/moovfinancial/moov-go/pkg/moov/schedules"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,43 +26,43 @@ func Test_Schedules(t *testing.T) {
 	customerCard := createTemporaryCard(t, mc, customer.AccountID)
 	customerPmId := customerCard.PaymentMethods[0].PaymentMethodID
 
-	schedule, err := mc.CreateSchedule(ctx, partnerId, schedules.UpsertSchedule{
+	schedule, err := mc.CreateSchedule(ctx, partnerId, moov.CreateSchedule{
 		Description: "a simple schedule",
 
 		// Setup a recurring transfer to handle repayment of say a loan with 6 periods
-		RecurTransfer: &schedules.RecurTransfer{
+		RecurTransfer: &moov.RecurTransfer{
 			RecurrenceRule: "FREQ=DAILY;DTSTART=20460101T150405Z;COUNT=6",
-			Transfer: schedules.Transfer{
+			Transfer: moov.ScheduleTransfer{
 				Description: "example of a description for all of the occurrences",
-				Amount: schedules.Amount{
+				Amount: moov.ScheduleAmount{
 					Value:    100,
 					Currency: "USD",
 				},
 				PartnerID: FACILITATOR_ID,
-				Source: schedules.PaymentMethod{
+				Source: moov.SchedulePaymentMethod{
 					PaymentMethodID: customerPmId,
 				},
-				Destination: schedules.PaymentMethod{
+				Destination: moov.SchedulePaymentMethod{
 					PaymentMethodID: merchantPmId,
 				},
 			},
 		},
 
 		// Lets add a one time occurrence to handle the setup fee's
-		Occurrences: []schedules.UpsertTransferOccurrence{
+		Occurrences: []moov.CreateTransferOccurrence{
 			{
 				RunOn: now,
-				Transfer: schedules.Transfer{
+				Transfer: moov.ScheduleTransfer{
 					Description: "setup fee example",
-					Amount: schedules.Amount{
+					Amount: moov.ScheduleAmount{
 						Value:    200,
 						Currency: "USD",
 					},
 					PartnerID: FACILITATOR_ID,
-					Source: schedules.PaymentMethod{
+					Source: moov.SchedulePaymentMethod{
 						PaymentMethodID: customerCard.PaymentMethods[0].PaymentMethodID,
 					},
-					Destination: schedules.PaymentMethod{
+					Destination: moov.SchedulePaymentMethod{
 						PaymentMethodID: bankAcct.PaymentMethods[0].PaymentMethodID,
 					},
 				},
@@ -110,7 +109,7 @@ func Test_Schedules(t *testing.T) {
 	})
 
 	t.Run("Update", func(t *testing.T) {
-		upsert := schedule.ToUpsertSchedule()
+		upsert := schedule.ToUpdateSchedule()
 		require.Len(t, upsert.Occurrences, 7)
 
 		// price increase for all recurring transfers
@@ -123,19 +122,19 @@ func Test_Schedules(t *testing.T) {
 		upsert.Occurrences[1].Transfer.Amount.Value = 300
 
 		// Add a new one time occurrence to charge a fee in an hour from now
-		upsert.Occurrences = append(upsert.Occurrences, schedules.UpsertTransferOccurrence{
+		upsert.Occurrences = append(upsert.Occurrences, moov.UpdateTransferOccurrence{
 			RunOn: now.Add(time.Hour),
-			Transfer: schedules.Transfer{
+			Transfer: moov.ScheduleTransfer{
 				Description: "late fee fine",
-				Amount: schedules.Amount{
+				Amount: moov.ScheduleAmount{
 					Value:    1,
 					Currency: "USD",
 				},
 				PartnerID: partnerId,
-				Source: schedules.PaymentMethod{
+				Source: moov.SchedulePaymentMethod{
 					PaymentMethodID: customerCard.PaymentMethods[0].PaymentMethodID,
 				},
-				Destination: schedules.PaymentMethod{
+				Destination: moov.SchedulePaymentMethod{
 					PaymentMethodID: bankAcct.PaymentMethods[0].PaymentMethodID,
 				},
 			},
