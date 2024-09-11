@@ -39,6 +39,9 @@ const (
 	pathWalletTransactions = "/accounts/%s/wallets/%s/transactions"
 	pathWalletTransaction  = "/accounts/%s/wallets/%s/transactions/%s"
 
+	pathSweepConfigs = "/accounts/%s/sweep-configs"
+	pathSweepConfig  = "/accounts/%s/sweep-configs/%s"
+
 	pathApplePay        = "/accounts/%s/apple-pay"
 	pathApplePayDomains = "/accounts/%s/apple-pay/domains"
 

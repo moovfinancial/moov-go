@@ -39,6 +39,7 @@ type Transaction struct {
 	NetAmountDecimal        string                  `json:"netAmountDecimal,omitempty"`
 	AvailableBalance        int                     `json:"availableBalance,omitempty"`
 	AvailableBalanceDecimal string                  `json:"availableBalanceDecimal,omitempty"`
+	SweepID                 *string                 `json:"sweepID,omitempty"`
 }
 
 type WalletTransactionStatus string
@@ -144,6 +145,14 @@ func WithCompletedStartDateTime(completedStartDateTime time.Time) ListTransactio
 func WithCompletedEndDateTime(completedEndDateTime time.Time) ListTransactionFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["completedEndDateTime"] = completedEndDateTime.Format(time.RFC3339)
+		return nil
+	})
+}
+
+// WithSweepID filters for transactions accrued in a sweep
+func WithSweepID(sweepID string) ListTransactionFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["sweepID"] = sweepID
 		return nil
 	})
 }
