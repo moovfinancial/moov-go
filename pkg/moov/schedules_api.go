@@ -17,17 +17,12 @@ func (c Client) CreateSchedule(ctx context.Context, accountID string, schedule s
 		return nil, err
 	}
 
-	switch resp.Status() {
-	case StatusCompleted:
-		return CompletedObjectOrError[schedules.Schedule](resp)
-	default:
-		return nil, resp
-	}
+	return CompletedObjectOrError[schedules.Schedule](resp)
 }
 
 func (c Client) ListSchedule(ctx context.Context, accountID string) ([]schedules.Schedule, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathSchedules, accountID),
+		Endpoint(http.MethodGet, pathSchedules, accountID),
 		AcceptJson())
 	if err != nil {
 		return nil, err
@@ -38,7 +33,7 @@ func (c Client) ListSchedule(ctx context.Context, accountID string) ([]schedules
 
 func (c Client) GetSchedule(ctx context.Context, accountID string, scheduleID string) (*schedules.Schedule, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathSchedule, accountID, scheduleID),
+		Endpoint(http.MethodGet, pathSchedule, accountID, scheduleID),
 		AcceptJson())
 	if err != nil {
 		return nil, err
@@ -47,9 +42,9 @@ func (c Client) GetSchedule(ctx context.Context, accountID string, scheduleID st
 	return CompletedObjectOrError[schedules.Schedule](resp)
 }
 
-func (c Client) UpdateSchedule(ctx context.Context, accountID string, schedule schedules.UpsertSchedule) (*schedules.Schedule, error) {
+func (c Client) UpdateSchedule(ctx context.Context, accountID string, scheduleID string, schedule schedules.UpsertSchedule) (*schedules.Schedule, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathSchedules, accountID),
+		Endpoint(http.MethodPut, pathSchedule, accountID, scheduleID),
 		AcceptJson(),
 		JsonBody(schedule))
 	if err != nil {
@@ -57,6 +52,17 @@ func (c Client) UpdateSchedule(ctx context.Context, accountID string, schedule s
 	}
 
 	return CompletedObjectOrError[schedules.Schedule](resp)
+}
+
+func (c Client) CancelSchedule(ctx context.Context, accountID string, scheduleID string) error {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodDelete, pathSchedule, accountID, scheduleID),
+		AcceptJson())
+	if err != nil {
+		return err
+	}
+
+	return CompletedNilOrError(resp)
 }
 
 type scheduleOccurrenceFilterArg func() string

@@ -4,40 +4,40 @@ import "time"
 
 type Schedule struct {
 	// prod or sandbox
-	Mode string `json:"mode,omitempty" spanner:"mode"`
+	Mode string `json:"mode,omitempty"`
 
-	ScheduleID string `json:"scheduleID,omitempty" spanner:"schedule_id"`
+	ScheduleID string `json:"scheduleID,omitempty"`
 
 	// This is the account ID of the source transfers that the transfer will run using.
-	SourceAccountID string `json:"sourceAccountID,omitempty" spanner:"source_account_id"`
+	SourceAccountID string `json:"sourceAccountID,omitempty"`
 
 	// This is the destination ID of the destination transfers that the transfer will run using.
-	DestinationAccountID string `json:"destinationAccountID,omitempty" spanner:"destination_account_id"`
+	DestinationAccountID string `json:"destinationAccountID,omitempty"`
 
 	// This is the partner ID that the transfer will run using.
-	PartnerAccountID string `json:"partnerAccountID,omitempty" spanner:"partner_account_id"`
+	PartnerAccountID string `json:"partnerAccountID,omitempty"`
 
 	// AccountID of the account that created it and is allowed to update it.
-	OwnerID string `json:"ownerID,omitempty" spanner:"owner_id"`
+	OwnerID string `json:"ownerID,omitempty"`
 
 	// Description of what this schedule is
-	Description string `json:"description,omitempty" spanner:"description"`
+	Description string `json:"description,omitempty"`
 
 	// If specified will generate Scheduled transfers based on its configuration
-	RecurTransfer *RecurTransfer `json:"recurTransfer,omitempty" spanner:"recur_transfer"`
+	RecurTransfer *RecurTransfer `json:"recurTransfer,omitempty"`
 
 	// List of all generated and manually added transfers to be made.
-	Occurrences []TransferOccurrence `json:"occurrences,omitempty" spanner:"-"`
+	Occurrences []TransferOccurrence `json:"occurrences,omitempty"`
 
-	CreatedOn  time.Time  `json:"createdOn,omitempty" spanner:"created_on"`
-	UpdatedOn  time.Time  `json:"updatedOn,omitempty" spanner:"updated_on"`
-	DisabledOn *time.Time `json:"disabledOn,omitempty"  spanner:"disabled_on"`
+	CreatedOn  time.Time  `json:"createdOn,omitempty"`
+	UpdatedOn  time.Time  `json:"updatedOn,omitempty"`
+	DisabledOn *time.Time `json:"disabledOn,omitempty" `
 }
 
 func (s Schedule) ToUpsertSchedule() UpsertSchedule {
-	occs := make([]UpsertTransferOccurrence, len(s.Occurrences))
+	upsOccs := make([]UpsertTransferOccurrence, len(s.Occurrences))
 	for i, occ := range s.Occurrences {
-		occs[i] = UpsertTransferOccurrence{
+		upsOccs[i] = UpsertTransferOccurrence{
 			OccurrenceID: occ.OccurrenceID,
 			Transfer:     occ.Transfer,
 			RunOn:        occ.RunOn,
@@ -48,7 +48,7 @@ func (s Schedule) ToUpsertSchedule() UpsertSchedule {
 	return UpsertSchedule{
 		Description:   s.Description,
 		RecurTransfer: s.RecurTransfer,
-		Occurrences:   occs,
+		Occurrences:   upsOccs,
 	}
 }
 
@@ -66,39 +66,39 @@ type RecurTransfer struct {
 }
 
 type TransferOccurrence struct {
-	ScheduleID string `json:"scheduleID,omitempty" spanner:"schedule_id"`
+	ScheduleID string `json:"scheduleID,omitempty"`
 
 	// Unique ID for updating a specific occurrence
-	OccurrenceID string `json:"occurrenceID,omitempty" spanner:"occurrence_id"`
+	OccurrenceID string `json:"occurrenceID,omitempty"`
 
 	// Mode to run the occurence under
-	Mode string `json:"mode,omitempty" spanner:"mode"`
+	Mode string `json:"mode,omitempty"`
 
 	// Transfer details that will be used.
-	Transfer Transfer `json:"transfer,omitempty" spanner:"transfer"`
+	Transfer Transfer `json:"transfer,omitempty"`
 
 	// If this scheduled transfer was generated or manually added for say a correction
 	// If a new interval is specified, all un-ran generated transfers will be re-generated
-	Generated bool `json:"generated,omitempty" spanner:"generated"`
+	Generated bool `json:"generated,omitempty"`
 
 	// Flag if this is part of an indefinite schedule
-	Indefinite bool `json:"indefinite,omitempty" spanner:"indefinite"`
+	Indefinite bool `json:"indefinite,omitempty"`
 
 	// Modified since generated. This could be switching just a single payment method
-	Modified bool `json:"modified,omitempty" spanner:"modified"`
+	Modified bool `json:"modified,omitempty"`
 
 	// Time to kick off the run. Normalize to UTC.
-	RunOn time.Time `json:"runOn,omitempty" spanner:"run_on"`
+	RunOn time.Time `json:"runOn,omitempty"`
 
 	// When the transfer was kicked off. If nil, hasn't ran. Normalize to UTC.
-	RanOn *time.Time `json:"ranOn,omitempty" spanner:"ran_on"`
+	RanOn *time.Time `json:"ranOn,omitempty"`
 
 	// Ability to cancel this specific transfer from running
-	CancelledOn *time.Time `json:"cancelledOn,omitempty" spanner:"cancelled_on"`
+	CancelledOn *time.Time `json:"cancelledOn,omitempty"`
 
 	// ID of the transfer that ran
-	TransferID     *string `json:"transferID,omitempty" spanner:"transfer_id"`
-	TransferStatus *string `json:"transferStatus,omitempty" spanner:"transfer_status"`
+	TransferID     *string `json:"transferID,omitempty"`
+	TransferStatus *string `json:"transferStatus,omitempty"`
 }
 
 type UpsertSchedule struct {
@@ -114,7 +114,7 @@ type UpsertSchedule struct {
 
 type UpsertTransferOccurrence struct {
 	// Leave empty to add a new occurrence or set to the ID of the occurrence to change.
-	OccurrenceID string `json:"occurrenceID,omitempty" spanner:"occurrence_id"`
+	OccurrenceID string `json:"occurrenceID,omitempty"`
 
 	// Transfer details that will be used.
 	Transfer Transfer `json:"transfer,omitempty"`

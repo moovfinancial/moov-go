@@ -1,31 +1,31 @@
 package schedules
 
 type Transfer struct {
-	Description string `json:"description,omitempty" spanner:"description"`
-	Amount      Amount `json:"amount,omitempty" spanner:"amount"`
+	Description string `json:"description,omitempty"`
+	Amount      Amount `json:"amount,omitempty"`
 
-	PartnerID   string        `json:"partnerAccountID,omitempty" spanner:"partner_account_id"`
-	Source      PaymentMethod `json:"source,omitempty" spanner:"source"`
-	Destination PaymentMethod `json:"destination,omitempty" spanner:"destination"`
+	PartnerID   string        `json:"partnerAccountID,omitempty"`
+	Source      PaymentMethod `json:"source,omitempty"`
+	Destination PaymentMethod `json:"destination,omitempty"`
 }
 
 type Amount struct {
-	Value    int64  `json:"value,omitempty" spanner:"value"`
-	Currency string `json:"currency,omitempty" spanner:"currency"`
+	Value    int64  `json:"value,omitempty"`
+	Currency string `json:"currency,omitempty"`
 }
 
 type PaymentMethod struct {
-	PaymentMethodID string `json:"paymentMethodID,omitempty" spanner:"payment_method_id"`
+	PaymentMethodID string `json:"paymentMethodID,omitempty"`
 
-	AchDetails  *AchDetails  `json:"achDetails,omitempty" spanner:"ach_details"`
-	CardDetails *CardDetails `json:"cardDetails,omitempty" spanner:"card_details"`
+	AchDetails  *AchDetails  `json:"achDetails,omitempty"`
+	CardDetails *CardDetails `json:"cardDetails,omitempty"`
 }
 
 type AchDetails struct {
-	CompanyEntryDescription *string `json:"companyEntryDescription,omitempty" spanner:"company_entry_description"`
-	OriginatingCompanyName  *string `json:"originatingCompanyName,omitempty" spanner:"originating_company_name"`
+	CompanyEntryDescription *string `json:"companyEntryDescription,omitempty"`
+	OriginatingCompanyName  *string `json:"originatingCompanyName,omitempty"`
 }
 
 type CardDetails struct {
-	DynamicDescriptor *string `json:"dynamicDescriptor,omitempty" spanner:"dynamic_descriptor"`
+	DynamicDescriptor *string `json:"dynamicDescriptor,omitempty"`
 }

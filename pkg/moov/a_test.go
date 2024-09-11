@@ -3,9 +3,11 @@ package moov_test
 import (
 	"context"
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"math/big"
 	"testing"
+	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
@@ -97,6 +99,13 @@ func NoResponseError(t *testing.T, err error) {
 	require.NoError(t, err)
 }
 
+func PrettyDebug(t *testing.T, a any) {
+	b, err := json.MarshalIndent(a, "  ", "  ")
+	require.NoError(t, err)
+
+	t.Logf("\n%s\n", string(b))
+}
+
 func CreateTemporaryTestAccount(t *testing.T, mc *moov.Client, create moov.CreateAccount) *moov.Account {
 	account, started, err := mc.CreateAccount(context.Background(), create)
 	moov.DebugPrintResponse(err, fmt.Printf)
@@ -112,4 +121,57 @@ func CreateTemporaryTestAccount(t *testing.T, mc *moov.Client, create moov.Creat
 	})
 
 	return account
+}
+
+func createTemporaryBankAccount(t *testing.T, mc *moov.Client, accountID string) *moov.BankAccount {
+	resp, err := mc.CreateBankAccount(BgCtx(), accountID, moov.WithBankAccount(moov.BankAccountRequest{
+		HolderName:    "Schedule deposit target",
+		HolderType:    moov.HolderType_Individual,
+		AccountType:   moov.BankAccountType_Checking,
+		AccountNumber: randomBankAccountNumber(),
+		RoutingNumber: "273976369",
+	}), moov.WaitForPaymentMethod())
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		if resp != nil {
+			_ = mc.DeleteBankAccount(BgCtx(), accountID, resp.BankAccountID)
+		}
+	})
+
+	require.NotEmpty(t, resp.PaymentMethods)
+	return resp
+}
+
+func createTemporaryCard(t *testing.T, mc *moov.Client, accountID string) *moov.Card {
+	exp := time.Now().UTC().AddDate(0, 7, 0)
+
+	// Create card
+	card, err := mc.CreateCard(context.Background(), accountID, moov.CreateCard{
+		CardNumber: "4111111111111111",
+		CardCvv:    "123",
+		Expiration: moov.Expiration{
+			Month: exp.Format("01"),
+			Year:  exp.Format("06"),
+		},
+		HolderName: "john doe",
+		BillingAddress: moov.Address{
+			AddressLine1:    "123 Main Street",
+			City:            "City",
+			StateOrProvince: "CO",
+			PostalCode:      "12345",
+			Country:         "US",
+		},
+		CardOnFile: false,
+	})
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		if card != nil {
+			_ = mc.DisableCard(BgCtx(), accountID, card.CardID)
+		}
+	})
+
+	require.NotEmpty(t, card.PaymentMethods)
+	return card
 }
