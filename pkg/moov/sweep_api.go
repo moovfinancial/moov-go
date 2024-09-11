@@ -83,3 +83,25 @@ func (c Client) UpdateSweepConfig(ctx context.Context, update UpdateSweepConfig)
 
 	return CompletedObjectOrError[SweepConfig](resp)
 }
+
+// ListSweeps lists sweeps associated with a wallet
+// https://docs.moov.io/api/money-movement/sweeps/list/
+func (c Client) ListSweeps(ctx context.Context, accountID string, walletID string) ([]Sweep, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathSweeps, accountID, walletID), AcceptJson())
+	if err != nil {
+		return nil, fmt.Errorf("listing sweeps: %v", err)
+	}
+
+	return CompletedListOrError[Sweep](resp)
+}
+
+// GetSweep retrives a sweep for a given sweepID.
+// https://docs.moov.io/api/money-movement/sweeps/get/
+func (c Client) GetSweep(ctx context.Context, accountID string, walletID string, sweepID string) (*Sweep, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathSweep, accountID, walletID, sweepID), AcceptJson())
+	if err != nil {
+		return nil, fmt.Errorf("getting sweep: %v", err)
+	}
+
+	return CompletedObjectOrError[Sweep](resp)
+}
