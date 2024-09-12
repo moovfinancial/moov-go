@@ -19,7 +19,7 @@ func Example_SweepConfigs_Endpoints() {
 		walletID  = "ce906d91-61ef-47eb-8e15-38f80b863200"
 
 		ctx        = context.Background()
-		minBalance = "100.0"
+		minBalance = "100.00"
 	)
 
 	// Create a sweep config
