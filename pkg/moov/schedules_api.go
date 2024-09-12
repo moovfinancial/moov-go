@@ -75,14 +75,17 @@ func (c Client) CancelSchedule(ctx context.Context, accountID string, scheduleID
 
 type scheduleOccurrenceFilterArg func() string
 
+// Occurrence with the specific ID
 func OccurrenceByID(id string) scheduleOccurrenceFilterArg {
 	return func() string { return id }
 }
 
+// Occurrence closest to now without going over.
 func OccurrenceLatest() scheduleOccurrenceFilterArg {
 	return func() string { return "latest" }
 }
 
+// Occurrence closest to time `t` without going over.
 func OccurrenceLatestToTime(t time.Time) scheduleOccurrenceFilterArg {
 	return func() string { return t.UTC().Format(time.RFC3339) }
 }
