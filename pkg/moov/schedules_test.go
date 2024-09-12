@@ -15,6 +15,7 @@ func Test_Schedules(t *testing.T) {
 
 	// Just bumping now so we don't end up with a bunch more test transfers
 	now := time.Date(2040, time.March, 1, 0, 0, 0, 0, time.UTC)
+	start := now.AddDate(0, 0, 1)
 
 	partnerId := FACILITATOR_ID
 
@@ -31,7 +32,8 @@ func Test_Schedules(t *testing.T) {
 
 		// Setup a recurring transfer to handle repayment of say a loan with 6 periods
 		RecurTransfer: &moov.RecurTransfer{
-			RecurrenceRule: "FREQ=DAILY;DTSTART=20460101T150405Z;COUNT=6",
+			Start:          &start,
+			RecurrenceRule: "FREQ=MONTHLY;COUNT=6",
 			Transfer: moov.ScheduleTransfer{
 				Description: "example of a description for all of the occurrences",
 				Amount: moov.ScheduleAmount{
@@ -116,7 +118,7 @@ func Test_Schedules(t *testing.T) {
 		upsert.RecurTransfer.Transfer.Amount.Value = 200
 
 		// Lets shift an occurrence by 1 day
-		upsert.Occurrences[0].RunOn = upsert.Occurrences[0].RunOn.AddDate(1, 0, 20)
+		upsert.Occurrences[0].RunOn = upsert.Occurrences[0].RunOn.AddDate(0, 0, 1)
 
 		// Lets change the amount of the second
 		upsert.Occurrences[1].Transfer.Amount.Value = 300
@@ -141,7 +143,7 @@ func Test_Schedules(t *testing.T) {
 		})
 
 		// Lets cancel the third occurrence
-		upsert.Occurrences[2].Cancelled = moov.PtrOf(true)
+		upsert.Occurrences[2].Canceled = moov.PtrOf(true)
 
 		// Do the update
 		updated, err := mc.UpdateSchedule(ctx, partnerId, schedule.ScheduleID, upsert)
@@ -159,7 +161,7 @@ func Test_Schedules(t *testing.T) {
 		require.Equal(t, int64(300), updated.Occurrences[2].Transfer.Amount.Value)
 
 		// Lets cancel the third occurrence
-		require.NotNil(t, updated.Occurrences[3].CancelledOn)
+		require.NotNil(t, updated.Occurrences[3].CanceledOn)
 
 		schedule = updated
 	})

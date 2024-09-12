@@ -41,7 +41,7 @@ func (s Schedule) ToUpdateSchedule() UpdateSchedule {
 			OccurrenceID: &occ.OccurrenceID,
 			Transfer:     occ.Transfer,
 			RunOn:        occ.RunOn,
-			Cancelled:    nil,
+			Canceled:     nil,
 		}
 	}
 
@@ -54,6 +54,9 @@ func (s Schedule) ToUpdateSchedule() UpdateSchedule {
 
 // https://www.rfc-editor.org/rfc/rfc5545#section-3.3.10
 type RecurTransfer struct {
+	// If omited the start time for the occurrence will be the timestamp of when the schedule was created.
+	Start *time.Time `json:"start,omitempty"`
+
 	// Transfer values to use to create the transfer based on the recurRule
 	// When changed, should just modify the transfer of the schedules
 	Transfer ScheduleTransfer `json:"transfer,omitempty"`
@@ -96,7 +99,7 @@ type TransferOccurrence struct {
 	RanOn *time.Time `json:"ranOn,omitempty"`
 
 	// Ability to cancel this specific transfer from running
-	CancelledOn *time.Time `json:"cancelledOn,omitempty"`
+	CanceledOn *time.Time `json:"canceledOn,omitempty"`
 
 	// ID of the transfer that ran
 	TransferID     *string `json:"transferID,omitempty"`
@@ -143,8 +146,8 @@ type UpdateTransferOccurrence struct {
 	// Time to kick off the run. Normalize to UTC.
 	RunOn time.Time `json:"runOn,omitempty"`
 
-	// If nil, cancelledOn will be unchanged. If set true, it will be cancelled. If set false and hasn't ran yet will be uncancelled
-	Cancelled *bool `json:"cancelled,omitempty"`
+	// If nil, canceledOn will be unchanged. If set true, it will be canceled. If set false and hasn't ran yet it will be resumed
+	Canceled *bool `json:"canceled,omitempty"`
 }
 
 type ScheduleTransfer struct {
