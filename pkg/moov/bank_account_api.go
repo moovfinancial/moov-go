@@ -37,6 +37,7 @@ func WaitForPaymentMethod() CreateBankAccountType {
 }
 
 // CreateBankAccount creates a new bank account for the given customer account
+// https://docs.moov.io/api/sources/bank-accounts/create/
 func (c Client) CreateBankAccount(ctx context.Context, accountID string, opts ...CreateBankAccountType) (*BankAccount, error) {
 	args := prependArgs(opts, AcceptJson())
 	resp, err := c.CallHttp(ctx,
@@ -57,6 +58,7 @@ func (c Client) CreateBankAccount(ctx context.Context, accountID string, opts ..
 }
 
 // GetBankAccount retrieves a bank account for the given customer account
+// https://docs.moov.io/api/sources/bank-accounts/get/
 func (c Client) GetBankAccount(ctx context.Context, accountID string, bankAccountID string) (*BankAccount, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathBankAccount, accountID, bankAccountID),
@@ -69,6 +71,7 @@ func (c Client) GetBankAccount(ctx context.Context, accountID string, bankAccoun
 }
 
 // DeleteBankAccount deletes a bank account for the given customer account
+// https://docs.moov.io/api/sources/bank-accounts/delete/
 func (c Client) DeleteBankAccount(ctx context.Context, accountID string, bankAccountID string) error {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathBankAccount, accountID, bankAccountID))
 	if err != nil {
@@ -79,6 +82,7 @@ func (c Client) DeleteBankAccount(ctx context.Context, accountID string, bankAcc
 }
 
 // ListBankAccounts lists all bank accounts for the given customer account
+// https://docs.moov.io/api/sources/bank-accounts/list/
 func (c Client) ListBankAccounts(ctx context.Context, accountID string) ([]BankAccount, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathBankAccounts, accountID),
@@ -91,6 +95,7 @@ func (c Client) ListBankAccounts(ctx context.Context, accountID string) ([]BankA
 }
 
 // MicroDepositInitiate creates a new micro deposit verification for the given bank account
+// https://docs.moov.io/api/sources/bank-accounts/initiate-micro-deposits/
 func (c Client) MicroDepositInitiate(ctx context.Context, accountID string, bankAccountID string) error {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathBankAccountMicroDeposits, accountID, bankAccountID))
 	if err != nil {
@@ -101,6 +106,7 @@ func (c Client) MicroDepositInitiate(ctx context.Context, accountID string, bank
 }
 
 // MicroDepositConfirm confirms a micro deposit verification for the given bank account
+// https://docs.moov.io/api/sources/bank-accounts/complete-micro-deposits/
 func (c Client) MicroDepositConfirm(ctx context.Context, accountID string, bankAccountID string, amounts []int) error {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPut, pathBankAccountMicroDeposits, accountID, bankAccountID),
@@ -120,6 +126,8 @@ func (c Client) MicroDepositConfirm(ctx context.Context, accountID string, bankA
 	}
 }
 
+// InstantVerificationInitiate creates a new bank account verification for the given bank account
+// https://docs.moov.io/api/sources/bank-accounts/initiate-bank-account-verification/
 func (c Client) InstantVerificationInitiate(ctx context.Context, accountID, bankAccountID string) error {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathBankAccountInstantVerification, accountID, bankAccountID))
 	if err != nil {
@@ -129,6 +137,19 @@ func (c Client) InstantVerificationInitiate(ctx context.Context, accountID, bank
 	return CompletedNilOrError(resp)
 }
 
+// GetInstantBankAccountVerfication retrieves an active bank account verification for the given bank account
+// https://docs.moov.io/api/sources/bank-accounts/get-bank-account-verification/
+func (c Client) GetInstantBankAccountVerfication(ctx context.Context, accountID, bankAccountID string) error {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathBankAccountInstantVerification, accountID, bankAccountID))
+	if err != nil {
+		return err
+	}
+
+	return CompletedNilOrError(resp)
+}
+
+// InstantVerificationComplete confirms a bank account verification for the given bank account
+// https://docs.moov.io/api/sources/bank-accounts/complete-bank-account-verification/
 func (c Client) InstantVerificationComplete(ctx context.Context, accountID, bankAccountID, code string) error {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPut, pathBankAccountInstantVerification, accountID, bankAccountID),

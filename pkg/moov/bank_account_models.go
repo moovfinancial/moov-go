@@ -24,8 +24,10 @@ type BankAccountType string
 
 // List of HolderType
 const (
-	BankAccountType_Checking BankAccountType = "checking"
-	BankAccountType_Savings  BankAccountType = "savings"
+	BankAccountType_Checking      BankAccountType = "checking"
+	BankAccountType_Savings       BankAccountType = "savings"
+	BankAccountType_GeneralLedger BankAccountType = "general-ledger"
+	BankAccountType_Loan          BankAccountType = "loan"
 )
 
 // HolderType Defines the type of the account holder
