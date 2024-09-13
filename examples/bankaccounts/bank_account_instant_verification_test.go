@@ -6,13 +6,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-faker/faker/v4"
 	"github.com/moovfinancial/moov-go/pkg/moov"
+
+	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/require"
 )
 
 // Sets up an account with linked bank account and initiates instant verification
-func TestBankAccountInstantVerificationExample(t *testing.T) {
+func TestBankAccount_InstantVerificationExample(t *testing.T) {
 	// Step 1: create Moov client and set some variables
 
 	// The following code shows how you can configure the moov client with
