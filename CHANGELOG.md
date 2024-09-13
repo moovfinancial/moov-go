@@ -1,10 +1,18 @@
-
-## v0.4.4 (Released 2024-10-11)
+## v0.5.0 (Released 2024-09-13)
 
 ADDITIONS
 
 - feat: adding in Scheduled Transfers to the client.
 - feat: adding in Wallet Sweeps to the client.
+
+IMPROVEMENTS
+
+- feat: support general-ledger and loan bank accounts
+- moov: extract "error" from JSON response on 400s
+
+BUILD
+
+- fix(deps): update module github.com/go-faker/faker/v4 to v4.5.0
 
 ## v0.4.3 (Released 2024-08-05)
 
