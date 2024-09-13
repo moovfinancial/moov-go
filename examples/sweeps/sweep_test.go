@@ -2,95 +2,88 @@ package sweeps
 
 import (
 	"context"
-	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
-func Example_SweepConfigs_Endpoints() {
+func TestSweepConfigsEndpoints(t *testing.T) {
 	mc, err := moov.NewClient()
-	if err != nil {
-		fmt.Printf("new client: %v", err)
-		return
-	}
+	require.NoError(t, err)
 
 	var (
-		accountID = "2f29c185-91d8-40c7-8963-3915aa673c21"
-		walletID  = "ce906d91-61ef-47eb-8e15-38f80b863200"
+		ctx = context.Background()
 
-		ctx        = context.Background()
-		minBalance = "100.00"
+		accountID  = "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
+		walletID   = "4dbac313-d505-4d51-a0fe-c11787916fcf"
+		minBalance = "1000.00"
 	)
 
-	// Create a sweep config
-	sweepConfig, err := mc.CreateSweepConfig(ctx, moov.CreateSweepConfig{
-		AccountID:           accountID,
-		WalletID:            walletID,
-		Status:              moov.SweepConfigStatus_Enabled,
-		PushPaymentMethodID: "8e17b62d-cd7f-4d88-8576-608ba7575860",
-		PullPaymentMethodID: "a54ddae8-57ab-4941-a723-097292fe30ac",
-		MinimumBalance:      &minBalance,
-	})
-	if err != nil {
-		fmt.Printf("creating sweep config: %v", err)
-		return
-	}
-	fmt.Printf("Created sweep config: %+v", sweepConfig)
+	sweepConfigs, err := mc.ListSweepConfigs(ctx, accountID)
+	require.NoError(t, err)
 
-	// Get a sweep config by ID
-	sweepConfig, err = mc.GetSweepConfig(ctx, accountID, sweepConfig.SweepConfigID)
-	if err != nil {
-		fmt.Printf("getting sweep config: %v", err)
-		return
+	var sweepConfig *moov.SweepConfig
+	// If no sweep configs found, create one
+	if len(sweepConfigs) == 0 {
+		// Create a sweep config
+		sweepConfig, err := mc.CreateSweepConfig(ctx, moov.CreateSweepConfig{
+			AccountID:           accountID,
+			WalletID:            walletID,
+			Status:              moov.SweepConfigStatus_Enabled,
+			PushPaymentMethodID: "b46193d2-6b9b-4a73-afdc-3871779f51e3",
+			PullPaymentMethodID: "467dfcdc-463b-4282-83af-db6f47562bf9",
+			MinimumBalance:      &minBalance,
+		})
+		require.NoError(t, err)
+		t.Logf("Created sweep config: %+v", sweepConfig)
+	} else {
+		sweepConfig = &sweepConfigs[0]
 	}
-	fmt.Printf("Got sweep config: %+v", sweepConfig)
+	t.Logf("Got sweep config: %+v", sweepConfig)
 
 	// Update the sweep config
-	minBalance = "0"
-	pullPaymentMethodID := "219b2089-4dec-45e7-a0cb-68063565868c"
+	minBalance = "2000.00"
+	statementDescriptor := "my-sweeps"
+
 	sweepConfig, err = mc.UpdateSweepConfig(ctx, moov.UpdateSweepConfig{
 		AccountID:           accountID,
 		SweepConfigID:       sweepConfig.SweepConfigID,
 		MinimumBalance:      &minBalance,
-		PullPaymentMethodID: &pullPaymentMethodID,
+		StatementDescriptor: &statementDescriptor,
 	})
-	if err != nil {
-		fmt.Printf("udpating sweep config: %v", err)
-		return
-	}
-	fmt.Printf("updated sweep config: %+v", sweepConfig)
+	require.NoError(t, err)
+	t.Logf("updated sweep config: %+v", sweepConfig)
+
+	// Get the sweep config by ID
+	sweepConfig, err = mc.GetSweepConfig(ctx, accountID, sweepConfig.SweepConfigID)
+	require.NoError(t, err)
+	t.Logf("Got sweep config by ID: %+v", sweepConfig)
 }
 
-func Example_Sweeps_Endpoints() {
+func TestSweepEndpoints(t *testing.T) {
 	mc, err := moov.NewClient()
-	if err != nil {
-		fmt.Printf("new client: %v", err)
-		return
-	}
+	require.NoError(t, err)
 
 	var (
-		accountID = "2f29c185-91d8-40c7-8963-3915aa673c21"
-		walletID  = "ce906d91-61ef-47eb-8e15-38f80b863200"
+		accountID = "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
+		walletID  = "4dbac313-d505-4d51-a0fe-c11787916fcf"
 		ctx       = context.Background()
 	)
 
 	sweeps, err := mc.ListSweeps(ctx, accountID, walletID)
-	if err != nil {
-		fmt.Printf("listing sweeps: %v", err)
-		return
-	}
+	require.NoError(t, err)
 
 	if len(sweeps) == 0 {
-		fmt.Printf("no sweeps associated with walletID of %v", walletID)
+		t.Logf("no sweeps associated with walletID of %v", walletID)
 		return
 	}
-	fmt.Printf("Listing sweeps returned %d sweeps", len(sweeps))
+	t.Logf("Listing sweeps returned %d sweeps", len(sweeps))
 
 	sweep := &sweeps[0]
 	sweep, err = mc.GetSweep(ctx, accountID, walletID, sweep.SweepID)
-	if err != nil {
-		fmt.Printf("getting sweep: %v", err)
-		return
-	}
-	fmt.Printf("Got first sweep in list: %+v", sweep)
+	require.NoError(t, err)
+
+	t.Logf("Got first sweep in list: %+v", sweep)
 }
