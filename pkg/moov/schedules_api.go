@@ -91,7 +91,7 @@ func OccurrenceLatestToTime(t time.Time) scheduleOccurrenceFilterArg {
 }
 
 // Guide: https://docs.moov.io/guides/money-movement/scheduling/
-func (c Client) GetScheduleOccurrence(ctx context.Context, accountID string, scheduleID string, filter scheduleOccurrenceFilterArg) (*TransferOccurrence, error) {
+func (c Client) GetScheduleOccurrence(ctx context.Context, accountID string, scheduleID string, filter scheduleOccurrenceFilterArg) (*Occurrence, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathScheduleOccurrence, accountID, scheduleID, filter()),
 		AcceptJson())
@@ -99,5 +99,5 @@ func (c Client) GetScheduleOccurrence(ctx context.Context, accountID string, sch
 		return nil, err
 	}
 
-	return CompletedObjectOrError[TransferOccurrence](resp)
+	return CompletedObjectOrError[Occurrence](resp)
 }

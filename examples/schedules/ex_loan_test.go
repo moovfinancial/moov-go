@@ -21,16 +21,16 @@ func Test_Loan_Example(t *testing.T) {
 		Description: "Car Loan",
 
 		// One time occurrence to handle say the tax, title, and registration of a new car.
-		Occurrences: []moov.CreateTransferOccurrence{
+		Occurrences: []moov.CreateOccurrence{
 			{
 				RunOn: env.Now,
-				Transfer: moov.ScheduleTransfer{
+				RunTransfer: moov.RunTransfer{
 					Description: "Tax, Title, Registration",
 					Amount: moov.ScheduleAmount{
 						Value:    2,
 						Currency: "USD",
 					},
-					PartnerID: env.PartnerID,
+					PartnerAccountID: env.PartnerID,
 					Source: moov.SchedulePaymentMethod{
 						PaymentMethodID: env.CustomerPmId,
 					},
@@ -42,16 +42,16 @@ func Test_Loan_Example(t *testing.T) {
 		},
 
 		// Add in a recurring schedule for the remaining 36 payments
-		RecurTransfer: &moov.RecurTransfer{
+		Recur: &moov.Recur{
 			Start:          &paymentsStart,
 			RecurrenceRule: "FREQ=MONTHLY;BYDAY=+1MO;COUNT=36",
-			Transfer: moov.ScheduleTransfer{
+			RunTransfer: moov.RunTransfer{
 				Description: "Monthly payment",
 				Amount: moov.ScheduleAmount{
 					Value:    1,
 					Currency: "USD",
 				},
-				PartnerID: env.PartnerID,
+				PartnerAccountID: env.PartnerID,
 				Source: moov.SchedulePaymentMethod{
 					PaymentMethodID: env.CustomerPmId,
 				},

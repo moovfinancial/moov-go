@@ -18,16 +18,16 @@ func Test_Subscription(t *testing.T) {
 		Description: "Streaming Services",
 
 		// Add in a recurring schedule that goes on indefinitely that bills every month at this time.
-		RecurTransfer: &moov.RecurTransfer{
+		Recur: &moov.Recur{
 			Start:          &env.Now,
 			RecurrenceRule: "FREQ=MONTHLY",
-			Transfer: moov.ScheduleTransfer{
+			RunTransfer: moov.RunTransfer{
 				Description: "Monthly payment",
 				Amount: moov.ScheduleAmount{
 					Value:    1,
 					Currency: "USD",
 				},
-				PartnerID: env.PartnerID,
+				PartnerAccountID: env.PartnerID,
 				Source: moov.SchedulePaymentMethod{
 					PaymentMethodID: env.CustomerPmId,
 				},
@@ -43,9 +43,9 @@ func Test_Subscription(t *testing.T) {
 	occ, err := env.Client.GetScheduleOccurrence(ctx, env.PartnerID, schedule.ScheduleID, moov.OccurrenceLatestToTime(env.Now))
 	require.NoError(t, err)
 
-	if occ.TransferStatus == nil {
+	if occ.Status == nil {
 		// payment hasn't ran yet
-	} else if *occ.TransferStatus == string(moov.TransferStatus_Failed) {
+	} else if *occ.Status == string(moov.TransferStatus_Failed) {
 		// last transfer failed, don't allow access to premium features
 	} else {
 		// payment is in the middle of processing and hasn't fully completed and been deposited in merchants account
