@@ -14,8 +14,8 @@ func Test_Run_Tomorrow_Example(t *testing.T) {
 	// Lets setup an example environment where the client, customer, and merchant already exist.
 	env := Setup(t, ctx)
 
-	// Run the payment tomorrow 1 month from today
-	runDate := env.Now.AddDate(0, 1, 0)
+	// Run the payment tomorrow
+	runDate := env.Now.AddDate(0, 0, 1)
 
 	_, err := env.Client.CreateSchedule(ctx, env.PartnerID, moov.CreateSchedule{
 		Description: "Delayed Payment",
