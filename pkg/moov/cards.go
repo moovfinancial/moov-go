@@ -74,6 +74,7 @@ type CreateCard struct {
 	CardCvv           string     `json:"cardCvv,omitempty"`
 	Expiration        Expiration `json:"expiration,omitempty"`
 	HolderName        string     `json:"holderName,omitempty"`
+	VerifyName        bool       `json:"verifyName,omitempty"`
 	BillingAddress    Address    `json:"billingAddress,omitempty"`
 	CardOnFile        bool       `json:"cardOnFile,omitempty"`
 	MerchantAccountID string     `json:"merchantAccountID,omitempty"`
@@ -128,6 +129,8 @@ type cardPatch struct {
 	Expiration     *Expiration   `json:"expiration,omitempty"`
 	BillingAddress *AddressPatch `json:"billingAddress,omitempty"`
 	CardOnFile     *bool         `json:"cardOnFile,omitempty"`
+	HolderName     *string       `json:"holderName,omitempty"`
+	VerifyName     *bool         `json:"verifyName,omitempty"`
 }
 
 func applyCardUpdateFilters(opts ...CardUpdateFilter) (*cardPatch, error) {
@@ -173,13 +176,29 @@ func WithCardOnFile(cardOnFile bool) CardUpdateFilter {
 	}
 }
 
+// WithHolderName sets the holderName for the card
+func WithHolderName(holderName string) CardUpdateFilter {
+	return func(card *cardPatch) error {
+		card.HolderName = &holderName
+		return nil
+	}
+}
+
+// WithVerifyName sets the verifyName flag for the card update request
+func WithVerifyName(verifyName bool) CardUpdateFilter {
+	return func(card *cardPatch) error {
+		card.VerifyName = &verifyName
+		return nil
+	}
+}
+
 // UpdateCard performs a partial update on a card associated with a Moov account. Only fields that
 // are populated (non-nil) in the request will be updated. If a value is provided for CVV, a new
 // verification ($0 authorization) will be submitted for the card. Updating the expiration date or
 // address will update the information stored on file for the card but will not be verified
 // https://docs.moov.io/api/#tag/Cards/operation/updateCard
 func (c Client) UpdateCard(ctx context.Context, accountID string, cardID string, opt1 CardUpdateFilter, opts ...CardUpdateFilter) (*Card, error) {
-	// Create a new CardPost payload and apply any filters
+	// Create a new CardPatch payload and apply any filters
 	opts = append([]CardUpdateFilter{opt1}, opts...)
 	payload, err := applyCardUpdateFilters(opts...)
 	if err != nil {
