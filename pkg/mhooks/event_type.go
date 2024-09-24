@@ -29,6 +29,8 @@ const (
 	EventTypeRepresentativeCreated    EventType = "representative.created"
 	EventTypeRepresentativeDeleted    EventType = "representative.deleted"
 	EventTypeRepresentativeUpdated    EventType = "representative.updated"
+	EventTypeSweepCreated             EventType = "sweep.created"
+	EventTypeSweepUpdated             EventType = "sweep.updated"
 	EventTypeTestPing                 EventType = "event.test"
 	EventTypeTransferCreated          EventType = "transfer.created"
 	EventTypeTransferUpdated          EventType = "transfer.updated"
@@ -197,6 +199,24 @@ type RepresentativeUpdated struct {
 	RepresentativeID string `json:"representativeID"`
 	// ID of the account
 	AccountID string `json:"accountID"`
+}
+
+type SweepCreated struct {
+	// ID of the sweep
+	SweepID string `json:"sweepID"`
+	// ID of the Wallet
+	WalletID string `json:"walletID"`
+}
+
+// SweepUpdated struct for SweepUpdated
+type SweepUpdated struct {
+	// ID of the sweep
+	SweepID string `json:"sweepID"`
+	// ID of the Wallet
+	WalletID string           `json:"walletID"`
+	Status   moov.SweepStatus `json:"status"`
+	// ID of the transfer
+	TransferID *string `json:"transferID,omitempty"`
 }
 
 type TestPing struct {

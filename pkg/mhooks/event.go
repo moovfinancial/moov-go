@@ -117,6 +117,8 @@ type Event struct {
 	representativeCreated    *RepresentativeCreated
 	representativeDeleted    *RepresentativeDeleted
 	representativeUpdated    *RepresentativeUpdated
+	sweepCreated             *SweepCreated
+	sweepUpdated             *SweepUpdated
 	testPing                 *TestPing
 	transferCreated          *TransferCreated
 	transferUpdated          *TransferUpdated
@@ -281,6 +283,22 @@ func (e Event) RepresentativeUpdated() (*RepresentativeUpdated, error) {
 	}
 
 	return e.representativeUpdated, nil
+}
+
+func (e Event) SweepCreated() (*SweepCreated, error) {
+	if e.EventType != EventTypeSweepCreated {
+		return nil, newInvalidEventTypeError(EventTypeSweepCreated, e.EventType)
+	}
+
+	return e.sweepCreated, nil
+}
+
+func (e Event) SweepUpdated() (*SweepUpdated, error) {
+	if e.EventType != EventTypeSweepUpdated {
+		return nil, newInvalidEventTypeError(EventTypeSweepUpdated, e.EventType)
+	}
+
+	return e.sweepUpdated, nil
 }
 
 func (e Event) TestPing() (*TestPing, error) {
