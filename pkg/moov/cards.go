@@ -57,6 +57,7 @@ type CardDetails struct {
 	TransactionSource        string            `json:"transactionSource,omitempty"`
 	InterchangeQualification string            `json:"interchangeQualification,omitempty"`
 	StatusUpdates            CardStatusUpdates `json:"statusUpdates,omitempty"`
+	InitiatedOn              *time.Time        `json:"initiatedOn,omitempty"`
 	CompletedOn              *time.Time        `json:"completedOn,omitempty"`
 }
 
