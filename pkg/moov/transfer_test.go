@@ -67,4 +67,16 @@ func Test_Transfers(t *testing.T) {
 		require.NotNil(t, completed)
 		require.Nil(t, started)
 	})
+
+	t.Run("list transfers", func(t *testing.T) {
+		transfers, err := mc.ListTransfers(BgCtx(),
+			moov.WithTransferAccountIDs([]string{
+				account.AccountID,
+			}),
+			// moov.WithTransferCount(10),
+			// moov.WithTransferStatus(string(moov.TransferStatus_Completed)),
+		)
+		require.NoError(t, err)
+		require.Greater(t, len(transfers), 0)
+	})
 }
