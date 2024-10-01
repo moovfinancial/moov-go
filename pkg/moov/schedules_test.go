@@ -15,7 +15,9 @@ func Test_Schedules(t *testing.T) {
 
 	// Just bumping now so we don't end up with a bunch more test transfers
 	now := time.Date(2040, time.March, 1, 0, 0, 0, 0, time.UTC)
-	start := now.AddDate(0, 0, 1)
+
+	// We'll start the monthly payments next month
+	start := now.AddDate(0, 1, 0)
 
 	partnerId := FACILITATOR_ID
 
@@ -29,6 +31,27 @@ func Test_Schedules(t *testing.T) {
 
 	schedule, err := mc.CreateSchedule(ctx, partnerId, moov.CreateSchedule{
 		Description: "a simple schedule",
+
+		// Lets add a one time occurrence to handle the setup fee's
+		Occurrences: []moov.CreateOccurrence{
+			{
+				RunOn: now,
+				RunTransfer: moov.RunTransfer{
+					Description: "setup fee and first month example",
+					Amount: moov.ScheduleAmount{
+						Value:    200,
+						Currency: "USD",
+					},
+					PartnerAccountID: FACILITATOR_ID,
+					Source: moov.SchedulePaymentMethod{
+						PaymentMethodID: customerPmId,
+					},
+					Destination: moov.SchedulePaymentMethod{
+						PaymentMethodID: merchantPmId,
+					},
+				},
+			},
+		},
 
 		// Setup a recurring transfer to handle repayment of say a loan with 6 periods
 		Recur: &moov.Recur{
@@ -49,27 +72,6 @@ func Test_Schedules(t *testing.T) {
 				},
 			},
 		},
-
-		// Lets add a one time occurrence to handle the setup fee's
-		Occurrences: []moov.CreateOccurrence{
-			{
-				RunOn: now,
-				RunTransfer: moov.RunTransfer{
-					Description: "setup fee example",
-					Amount: moov.ScheduleAmount{
-						Value:    200,
-						Currency: "USD",
-					},
-					PartnerAccountID: FACILITATOR_ID,
-					Source: moov.SchedulePaymentMethod{
-						PaymentMethodID: customerPmId,
-					},
-					Destination: moov.SchedulePaymentMethod{
-						PaymentMethodID: merchantPmId,
-					},
-				},
-			},
-		},
 	})
 
 	t.Cleanup(func() {
@@ -82,6 +84,8 @@ func Test_Schedules(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, schedule)
 		require.Len(t, schedule.Occurrences, 7)
+
+		require.Equal(t, now, schedule.Occurrences[0].RunOn)
 	})
 
 	t.Run("get & list", func(t *testing.T) {
