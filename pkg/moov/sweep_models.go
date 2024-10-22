@@ -53,6 +53,9 @@ type Sweep struct {
 	// Amount remaining in the wallet after the sweep transfer completes.
 	// A decimal-formatted numerical string that represents up to 9 decimal place precision.
 	ResidualBalance string `json:"residualBalance,omitempty"`
+	// The text that appears on the banking statement.
+	// The default descriptor is a 10 character ID if an override is not set in the sweep configs statementDescriptor.
+	StatementDescriptor string `json:"statementDescriptor,omitempty"`
 }
 
 type SweepStatus string

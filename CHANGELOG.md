@@ -1,3 +1,17 @@
+## v0.6.0 (Released 2024-10-16)
+
+ADDITIONS
+
+- feat: add `StatementDescriptor` to Sweep
+- mhooks: add `SweepCreated` and `SweepUpdated` webhook events
+
+IMPROVEMENTS
+
+- examples: create scheduled transfer for tomorrow
+- fix: add `HolderName` and `VerifyName` on Card Update
+- fix: add `InitiatedOn` on CardDetails
+- fix: add `VerifyName` on CreateCard
+
 ## v0.5.0 (Released 2024-09-13)
 
 ADDITIONS
