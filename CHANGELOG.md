@@ -1,3 +1,9 @@
+## v0.6.1 (Released 2024-10-23)
+
+IMPROVEMENTS
+
+- fix: add sweepID, occurrenceID, and scheduleID to transfer model
+
 ## v0.6.0 (Released 2024-10-16)
 
 ADDITIONS
