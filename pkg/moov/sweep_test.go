@@ -77,6 +77,5 @@ func Test_Sweep_ListAndGet(t *testing.T) {
 	sweepID := sweeps[0].SweepID
 	sweep, err := mc.GetSweep(ctx, accountID, walletID, sweepID)
 	require.NoError(t, err)
-
 	t.Logf("Got sweep: %+v", sweep)
 }

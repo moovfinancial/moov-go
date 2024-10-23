@@ -103,6 +103,12 @@ type Transfer struct {
 	MoovFeeDetails *MoovFeeDetails `json:"moovFeeDetails,omitempty"`
 	// ID for all transfers associated with a [transfer group](https://docs.moov.io/guides/money-movement/transfer-groups/).
 	GroupID *string `json:"groupID,omitempty"`
+	// ID of the associated sweep sweep.
+	SweepID *string `json:"sweepID,omitempty"`
+	// ID of the associated schedule.
+	ScheduleID *string `json:"scheduleID,omitempty"`
+	// ID of the associated occurrence.
+	OccurrenceID *string `json:"occurrenceID,omitempty"`
 	// The total refunded amount for a card transfer, representing one refunded amount, or multiple partial refunded amounts. Contains an integer value and its currency. See the `refunds` array for additional details.
 	RefundedAmount *Amount `json:"refundedAmount,omitempty"`
 	// A list of refunds for a card transfer.
