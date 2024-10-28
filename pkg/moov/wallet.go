@@ -35,6 +35,7 @@ type Transaction struct {
 	GrossAmountDecimal      string                  `json:"grossAmountDecimal,omitempty"`
 	Fee                     int                     `json:"fee,omitempty"`
 	FeeDecimal              string                  `json:"feeDecimal,omitempty"`
+	FeeIDs                  []string                `json:"feeIDs,omitempty"`
 	NetAmount               int                     `json:"netAmount,omitempty"`
 	NetAmountDecimal        string                  `json:"netAmountDecimal,omitempty"`
 	AvailableBalance        int                     `json:"availableBalance,omitempty"`
