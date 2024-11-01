@@ -139,13 +139,13 @@ func (c Client) InstantVerificationInitiate(ctx context.Context, accountID, bank
 
 // GetInstantBankAccountVerfication retrieves an active bank account verification for the given bank account
 // https://docs.moov.io/api/sources/bank-accounts/get-bank-account-verification/
-func (c Client) GetInstantBankAccountVerfication(ctx context.Context, accountID, bankAccountID string) error {
+func (c Client) GetInstantBankAccountVerfication(ctx context.Context, accountID, bankAccountID string) (*BankAccountVerification, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathBankAccountInstantVerification, accountID, bankAccountID))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return CompletedNilOrError(resp)
+	return CompletedObjectOrError[BankAccountVerification](resp)
 }
 
 // InstantVerificationComplete confirms a bank account verification for the given bank account
