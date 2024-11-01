@@ -1,3 +1,9 @@
+## v0.7.0 (Released 2024-11-01)
+
+ADDITIONS
+
+- feat: added `EndToEndToken` to card creation and updating
+
 ## v0.6.1 (Released 2024-10-23)
 
 IMPROVEMENTS
