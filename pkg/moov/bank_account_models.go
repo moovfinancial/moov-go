@@ -156,3 +156,29 @@ const (
 	RTPRejectionCode_AG03 RTPRejectionCode = "AG03" // Transaction Type Not Supported
 	RTPRejectionCode_MD07 RTPRejectionCode = "MD07" // Customer Deceased
 )
+
+type BankAccountVerificationMethod string
+
+// List of BankAccountVerificationMethod
+const (
+	BankAccountVerificationMethodInstant BankAccountVerificationMethod = "instant"
+	BankAccountVerificationMethodAch     BankAccountVerificationMethod = "ach"
+)
+
+type BankAccountVerificationStatus string
+
+// List of BankAccountVerificationStatus
+const (
+	BankAccountVerificationStatusNew                 BankAccountVerificationStatus = "new"
+	BankAccountVerificationStatusSentCredit          BankAccountVerificationStatus = "sent-credit"
+	BankAccountVerificationStatusMaxAttemptsExceeded BankAccountVerificationStatus = "max-attempts-exceeded"
+	BankAccountVerificationStatusFailed              BankAccountVerificationStatus = "failed"
+	BankAccountVerificationStatusExpired             BankAccountVerificationStatus = "expired"
+	BankAccountVerificationStatusSuccessful          BankAccountVerificationStatus = "successful"
+)
+
+type BankAccountVerification struct {
+	VerificationMethod BankAccountVerificationMethod `json:"verificationMethod"`
+	Status             BankAccountVerificationStatus `json:"status"`
+	ExceptionDetails   *ExceptionDetails             `json:"exceptionDetails"`
+}
