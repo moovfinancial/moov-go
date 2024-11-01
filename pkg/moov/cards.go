@@ -128,6 +128,8 @@ func (c Client) GetCard(ctx context.Context, accountID string, cardID string) (*
 type CardUpdateFilter func(*cardPatch) error
 
 type cardPatch struct {
+	EndToEndToken *EndToEndToken `json:"e2ee,omitempty"`
+
 	CardCvv        *string       `json:"cardCvv,omitempty"`
 	Expiration     *Expiration   `json:"expiration,omitempty"`
 	BillingAddress *AddressPatch `json:"billingAddress,omitempty"`
@@ -191,6 +193,14 @@ func WithHolderName(holderName string) CardUpdateFilter {
 func WithVerifyName(verifyName bool) CardUpdateFilter {
 	return func(card *cardPatch) error {
 		card.VerifyName = &verifyName
+		return nil
+	}
+}
+
+// WithVerifyName sets the verifyName flag for the card update request
+func WithEndToEndToken(token EndToEndToken) CardUpdateFilter {
+	return func(card *cardPatch) error {
+		card.EndToEndToken = &token
 		return nil
 	}
 }
