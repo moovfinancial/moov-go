@@ -79,6 +79,8 @@ type CreateCard struct {
 	BillingAddress    Address    `json:"billingAddress,omitempty"`
 	CardOnFile        bool       `json:"cardOnFile,omitempty"`
 	MerchantAccountID string     `json:"merchantAccountID,omitempty"`
+
+	EndToEndToken *EndToEndToken `json:"e2ee,omitempty"`
 }
 
 // CreateCard creates a new card for the given customer linked to their account

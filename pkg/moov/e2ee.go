@@ -7,6 +7,10 @@ import (
 	jose "github.com/go-jose/go-jose/v4"
 )
 
+type EndToEndToken struct {
+	Token string `json:"token"`
+}
+
 func (c Client) GenerateEndToEndPublicKey(ctx context.Context) (*jose.JSONWebKey, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathEndToEndPublicKey))
 	if err != nil {
