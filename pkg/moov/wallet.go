@@ -20,26 +20,26 @@ type AvailableBalance struct {
 	ValueDecimal string `json:"valueDecimal"`
 }
 
-type Transaction struct {
-	WalletID                string                  `json:"walletID,omitempty"`
-	TransactionID           string                  `json:"transactionID,omitempty"`
-	TransactionType         string                  `json:"transactionType,omitempty"`
-	SourceType              string                  `json:"sourceType,omitempty"`
-	SourceID                string                  `json:"sourceID,omitempty"`
-	Status                  WalletTransactionStatus `json:"status,omitempty"`
-	Memo                    string                  `json:"memo,omitempty"`
-	CreatedOn               time.Time               `json:"createdOn,omitempty"`
-	CompletedOn             time.Time               `json:"completedOn,omitempty"`
-	Currency                string                  `json:"currency,omitempty"`
-	GrossAmount             int                     `json:"grossAmount,omitempty"`
-	GrossAmountDecimal      string                  `json:"grossAmountDecimal,omitempty"`
-	Fee                     int                     `json:"fee,omitempty"`
-	FeeDecimal              string                  `json:"feeDecimal,omitempty"`
-	NetAmount               int                     `json:"netAmount,omitempty"`
-	NetAmountDecimal        string                  `json:"netAmountDecimal,omitempty"`
-	AvailableBalance        int                     `json:"availableBalance,omitempty"`
-	AvailableBalanceDecimal string                  `json:"availableBalanceDecimal,omitempty"`
-	SweepID                 *string                 `json:"sweepID,omitempty"`
+type WalletTransaction struct {
+	WalletID                string                      `json:"walletID,omitempty"`
+	TransactionID           string                      `json:"transactionID,omitempty"`
+	TransactionType         WalletTransactionType       `json:"transactionType,omitempty"`
+	SourceType              WalletTransactionSourceType `json:"sourceType,omitempty"`
+	SourceID                string                      `json:"sourceID,omitempty"`
+	Status                  WalletTransactionStatus     `json:"status,omitempty"`
+	Memo                    string                      `json:"memo,omitempty"`
+	CreatedOn               time.Time                   `json:"createdOn,omitempty"`
+	CompletedOn             time.Time                   `json:"completedOn,omitempty"`
+	Currency                string                      `json:"currency,omitempty"`
+	GrossAmount             int                         `json:"grossAmount,omitempty"`
+	GrossAmountDecimal      string                      `json:"grossAmountDecimal,omitempty"`
+	Fee                     int                         `json:"fee,omitempty"`
+	FeeDecimal              string                      `json:"feeDecimal,omitempty"`
+	NetAmount               int                         `json:"netAmount,omitempty"`
+	NetAmountDecimal        string                      `json:"netAmountDecimal,omitempty"`
+	AvailableBalance        int                         `json:"availableBalance,omitempty"`
+	AvailableBalanceDecimal string                      `json:"availableBalanceDecimal,omitempty"`
+	SweepID                 *string                     `json:"sweepID,omitempty"`
 }
 
 type WalletTransactionStatus string
@@ -49,6 +49,45 @@ const (
 	WalletTransactionStatus_Completed WalletTransactionStatus = "completed"
 	WalletTransactionStatus_Canceled  WalletTransactionStatus = "canceled"
 	WalletTransactionStatus_Failed    WalletTransactionStatus = "failed"
+)
+
+type WalletTransactionType string
+
+const (
+	WalletTransactionTypeAccountFunding               WalletTransactionType = "account-funding"
+	WalletTransactionTypeAchReversal                  WalletTransactionType = "ach-reversal"
+	WalletTransactionTypeAutoSweep                    WalletTransactionType = "auto-sweep"
+	WalletTransactionTypeCardPayment                  WalletTransactionType = "card-payment"
+	WalletTransactionTypeCardDecline                  WalletTransactionType = "card-decline"
+	WalletTransactionTypeCardReversal                 WalletTransactionType = "card-reversal"
+	WalletTransactionTypeCashOut                      WalletTransactionType = "cash-out"
+	WalletTransactionTypeDispute                      WalletTransactionType = "dispute"
+	WalletTransactionTypeDisputeReversal              WalletTransactionType = "dispute-reversal"
+	WalletTransactionTypeFacilitatorFee               WalletTransactionType = "facilitator-fee"
+	WalletTransactionTypeIssuingRefund                WalletTransactionType = "issuing-refund"
+	WalletTransactionTypeIssuingTransaction           WalletTransactionType = "issuing-transaction"
+	WalletTransactionTypeIssuingTransactionAdjustment WalletTransactionType = "issuing-transaction-adjustment"
+	WalletTransactionTypeIssuingAuthHold              WalletTransactionType = "issuing-auth-hold"
+	WalletTransactionTypeIssuingAuthRelease           WalletTransactionType = "issuing-auth-release"
+	WalletTransactionTypeIssuingDecline               WalletTransactionType = "issuing-decline"
+	WalletTransactionTypeMoovFee                      WalletTransactionType = "moov-fee"
+	WalletTransactionTypePayment                      WalletTransactionType = "payment"
+	WalletTransactionTypePayout                       WalletTransactionType = "payout"
+	WalletTransactionTypeRefund                       WalletTransactionType = "refund"
+	WalletTransactionTypeRefundFailure                WalletTransactionType = "refund-failure"
+	WalletTransactionTypeRtpFailure                   WalletTransactionType = "rtp-failure"
+	WalletTransactionTypeTopUp                        WalletTransactionType = "top-up"
+	WalletTransactionTypeWalletTransfer               WalletTransactionType = "wallet-transfer"
+)
+
+type WalletTransactionSourceType string
+
+const (
+	WalletTransactionSourceTypeTransfer               WalletTransactionSourceType = "transfer"
+	WalletTransactionSourceTypeDispute                WalletTransactionSourceType = "dispute"
+	WalletTransactionSourceTypeIssuingCardTransaction WalletTransactionSourceType = "issuing-card-transaction"
+	WalletTransactionSourceTypeIssuingAuthorization   WalletTransactionSourceType = "issuing-authorization"
+	WalletTransactionSourceTypeSweep                  WalletTransactionSourceType = "sweep"
 )
 
 // ListWallets lists all wallets that are associated with a Moov account
@@ -159,23 +198,23 @@ func WithSweepID(sweepID string) ListTransactionFilter {
 
 // ListWalletTransactions lists all transactions for the given wallet id
 // https://docs.moov.io/api/index.html#tag/Wallet-transactions
-func (c Client) ListWalletTransactions(ctx context.Context, accountID string, walletID string, opts ...ListTransactionFilter) ([]Transaction, error) {
+func (c Client) ListWalletTransactions(ctx context.Context, accountID string, walletID string, opts ...ListTransactionFilter) ([]WalletTransaction, error) {
 	args := prependArgs(opts, AcceptJson())
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWalletTransactions, accountID, walletID), args...)
 	if err != nil {
 		return nil, err
 	}
 
-	return CompletedListOrError[Transaction](resp)
+	return CompletedListOrError[WalletTransaction](resp)
 }
 
 // GetWalletTransaction retrieves a transaction for the given wallet id and transaction id
 // https://docs.moov.io/api/index.html#tag/Wallet-transactions/operation/getWalletTransaction
-func (c Client) GetWalletTransaction(ctx context.Context, accountID string, walletID string, transactionID string) (*Transaction, error) {
+func (c Client) GetWalletTransaction(ctx context.Context, accountID string, walletID string, transactionID string) (*WalletTransaction, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWalletTransaction, accountID, walletID, transactionID), AcceptJson())
 	if err != nil {
 		return nil, err
 	}
 
-	return CompletedObjectOrError[Transaction](resp)
+	return CompletedObjectOrError[WalletTransaction](resp)
 }
