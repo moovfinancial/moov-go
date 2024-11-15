@@ -2,8 +2,8 @@
 
 BREAKING CHANGES
 
-- wallet: renamed `Transaction` to `WalletTransaction`
-- wallet: updated `Transaction`'s `TransactionType` and `SourceType` fields from `string` to enums 
+- wallet: rename `Transaction` to `WalletTransaction`
+- wallet: update `Transaction`'s `TransactionType` and `SourceType` fields from `string` to enums 
 
 ## v0.7.0 (Released 2024-11-01)
 
