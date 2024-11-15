@@ -1,3 +1,10 @@
+## v0.8.0 (Released 2024-11-15)
+
+BREAKING CHANGES
+
+- wallet: renamed `Transaction` to `WalletTransaction`
+- wallet: updated `Transaction`'s `TransactionType` and `SourceType` fields from `string` to enums 
+
 ## v0.7.0 (Released 2024-11-01)
 
 ADDITIONS
