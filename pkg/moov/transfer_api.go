@@ -99,7 +99,7 @@ type ListTransferFilter callArg
 
 func WithTransferAccountIDs(accountIDs []string) ListTransferFilter {
 	return callBuilderFn(func(call *callBuilder) error {
-		call.params["accoundIDs"] = strings.Join(accountIDs, ",")
+		call.params["accountIDs"] = strings.Join(accountIDs, ",")
 		return nil
 	})
 }
