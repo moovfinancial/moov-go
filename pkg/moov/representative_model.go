@@ -4,7 +4,6 @@ import "time"
 
 // Representative Describes a business representative.
 type Representative struct {
-	// UUID v4
 	RepresentativeID string `json:"representativeID,omitempty"`
 	Name             Name   `json:"name,omitempty"`
 	Phone            *Phone `json:"phone,omitempty"`

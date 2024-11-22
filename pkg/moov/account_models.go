@@ -93,8 +93,7 @@ type AccountCapability struct {
 
 // Account Describes a Moov account.
 type Account struct {
-	Mode Mode `json:"mode,omitempty"`
-	// UUID v4
+	Mode        Mode        `json:"mode,omitempty"`
 	AccountID   string      `json:"accountID,omitempty"`
 	AccountType AccountType `json:"accountType,omitempty"`
 	DisplayName string      `json:"displayName,omitempty"`
