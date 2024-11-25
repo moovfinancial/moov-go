@@ -54,7 +54,6 @@ type MXRequest struct {
 
 // BankAccountResponse Describes a bank account on a Moov account.
 type BankAccount struct {
-	// UUID v4
 	BankAccountID string `json:"bankAccountID,omitempty"`
 	// Once the bank account is linked, we don't reveal the full bank account number. The fingerprint acts as a way to identify whether two linked bank accounts are the same.
 	Fingerprint           string                  `json:"fingerprint,omitempty"`

@@ -16,9 +16,7 @@ type CreateTransfer struct {
 
 // CreateTransfer_Source Where funds for a transfer originate. For the source, you must include either a `paymentMethodID` or a `transferID`. A `transferID` is used to create a [transfer group](https://docs.moov.io/guides/money-movement/transfer-groups/), associating the new transfer with a parent transfer.
 type CreateTransfer_Source struct {
-	// UUID v4
-	TransferID string `json:"transferID,omitempty"`
-	// UUID v4
+	TransferID      string                            `json:"transferID,omitempty"`
 	PaymentMethodID string                            `json:"paymentMethodID,omitempty"`
 	CardDetails     *CreateTransfer_CardDetailsSource `json:"cardDetails,omitempty"`
 	AchDetails      *CreateTransfer_AchDetailsSource  `json:"achDetails,omitempty"`
@@ -43,7 +41,6 @@ type CreateTransfer_AchDetailsSource struct {
 
 // CreateTransfer_Destination The final stage of a transfer and the ultimate recipient of the funds.
 type CreateTransfer_Destination struct {
-	// UUID v4
 	PaymentMethodID string                                 `json:"paymentMethodID"`
 	CardDetails     *CreateTransfer_CardDetailsDestination `json:"cardDetails,omitempty"`
 	AchDetails      *CreateTransfer_AchDetailsBase         `json:"achDetails,omitempty"`
@@ -84,7 +81,6 @@ type TransferStarted struct {
 
 // Transfer struct for Transfer
 type Transfer struct {
-	// UUID v4
 	TransferID    string         `json:"transferID,omitempty"`
 	CreatedOn     time.Time      `json:"createdOn,omitempty"`
 	CompletedOn   *time.Time     `json:"completedOn,omitempty"`
@@ -155,7 +151,6 @@ type MoovFeeDetails struct {
 
 // Refund Details of a card refund.
 type Refund struct {
-	// UUID v4
 	RefundID  string       `json:"refundID,omitempty"`
 	CreatedOn time.Time    `json:"createdOn,omitempty"`
 	UpdatedOn time.Time    `json:"updatedOn,omitempty"`
@@ -179,7 +174,6 @@ type RefundCardDetails struct {
 
 // GetDispute Details of a card dispute.
 type GetDispute struct {
-	// UUID v4
 	DisputeID string    `json:"disputeID,omitempty"`
 	CreatedOn time.Time `json:"createdOn,omitempty"`
 	Amount    Amount    `json:"amount,omitempty"`
@@ -187,7 +181,6 @@ type GetDispute struct {
 
 // TransferSource struct for TransferSource
 type TransferSource struct {
-	// UUID v4
 	PaymentMethodID   string                    `json:"paymentMethodID,omitempty"`
 	PaymentMethodType PaymentMethodType         `json:"paymentMethodType,omitempty"`
 	Account           TransferAccount           `json:"account,omitempty"`
@@ -197,8 +190,7 @@ type TransferSource struct {
 	ApplePay          *ApplePayPaymentMethod    `json:"applePay,omitempty"`
 	AchDetails        *AchDetailsSource         `json:"achDetails,omitempty"`
 	CardDetails       *CardDetails              `json:"cardDetails,omitempty"`
-	// UUID v4
-	TransferID string `json:"transferID,omitempty"`
+	TransferID        string                    `json:"transferID,omitempty"`
 }
 
 // TransferAccount struct for TransferAccount
@@ -238,7 +230,6 @@ type AchException struct {
 
 // TransferDestination struct for TransferDestination
 type TransferDestination struct {
-	// UUID v4
 	PaymentMethodID   string                    `json:"paymentMethodID,omitempty"`
 	PaymentMethodType PaymentMethodType         `json:"paymentMethodType,omitempty"`
 	Account           TransferAccount           `json:"account,omitempty"`
@@ -323,9 +314,7 @@ type CreateTransferOptions struct {
 
 // CreateTransferOptionsTarget struct for CreateTransferOptionsTarget
 type CreateTransferOptionsTarget struct {
-	// UUID v4
-	AccountID string `json:"accountID,omitempty"`
-	// UUID v4
+	AccountID       string `json:"accountID,omitempty"`
 	PaymentMethodID string `json:"paymentMethodID,omitempty"`
 }
 

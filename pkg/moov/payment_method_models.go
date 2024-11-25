@@ -2,7 +2,6 @@ package moov
 
 // PaymentMethod A method of moving money
 type PaymentMethod struct {
-	// UUID v4
 	PaymentMethodID   string                    `json:"paymentMethodID,omitempty"`
 	PaymentMethodType PaymentMethodType         `json:"paymentMethodType,omitempty"`
 	Wallet            *WalletPaymentMethod      `json:"wallet,omitempty"`
@@ -13,7 +12,6 @@ type PaymentMethod struct {
 
 // BasicPaymentMethod struct for BasicPaymentMethod
 type BasicPaymentMethod struct {
-	// UUID v4
 	PaymentMethodID   string            `json:"paymentMethodID,omitempty"`
 	PaymentMethodType PaymentMethodType `json:"paymentMethodType,omitempty"`
 }
@@ -37,7 +35,6 @@ const (
 
 // WalletPaymentMethod A Moov wallet to store funds for transfers.
 type WalletPaymentMethod struct {
-	// UUID v4
 	WalletID string `json:"walletID,omitempty"`
 }
 
@@ -45,7 +42,6 @@ type BankAccountPaymentMethod BankAccount
 
 // Card Describes a card on a Moov account.
 type CardPaymentMethod struct {
-	// UUID v4
 	CardID string `json:"cardID,omitempty"`
 	// Uniquely identifies a linked payment card or token. For Apple Pay, the fingerprint is based on the tokenized card number and may vary based on the user's device. This field can be used to identify specific payment methods across multiple accounts on your platform.
 	Fingerprint        string            `json:"fingerprint,omitempty"`
