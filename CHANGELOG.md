@@ -1,3 +1,9 @@
+## v0.8.1 (Released 2024-11-25)
+
+ADDITIONS
+
+- feat: added `Skip` and `Count` to schedule listing
+
 ## v0.8.0 (Released 2024-11-15)
 
 BREAKING CHANGES
