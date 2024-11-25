@@ -106,7 +106,7 @@ func Test_Schedules(t *testing.T) {
 				require.Len(t, s2.Occurrences, 7)
 				require.Equal(t, schedule, s2)
 
-				list, err := mc.ListSchedule(ctx, party.id)
+				list, err := mc.ListSchedule(ctx, party.id, moov.Count(1), moov.Skip(0))
 				require.NoError(t, err)
 				require.Contains(t, list, *s2)
 			})

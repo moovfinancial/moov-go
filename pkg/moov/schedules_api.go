@@ -22,10 +22,10 @@ func (c Client) CreateSchedule(ctx context.Context, accountID string, schedule C
 
 // Guide: https://docs.moov.io/guides/money-movement/scheduling/
 // Documentation: https://docs.moov.io/api/money-movement/schedules/list/
-func (c Client) ListSchedule(ctx context.Context, accountID string) ([]Schedule, error) {
+func (c Client) ListSchedule(ctx context.Context, accountID string, args ...callArg) ([]Schedule, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathSchedules, accountID),
-		AcceptJson())
+		append(args, AcceptJson())...)
 	if err != nil {
 		return nil, err
 	}
