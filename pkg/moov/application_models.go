@@ -17,7 +17,7 @@ type Application struct {
 	Description   string             `json:"description,omitempty"`
 
 	// don't use this, it's not used by the API
-	AccountMode string `json:"accountMode,omitempty"`
+	AccountMode uint `json:"accountMode,omitempty"`
 }
 
 type CreateApplicationKey struct {
