@@ -9,6 +9,9 @@ const (
 	pathAccounts = "/accounts"
 	pathAccount  = "/accounts/%s"
 
+	pathApplications    = "/applications"
+	pathApplicationKeys = "/applications/%s/keys"
+
 	pathCapabilities = "/accounts/%s/capabilities"
 	pathCapability   = "/accounts/%s/capabilities/%s"
 
