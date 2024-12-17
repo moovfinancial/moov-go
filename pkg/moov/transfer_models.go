@@ -125,6 +125,14 @@ type Amount struct {
 	Value int64 `json:"value,omitempty" otel:"value"`
 }
 
+// AmountDecimal A decimal value representing money in a specific currency.
+type AmountDecimal struct {
+	// A 3-letter ISO 4217 currency code.
+	Currency string `json:"currency,omitempty" otel:"currency"`
+	// A decimal-formatted numerical string that represents up to 9 decimal place precision.
+	ValueDecimal string `json:"valueDecimal,omitempty"`
+}
+
 // GetFacilitatorFee Fee you charged your customer for the transfer.
 type GetFacilitatorFee struct {
 	// Total facilitator fee in cents.
@@ -191,6 +199,8 @@ type TransferSource struct {
 	AchDetails        *AchDetailsSource         `json:"achDetails,omitempty"`
 	CardDetails       *CardDetails              `json:"cardDetails,omitempty"`
 	TransferID        string                    `json:"transferID,omitempty"`
+	FeeAmount         *AmountDecimal            `json:"feeAmount,omitempty"`
+	NetAmount         *AmountDecimal            `json:"netAmount,omitempty"`
 }
 
 // TransferAccount struct for TransferAccount
@@ -240,6 +250,8 @@ type TransferDestination struct {
 	AchDetails        *AchDetails               `json:"achDetails,omitempty"`
 	CardDetails       *CardDetails              `json:"cardDetails,omitempty"`
 	RtpDetails        *RtpDetails               `json:"rtpDetails,omitempty"`
+	FeeAmount         *AmountDecimal            `json:"feeAmount,omitempty"`
+	NetAmount         *AmountDecimal            `json:"netAmount,omitempty"`
 }
 
 // AchDetails ACH specific details about the transaction.
