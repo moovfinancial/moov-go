@@ -79,3 +79,27 @@ func Test_Sweep_ListAndGet(t *testing.T) {
 	require.NoError(t, err)
 	t.Logf("Got sweep: %+v", sweep)
 }
+
+func Test_Sweep_ListAccuring(t *testing.T) {
+	var (
+		mc = NewTestClient(t)
+
+		ctx = context.Background()
+		// IDs for Lincoln National Corporation
+		accountID = "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
+		walletID  = "4dbac313-d505-4d51-a0fe-c11787916fcf"
+	)
+
+	sweeps, err := mc.ListSweeps(ctx, accountID, walletID, moov.WithSweepStatus(string(moov.SweepStatus_Accruing)))
+	require.NoError(t, err)
+	t.Logf("Got %v sweeps for wallet %v", len(sweeps), walletID)
+
+	if len(sweeps) == 0 {
+		return
+	}
+
+	sweepID := sweeps[0].SweepID
+	sweep, err := mc.GetSweep(ctx, accountID, walletID, sweepID)
+	require.NoError(t, err)
+	t.Logf("Got sweep: %+v", sweep)
+}
