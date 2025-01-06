@@ -84,10 +84,35 @@ func (c Client) UpdateSweepConfig(ctx context.Context, update UpdateSweepConfig)
 	return CompletedObjectOrError[SweepConfig](resp)
 }
 
+type ListSweepsFilter callArg
+
+func WithSweepStatus(status string) ListSweepsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["status"] = status
+		return nil
+	})
+}
+
+func WithSweepStatementDescriptor(statementDescriptor string) ListSweepsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["statementDescriptor"] = statementDescriptor
+		return nil
+	})
+}
+
+func WithSweepSkip(skip int) ListSweepsFilter {
+	return Skip(skip)
+}
+
+func WithSweepCount(count int) ListSweepsFilter {
+	return Count(count)
+}
+
 // ListSweeps lists sweeps associated with a wallet
 // https://docs.moov.io/api/money-movement/sweeps/list/
-func (c Client) ListSweeps(ctx context.Context, accountID string, walletID string) ([]Sweep, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathSweeps, accountID, walletID), AcceptJson())
+func (c Client) ListSweeps(ctx context.Context, accountID string, walletID string, filters ...ListSweepsFilter) ([]Sweep, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathSweeps, accountID, walletID), prependArgs(filters, AcceptJson())...)
+
 	if err != nil {
 		return nil, fmt.Errorf("listing sweeps: %v", err)
 	}
