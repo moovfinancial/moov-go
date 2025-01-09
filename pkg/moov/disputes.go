@@ -63,6 +63,16 @@ type DisputesEvidenceUpdate struct {
 	EvidenceType EvidenceType `json:"evidenceType"`
 }
 
+type DisputeEvidenceUpload struct {
+	DisputeID    string    `json:"disputeID,omitempty"`
+	EvidenceID   string    `json:"evidenceID,omitempty"`
+	EvidenceType string    `json:"evidenceType,omitempty"`
+	FileName     string    `json:"fileName,omitempty"`
+	MimeType     string    `json:"mimeType,omitempty"`
+	Size         int       `json:"size,omitempty"`
+	CreatedOn    time.Time `json:"createdOn,omitempty"`
+}
+
 type DisputeListFilter callArg
 
 func WithDisputeCount(c int) DisputeListFilter {
@@ -150,9 +160,9 @@ const (
 
 // ListDisputes lists of Disputes that are associated with a Moov account
 // https://docs.moov.io/api/money-movement/disputes/list/
-func (c Client) ListDisputes(ctx context.Context, filters ...DisputeListFilter) ([]Dispute, error) {
+func (c Client) ListDisputes(ctx context.Context, accountID string, filters ...DisputeListFilter) ([]Dispute, error) {
 	args := prependArgs(filters, AcceptJson())
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathDisputes), args...)
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathDisputes, accountID), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -162,8 +172,8 @@ func (c Client) ListDisputes(ctx context.Context, filters ...DisputeListFilter) 
 
 // GetDispute retrieves a dispute for the given dispute id
 // https://docs.moov.io/api/money-movement/disputes/get/
-func (c Client) GetDispute(ctx context.Context, disputeID string) (*Dispute, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathDispute, disputeID), AcceptJson())
+func (c Client) GetDispute(ctx context.Context, accountID string, disputeID string) (*Dispute, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathDispute, accountID, disputeID), AcceptJson())
 	if err != nil {
 		return nil, err
 	}
@@ -173,8 +183,8 @@ func (c Client) GetDispute(ctx context.Context, disputeID string) (*Dispute, err
 
 // AcceptDispute sets the status of the dispute to accepted
 // https://docs.moov.io/api/money-movement/disputes/post/
-func (c Client) AcceptDispute(ctx context.Context, disputeID string) (*Dispute, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeAccept, disputeID), AcceptJson())
+func (c Client) AcceptDispute(ctx context.Context, accountID string, disputeID string) (*Dispute, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeAccept, accountID, disputeID), AcceptJson())
 	if err != nil {
 		return nil, err
 	}
@@ -184,20 +194,20 @@ func (c Client) AcceptDispute(ctx context.Context, disputeID string) (*Dispute, 
 
 // UploadDisputeEvidence Uploads text as evidence for a dispute.
 // https://docs.moov.io/api/money-movement/disputes/post-text/
-func (c Client) UploadDisputeEvidence(ctx context.Context, disputeID string, evidenceText DisputesEvidenceText) ([]DisputeEvidence, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeEvidenceText, disputeID), AcceptJson(), JsonBody(evidenceText))
+func (c Client) UploadDisputeEvidence(ctx context.Context, accountID string, disputeID string, evidenceText DisputesEvidenceText) (*DisputeEvidence, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeEvidenceText, accountID, disputeID), AcceptJson(), JsonBody(evidenceText))
 
 	if err != nil {
 		return nil, err
 	}
 
-	return CompletedListOrError[DisputeEvidence](resp)
+	return CompletedObjectOrError[DisputeEvidence](resp)
 }
 
 // DeleteDisputeEvidence deletes a piece of dispute evidence for the given dispute and evidence id
 // https://docs.moov.io/api/money-movement/disputes/delete
-func (c Client) DeleteDisputeEvidence(ctx context.Context, disputeID, evidenceID string) error {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathDisputeEvidence, disputeID, evidenceID), AcceptJson())
+func (c Client) DeleteDisputeEvidence(ctx context.Context, accountID string, disputeID, evidenceID string) error {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathDisputeEvidence, accountID, disputeID, evidenceID), AcceptJson())
 	if err != nil {
 		return err
 	}
@@ -206,22 +216,23 @@ func (c Client) DeleteDisputeEvidence(ctx context.Context, disputeID, evidenceID
 
 // UploadEvidenceFile uploads a new evidence file for the given dispute id
 // https://docs.moov.io/api/money-movement/disputes/post-file/
-func (c Client) UploadEvidenceFile(ctx context.Context, disputeID string, evidenceType EvidenceType, filename string, file io.Reader, mimeType string) error {
+func (c Client) UploadEvidenceFile(ctx context.Context, accountID string, disputeID string, evidenceType EvidenceType, filename string, file io.Reader, mimeType string) (*DisputeEvidenceUpload, error) {
 	var multiParts []multipartFn
 	multiParts = append(multiParts, MultipartField("evidenceType", string(evidenceType)))
 	multiParts = append(multiParts, MultipartFile("file", filename, file, mimeType))
 
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeEvidenceFile, disputeID), MultipartBody(multiParts...))
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeEvidenceFile, accountID, disputeID), MultipartBody(multiParts...))
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return CompletedNilOrError(resp)
+
+	return CompletedObjectOrError[DisputeEvidenceUpload](resp)
 }
 
 // ListDisputeEvidence lists all evidence for the given dispute id
 // https://docs.moov.io/api/money-movement/disputes/list-evidence/
-func (c Client) ListDisputeEvidence(ctx context.Context, disputeID string) ([]DisputeEvidence, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathDisputeEvidences, disputeID), AcceptJson())
+func (c Client) ListDisputeEvidence(ctx context.Context, accountID string, disputeID string) ([]DisputeEvidence, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathDisputeEvidences, accountID, disputeID), AcceptJson())
 
 	if err != nil {
 		return nil, err
@@ -232,8 +243,8 @@ func (c Client) ListDisputeEvidence(ctx context.Context, disputeID string) ([]Di
 
 // SubmitDisputeEvidence Submits evidence for a dispute.
 // https://docs.moov.io/api/money-movement/disputes/post-evidence/
-func (c Client) SubmitDisputeEvidence(ctx context.Context, disputeID string) (*Dispute, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeSubmitEvidence, disputeID), AcceptJson())
+func (c Client) SubmitDisputeEvidence(ctx context.Context, accountID string, disputeID string) (*Dispute, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathDisputeSubmitEvidence, accountID, disputeID), AcceptJson())
 	if err != nil {
 		return nil, err
 	}
@@ -243,8 +254,8 @@ func (c Client) SubmitDisputeEvidence(ctx context.Context, disputeID string) (*D
 
 // UpdateDisputeEvidence Updates dispute evidence by ID.
 // https://docs.moov.io/api/money-movement/disputes/patch/
-func (c Client) UpdateDisputeEvidence(ctx context.Context, disputeID string, evidenceID string, evidenceUpdate DisputesEvidenceUpdate) (*DisputeEvidence, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPatch, pathDisputeEvidence, disputeID, evidenceID), AcceptJson(), JsonBody(evidenceUpdate))
+func (c Client) UpdateDisputeEvidence(ctx context.Context, accountID string, disputeID string, evidenceID string, evidenceUpdate DisputesEvidenceUpdate) (*DisputeEvidence, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPatch, pathDisputeEvidence, accountID, disputeID, evidenceID), AcceptJson(), JsonBody(evidenceUpdate))
 
 	if err != nil {
 		return nil, err
@@ -255,8 +266,8 @@ func (c Client) UpdateDisputeEvidence(ctx context.Context, disputeID string, evi
 
 // GetDisputeEvidence retrieves the piece of dispute evidence for the given dispute and evidence id
 // https://docs.moov.io/api/money-movement/disputes/get-evidence/
-func (c Client) GetDisputeEvidence(ctx context.Context, disputeID, evidenceID string) (*DisputeEvidence, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathDisputeEvidence, disputeID, evidenceID), AcceptJson())
+func (c Client) GetDisputeEvidence(ctx context.Context, accountID string, disputeID, evidenceID string) (*DisputeEvidence, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathDisputeEvidence, accountID, disputeID, evidenceID), AcceptJson())
 
 	if err != nil {
 		return nil, err
