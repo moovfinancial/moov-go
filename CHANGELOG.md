@@ -1,3 +1,19 @@
+## v0.9.0 (Released 2025-01-10)
+
+ADDITIONS
+
+- applications: list applications and create application keys via the API
+- sweeps: add filtering query parameters to list sweeps
+
+BREAKING CHANGES
+
+- disputes: switch to the newer `/accounts/{accountID}`-prefixed endpoints
+- disputes: return HTTP 201 with JSON body instead of 204 on successful evidence file upload
+
+BUILD
+
+fix(deps): update module github.com/stretchr/testify to v1.10.0
+
 ## v0.8.1 (Released 2024-11-25)
 
 ADDITIONS
