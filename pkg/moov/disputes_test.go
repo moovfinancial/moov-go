@@ -42,7 +42,7 @@ func TestDisputesMarshal(t *testing.T) {
 func Test_Disputes(t *testing.T) {
 	mc := NewTestClient(t)
 
-	disputes, err := mc.ListDisputes(context.Background(), moov.WithDisputeCount(200), moov.WithDisputeSkip(0))
+	disputes, err := mc.ListDisputes(context.Background(), FACILITATOR_ID, moov.WithDisputeCount(200), moov.WithDisputeSkip(0))
 	require.NoError(t, err)
 	require.NotNil(t, disputes)
 }
@@ -52,7 +52,7 @@ func Test_GetDisputes_NotFound(t *testing.T) {
 
 	// We don't have any disputes to test against! So we can at least check for not found vs other possible errors
 	disputeID := uuid.NewString()
-	dispute, err := mc.GetDispute(context.Background(), disputeID)
+	dispute, err := mc.GetDispute(context.Background(), FACILITATOR_ID, disputeID)
 	require.Nil(t, dispute)
 
 	// find and cast the error into HttpCallError so it can be inspected
@@ -67,7 +67,7 @@ func Test_AcceptDisputes_DisputeNotFound(t *testing.T) {
 
 	// We don't have any disputes to test against! So we can at least check for not found vs other possible errors
 	disputeID := uuid.NewString()
-	dispute, err := mc.AcceptDispute(context.Background(), disputeID)
+	dispute, err := mc.AcceptDispute(context.Background(), FACILITATOR_ID, disputeID)
 	require.Nil(t, dispute)
 
 	// find and cast the error into HttpCallError so it can be inspected
@@ -82,7 +82,7 @@ func Test_UploadDisputeEvidence_DisputeNotFound(t *testing.T) {
 
 	// We don't have any disputes to test against! So we can at least check for not found vs other possible errors
 	disputeID := uuid.NewString()
-	dispute, err := mc.UploadDisputeEvidence(context.Background(), disputeID, moov.DisputesEvidenceText{
+	dispute, err := mc.UploadDisputeEvidence(context.Background(), FACILITATOR_ID, disputeID, moov.DisputesEvidenceText{
 		Text:         "Some evidence text",
 		EvidenceType: moov.EvidenceType_GenericEvidence,
 	})
@@ -100,7 +100,7 @@ func Test_SubmitDisputeEvidence_DisputeNotFound(t *testing.T) {
 
 	// We don't have any disputes to test against! So we can at least check for not found vs other possible errors
 	disputeID := uuid.NewString()
-	dispute, err := mc.SubmitDisputeEvidence(context.Background(), disputeID)
+	dispute, err := mc.SubmitDisputeEvidence(context.Background(), FACILITATOR_ID, disputeID)
 	require.Nil(t, dispute)
 
 	// find and cast the error into HttpCallError so it can be inspected
@@ -116,7 +116,7 @@ func Test_UpdateDisputeEvidence_DisputeNotFound(t *testing.T) {
 	// We don't have any disputes to test against! So we can at least check for not found vs other possible errors
 	disputeID := uuid.NewString()
 	evidenceID := uuid.NewString()
-	dispute, err := mc.UpdateDisputeEvidence(context.Background(), disputeID, evidenceID, moov.DisputesEvidenceUpdate{
+	dispute, err := mc.UpdateDisputeEvidence(context.Background(), FACILITATOR_ID, disputeID, evidenceID, moov.DisputesEvidenceUpdate{
 		EvidenceType: moov.EvidenceType_Other,
 	})
 	require.Nil(t, dispute)
@@ -135,7 +135,7 @@ func Test_DeleteDisputeEvidence_DisputeNotFound(t *testing.T) {
 	disputeID := uuid.NewString()
 	evidenceID := uuid.NewString()
 
-	err := mc.DeleteDisputeEvidence(context.Background(), disputeID, evidenceID)
+	err := mc.DeleteDisputeEvidence(context.Background(), FACILITATOR_ID, disputeID, evidenceID)
 	require.Error(t, err)
 
 	// find and cast the error into HttpCallError so it can be inspected
@@ -151,7 +151,7 @@ func Test_UploadEvidenceFile_DisputeNotFound(t *testing.T) {
 	// We don't have any disputes to test against! So we can at least check for not found vs other possible errors
 	disputeID := uuid.NewString()
 	file := bytes.NewReader([]byte("test"))
-	err := mc.UploadEvidenceFile(context.Background(), disputeID, moov.EvidenceType_CoverLetter, "test.pdf", file, "application/pdf")
+	_, err := mc.UploadEvidenceFile(context.Background(), FACILITATOR_ID, disputeID, moov.EvidenceType_CoverLetter, "test.pdf", file, "application/pdf")
 	require.Error(t, err)
 
 	// find and cast the error into HttpCallError so it can be inspected
@@ -166,7 +166,7 @@ func Test_ListDisputeEvidence_DisputeNotFound(t *testing.T) {
 
 	// We don't have any disputes to test against! So we can at least check for not found vs other possible errors
 	disputeID := uuid.NewString()
-	evidence, err := mc.ListDisputeEvidence(context.Background(), disputeID)
+	evidence, err := mc.ListDisputeEvidence(context.Background(), FACILITATOR_ID, disputeID)
 	require.Nil(t, evidence)
 	require.Error(t, err)
 
@@ -183,7 +183,7 @@ func Test_GetDisputeEvidence_DisputeNotFound(t *testing.T) {
 	// We don't have any disputes to test against! So we can at least check for not found vs other possible errors
 	disputeID := uuid.NewString()
 	evidenceID := uuid.NewString()
-	evidence, err := mc.GetDisputeEvidence(context.Background(), disputeID, evidenceID)
+	evidence, err := mc.GetDisputeEvidence(context.Background(), FACILITATOR_ID, disputeID, evidenceID)
 	require.Nil(t, evidence)
 	require.Error(t, err)
 
