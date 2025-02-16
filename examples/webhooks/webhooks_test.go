@@ -9,11 +9,12 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/mhooks"
 )
 
-// Example handler func for processing a single event type (AccountCreated)
+// Example handler func for parsing a single event type (AccountCreated)
 //
 // The handler will only set a non-200 status if an unexpected error occurs, and
 // we want the webhook to be retried.
-func ExampleHandler_SingleEvent() {
+func ExampleParseEvent_singleEvent() {
+
 	var handler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
 		secret := "your-webhook-signing-secret" // fetched from secure storage
 
@@ -43,11 +44,11 @@ func ExampleHandler_SingleEvent() {
 	log.Fatal(err)
 }
 
-// Example handler func for processing multiple event types (TransferCreated or TransferUpdated)
+// Example handler func for parsing multiple event types (TransferCreated or TransferUpdated)
 //
 // The handler will only set a non-200 status if an unexpected error occurs, and
 // we want the webhook to be retried.
-func ExampleHandler_MultipleEvents() {
+func ExampleParseEvent_multipleEvents() {
 	var handler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
 		secret := "your-webhook-signing-secret" // fetched from secure storage
 		event, err := mhooks.ParseEvent(r, secret)
