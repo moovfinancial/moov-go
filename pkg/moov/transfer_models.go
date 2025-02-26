@@ -269,6 +269,7 @@ type AchDetails struct {
 	CorrectedOn            *time.Time `json:"correctedOn,omitempty"`
 	ReturnedOn             *time.Time `json:"returnedOn,omitempty"`
 	CompletedOn            *time.Time `json:"completedOn,omitempty"`
+	CanceledOn             *time.Time `json:"canceledOn,omitempty"`
 }
 
 // RtpDetails RTP specific details about the transaction.
