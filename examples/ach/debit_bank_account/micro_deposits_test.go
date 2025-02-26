@@ -23,6 +23,9 @@ func TestMicroDepositExample(t *testing.T) {
 	mc, err := moov.NewClient() // reads credentials from Environmental variables
 	require.NoError(t, err)
 
+	// The account facilitating the transfer
+	partnerAccountID := "5352b013-ae58-4a63-8a3f-97f316a917cf" // example
+
 	// The account we'll send funds to
 	destinationAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9" // example
 
@@ -121,7 +124,7 @@ func TestMicroDepositExample(t *testing.T) {
 				Currency: "USD",
 				Value:    4328, // $43.28
 			},
-		}).
+		}, partnerAccountID).
 		// not required since ACH is processed in batches,
 		// but useful in getting the full transfer model
 		WaitForRailResponse()

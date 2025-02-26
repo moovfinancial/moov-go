@@ -17,6 +17,9 @@ func TestDebitPullWithRefund(t *testing.T) {
 	// However, it is recommended to load the credentials from the
 	// configuration file.
 
+	// The account facilitating the transfer
+	partnerAccountID := "5352b013-ae58-4a63-8a3f-97f316a917cf" // example
+
 	mc, err := moov.NewClient(moov.WithCredentials(moov.CredentialsFromEnv()))
 	require.NoError(t, err)
 
@@ -96,7 +99,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 				Total: moov.PtrOf(int64(2)), // $0.02
 			},
 			Description: "Pull from card",
-		}).WaitForRailResponse()
+		}, partnerAccountID).WaitForRailResponse()
 	require.NoError(t, err)
 
 	t.Logf("Transfer %s created", completedTransfer.TransferID)
@@ -108,6 +111,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 	// Step 7: refund transfer
 	refund, _, err := mc.RefundTransfer(
 		ctx,
+		partnerAccountID,
 		completedTransfer.TransferID,
 		moov.CreateRefund{
 			Amount: 97,

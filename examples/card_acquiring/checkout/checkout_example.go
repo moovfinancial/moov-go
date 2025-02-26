@@ -169,7 +169,7 @@ func main() {
 		Amount:         amount,
 		FacilitatorFee: facilitatorFee,
 		Description:    description,
-	}).WaitForRailResponse()
+	}, lincolnAccount.AccountID).WaitForRailResponse()
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -177,7 +177,7 @@ func main() {
 	fmt.Printf("TransferID: %s \t Status: %s \n", completedTransfer.TransferID, completedTransfer.Status)
 
 	// We can check the status of the transfer. More important for batched ACH transactions
-	transferStatus, err := mc.GetTransfer(ctx, completedTransfer.TransferID)
+	transferStatus, err := mc.GetTransfer(ctx, lincolnAccount.AccountID, completedTransfer.TransferID)
 	if err != nil {
 		fmt.Println(err)
 		return

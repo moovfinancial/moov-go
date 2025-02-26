@@ -58,17 +58,17 @@ const (
 
 	pathTransferOptions = "/transfer-options"
 
-	pathTransfers = "/transfers"
-	pathTransfer  = "/transfers/%s"
+	pathTransfers = "/accounts/%s/transfers"
+	pathTransfer  = "/accounts/%s/transfers/%s"
 
 	pathSchedules          = "/accounts/%s/schedules"
 	pathSchedule           = "/accounts/%s/schedules/%s"
 	pathScheduleOccurrence = "/accounts/%s/schedules/%s/occurrences/%s"
 
-	pathReversals = "/transfers/%s/reversals"
+	pathReversals = "/accounts/%s/transfers/%s/reversals"
 
-	pathRefunds = "/transfers/%s/refunds"
-	pathRefund  = "/transfers/%s/refunds/%s"
+	pathRefunds = "/accounts/%s/transfers/%s/refunds"
+	pathRefund  = "/accounts/%s/transfers/%s/refunds/%s"
 
 	pathDisputes              = "/accounts/%s/disputes"
 	pathDispute               = "/accounts/%s/disputes/%s"

@@ -20,6 +20,9 @@ func TestVisaSandboxPush(t *testing.T) {
 	mc, err := moov.NewClient(moov.WithCredentials(moov.CredentialsFromEnv()))
 	require.NoError(t, err)
 
+	// The account facilitating the transfer
+	partnerAccountID := "5352b013-ae58-4a63-8a3f-97f316a917cf" // example
+
 	// sourceAccountID is the account from which we will pull money. This
 	// account should be properly configured (e.g. MCC should be set)
 	sourceAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9" // example
@@ -116,7 +119,7 @@ func TestVisaSandboxPush(t *testing.T) {
 				Total: moov.PtrOf(int64(2)), // $0.02
 			},
 			Description: "Push to card",
-		}).WaitForRailResponse()
+		}, partnerAccountID).WaitForRailResponse()
 	require.NoError(t, err)
 
 	fmt.Printf("Transfer: %+v\n", completedTransfer.TransferID)
