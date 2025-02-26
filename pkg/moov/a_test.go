@@ -14,6 +14,9 @@ import (
 )
 
 const FACILITATOR_ID = "5352b013-ae58-4a63-8a3f-97f316a917cf"
+const FACILITATOR_WALLET_PM_ID = "041fdc88-c93d-4cb4-80aa-b2dde9a4fe2e"
+
+const LINCOLN_WALLET_PM_ID = "67ebda6c-de48-474c-b49d-2cd3aa7d3f92"
 
 func getLincolnBank(t *testing.T, mc *moov.Client) *moov.Account {
 	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))
@@ -75,6 +78,7 @@ func createTestBusinessAccount() moov.CreateAccount {
 func paymentMethodsFromOptions(t *testing.T, options *moov.TransferOptions, sourceType moov.PaymentMethodType, destType moov.PaymentMethodType) (string, string) {
 	sourceId := ""
 	destId := ""
+
 	for _, pm := range options.SourceOptions {
 		if pm.PaymentMethodType == sourceType {
 			sourceId = pm.PaymentMethodID

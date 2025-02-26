@@ -70,6 +70,9 @@ const (
 	pathRefunds = "/transfers/%s/refunds"
 	pathRefund  = "/transfers/%s/refunds/%s"
 
+	pathReceipts = "/receipts"
+	pathReceipt  = "/receipts/%s"
+
 	pathDisputes              = "/accounts/%s/disputes"
 	pathDispute               = "/accounts/%s/disputes/%s"
 	pathDisputeAccept         = "/accounts/%s/disputes/%s/accept"
