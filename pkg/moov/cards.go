@@ -51,23 +51,17 @@ type CardAccountUpdater struct {
 }
 
 type CardDetails struct {
-	Status                   string            `json:"status,omitempty"`
-	FailureCode              string            `json:"failureCode,omitempty"`
-	DynamicDescriptor        string            `json:"dynamicDescriptor,omitempty"`
-	TransactionSource        string            `json:"transactionSource,omitempty"`
-	InterchangeQualification string            `json:"interchangeQualification,omitempty"`
-	StatusUpdates            CardStatusUpdates `json:"statusUpdates,omitempty"`
-	InitiatedOn              *time.Time        `json:"initiatedOn,omitempty"`
-	CompletedOn              *time.Time        `json:"completedOn,omitempty"`
-}
-
-type CardStatusUpdates struct {
-	Initiated time.Time `json:"initiated,omitempty"`
-	Confirmed time.Time `json:"confirmed,omitempty"`
-	Settled   time.Time `json:"settled,omitempty"`
-	Failed    time.Time `json:"failed,omitempty"`
-	Canceled  time.Time `json:"canceled,omitempty"`
-	Completed time.Time `json:"completed,omitempty"`
+	Status                   string     `json:"status,omitempty"`
+	FailureCode              string     `json:"failureCode,omitempty"`
+	DynamicDescriptor        string     `json:"dynamicDescriptor,omitempty"`
+	TransactionSource        string     `json:"transactionSource,omitempty"`
+	InterchangeQualification string     `json:"interchangeQualification,omitempty"`
+	InitiatedOn              *time.Time `json:"initiatedOn,omitempty"`
+	ConfirmedOn              *time.Time `json:"confirmedOn,omitempty"`
+	SettledOn                *time.Time `json:"settledOn,omitempty"`
+	FailedOn                 *time.Time `json:"failedOn,omitempty"`
+	CanceledOn               *time.Time `json:"canceledOn,omitempty"`
+	CompletedOn              *time.Time `json:"completedOn,omitempty"`
 }
 
 type CreateCard struct {
