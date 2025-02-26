@@ -90,7 +90,7 @@ func TestRTPCreditACHFallbackExample(t *testing.T) {
 				Currency: "USD",
 				Value:    132, // $1.32
 			},
-		}).Started()
+		}, account.AccountID).Started()
 	require.NoError(t, err)
 
 	t.Logf("Transfer %s created", completedAsyncTransfer.TransferID)

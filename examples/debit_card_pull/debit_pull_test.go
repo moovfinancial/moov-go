@@ -96,7 +96,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 				Total: moov.PtrOf(int64(2)), // $0.02
 			},
 			Description: "Pull from card",
-		}).WaitForRailResponse()
+		}, accountID).WaitForRailResponse()
 	require.NoError(t, err)
 
 	t.Logf("Transfer %s created", completedTransfer.TransferID)
@@ -108,6 +108,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 	// Step 7: refund transfer
 	refund, _, err := mc.RefundTransfer(
 		ctx,
+		accountID,
 		completedTransfer.TransferID,
 		moov.CreateRefund{
 			Amount: 97,

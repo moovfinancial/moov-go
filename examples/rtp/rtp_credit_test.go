@@ -90,6 +90,7 @@ func TestRTPCreditExample(t *testing.T) {
 				Value:    132, // $1.32
 			},
 		},
+		account.AccountID,
 	).Started()
 	require.NoError(t, err)
 
