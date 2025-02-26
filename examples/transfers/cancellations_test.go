@@ -7,10 +7,10 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
-func ExampleCancelTransfer() {
+func ExampleClient_CancelTransfer() {
 	mc, err := moov.NewClient()
 	if err != nil {
-		fmt.Errorf("new Moov client: %w", err)
+		fmt.Errorf("new Moov client: %v", err)
 		return
 	}
 
@@ -22,17 +22,17 @@ func ExampleCancelTransfer() {
 
 	cancellation, err := mc.CancelTransfer(ctx, partnerAccountID, transferID)
 	if err != nil {
-		fmt.Printf("cancelling transfer: %w", err)
+		fmt.Printf("cancelling transfer: %v", err)
 		return
 	}
 
 	fmt.Printf("Created cancellation: %+v", cancellation)
 }
 
-func ExampleGetCancellation() {
+func ExampleClient_GetCancellation() {
 	mc, err := moov.NewClient()
 	if err != nil {
-		fmt.Errorf("new Moov client: %w", err)
+		fmt.Errorf("new Moov client: %v", err)
 		return
 	}
 
@@ -45,7 +45,7 @@ func ExampleGetCancellation() {
 
 	cancellation, err := mc.GetCancellation(ctx, partnerAccountID, transferID, cancellationID)
 	if err != nil {
-		fmt.Printf("getting cancellation: %w", err)
+		fmt.Printf("getting cancellation: %v", err)
 		return
 	}
 
