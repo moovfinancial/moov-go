@@ -121,7 +121,7 @@ func TestMicroDepositExample(t *testing.T) {
 				Currency: "USD",
 				Value:    4328, // $43.28
 			},
-		}).
+		}, account.AccountID).
 		// not required since ACH is processed in batches,
 		// but useful in getting the full transfer model
 		WaitForRailResponse()

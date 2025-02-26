@@ -130,7 +130,7 @@ func TestBankAccount_InstantVerificationExample(t *testing.T) {
 				Currency: "USD",
 				Value:    1245, // $12.45
 			},
-		}).
+		}, account.AccountID).
 		// not required, but useful in getting the full transfer model
 		WaitForRailResponse()
 

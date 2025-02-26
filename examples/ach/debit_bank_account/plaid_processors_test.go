@@ -109,7 +109,7 @@ func TestPlaidProcessorExample(t *testing.T) {
 				Currency: "USD",
 				Value:    2717, // $27.17
 			},
-		}).
+		}, account.AccountID).
 		// not required since ACH is processed in batches,
 		// but useful in getting the full transfer model
 		WaitForRailResponse()

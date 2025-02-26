@@ -23,6 +23,9 @@ func TestMicroDepositExample(t *testing.T) {
 	mc, err := moov.NewClient() // reads credentials from Environmental variables
 	require.NoError(t, err)
 
+	// The account facilitating the transfer
+	partnerAccountID := "a6119cd4-0d39-486b-88a1-0672a8ce4c3c" // example
+
 	// The account we'll send funds from
 	sourceAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9" // example
 
@@ -120,7 +123,7 @@ func TestMicroDepositExample(t *testing.T) {
 				Currency: "USD",
 				Value:    2843, // $28.43
 			},
-		}).WaitForRailResponse()
+		}, partnerAccountID).WaitForRailResponse()
 	require.NoError(t, err)
 
 	t.Logf("Transfer %s created", completedTransfer.TransferID)

@@ -41,7 +41,7 @@ func Test_Transfers(t *testing.T) {
 				Currency: "usd",
 				Value:    1,
 			},
-		}).Started()
+		}, FACILITATOR_ID).Started()
 		NoResponseError(t, err)
 
 		// We made an async transfer, so completed should be nil, while started not nil
@@ -60,7 +60,7 @@ func Test_Transfers(t *testing.T) {
 				Currency: "usd",
 				Value:    1,
 			},
-		}).WaitForRailResponse()
+		}, FACILITATOR_ID).WaitForRailResponse()
 		NoResponseError(t, err)
 
 		// We made a sync transfer, so completed should be not nil, while started is nil
@@ -70,6 +70,7 @@ func Test_Transfers(t *testing.T) {
 
 	t.Run("list transfers", func(t *testing.T) {
 		transfers, err := mc.ListTransfers(BgCtx(),
+			account.AccountID,
 			moov.WithTransferAccountIDs([]string{
 				account.AccountID,
 			}),
