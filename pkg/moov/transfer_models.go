@@ -229,6 +229,7 @@ type AchDetailsSource struct {
 	CorrectedOn            *time.Time      `json:"correctedOn,omitempty"`
 	ReturnedOn             *time.Time      `json:"returnedOn,omitempty"`
 	CompletedOn            *time.Time      `json:"completedOn,omitempty"`
+	CanceledOn             *time.Time      `json:"canceledOn,omitempty"`
 	DebitHoldPeriod        DebitHoldPeriod `json:"debitHoldPeriod,omitempty"`
 }
 
