@@ -40,8 +40,9 @@ func Test_Receipts(t *testing.T) {
 		require.NotNil(t, transfer)
 
 		receipts, err := mc.CreateReceipt(BgCtx(), moov.CreateReceipt{
-			Kind:  "sale",
+			Kind:  "sale.customer.v1",
 			ForID: transfer.TransferID,
+			Email: moov.PtrOf("noreply@moov.io"),
 		})
 		require.NoError(t, err)
 		require.Len(t, receipts, 1)

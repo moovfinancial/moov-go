@@ -14,7 +14,11 @@ func (c Client) CreateReceipt(ctx context.Context, receipts ...CreateReceipt) ([
 		return nil, err
 	}
 
-	return CompletedListOrError[Receipt](resp)
+	if resp.Status() == StatusStarted {
+		return UnmarshalListResponse[Receipt](resp)
+	} else {
+		return nil, resp
+	}
 }
 
 type ListReceiptsFilter callArg
