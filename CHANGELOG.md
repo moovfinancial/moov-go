@@ -1,3 +1,10 @@
+## v0.10.0 (Released 2025-02-28)
+
+BREAKING CHANGES
+
+- transfers: switch to newer `/accounts/{accountID}`-prefixed endpoints
+- transfers: update transfer methods to accept an accountID parameter
+
 ## v0.9.0 (Released 2025-01-10)
 
 ADDITIONS
