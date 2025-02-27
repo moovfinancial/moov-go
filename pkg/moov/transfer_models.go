@@ -112,7 +112,10 @@ type Transfer struct {
 	// The total disputed amount for a card transfer.
 	DisputedAmount *Amount `json:"disputedAmount,omitempty"`
 	// A list of disputes for a card transfer.
-	Disputes    []GetDispute        `json:"disputes,omitempty"`
+	Disputes []GetDispute `json:"disputes,omitempty"`
+	// A list of cancellations for a transfer.
+	Cancellations []Cancellation `json:"cancellations,omitempty"`
+
 	Source      TransferSource      `json:"source,omitempty"`
 	Destination TransferDestination `json:"destination,omitempty"`
 }
@@ -177,6 +180,12 @@ type GetDispute struct {
 	DisputeID string    `json:"disputeID,omitempty"`
 	CreatedOn time.Time `json:"createdOn,omitempty"`
 	Amount    Amount    `json:"amount,omitempty"`
+}
+
+type Cancellation struct {
+	CancellationID string             `json:"cancellationID"`
+	Status         CancellationStatus `json:"status"`
+	CreatedOn      time.Time          `json:"createdOn"`
 }
 
 // TransferSource struct for TransferSource
