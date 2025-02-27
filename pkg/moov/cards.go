@@ -59,6 +59,7 @@ type CardDetails struct {
 	StatusUpdates            CardStatusUpdates `json:"statusUpdates,omitempty"`
 	InitiatedOn              *time.Time        `json:"initiatedOn,omitempty"`
 	CompletedOn              *time.Time        `json:"completedOn,omitempty"`
+	ConfirmedOn              *time.Time        `json:"confirmedOn,omitempty"`
 }
 
 type CardStatusUpdates struct {
