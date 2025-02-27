@@ -25,7 +25,7 @@ func WithTransferIdempotencyKey(key uuid.UUID) CreateTransferArgs {
 
 // CreateTransfer creates a new transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
-func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, accountID string, options ...CreateTransferArgs) CreateTransferBuilder {
+func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, partnerAccountID string, options ...CreateTransferArgs) CreateTransferBuilder {
 	builder := &createTransferBuilder{}
 	callArgs := []callArg{
 		AcceptJson(),
@@ -40,7 +40,7 @@ func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, acc
 	return CreateTransferBuilder{
 		client:   c,
 		ctx:      ctx,
-		endpoint: Endpoint(http.MethodPost, pathTransfers, accountID),
+		endpoint: Endpoint(http.MethodPost, pathTransfers, partnerAccountID),
 		callArgs: callArgs,
 	}
 }
@@ -221,7 +221,7 @@ func WithRefundIdempotencyKey(key uuid.UUID) CreateRefundArgs {
 
 // RefundTransfer refunds a transfer
 // https://docs.moov.io/api/#tag/Transfers/operation/refundTransfer
-func (c Client) RefundTransfer(ctx context.Context, accountID, transferID string, refund CreateRefund, options ...CreateRefundArgs) (*Refund, *RefundStarted, error) {
+func (c Client) RefundTransfer(ctx context.Context, partnerAccountID, transferID string, refund CreateRefund, options ...CreateRefundArgs) (*Refund, *RefundStarted, error) {
 	args := prependArgs(options,
 		AcceptJson(),
 		WithRefundIdempotencyKey(uuid.New()),
@@ -229,7 +229,7 @@ func (c Client) RefundTransfer(ctx context.Context, accountID, transferID string
 	)
 
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathRefunds, accountID, transferID),
+		Endpoint(http.MethodPost, pathRefunds, partnerAccountID, transferID),
 		args...)
 	if err != nil {
 		return nil, nil, err
@@ -284,14 +284,14 @@ func WithReversalsIdempotencyKey(key uuid.UUID) CreateReversalArgs {
 
 // ReverseTransfer reverses a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/reverseTransfer
-func (c Client) ReverseTransfer(ctx context.Context, accountID, transferID string, refund CreateReversal, options ...CreateReversalArgs) (*CreatedReversal, error) {
+func (c Client) ReverseTransfer(ctx context.Context, partnerAccountID, transferID string, refund CreateReversal, options ...CreateReversalArgs) (*CreatedReversal, error) {
 	args := prependArgs(options,
 		AcceptJson(),
 		WithReversalsIdempotencyKey(uuid.New()),
 		JsonBody(refund),
 	)
 
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathReversals, accountID, transferID), args...)
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathReversals, partnerAccountID, transferID), args...)
 	if err != nil {
 		return nil, err
 	}
