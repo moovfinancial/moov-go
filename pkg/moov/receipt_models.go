@@ -5,15 +5,21 @@ import (
 )
 
 type CreateReceipt struct {
-	Kind           string  `json:"kind"`
-	ForID          string  `json:"forId"`
+	Kind string `json:"kind"`
+
+	// lookup
+	ForTransferID   *string `json:"forTransferID"`
+	ForScheduleID   *string `json:"forScheduleID"`
+	ForOccurrenceID *string `json:"forOccurrenceID"`
+
+	// recipient
 	Email          *string `json:"email"`
-	EmailAccountID *string `json:"emailAccountId"`
+	EmailAccountID *string `json:"emailAccountID"`
 }
 
 type Receipt struct {
 	// ID is the unique identifier for the receipt
-	ID string `json:"id"`
+	ID string `json:"receiptID"`
 
 	// AccountID is the ID of the account that created the receipt
 	CreatedBy string `json:"createdBy"`
@@ -21,12 +27,14 @@ type Receipt struct {
 	// kind of receipt, simple sale, signature, business copy, etc...
 	Kind string `json:"kind"`
 
-	// ForID is the ID of the schedule or transfer that this receipt is for
-	ForID string `json:"forId"`
+	// ForID is the ID of the schedule or transfer or whatever that this receipt is watching and will trigger for
+	ForTransferID   *string `json:"forTransferID"`
+	ForScheduleID   *string `json:"forScheduleID"`
+	ForOccurrenceID *string `json:"forOccurrenceID"`
 
 	// recipient ...
 	Email          *string `json:"email"`
-	EmailAccountID *string `json:"emailAccountId"`
+	EmailAccountID *string `json:"emailAccountID"`
 
 	// DisabledOn is the date and time the receipt was disabled
 	DisabledOn *time.Time `json:"disabledOn"`
@@ -36,7 +44,7 @@ type Receipt struct {
 }
 
 type SentReceipt struct {
-	ReceiptID      string    `json:"receiptId"`
+	ReceiptID      string    `json:"receiptID"`
 	IdempotencyKey string    `json:"idempotencyKey"`
 	SentOn         time.Time `json:"sentOn"`
 }
