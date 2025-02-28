@@ -14,6 +14,7 @@ func Test_Receipts(t *testing.T) {
 	customerCard := createTemporaryCard(t, mc, customer.AccountID)
 
 	var transfer *moov.TransferStarted = nil
+	var receipt *moov.Receipt = nil
 
 	t.Run("make async transfer", func(t *testing.T) {
 		started, err := mc.CreateTransfer(BgCtx(), moov.CreateTransfer{
@@ -47,6 +48,9 @@ func Test_Receipts(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, receipts, 1)
 		require.NotEmpty(t, receipts[0].ID)
+
+		receipt = &receipts[0]
+		t.Logf("receipt: %+v\n", receipt)
 	})
 
 	t.Run("list receipts", func(t *testing.T) {
@@ -55,5 +59,13 @@ func Test_Receipts(t *testing.T) {
 		receipts, err := mc.ListReceipts(BgCtx(), moov.ReceiptByTransferID(transfer.TransferID))
 		require.NoError(t, err)
 		require.Len(t, receipts, 1)
+
+		// check and empty for the comparison as it could have sent before calling list
+		for i, r := range receipts {
+			require.Len(t, r.SentFor, 1)
+			receipts[i].SentFor = []moov.SentReceipt{}
+		}
+
+		require.Contains(t, receipts, *receipt)
 	})
 }
