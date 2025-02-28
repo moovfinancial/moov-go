@@ -300,7 +300,7 @@ func (c Client) ReverseTransfer(ctx context.Context, partnerAccountID, transferI
 }
 
 // CancelTransfer cancels a transfer
-// TODO(vince,2/21/2025): add link to Moov docs when it's published.
+// https://docs.moov.io/api/money-movement/transfers/cancel/
 func (c Client) CancelTransfer(ctx context.Context, accountID string, transferID string) (*Cancellation, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathCancellations, accountID, transferID))
 	if err != nil {
@@ -310,8 +310,8 @@ func (c Client) CancelTransfer(ctx context.Context, accountID string, transferID
 	return CompletedObjectOrError[Cancellation](resp)
 }
 
-// GetCancellation gets a transfer
-// TODO(vince,2/21/2025): add link to Moov docs when it's published.
+// GetCancellation gets a cancellation
+// https://docs.moov.io/api/money-movement/transfers/cancel-details/
 func (c Client) GetCancellation(ctx context.Context, accountID string, transferID string, cancellationID string) (*Cancellation, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathCancellation, accountID, transferID, cancellationID))
 	if err != nil {
