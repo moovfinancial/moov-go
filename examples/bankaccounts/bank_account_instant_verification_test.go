@@ -123,6 +123,7 @@ func TestBankAccount_InstantVerificationExample(t *testing.T) {
 
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,
+		partnerAccountID,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: sourcePaymentMethod.PaymentMethodID,
@@ -134,7 +135,7 @@ func TestBankAccount_InstantVerificationExample(t *testing.T) {
 				Currency: "USD",
 				Value:    1245, // $12.45
 			},
-		}, partnerAccountID).
+		}).
 		// not required, but useful in getting the full transfer model
 		WaitForRailResponse()
 

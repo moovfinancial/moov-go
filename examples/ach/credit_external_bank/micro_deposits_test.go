@@ -112,6 +112,7 @@ func TestMicroDepositExample(t *testing.T) {
 	// Step 6: create transfer
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,
+		partnerAccountID,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: sourcePaymentMethod.PaymentMethodID,
@@ -123,7 +124,7 @@ func TestMicroDepositExample(t *testing.T) {
 				Currency: "USD",
 				Value:    2843, // $28.43
 			},
-		}, partnerAccountID).WaitForRailResponse()
+		}).WaitForRailResponse()
 	require.NoError(t, err)
 
 	t.Logf("Transfer %s created", completedTransfer.TransferID)

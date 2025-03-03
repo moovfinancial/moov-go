@@ -113,6 +113,7 @@ func TestMicroDepositExample(t *testing.T) {
 	// Step 6: create transfer
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,
+		partnerAccountID,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: pullPaymentMethod.PaymentMethodID,
@@ -124,7 +125,7 @@ func TestMicroDepositExample(t *testing.T) {
 				Currency: "USD",
 				Value:    4328, // $43.28
 			},
-		}, partnerAccountID).
+		}).
 		// not required since ACH is processed in batches,
 		// but useful in getting the full transfer model
 		WaitForRailResponse()

@@ -101,6 +101,7 @@ func TestVisaSandboxPush(t *testing.T) {
 	// Step 6: create transfer
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,
+		partnerAccountID,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: sourcePaymentMethod.PaymentMethodID,
@@ -119,7 +120,7 @@ func TestVisaSandboxPush(t *testing.T) {
 				Total: moov.PtrOf(int64(2)), // $0.02
 			},
 			Description: "Push to card",
-		}, partnerAccountID).WaitForRailResponse()
+		}).WaitForRailResponse()
 	require.NoError(t, err)
 
 	fmt.Printf("Transfer: %+v\n", completedTransfer.TransferID)

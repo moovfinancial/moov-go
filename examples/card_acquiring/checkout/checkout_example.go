@@ -163,13 +163,15 @@ func main() {
 	description := "Pay Instructor for May 15 Class"
 
 	// Create a transfer from the card to the wallet
-	completedTransfer, _, err := mc.CreateTransfer(context.Background(), moov.CreateTransfer{
-		Source:         source,
-		Destination:    destination,
-		Amount:         amount,
-		FacilitatorFee: facilitatorFee,
-		Description:    description,
-	}, lincolnAccount.AccountID).WaitForRailResponse()
+	completedTransfer, _, err := mc.CreateTransfer(context.Background(),
+		lincolnAccount.AccountID,
+		moov.CreateTransfer{
+			Source:         source,
+			Destination:    destination,
+			Amount:         amount,
+			FacilitatorFee: facilitatorFee,
+			Description:    description,
+		}).WaitForRailResponse()
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -25,7 +25,7 @@ func WithTransferIdempotencyKey(key uuid.UUID) CreateTransferArgs {
 
 // CreateTransfer creates a new transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
-func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, partnerAccountID string, options ...CreateTransferArgs) CreateTransferBuilder {
+func (c Client) CreateTransfer(ctx context.Context, partnerAccountID string, transfer CreateTransfer, options ...CreateTransferArgs) CreateTransferBuilder {
 	builder := &createTransferBuilder{}
 	callArgs := []callArg{
 		AcceptJson(),

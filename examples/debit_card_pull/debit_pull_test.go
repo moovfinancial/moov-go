@@ -81,6 +81,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 	// Step 6: create transfer
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,
+		partnerAccountID,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: sourcePaymentMethodID,
@@ -99,7 +100,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 				Total: moov.PtrOf(int64(2)), // $0.02
 			},
 			Description: "Pull from card",
-		}, partnerAccountID).WaitForRailResponse()
+		}).WaitForRailResponse()
 	require.NoError(t, err)
 
 	t.Logf("Transfer %s created", completedTransfer.TransferID)
