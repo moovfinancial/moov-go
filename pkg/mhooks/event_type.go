@@ -9,32 +9,34 @@ import (
 type EventType string
 
 const (
-	EventTypeAccountCreated           EventType = "account.created"
-	EventTypeAccountDeleted           EventType = "account.deleted"
-	EventTypeAccountUpdated           EventType = "account.updated"
-	EventTypeBalanceUpdated           EventType = "balance.updated"
-	EventTypeBankAccountCreated       EventType = "bankAccount.created"
-	EventTypeBankAccountDeleted       EventType = "bankAccount.deleted"
-	EventTypeBankAccountUpdated       EventType = "bankAccount.updated"
-	EventTypeCardAutoUpdated          EventType = "card.autoUpdated"
-	EventTypeCapabilityRequested      EventType = "capability.requested"
-	EventTypeCapabilityUpdated        EventType = "capability.updated"
-	EventTypeDisputeCreated           EventType = "dispute.created"
-	EventTypeDisputeUpdated           EventType = "dispute.updated"
-	EventTypeNetworkIDUpdated         EventType = "networkID.updated"
-	EventTypePaymentMethodDisabled    EventType = "paymentMethod.disabled"
-	EventTypePaymentMethodEnabled     EventType = "paymentMethod.enabled"
-	EventTypeRefundCreated            EventType = "refund.created"
-	EventTypeRefundUpdated            EventType = "refund.updated"
-	EventTypeRepresentativeCreated    EventType = "representative.created"
-	EventTypeRepresentativeDeleted    EventType = "representative.deleted"
-	EventTypeRepresentativeUpdated    EventType = "representative.updated"
-	EventTypeSweepCreated             EventType = "sweep.created"
-	EventTypeSweepUpdated             EventType = "sweep.updated"
-	EventTypeTestPing                 EventType = "event.test"
-	EventTypeTransferCreated          EventType = "transfer.created"
-	EventTypeTransferUpdated          EventType = "transfer.updated"
-	EventTypeWalletTransactionUpdated EventType = "walletTransaction.updated"
+	EventTypeAccountCreated             EventType = "account.created"
+	EventTypeAccountDeleted             EventType = "account.deleted"
+	EventTypeAccountUpdated             EventType = "account.updated"
+	EventTypeBalanceUpdated             EventType = "balance.updated"
+	EventTypeBankAccountCreated         EventType = "bankAccount.created"
+	EventTypeBankAccountDeleted         EventType = "bankAccount.deleted"
+	EventTypeBankAccountUpdated         EventType = "bankAccount.updated"
+	EventTypeCardAutoUpdated            EventType = "card.autoUpdated"
+	EventTypeCapabilityRequested        EventType = "capability.requested"
+	EventTypeCapabilityUpdated          EventType = "capability.updated"
+	EventTypeDisputeCreated             EventType = "dispute.created"
+	EventTypeDisputeUpdated             EventType = "dispute.updated"
+	EventTypeNetworkIDUpdated           EventType = "networkID.updated"
+	EventTypePaymentMethodDisabled      EventType = "paymentMethod.disabled"
+	EventTypePaymentMethodEnabled       EventType = "paymentMethod.enabled"
+	EventTypeRefundCreated              EventType = "refund.created"
+	EventTypeRefundUpdated              EventType = "refund.updated"
+	EventTypeRepresentativeCreated      EventType = "representative.created"
+	EventTypeRepresentativeDeleted      EventType = "representative.deleted"
+	EventTypeRepresentativeUpdated      EventType = "representative.updated"
+	EventTypeSweepCreated               EventType = "sweep.created"
+	EventTypeSweepUpdated               EventType = "sweep.updated"
+	EventTypeTestPing                   EventType = "event.test"
+	EventTypeTerminalApplicationCreated EventType = "terminalApplication.created"
+	EventTypeTerminalApplicationUpdated EventType = "terminalApplication.updated"
+	EventTypeTransferCreated            EventType = "transfer.created"
+	EventTypeTransferUpdated            EventType = "transfer.updated"
+	EventTypeWalletTransactionUpdated   EventType = "walletTransaction.updated"
 )
 
 type AccountCreated struct {
@@ -221,6 +223,18 @@ type SweepUpdated struct {
 
 type TestPing struct {
 	Ping bool `json:"ping"`
+}
+
+type TerminalApplicationCreated struct {
+	TerminalApplicationID string `json:"terminalApplicationID"`
+	// TODO(vince, 2/21/2025): this enum needs to be added by card-push team first.
+	// Status                TerminalApplicationStatus `json:"status"`
+}
+
+type TerminalApplicationUpdated struct {
+	TerminalApplicationID string `json:"terminalApplicationID"`
+	// TODO(vince, 2/21/2025): this enum needs to be added by card-push team first.
+	// Status                TerminalApplicationStatus `json:"status"`
 }
 
 type TransferCreated struct {

@@ -71,6 +71,10 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 		eventData = &event.representativeDeleted
 	case EventTypeRepresentativeUpdated:
 		eventData = &event.representativeUpdated
+	case EventTypeTerminalApplicationCreated:
+		eventData = &event.terminalApplicationCreated
+	case EventTypeTerminalApplicationUpdated:
+		eventData = &event.terminalApplicationUpdated
 	case EventTypeTestPing:
 		eventData = &event.testPing
 	case EventTypeTransferCreated:
@@ -97,32 +101,34 @@ type Event struct {
 	CreatedOn time.Time       `json:"createdOn"`
 	Data      json.RawMessage `json:"data"`
 
-	accountCreated           *AccountCreated
-	accountDeleted           *AccountDeleted
-	accountUpdated           *AccountUpdated
-	balanceUpdated           *BalanceUpdated
-	bankAccountCreated       *BankAccountCreated
-	bankAccountDeleted       *BankAccountDeleted
-	bankAccountUpdated       *BankAccountUpdated
-	cardAutoUpdated          *CardAutoUpdated
-	capabilityRequested      *CapabilityRequested
-	capabilityUpdated        *CapabilityUpdated
-	disputeCreated           *DisputeCreated
-	disputeUpdated           *DisputeUpdated
-	networkIDUpdated         *NetworkIDUpdated
-	paymentMethodDisabled    *PaymentMethodDisabled
-	paymentMethodEnabled     *PaymentMethodEnabled
-	refundCreated            *RefundCreated
-	refundUpdated            *RefundUpdated
-	representativeCreated    *RepresentativeCreated
-	representativeDeleted    *RepresentativeDeleted
-	representativeUpdated    *RepresentativeUpdated
-	sweepCreated             *SweepCreated
-	sweepUpdated             *SweepUpdated
-	testPing                 *TestPing
-	transferCreated          *TransferCreated
-	transferUpdated          *TransferUpdated
-	walletTransactionUpdated *WalletTransactionUpdated
+	accountCreated             *AccountCreated
+	accountDeleted             *AccountDeleted
+	accountUpdated             *AccountUpdated
+	balanceUpdated             *BalanceUpdated
+	bankAccountCreated         *BankAccountCreated
+	bankAccountDeleted         *BankAccountDeleted
+	bankAccountUpdated         *BankAccountUpdated
+	cardAutoUpdated            *CardAutoUpdated
+	capabilityRequested        *CapabilityRequested
+	capabilityUpdated          *CapabilityUpdated
+	disputeCreated             *DisputeCreated
+	disputeUpdated             *DisputeUpdated
+	networkIDUpdated           *NetworkIDUpdated
+	paymentMethodDisabled      *PaymentMethodDisabled
+	paymentMethodEnabled       *PaymentMethodEnabled
+	refundCreated              *RefundCreated
+	refundUpdated              *RefundUpdated
+	representativeCreated      *RepresentativeCreated
+	representativeDeleted      *RepresentativeDeleted
+	representativeUpdated      *RepresentativeUpdated
+	sweepCreated               *SweepCreated
+	sweepUpdated               *SweepUpdated
+	testPing                   *TestPing
+	terminalApplicationCreated *TerminalApplicationCreated
+	terminalApplicationUpdated *TerminalApplicationUpdated
+	transferCreated            *TransferCreated
+	transferUpdated            *TransferUpdated
+	walletTransactionUpdated   *WalletTransactionUpdated
 }
 
 func (e Event) AccountCreated() (*AccountCreated, error) {
@@ -307,6 +313,22 @@ func (e Event) TestPing() (*TestPing, error) {
 	}
 
 	return e.testPing, nil
+}
+
+func (e Event) TerminalApplicationCreated() (*TerminalApplicationCreated, error) {
+	if e.EventType != EventTypeTerminalApplicationCreated {
+		return nil, newInvalidEventTypeError(EventTypeTerminalApplicationCreated, e.EventType)
+	}
+
+	return e.terminalApplicationCreated, nil
+}
+
+func (e Event) TerminalApplicationUpdated() (*TerminalApplicationUpdated, error) {
+	if e.EventType != EventTypeTerminalApplicationUpdated {
+		return nil, newInvalidEventTypeError(EventTypeTerminalApplicationUpdated, e.EventType)
+	}
+
+	return e.terminalApplicationUpdated, nil
 }
 
 func (e Event) TransferCreated() (*TransferCreated, error) {
