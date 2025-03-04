@@ -16,6 +16,8 @@ const (
 	EventTypeBankAccountCreated       EventType = "bankAccount.created"
 	EventTypeBankAccountDeleted       EventType = "bankAccount.deleted"
 	EventTypeBankAccountUpdated       EventType = "bankAccount.updated"
+	EventTypeCancellationCreated      EventType = "cancellation.created"
+	EventTypeCancellationUpdated      EventType = "cancellation.updated"
 	EventTypeCardAutoUpdated          EventType = "card.autoUpdated"
 	EventTypeCapabilityRequested      EventType = "capability.requested"
 	EventTypeCapabilityUpdated        EventType = "capability.updated"
@@ -82,6 +84,18 @@ type BankAccountUpdated struct {
 	Status           moov.BankAccountStatus       `json:"status"`
 	StatusReason     moov.BankAccountStatusReason `json:"statusReason"`
 	ExceptionDetails *moov.ExceptionDetails       `json:"exceptionDetails,omitempty"`
+}
+
+type CancellationCreated struct {
+	CancellationID string                  `json:"cancellationID"`
+	TransferID     string                  `json:"transferID"`
+	Status         moov.CancellationStatus `json:"status"`
+}
+
+type CancellationUpdated struct {
+	CancellationID string                  `json:"cancellationID"`
+	TransferID     string                  `json:"transferID"`
+	Status         moov.CancellationStatus `json:"status"`
 }
 
 type CardAutoUpdated struct {
