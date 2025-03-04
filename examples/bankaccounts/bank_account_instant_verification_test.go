@@ -117,8 +117,13 @@ func TestBankAccount_InstantVerificationExample(t *testing.T) {
 	destinationPaymentMethod := paymentMethods[0]
 
 	// Step 6: create transfer
+
+	// The account facilitating the transfer
+	partnerAccountID := "5352b013-ae58-4a63-8a3f-97f316a917cf" // example
+
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,
+		partnerAccountID,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: sourcePaymentMethod.PaymentMethodID,

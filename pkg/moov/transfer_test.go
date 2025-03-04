@@ -30,18 +30,20 @@ func Test_Transfers(t *testing.T) {
 	source, dest := paymentMethodsFromOptions(t, options, moov.PaymentMethodType_AchDebitFund, moov.PaymentMethodType_MoovWallet)
 
 	t.Run("make async transfer", func(t *testing.T) {
-		started, err := mc.CreateTransfer(BgCtx(), moov.CreateTransfer{
-			Source: moov.CreateTransfer_Source{
-				PaymentMethodID: source,
-			},
-			Destination: moov.CreateTransfer_Destination{
-				PaymentMethodID: dest,
-			},
-			Amount: moov.Amount{
-				Currency: "usd",
-				Value:    1,
-			},
-		}).Started()
+		started, err := mc.CreateTransfer(BgCtx(),
+			FACILITATOR_ID,
+			moov.CreateTransfer{
+				Source: moov.CreateTransfer_Source{
+					PaymentMethodID: source,
+				},
+				Destination: moov.CreateTransfer_Destination{
+					PaymentMethodID: dest,
+				},
+				Amount: moov.Amount{
+					Currency: "usd",
+					Value:    1,
+				},
+			}).Started()
 		NoResponseError(t, err)
 
 		// We made an async transfer, so completed should be nil, while started not nil
@@ -49,18 +51,20 @@ func Test_Transfers(t *testing.T) {
 	})
 
 	t.Run("make sync transfer", func(t *testing.T) {
-		completed, started, err := mc.CreateTransfer(BgCtx(), moov.CreateTransfer{
-			Source: moov.CreateTransfer_Source{
-				PaymentMethodID: source,
-			},
-			Destination: moov.CreateTransfer_Destination{
-				PaymentMethodID: dest,
-			},
-			Amount: moov.Amount{
-				Currency: "usd",
-				Value:    1,
-			},
-		}).WaitForRailResponse()
+		completed, started, err := mc.CreateTransfer(BgCtx(),
+			FACILITATOR_ID,
+			moov.CreateTransfer{
+				Source: moov.CreateTransfer_Source{
+					PaymentMethodID: source,
+				},
+				Destination: moov.CreateTransfer_Destination{
+					PaymentMethodID: dest,
+				},
+				Amount: moov.Amount{
+					Currency: "usd",
+					Value:    1,
+				},
+			}).WaitForRailResponse()
 		NoResponseError(t, err)
 
 		// We made a sync transfer, so completed should be not nil, while started is nil
@@ -70,6 +74,7 @@ func Test_Transfers(t *testing.T) {
 
 	t.Run("list transfers", func(t *testing.T) {
 		transfers, err := mc.ListTransfers(BgCtx(),
+			account.AccountID,
 			moov.WithTransferAccountIDs([]string{
 				account.AccountID,
 			}),
