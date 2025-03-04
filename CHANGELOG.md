@@ -1,8 +1,11 @@
 ## v0.10.0 (Released 2025-03-04)
 
-ADDITIONS
+BREAKING CHANGES
 
 - transfers: update methods to use the `/accounts/{accountID}`-prefixed endpoints
+
+ADDITIONS
+
 - transfers: add cancellation API endpoints and client methods
 - cards: update `CardDetails` model to use new `CardTransactionStatus` enum
 
