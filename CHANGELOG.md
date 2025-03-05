@@ -3,11 +3,11 @@
 BREAKING CHANGES
 
 - transfers: update methods to use the `/accounts/{accountID}`-prefixed endpoints
+- cards: update `CardDetails` model to use new `CardTransactionStatus` enum
 
 ADDITIONS
 
 - transfers: add cancellation API endpoints and client methods
-- cards: update `CardDetails` model to use new `CardTransactionStatus` enum
 
 ## v0.9.0 (Released 2025-01-10)
 
