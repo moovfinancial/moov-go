@@ -30,12 +30,12 @@ type TerminalApplication struct {
 
 type TerminalApplicationRequest struct {
 	Platform TerminalApplicationPlatform `json:"platform"`
-	// The app bundle identifier of the terminal application. Required if platform is ios.
+	// The app bundle identifier of the terminal application. Required if platform is `ios`.
 	AppBundleID string `json:"appBundleID,omitempty"`
-	// The app package name of the terminal application. Required if platform is android.
+	// The app package name of the terminal application. Required if platform is `android`.
 	PackageName string `json:"packageName,omitempty"`
-	// The app version of the terminal application. Required if paltform is android.
+	// The app version of the terminal application. Required if paltform is `android`.
 	Sha256Digest string `json:"sha256Digest,omitempty"`
-	// The app version of the terminal application. Required if platform is android.
+	// The app version of the terminal application. Required if platform is `android`.
 	VersionCode string `json:"versionCode,omitempty"`
 }
