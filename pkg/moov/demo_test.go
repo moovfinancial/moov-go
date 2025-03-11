@@ -43,11 +43,10 @@ const (
 	partnerAccountID       = "db04bf9d-91f6-4206-ba38-6844636532ad"
 	awesomeDronesAccountID = "e5a43c02-559a-49e4-a0f8-5b180ec30202"
 	dbFilename             = "sqlite.txt"
-
-	maxXfrAmt = 20
+	maxXfrAmt              = 20
 
 	// total transfers created = 3  * numTransfersPerType
-	numTransfersPerType = 20
+	numTransfersPerType = 3
 )
 
 /*
@@ -132,10 +131,11 @@ func TestDemo_CreateTransfers(t *testing.T) {
 
 		createdXfrIDs = append(createdXfrIDs, xfr.TransferID)
 
+		numXfr := len(createdXfrIDs)
 		if hasBug {
-			fmt.Printf("😨😨😨 Created %s %s transfer\n", prettyPrintAmount(xfr.Amount), xfrType)
+			fmt.Printf("(%d) 😨😨😨 Created %s %s transfer\n", numXfr, prettyPrintAmount(xfr.Amount), xfrType)
 		} else {
-			fmt.Printf("💸 Created %s transfer\n", prettyPrintAmount(xfr.Amount))
+			fmt.Printf("(%d) 💸 Created %s %s transfer\n", numXfr, prettyPrintAmount(xfr.Amount), xfrType)
 		}
 
 	}
@@ -167,7 +167,7 @@ func TestDemo_CreateTransfers(t *testing.T) {
 	fmt.Println()
 	fmt.Println("Result: ")
 	fmt.Printf("Created %d transfers successfully\n", len(createdXfrIDs))
-	fmt.Printf("But %d out of %d transfers have wrong amounts \n\n", numBadXfrs, len(createdXfrIDs))
+	fmt.Printf("But %d out of %d transfers have WRONG amounts \n\n", numBadXfrs, len(createdXfrIDs))
 }
 
 /*
