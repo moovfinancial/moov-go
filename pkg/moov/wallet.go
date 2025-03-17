@@ -88,6 +88,7 @@ const (
 	WalletTransactionSourceTypeIssuingCardTransaction WalletTransactionSourceType = "issuing-card-transaction"
 	WalletTransactionSourceTypeIssuingAuthorization   WalletTransactionSourceType = "issuing-authorization"
 	WalletTransactionSourceTypeSweep                  WalletTransactionSourceType = "sweep"
+	WalletTransactionSourceTypeFee                    WalletTransactionSourceType = "fee"
 )
 
 // ListWallets lists all wallets that are associated with a Moov account
