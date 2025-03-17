@@ -14,7 +14,7 @@ type TerminalApplicationPlatform string
 // List of TerminalApplicationPlatform
 const (
 	TerminalApplicationPlatform_Android TerminalApplicationPlatform = "android"
-	TerminalApplicationPlatform_IOS     TerminalApplicationPlatform = "ios"
+	TerminalApplicationPlatform_iOS     TerminalApplicationPlatform = "ios"
 )
 
 type TerminalApplication struct {
