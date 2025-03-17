@@ -60,10 +60,9 @@ func Test_Receipts(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, receipts, 1)
 
-		// check and empty for the comparison as it could have sent before calling list
-		for i, r := range receipts {
-			require.Len(t, r.SentFor, 1)
-			receipts[i].SentFor = []moov.SentReceipt{}
+		// The receipt may be sent or not by this point so we need to clear out the sentFor list
+		for i := range receipts {
+			receipts[i].SentFor = nil
 		}
 
 		require.Contains(t, receipts, *receipt)
