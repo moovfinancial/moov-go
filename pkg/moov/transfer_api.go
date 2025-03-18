@@ -299,6 +299,28 @@ func (c Client) ReverseTransfer(ctx context.Context, partnerAccountID, transferI
 	return CompletedObjectOrError[CreatedReversal](resp)
 }
 
+// CancelTransfer cancels a transfer
+// https://docs.moov.io/api/money-movement/transfers/cancel/
+func (c Client) CancelTransfer(ctx context.Context, accountID string, transferID string) (*Cancellation, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathCancellations, accountID, transferID))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Cancellation](resp)
+}
+
+// GetCancellation gets a cancellation
+// https://docs.moov.io/api/money-movement/transfers/cancel-details/
+func (c Client) GetCancellation(ctx context.Context, accountID string, transferID string, cancellationID string) (*Cancellation, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathCancellation, accountID, transferID, cancellationID))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Cancellation](resp)
+}
+
 // TransferOptions lists all transfer options between a source and destination
 // https://docs.moov.io/api/#tag/Transfers/operation/createTransferOptions
 func (c Client) TransferOptions(ctx context.Context, payload CreateTransferOptions) (*TransferOptions, error) {

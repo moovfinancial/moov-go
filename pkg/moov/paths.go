@@ -65,10 +65,16 @@ const (
 	pathSchedule           = "/accounts/%s/schedules/%s"
 	pathScheduleOccurrence = "/accounts/%s/schedules/%s/occurrences/%s"
 
+	pathCancellations = "/accounts/%s/transfers/%s/cancellations"
+	pathCancellation  = "/accounts/%s/transfers/%s/cancellations/%s"
+
 	pathReversals = "/accounts/%s/transfers/%s/reversals"
 
 	pathRefunds = "/accounts/%s/transfers/%s/refunds"
 	pathRefund  = "/accounts/%s/transfers/%s/refunds/%s"
+
+	pathReceipts = "/receipts"
+	pathReceipt  = "/receipts/%s"
 
 	pathDisputes              = "/accounts/%s/disputes"
 	pathDispute               = "/accounts/%s/disputes/%s"

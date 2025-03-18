@@ -2,13 +2,12 @@ package schedules
 
 import (
 	"context"
-	"crypto/rand"
 	"fmt"
-	"math/big"
 	"testing"
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
@@ -20,7 +19,6 @@ type Env struct {
 
 	PartnerID string
 
-	Merchant     *moov.Account
 	MerchantPmId string
 
 	Customer     *moov.Account
@@ -42,51 +40,10 @@ func Setup(t *testing.T, ctx context.Context) *Env {
 		// Just bumping time to way ahead so we're not accidently tripping on test data
 		Now:       time.Date(2040, time.March, 10, 12, 0, 0, 0, time.UTC),
 		Client:    mc,
-		PartnerID: "5352b013-ae58-4a63-8a3f-97f316a917cf",
+		PartnerID: testtools.PARTNER_ID,
 	}
 
-	// Merchant to accept the payments
-	merchant, _, err := mc.CreateAccount(ctx, moov.CreateAccount{
-		Type: moov.AccountType_Business,
-		Profile: moov.CreateProfile{
-			Business: &moov.CreateBusinessProfile{
-				Name:        "John Does Hobbies",
-				Type:        moov.BusinessType_Llc,
-				Description: "Merchant in moov-go Schedules example",
-				IndustryCodes: &moov.IndustryCodes{
-					Mcc:   "6012",
-					Naics: "522110",
-					Sic:   "6021",
-				},
-			},
-		},
-	})
-	require.NoError(t, err)
-	env.Merchant = merchant
-	t.Cleanup(func() {
-		mc.DisconnectAccount(ctx, merchant.AccountID)
-	})
-
-	merchantBa, err := mc.CreateBankAccount(ctx, merchant.AccountID, moov.WithBankAccount(moov.BankAccountRequest{
-		HolderName:    "Schedule business deposit target",
-		HolderType:    moov.HolderType_Business,
-		AccountType:   moov.BankAccountType_Checking,
-		AccountNumber: randomBankAccountNumber(),
-		RoutingNumber: "273976369",
-	}), moov.WaitForPaymentMethod())
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		mc.DeleteBankAccount(ctx, merchant.AccountID, merchantBa.BankAccountID)
-	})
-
-	fmt.Printf("\n\n%+v\n\n", merchantBa.PaymentMethods)
-
-	for _, pm := range merchantBa.PaymentMethods {
-		if pm.PaymentMethodType == moov.PaymentMethodType_AchCreditStandard {
-			env.MerchantPmId = pm.PaymentMethodID
-		}
-	}
-	require.NotEmpty(t, env.MerchantPmId)
+	env.MerchantPmId = testtools.MERCHANT_WALLET_PM_ID
 
 	// Setup the customers account
 	customer, _, err := mc.CreateAccount(ctx, moov.CreateAccount{
@@ -148,9 +105,4 @@ func Setup(t *testing.T, ctx context.Context) *Env {
 	require.NotEmpty(t, env.CustomerPmId)
 
 	return &env
-}
-
-func randomBankAccountNumber() string {
-	n, _ := rand.Int(rand.Reader, big.NewInt(999999999))
-	return fmt.Sprintf("%d", 100000000+n.Int64())
 }

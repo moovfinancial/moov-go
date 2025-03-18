@@ -87,6 +87,10 @@ type Transfer struct {
 	Status        TransferStatus `json:"status,omitempty"`
 	FailureReason *FailureReason `json:"failureReason,omitempty"`
 	Amount        Amount         `json:"amount,omitempty"`
+
+	Source      TransferSource      `json:"source,omitempty"`
+	Destination TransferDestination `json:"destination,omitempty"`
+
 	// A description of the transfer.
 	Description string `json:"description,omitempty"`
 	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
@@ -97,6 +101,7 @@ type Transfer struct {
 	// Same as `moovFee`, but a decimal-formatted numerical string that represents up to 9 decimal place precision.
 	MoovFeeDecimal string          `json:"moovFeeDecimal,omitempty"`
 	MoovFeeDetails *MoovFeeDetails `json:"moovFeeDetails,omitempty"`
+
 	// ID for all transfers associated with a [transfer group](https://docs.moov.io/guides/money-movement/transfer-groups/).
 	GroupID *string `json:"groupID,omitempty"`
 	// ID of the associated sweep sweep.
@@ -115,9 +120,6 @@ type Transfer struct {
 	Disputes []GetDispute `json:"disputes,omitempty"`
 	// A list of cancellations for a transfer.
 	Cancellations []Cancellation `json:"cancellations,omitempty"`
-
-	Source      TransferSource      `json:"source,omitempty"`
-	Destination TransferDestination `json:"destination,omitempty"`
 }
 
 // Amount A representation of money containing an integer value and its currency.
@@ -496,4 +498,5 @@ type CancellationStatus string
 const (
 	CancellationStatus_Pending   CancellationStatus = "pending"
 	CancellationStatus_Completed CancellationStatus = "completed"
+	CancellationStatus_Failed    CancellationStatus = "failed"
 )
