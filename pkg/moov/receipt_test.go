@@ -18,7 +18,7 @@ func Test_Receipts(t *testing.T) {
 	var receipt *moov.Receipt = nil
 
 	t.Run("make async transfer", func(t *testing.T) {
-		started, err := mc.CreateTransfer(BgCtx(), moov.CreateTransfer{
+		started, err := mc.CreateTransfer(BgCtx(), testtools.PARTNER_ID, moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: customerCard.PaymentMethods[0].PaymentMethodID,
 			},

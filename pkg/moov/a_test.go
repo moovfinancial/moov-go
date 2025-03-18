@@ -14,8 +14,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const FACILITATOR_ID = testtools.FACILITATOR_ID
-const FACILITATOR_WALLET_PM_ID = testtools.FACILITATOR_WALLET_PM_ID
+const FACILITATOR_ID = testtools.PARTNER_ID
+const FACILITATOR_WALLET_PM_ID = testtools.PARTNER_WALLET_PM_ID
 
 const MERCHANT_WALLET_PM_ID = testtools.MERCHANT_WALLET_PM_ID
 

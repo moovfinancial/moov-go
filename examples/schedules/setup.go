@@ -40,7 +40,7 @@ func Setup(t *testing.T, ctx context.Context) *Env {
 		// Just bumping time to way ahead so we're not accidently tripping on test data
 		Now:       time.Date(2040, time.March, 10, 12, 0, 0, 0, time.UTC),
 		Client:    mc,
-		PartnerID: testtools.FACILITATOR_ID,
+		PartnerID: testtools.PARTNER_ID,
 	}
 
 	env.MerchantPmId = testtools.MERCHANT_WALLET_PM_ID
