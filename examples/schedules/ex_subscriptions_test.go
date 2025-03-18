@@ -27,7 +27,6 @@ func Test_Subscription(t *testing.T) {
 					Value:    1,
 					Currency: "USD",
 				},
-				PartnerAccountID: env.PartnerID,
 				Source: moov.SchedulePaymentMethod{
 					PaymentMethodID: env.CustomerPmId,
 				},

@@ -9,14 +9,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
 
-const FACILITATOR_ID = "5352b013-ae58-4a63-8a3f-97f316a917cf"
-const FACILITATOR_WALLET_PM_ID = "041fdc88-c93d-4cb4-80aa-b2dde9a4fe2e"
+const FACILITATOR_ID = testtools.FACILITATOR_ID
+const FACILITATOR_WALLET_PM_ID = testtools.FACILITATOR_WALLET_PM_ID
 
-const LINCOLN_WALLET_PM_ID = "67ebda6c-de48-474c-b49d-2cd3aa7d3f92"
+const MERCHANT_WALLET_PM_ID = testtools.MERCHANT_WALLET_PM_ID
 
 func getLincolnBank(t *testing.T, mc *moov.Client) *moov.Account {
 	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))

@@ -3,6 +3,7 @@ package moov_test
 import (
 	"testing"
 
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
@@ -22,7 +23,7 @@ func Test_Receipts(t *testing.T) {
 				PaymentMethodID: customerCard.PaymentMethods[0].PaymentMethodID,
 			},
 			Destination: moov.CreateTransfer_Destination{
-				PaymentMethodID: LINCOLN_WALLET_PM_ID,
+				PaymentMethodID: testtools.MERCHANT_WALLET_PM_ID,
 			},
 			Amount: moov.Amount{
 				Currency: "usd",
