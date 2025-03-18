@@ -163,13 +163,15 @@ func main() {
 	description := "Pay Instructor for May 15 Class"
 
 	// Create a transfer from the card to the wallet
-	completedTransfer, _, err := mc.CreateTransfer(context.Background(), moov.CreateTransfer{
-		Source:         source,
-		Destination:    destination,
-		Amount:         amount,
-		FacilitatorFee: facilitatorFee,
-		Description:    description,
-	}).WaitForRailResponse()
+	completedTransfer, _, err := mc.CreateTransfer(context.Background(),
+		lincolnAccount.AccountID,
+		moov.CreateTransfer{
+			Source:         source,
+			Destination:    destination,
+			Amount:         amount,
+			FacilitatorFee: facilitatorFee,
+			Description:    description,
+		}).WaitForRailResponse()
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -177,7 +179,7 @@ func main() {
 	fmt.Printf("TransferID: %s \t Status: %s \n", completedTransfer.TransferID, completedTransfer.Status)
 
 	// We can check the status of the transfer. More important for batched ACH transactions
-	transferStatus, err := mc.GetTransfer(ctx, completedTransfer.TransferID)
+	transferStatus, err := mc.GetTransfer(ctx, lincolnAccount.AccountID, completedTransfer.TransferID)
 	if err != nil {
 		fmt.Println(err)
 		return

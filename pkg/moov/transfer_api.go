@@ -25,7 +25,7 @@ func WithTransferIdempotencyKey(key uuid.UUID) CreateTransferArgs {
 
 // CreateTransfer creates a new transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/createTransfer
-func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, options ...CreateTransferArgs) CreateTransferBuilder {
+func (c Client) CreateTransfer(ctx context.Context, partnerAccountID string, transfer CreateTransfer, options ...CreateTransferArgs) CreateTransferBuilder {
 	builder := &createTransferBuilder{}
 	callArgs := []callArg{
 		AcceptJson(),
@@ -40,7 +40,7 @@ func (c Client) CreateTransfer(ctx context.Context, transfer CreateTransfer, opt
 	return CreateTransferBuilder{
 		client:   c,
 		ctx:      ctx,
-		endpoint: Endpoint(http.MethodPost, pathTransfers),
+		endpoint: Endpoint(http.MethodPost, pathTransfers, partnerAccountID),
 		callArgs: callArgs,
 	}
 }
@@ -156,9 +156,9 @@ func WithTransferCount(count int) ListTransferFilter {
 
 // ListTransfers lists all transfers
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/listTransfers
-func (c Client) ListTransfers(ctx context.Context, filters ...ListTransferFilter) ([]Transfer, error) {
+func (c Client) ListTransfers(ctx context.Context, accountID string, filters ...ListTransferFilter) ([]Transfer, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, pathTransfers),
+		Endpoint(http.MethodGet, pathTransfers, accountID),
 		prependArgs(filters, AcceptJson())...)
 	if err != nil {
 		return nil, err
@@ -169,9 +169,9 @@ func (c Client) ListTransfers(ctx context.Context, filters ...ListTransferFilter
 
 // GetTransfer retrieves a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/getTransfer
-func (c Client) GetTransfer(ctx context.Context, transferID string) (*Transfer, error) {
+func (c Client) GetTransfer(ctx context.Context, accountID, transferID string) (*Transfer, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, pathTransfer, transferID),
+		Endpoint(http.MethodGet, pathTransfer, accountID, transferID),
 		AcceptJson(),
 	)
 	if err != nil {
@@ -191,14 +191,14 @@ func PatchTransferMetadata(metadata map[string]string) TransferPatcher {
 
 // UpdateTransferMetaData updates the metadata for a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/patchTransfer
-func (c Client) PatchTransfer(ctx context.Context, transferID string, patches ...TransferPatcher) (*Transfer, error) {
+func (c Client) PatchTransfer(ctx context.Context, accountID, transferID string, patches ...TransferPatcher) (*Transfer, error) {
 	patch := &patchTransfer{}
 	for _, p := range patches {
 		p(patch)
 	}
 
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPatch, pathTransfer, transferID),
+		Endpoint(http.MethodPatch, pathTransfer, accountID, transferID),
 		AcceptJson(),
 		JsonBody(patch))
 	if err != nil {
@@ -221,7 +221,7 @@ func WithRefundIdempotencyKey(key uuid.UUID) CreateRefundArgs {
 
 // RefundTransfer refunds a transfer
 // https://docs.moov.io/api/#tag/Transfers/operation/refundTransfer
-func (c Client) RefundTransfer(ctx context.Context, transferID string, refund CreateRefund, options ...CreateRefundArgs) (*Refund, *RefundStarted, error) {
+func (c Client) RefundTransfer(ctx context.Context, partnerAccountID, transferID string, refund CreateRefund, options ...CreateRefundArgs) (*Refund, *RefundStarted, error) {
 	args := prependArgs(options,
 		AcceptJson(),
 		WithRefundIdempotencyKey(uuid.New()),
@@ -229,7 +229,7 @@ func (c Client) RefundTransfer(ctx context.Context, transferID string, refund Cr
 	)
 
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathRefunds, transferID),
+		Endpoint(http.MethodPost, pathRefunds, partnerAccountID, transferID),
 		args...)
 	if err != nil {
 		return nil, nil, err
@@ -249,10 +249,11 @@ func (c Client) RefundTransfer(ctx context.Context, transferID string, refund Cr
 
 // ListRefunds lists all refunds for a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/getRefunds
-func (c Client) ListRefunds(ctx context.Context, transferID string) ([]Refund, error) {
+func (c Client) ListRefunds(ctx context.Context, accountID, transferID string) ([]Refund, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, pathRefunds, transferID),
-		AcceptJson())
+		Endpoint(http.MethodGet, pathRefunds, accountID, transferID),
+		AcceptJson(),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -262,8 +263,11 @@ func (c Client) ListRefunds(ctx context.Context, transferID string) ([]Refund, e
 
 // GetRefund retrieves a refund for a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/getRefund
-func (c Client) GetRefund(ctx context.Context, transferID string, refundID string) (*Refund, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathRefund, transferID, refundID), AcceptJson())
+func (c Client) GetRefund(ctx context.Context, accountID, transferID, refundID string) (*Refund, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathRefund, accountID, transferID, refundID),
+		AcceptJson(),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -280,19 +284,41 @@ func WithReversalsIdempotencyKey(key uuid.UUID) CreateReversalArgs {
 
 // ReverseTransfer reverses a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/reverseTransfer
-func (c Client) ReverseTransfer(ctx context.Context, transferID string, refund CreateReversal, options ...CreateReversalArgs) (*CreatedReversal, error) {
+func (c Client) ReverseTransfer(ctx context.Context, partnerAccountID, transferID string, refund CreateReversal, options ...CreateReversalArgs) (*CreatedReversal, error) {
 	args := prependArgs(options,
 		AcceptJson(),
 		WithReversalsIdempotencyKey(uuid.New()),
 		JsonBody(refund),
 	)
 
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathReversals, transferID), args...)
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathReversals, partnerAccountID, transferID), args...)
 	if err != nil {
 		return nil, err
 	}
 
 	return CompletedObjectOrError[CreatedReversal](resp)
+}
+
+// CancelTransfer cancels a transfer
+// https://docs.moov.io/api/money-movement/transfers/cancel/
+func (c Client) CancelTransfer(ctx context.Context, accountID string, transferID string) (*Cancellation, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathCancellations, accountID, transferID))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Cancellation](resp)
+}
+
+// GetCancellation gets a cancellation
+// https://docs.moov.io/api/money-movement/transfers/cancel-details/
+func (c Client) GetCancellation(ctx context.Context, accountID string, transferID string, cancellationID string) (*Cancellation, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathCancellation, accountID, transferID, cancellationID))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Cancellation](resp)
 }
 
 // TransferOptions lists all transfer options between a source and destination

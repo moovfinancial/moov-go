@@ -87,6 +87,10 @@ type Transfer struct {
 	Status        TransferStatus `json:"status,omitempty"`
 	FailureReason *FailureReason `json:"failureReason,omitempty"`
 	Amount        Amount         `json:"amount,omitempty"`
+
+	Source      TransferSource      `json:"source,omitempty"`
+	Destination TransferDestination `json:"destination,omitempty"`
+
 	// A description of the transfer.
 	Description string `json:"description,omitempty"`
 	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
@@ -97,6 +101,7 @@ type Transfer struct {
 	// Same as `moovFee`, but a decimal-formatted numerical string that represents up to 9 decimal place precision.
 	MoovFeeDecimal string          `json:"moovFeeDecimal,omitempty"`
 	MoovFeeDetails *MoovFeeDetails `json:"moovFeeDetails,omitempty"`
+
 	// ID for all transfers associated with a [transfer group](https://docs.moov.io/guides/money-movement/transfer-groups/).
 	GroupID *string `json:"groupID,omitempty"`
 	// ID of the associated sweep sweep.
@@ -112,9 +117,9 @@ type Transfer struct {
 	// The total disputed amount for a card transfer.
 	DisputedAmount *Amount `json:"disputedAmount,omitempty"`
 	// A list of disputes for a card transfer.
-	Disputes    []GetDispute        `json:"disputes,omitempty"`
-	Source      TransferSource      `json:"source,omitempty"`
-	Destination TransferDestination `json:"destination,omitempty"`
+	Disputes []GetDispute `json:"disputes,omitempty"`
+	// A list of cancellations for a transfer.
+	Cancellations []Cancellation `json:"cancellations,omitempty"`
 }
 
 // Amount A representation of money containing an integer value and its currency.
@@ -179,6 +184,12 @@ type GetDispute struct {
 	Amount    Amount    `json:"amount,omitempty"`
 }
 
+type Cancellation struct {
+	CancellationID string             `json:"cancellationID"`
+	Status         CancellationStatus `json:"status"`
+	CreatedOn      time.Time          `json:"createdOn"`
+}
+
 // TransferSource struct for TransferSource
 type TransferSource struct {
 	PaymentMethodID   string                    `json:"paymentMethodID,omitempty"`
@@ -218,6 +229,7 @@ type AchDetailsSource struct {
 	CorrectedOn            *time.Time      `json:"correctedOn,omitempty"`
 	ReturnedOn             *time.Time      `json:"returnedOn,omitempty"`
 	CompletedOn            *time.Time      `json:"completedOn,omitempty"`
+	CanceledOn             *time.Time      `json:"canceledOn,omitempty"`
 	DebitHoldPeriod        DebitHoldPeriod `json:"debitHoldPeriod,omitempty"`
 }
 
@@ -258,6 +270,7 @@ type AchDetails struct {
 	CorrectedOn            *time.Time `json:"correctedOn,omitempty"`
 	ReturnedOn             *time.Time `json:"returnedOn,omitempty"`
 	CompletedOn            *time.Time `json:"completedOn,omitempty"`
+	CanceledOn             *time.Time `json:"canceledOn,omitempty"`
 }
 
 // RtpDetails RTP specific details about the transaction.
@@ -485,4 +498,5 @@ type CancellationStatus string
 const (
 	CancellationStatus_Pending   CancellationStatus = "pending"
 	CancellationStatus_Completed CancellationStatus = "completed"
+	CancellationStatus_Failed    CancellationStatus = "failed"
 )

@@ -51,24 +51,41 @@ type CardAccountUpdater struct {
 }
 
 type CardDetails struct {
-	Status                   string            `json:"status,omitempty"`
-	FailureCode              string            `json:"failureCode,omitempty"`
-	DynamicDescriptor        string            `json:"dynamicDescriptor,omitempty"`
-	TransactionSource        string            `json:"transactionSource,omitempty"`
-	InterchangeQualification string            `json:"interchangeQualification,omitempty"`
-	StatusUpdates            CardStatusUpdates `json:"statusUpdates,omitempty"`
-	InitiatedOn              *time.Time        `json:"initiatedOn,omitempty"`
-	CompletedOn              *time.Time        `json:"completedOn,omitempty"`
+	Status                   CardTransactionStatus `json:"status,omitempty"`
+	FailureCode              string                `json:"failureCode,omitempty"`
+	DynamicDescriptor        string                `json:"dynamicDescriptor,omitempty"`
+	TransactionSource        string                `json:"transactionSource,omitempty"`
+	InterchangeQualification string                `json:"interchangeQualification,omitempty"`
+	InitiatedOn              *time.Time            `json:"initiatedOn,omitempty"`
+	ConfirmedOn              *time.Time            `json:"confirmedOn,omitempty"`
+	SettledOn                *time.Time            `json:"settledOn,omitempty"`
+	FailedOn                 *time.Time            `json:"failedOn,omitempty"`
+	CanceledOn               *time.Time            `json:"canceledOn,omitempty"`
+	CompletedOn              *time.Time            `json:"completedOn,omitempty"`
 }
 
-type CardStatusUpdates struct {
-	Initiated time.Time `json:"initiated,omitempty"`
-	Confirmed time.Time `json:"confirmed,omitempty"`
-	Settled   time.Time `json:"settled,omitempty"`
-	Failed    time.Time `json:"failed,omitempty"`
-	Canceled  time.Time `json:"canceled,omitempty"`
-	Completed time.Time `json:"completed,omitempty"`
-}
+// CardTransactionStatus represents the status of a card transaction within a Transfer
+type CardTransactionStatus string
+
+const (
+	// Transaction has been initiated
+	CardTransactionStatus_Initiated CardTransactionStatus = "initiated"
+
+	// Transaction has been authorized by the card network
+	CardTransactionStatus_Confirmed CardTransactionStatus = "confirmed"
+
+	// Transaction settled with issuer; Moov wallet will be credited by 1 PM ET on a banking day, or the next banking day if it is a weekend or a holiday
+	CardTransactionStatus_Settled CardTransactionStatus = "settled"
+
+	// Funds have been credited to the merchant Moov wallet
+	CardTransactionStatus_Completed CardTransactionStatus = "completed"
+
+	// Transaction was successfully cancelled and authorization has been reversed
+	CardTransactionStatus_Canceled CardTransactionStatus = "canceled"
+
+	// Transaction failed; specific failure reason will be in cardDetails.failureCode
+	CardTransactionStatus_Failed CardTransactionStatus = "failed"
+)
 
 type CreateCard struct {
 	CardNumber        string     `json:"cardNumber,omitempty"`

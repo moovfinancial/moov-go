@@ -45,6 +45,10 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 		eventData = &event.bankAccountDeleted
 	case EventTypeBankAccountUpdated:
 		eventData = &event.bankAccountUpdated
+	case EventTypeCancellationCreated:
+		eventData = &event.cancellationCreated
+	case EventTypeCancellationUpdated:
+		eventData = &event.cancellationUpdated
 	case EventTypeCardAutoUpdated:
 		eventData = &event.cardAutoUpdated
 	case EventTypeCapabilityRequested:
@@ -104,6 +108,8 @@ type Event struct {
 	bankAccountCreated       *BankAccountCreated
 	bankAccountDeleted       *BankAccountDeleted
 	bankAccountUpdated       *BankAccountUpdated
+	cancellationCreated      *CancellationCreated
+	cancellationUpdated      *CancellationUpdated
 	cardAutoUpdated          *CardAutoUpdated
 	capabilityRequested      *CapabilityRequested
 	capabilityUpdated        *CapabilityUpdated
@@ -179,6 +185,22 @@ func (e Event) BankAccountUpdated() (*BankAccountUpdated, error) {
 	}
 
 	return e.bankAccountUpdated, nil
+}
+
+func (e Event) CancellationCreated() (*CancellationCreated, error) {
+	if e.EventType != EventTypeCancellationCreated {
+		return nil, newInvalidEventTypeError(EventTypeCancellationCreated, e.EventType)
+	}
+
+	return e.cancellationCreated, nil
+}
+
+func (e Event) CancellationUpdated() (*CancellationUpdated, error) {
+	if e.EventType != EventTypeCancellationUpdated {
+		return nil, newInvalidEventTypeError(EventTypeCancellationUpdated, e.EventType)
+	}
+
+	return e.cancellationUpdated, nil
 }
 
 func (e Event) CardAutoUpdated() (*CardAutoUpdated, error) {

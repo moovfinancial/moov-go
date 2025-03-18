@@ -22,6 +22,9 @@ func TestRTPCreditACHFallbackExample(t *testing.T) {
 	err = mc.Ping(ctx)
 	require.NoError(t, err)
 
+	// The account facilitating the transfer
+	partnerAccountID := "5352b013-ae58-4a63-8a3f-97f316a917cf" // example
+
 	// Account IDs used
 	sourceAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
 
@@ -79,6 +82,7 @@ func TestRTPCreditACHFallbackExample(t *testing.T) {
 	// Step 7: create transfer
 	completedAsyncTransfer, err := mc.CreateTransfer(
 		ctx,
+		partnerAccountID,
 		moov.CreateTransfer{
 			Source: moov.CreateTransfer_Source{
 				PaymentMethodID: sourcePaymentMethod.PaymentMethodID,

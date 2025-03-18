@@ -9,6 +9,7 @@
 # Moov - Go Client
 The official [Go](http://golang.org) client for the [Moov payments API](https://docs.moov.io/api/).
 
+<!-- Start SDK Installation [installation] -->
 ## Installation
 
 ```go
@@ -18,9 +19,6 @@ import (
 ```
 
 This SDK requires an API key. To generate an API login to the Moov Dashboard and follow the following instructions on [API Keys](https://docs.moov.io/guides/get-started/api-keys/). If you have not done so already, use the [Moov Dashboard](https://dashboard.moov.io/signup) to create an account.
-
-> [!NOTE]
-> Note that API Keys for Sandbox and Production are different keys.
 
 ```bash
 export MOOV_PUBLIC_KEY="public key here"
@@ -34,6 +32,7 @@ mc, err := moov.NewClient(
   moov.WithCredentials(moov.CredentialsFromEnv()), // optional, default is to read from environment
 )
 ```
+<!-- End SDK Installation [installation] -->
 
 ## Examples Usage
 
