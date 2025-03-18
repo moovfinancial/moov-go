@@ -87,4 +87,7 @@ const (
 
 	pathEndToEndPublicKey = "/end-to-end-keys"
 	pathEndToEndTokenTest = "/debug/end-to-end-token"
+
+	pathTerminalApplications = "/terminal-applications"
+	pathTerminalApplication  = "/terminal-applications/%s"
 )
