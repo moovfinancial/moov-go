@@ -73,6 +73,9 @@ const (
 	pathRefunds = "/accounts/%s/transfers/%s/refunds"
 	pathRefund  = "/accounts/%s/transfers/%s/refunds/%s"
 
+	pathReceipts = "/receipts"
+	pathReceipt  = "/receipts/%s"
+
 	pathDisputes              = "/accounts/%s/disputes"
 	pathDispute               = "/accounts/%s/disputes/%s"
 	pathDisputeAccept         = "/accounts/%s/disputes/%s/accept"
@@ -84,4 +87,7 @@ const (
 
 	pathEndToEndPublicKey = "/end-to-end-keys"
 	pathEndToEndTokenTest = "/debug/end-to-end-token"
+
+	pathTerminalApplications = "/terminal-applications"
+	pathTerminalApplication  = "/terminal-applications/%s"
 )

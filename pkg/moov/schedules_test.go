@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
@@ -21,9 +22,8 @@ func Test_Schedules(t *testing.T) {
 
 	partnerId := FACILITATOR_ID
 
-	merchant := getLincolnBank(t, mc)
-	bankAcct := createTemporaryBankAccount(t, mc, merchant.AccountID)
-	merchantPmId := bankAcct.PaymentMethods[0].PaymentMethodID
+	merchantAccountId := testtools.MERCHANT_ID
+	merchantPmId := testtools.MERCHANT_WALLET_PM_ID
 
 	customer := CreateTemporaryTestAccount(t, mc, createTestIndividualAccount())
 	customerCard := createTemporaryCard(t, mc, customer.AccountID)
@@ -42,7 +42,6 @@ func Test_Schedules(t *testing.T) {
 						Value:    200,
 						Currency: "USD",
 					},
-					PartnerAccountID: FACILITATOR_ID,
 					Source: moov.SchedulePaymentMethod{
 						PaymentMethodID: customerPmId,
 					},
@@ -63,7 +62,6 @@ func Test_Schedules(t *testing.T) {
 					Value:    100,
 					Currency: "USD",
 				},
-				PartnerAccountID: FACILITATOR_ID,
 				Source: moov.SchedulePaymentMethod{
 					PaymentMethodID: customerPmId,
 				},
@@ -96,7 +94,7 @@ func Test_Schedules(t *testing.T) {
 		}{
 			{"customer", customer.AccountID},
 			{"partner", partnerId},
-			{"merchant", merchant.AccountID},
+			{"merchant", merchantAccountId},
 		}
 
 		for _, party := range getTests {

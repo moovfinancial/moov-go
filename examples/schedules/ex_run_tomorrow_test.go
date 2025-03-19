@@ -30,7 +30,6 @@ func Test_Run_Tomorrow_Example(t *testing.T) {
 						Value:    2,
 						Currency: "USD",
 					},
-					PartnerAccountID: env.PartnerID,
 					Source: moov.SchedulePaymentMethod{
 						PaymentMethodID: env.CustomerPmId,
 					},
