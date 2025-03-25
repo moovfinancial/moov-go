@@ -37,7 +37,7 @@ func Setup(t *testing.T, ctx context.Context) *Env {
 	require.NoError(t, err)
 
 	env := Env{
-		// Just bumping time to way ahead so we're not accidently tripping on test data
+		// Just bumping time to way ahead so we're not accidentally tripping on test data
 		Now:       time.Date(2040, time.March, 10, 12, 0, 0, 0, time.UTC),
 		Client:    mc,
 		PartnerID: testtools.PARTNER_ID,

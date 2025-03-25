@@ -60,7 +60,7 @@ func (s Schedule) ToUpdateSchedule() UpdateSchedule {
 
 // https://www.rfc-editor.org/rfc/rfc5545#section-3.3.10
 type Recur struct {
-	// If omited the start time for the occurrence will be the timestamp of when the schedule was created.
+	// If omitted the start time for the occurrence will be the timestamp of when the schedule was created.
 	Start *time.Time `json:"start,omitempty"`
 
 	// This is the recurrence rule that is used to generate occurrences.
@@ -82,7 +82,7 @@ type Occurrence struct {
 	// Unique ID for updating a specific occurrence
 	OccurrenceID string `json:"occurrenceID,omitempty"`
 
-	// Mode to run the occurence under
+	// Mode to run the occurrence under
 	Mode string `json:"mode,omitempty"`
 
 	// If this scheduled transfer was generated or manually added for say a correction
