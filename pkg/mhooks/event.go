@@ -75,6 +75,10 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 		eventData = &event.representativeDeleted
 	case EventTypeRepresentativeUpdated:
 		eventData = &event.representativeUpdated
+	case EventTypeSweepCreated:
+		eventData = &event.sweepCreated
+	case EventTypeSweepUpdated:
+		eventData = &event.sweepUpdated
 	case EventTypeTestPing:
 		eventData = &event.testPing
 	case EventTypeTransferCreated:
