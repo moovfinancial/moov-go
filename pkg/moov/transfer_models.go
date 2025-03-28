@@ -7,6 +7,7 @@ type CreateTransfer struct {
 	Source         CreateTransfer_Source         `json:"source"`
 	Destination    CreateTransfer_Destination    `json:"destination"`
 	Amount         Amount                        `json:"amount"`
+	SalesTaxAmount *Amount                       `json:"salesTaxAmount,omitempty"`
 	FacilitatorFee CreateTransfer_FacilitatorFee `json:"facilitatorFee,omitempty"`
 	// An optional description of the transfer for your own internal use.
 	Description string `json:"description,omitempty"`
