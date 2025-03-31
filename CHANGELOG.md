@@ -1,3 +1,9 @@
+## v0.11.0 (Released 2025-03-31)
+
+ADDITIONS
+
+- scheduled transfers: added optional sales tax to the transfers to run
+
 ## v0.10.0 (Released 2025-03-04)
 
 BREAKING CHANGES
