@@ -167,8 +167,10 @@ type UpdateOccurrence struct {
 }
 
 type RunTransfer struct {
-	Description string         `json:"description,omitempty"`
-	Amount      ScheduleAmount `json:"amount,omitempty"`
+	Description string `json:"description,omitempty"`
+
+	Amount         ScheduleAmount  `json:"amount,omitempty"`
+	SalesTaxAmount *ScheduleAmount `json:"salesTaxAmount,omitempty"`
 
 	PartnerAccountID string                `json:"partnerAccountID,omitempty"`
 	Source           SchedulePaymentMethod `json:"source,omitempty"`
