@@ -132,6 +132,13 @@ func WithTransferGroup(groupID string) ListTransferFilter {
 	})
 }
 
+func WithTransferSchedule(scheduleID string) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["scheduleID"] = scheduleID
+		return nil
+	})
+}
+
 func WithTransferRefunded() ListTransferFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["refunded"] = "true"
