@@ -42,16 +42,19 @@ const (
 type AccountCreated struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
+	ForeignID string `json:"foreignID,omitempty"`
 }
 
 type AccountDeleted struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
+	ForeignID string `json:"foreignID,omitempty"`
 }
 
 type AccountUpdated struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
+	ForeignID string `json:"foreignID,omitempty"`
 }
 
 type BalanceUpdated struct {
@@ -110,12 +113,14 @@ type CapabilityRequested struct {
 	Capability moov.CapabilityName `json:"capabilityID"`
 	// ID of the account requesting the capability
 	AccountID string `json:"accountID"`
+	ForeignID string `json:"foreignID,omitempty"`
 }
 
 type CapabilityUpdated struct {
 	Capability moov.CapabilityName `json:"capabilityID"`
 	// ID of the account requesting the capability
 	AccountID string `json:"accountID"`
+	ForeignID string `json:"foreignID,omitempty"`
 	// Status of the capability
 	Status moov.CapabilityStatus `json:"status"`
 }
