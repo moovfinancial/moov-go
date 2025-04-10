@@ -123,6 +123,14 @@ func WithTransactionType(transactionType string) ListTransactionFilter {
 	})
 }
 
+// WithTransactionTypes filters transactions by transaction types. The parameter `transactionTypes` is a comma-separated parameter to filter by transaction types.
+func WithTransactionTypes(transactionTypes string) ListTransactionFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["transactionTypes"] = transactionTypes
+		return nil
+	})
+}
+
 // WithSourceType filters transactions by source type (transfer, dispute, issuing-transaction).
 func WithTransactionSourceType(sourceType string) ListTransactionFilter {
 	return callBuilderFn(func(call *callBuilder) error {
