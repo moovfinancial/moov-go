@@ -1,3 +1,12 @@
+## v0.12.0 (Released 2025-04-10)
+
+ADDITIONS
+
+- accounts: add foreignID
+- capabilities: add foreignID
+- transfers: add scheduleID query parameter to list transfers
+- wallet: add transactionTypes query parameter to list transactions
+
 ## v0.11.0 (Released 2025-03-31)
 
 ADDITIONS
