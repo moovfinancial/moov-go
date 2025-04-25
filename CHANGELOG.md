@@ -1,5 +1,9 @@
-## v0.13.0 (Released 2025-04-25)
+## v0.14.0 (Released 2025-04-25)
+
+REQUIRES GO 1.24
+
 IMPROVEMENTS
+
 - accounts: `UpdateAccount` has been deprecated in favor of `PatchAccount`
 
 ## v0.12.0 (Released 2025-04-10)
