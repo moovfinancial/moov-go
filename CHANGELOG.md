@@ -1,7 +1,6 @@
 ## v0.13.0 (Released 2025-04-25)
-ADDITIONS
-- Deprecated `UpdateAccount` 
-- Added `PatchAccount`
+IMPROVEMENTS
+- accounts: `UpdateAccount` has been deprecated in favor of `PatchAccount`
 
 ## v0.12.0 (Released 2025-04-10)
 
