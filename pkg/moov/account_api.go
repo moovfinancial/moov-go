@@ -41,10 +41,24 @@ func (c Client) GetAccount(ctx context.Context, accountID string) (*Account, err
 	return CompletedObjectOrError[Account](resp)
 }
 
+// Deprecated: use PatchAccount instead
 // UpdateAccount updates an account.
 func (c Client) UpdateAccount(ctx context.Context, account Account) (*Account, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPatch, pathAccount, account.AccountID),
+		AcceptJson(),
+		JsonBody(account))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Account](resp)
+}
+
+// PatchAccount updates an account.
+func (c Client) PatchAccount(ctx context.Context, accountID string, account PatchAccount) (*Account, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPatch, pathAccount, accountID),
 		AcceptJson(),
 		JsonBody(account))
 	if err != nil {

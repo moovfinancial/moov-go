@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateBusiness(t *testing.T) {
+func TestCreateAndPatchBusiness(t *testing.T) {
 	// Step 1: create Moov client and set some variables
 
 	// The following code shows how you can configure the moov client with
@@ -93,4 +93,29 @@ func TestCreateBusiness(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Logf("Created Account %s", account.AccountID)
+
+	// Step 2: patch the account with new information
+	patchAccount := moov.PatchAccount{
+		CustomerSupport: &moov.CustomerSupport{
+			Address: &moov.Address{
+				AddressLine1:    "123 Main Street",
+				AddressLine2:    "Apt 302",
+				City:            "Boulder",
+				StateOrProvince: "CO",
+				PostalCode:      "80301",
+				Country:         "US",
+			},
+			Email: "test@moov.io",
+			Phone: &moov.Phone{
+				Number:      "8185551212",
+				CountryCode: "1",
+			},
+			Website: "https://moov.io",
+		},
+	}
+
+	account, err = mc.PatchAccount(ctx, account.AccountID, patchAccount)
+	require.NoError(t, err)
+
+	t.Logf("Patched Account %s", account.AccountID)
 }

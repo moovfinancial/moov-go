@@ -91,6 +91,44 @@ type AccountCapability struct {
 	Status     CapabilityStatus `json:"status,omitempty"`
 }
 
+type PatchAccount struct {
+	ForeignID       string                 `json:"foreignID,omitempty"`
+	Profile         PatchProfile           `json:"profile"`
+	Metadata        map[string]string      `json:"metadata,omitempty"`
+	TermsOfService  *TermsOfServicePayload `json:"termsOfService,omitempty"`
+	CustomerSupport *CustomerSupport       `json:"customerSupport,omitempty"`
+	AccountSettings *AccountSettings       `json:"settings,omitempty"`
+}
+
+type PatchProfile struct {
+	Individual *PatchIndividualProfile `json:"individual,omitempty"`
+	Business   *PatchBusinessProfile   `json:"business,omitempty"`
+}
+
+type PatchIndividualProfile struct {
+	Name         Name          `json:"name"`
+	Phone        *Phone        `json:"phone,omitempty"`
+	Email        string        `json:"email"`
+	Address      *Address      `json:"address,omitempty"`
+	BirthDate    *Date         `json:"birthDate,omitempty"`
+	GovernmentID *GovernmentID `json:"governmentID,omitempty"`
+}
+
+type PatchBusinessProfile struct {
+	Name             string            `json:"legalBusinessName,omitempty"`
+	DBA              string            `json:"doingBusinessAs,omitempty"`
+	Type             *BusinessType     `json:"businessType,omitempty"`
+	Address          *Address          `json:"address,omitempty"`
+	Phone            *Phone            `json:"phone,omitempty"`
+	Email            string            `json:"email,omitempty"`
+	Website          string            `json:"website,omitempty"`
+	Description      string            `json:"description,omitempty"`
+	OwnersProvided   bool              `json:"ownersProvided,omitempty"`
+	IndustryCodes    *IndustryCodes    `json:"industryCodes,omitempty"`
+	PrimaryRegulator *PrimaryRegulator `json:"primaryRegulator,omitempty"`
+	TaxID            *TaxID            `json:"taxID"`
+}
+
 // Account Describes a Moov account.
 type Account struct {
 	Mode        Mode        `json:"mode,omitempty"`
