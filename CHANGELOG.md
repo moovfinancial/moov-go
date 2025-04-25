@@ -1,3 +1,13 @@
+## v0.14.0 (Released 2025-04-25)
+
+IMPROVEMENTS
+
+- accounts: `UpdateAccount` has been deprecated in favor of `PatchAccount`
+
+BUILD
+
+- build: update to Go 1.24
+
 ## v0.12.0 (Released 2025-04-10)
 
 ADDITIONS
