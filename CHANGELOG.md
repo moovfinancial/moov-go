@@ -1,3 +1,9 @@
+## v0.15.0 (Released 2025-05-09)
+
+ADDITIONS
+
+- transfers: add optional `SalesTaxAmount` amount field to `Transfer`
+
 ## v0.14.0 (Released 2025-04-25)
 
 IMPROVEMENTS
@@ -61,7 +67,7 @@ ADDITIONS
 BREAKING CHANGES
 
 - wallet: rename `Transaction` to `WalletTransaction`
-- wallet: update `Transaction`'s `TransactionType` and `SourceType` fields from `string` to enums 
+- wallet: update `Transaction`'s `TransactionType` and `SourceType` fields from `string` to enums
 
 ## v0.7.0 (Released 2024-11-01)
 
