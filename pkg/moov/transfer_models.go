@@ -122,7 +122,7 @@ type Transfer struct {
 	// A list of cancellations for a transfer.
 	Cancellations []Cancellation `json:"cancellations,omitempty"`
 
-	// Optional sales tax amount. `transfer.amount.value` should be inclusive of any sales tax and represents the total amount charged.
+	// Optional sales tax amount. Transfer.Amount.Value should be inclusive of any sales tax and represents the total amount charged.
 	SalesTaxAmount *Amount `json:"salesTaxAmount,omitempty"`
 }
 
