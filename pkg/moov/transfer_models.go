@@ -102,6 +102,8 @@ type Transfer struct {
 	// Same as `moovFee`, but a decimal-formatted numerical string that represents up to 9 decimal place precision.
 	MoovFeeDecimal string          `json:"moovFeeDecimal,omitempty"`
 	MoovFeeDetails *MoovFeeDetails `json:"moovFeeDetails,omitempty"`
+	// Fees charged to your platform account for transfers.
+	MoovFees []MoovFee `json:"moovFees,omitempty"`
 
 	// ID for all transfers associated with a [transfer group](https://docs.moov.io/guides/money-movement/transfer-groups/).
 	GroupID *string `json:"groupID,omitempty"`
@@ -124,6 +126,26 @@ type Transfer struct {
 
 	// Optional sales tax amount. Transfer.Amount.Value should be inclusive of any sales tax and represents the total amount charged.
 	SalesTaxAmount *Amount `json:"salesTaxAmount,omitempty"`
+}
+
+// Fees charged to accounts involved in the transfer.
+type MoovFee struct {
+	// ID of the account that fees were charged to.
+	AccountID string `json:"accountID"`
+	// List of fee IDs that sum to the totalAmount.
+	FeeIDs []string `json:"feeIDs"`
+	// The total amount of fees charged to the account.
+	TotalAmount AmountDecimal `json:"totalAmount"`
+	// Indicates whether the account charged was the partner, source, or destination of the transfer.
+	TransferParty TransferParty `json:"transferParty"`
+}
+
+// AmountDecimal A decimal value representing money in a specific currency.
+type AmountDecimal struct {
+	// A 3-letter ISO 4217 currency code.
+	Currency string `json:"currency"`
+	// A decimal-formatted numerical string that represents up to 9 decimal place precision. For example, $12.987654321 is '12.987654321'.
+	ValueDecimal string `json:"valueDecimal"`
 }
 
 // Amount A representation of money containing an integer value and its currency.
@@ -503,4 +525,14 @@ const (
 	CancellationStatus_Pending   CancellationStatus = "pending"
 	CancellationStatus_Completed CancellationStatus = "completed"
 	CancellationStatus_Failed    CancellationStatus = "failed"
+)
+
+// TransferParty The party that was charged for the transfer.
+type TransferParty string
+
+// List of TransferParty
+const (
+	TransferParty_Source      TransferParty = "source"
+	TransferParty_Destination TransferParty = "destination"
+	TransferParty_Partner     TransferParty = "partner"
 )
