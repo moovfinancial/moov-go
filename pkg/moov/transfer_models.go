@@ -103,7 +103,7 @@ type Transfer struct {
 	MoovFeeDecimal string          `json:"moovFeeDecimal,omitempty"`
 	MoovFeeDetails *MoovFeeDetails `json:"moovFeeDetails,omitempty"`
 	// Fees charged to your platform account for transfers.
-	MoovFees []MoovFees `json:"moovFees,omitempty"`
+	MoovFees []MoovFee `json:"moovFees,omitempty"`
 
 	// ID for all transfers associated with a [transfer group](https://docs.moov.io/guides/money-movement/transfer-groups/).
 	GroupID *string `json:"groupID,omitempty"`
@@ -129,15 +129,15 @@ type Transfer struct {
 }
 
 // Fees charged to accounts involved in the transfer.
-type MoovFees struct {
+type MoovFee struct {
 	// ID of the account that fees were charged to.
 	AccountID string `json:"accountID"`
 	// List of fee IDs that sum to the totalAmount.
 	FeeIDs []string `json:"feeIDs"`
 	// The total amount of fees charged to the account.
-	AmountDecimal AmountDecimal `json:"totalAmount"`
+	TotalAmount AmountDecimal `json:"totalAmount"`
 	// Indicates whether the account charged was the partner, source, or destination of the transfer.
-	TransferParty string `json:"transferParty"`
+	TransferParty TransferParty `json:"transferParty"`
 }
 
 // The total amount of fees charged to the account.
@@ -525,4 +525,14 @@ const (
 	CancellationStatus_Pending   CancellationStatus = "pending"
 	CancellationStatus_Completed CancellationStatus = "completed"
 	CancellationStatus_Failed    CancellationStatus = "failed"
+)
+
+// TransferParty The party that was charged for the transfer.
+type TransferParty string
+
+// List of TransferParty
+const (
+	TransferParty_Source      TransferParty = "source"
+	TransferParty_Destination TransferParty = "destination"
+	TransferParty_Partner     TransferParty = "partner"
 )
