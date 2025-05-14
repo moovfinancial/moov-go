@@ -102,6 +102,8 @@ type Transfer struct {
 	// Same as `moovFee`, but a decimal-formatted numerical string that represents up to 9 decimal place precision.
 	MoovFeeDecimal string          `json:"moovFeeDecimal,omitempty"`
 	MoovFeeDetails *MoovFeeDetails `json:"moovFeeDetails,omitempty"`
+	// Fees charged to your platform account for transfers.
+	MoovFees []MoovFees `json:"moovFees,omitempty"`
 
 	// ID for all transfers associated with a [transfer group](https://docs.moov.io/guides/money-movement/transfer-groups/).
 	GroupID *string `json:"groupID,omitempty"`
@@ -124,6 +126,26 @@ type Transfer struct {
 
 	// Optional sales tax amount. Transfer.Amount.Value should be inclusive of any sales tax and represents the total amount charged.
 	SalesTaxAmount *Amount `json:"salesTaxAmount,omitempty"`
+}
+
+// Fees charged to accounts involved in the transfer.
+type MoovFees struct {
+	// ID of the account that fees were charged to.
+	AccountID string `json:"accountID,omitempty"`
+	// List of fee IDs that sum to the totalAmount.
+	FeeIDs []string `json:"feeIDs,omitempty"`
+	// The total amount of fees charged to the account.
+	TotalAmount TotalAmount `json:"totalAmount,omitempty"`
+	// Indicates whether the account charged was the partner, source, or destination of the transfer.
+	TransferParty string `json:"transferParty,omitempty"`
+}
+
+// The total amount of fees charged to the account.
+type TotalAmount struct {
+	// A 3-letter ISO 4217 currency code.
+	Currency string `json:"currency,omitempty"`
+	// A decimal-formatted numerical string that represents up to 9 decimal place precision.
+	ValueDecimal string `json:"valueDecimal,omitempty"`
 }
 
 // Amount A representation of money containing an integer value and its currency.
