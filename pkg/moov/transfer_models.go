@@ -140,11 +140,11 @@ type MoovFee struct {
 	TransferParty TransferParty `json:"transferParty"`
 }
 
-// The total amount of fees charged to the account.
+// AmountDecimal A decimal value representing money in a specific currency.
 type AmountDecimal struct {
 	// A 3-letter ISO 4217 currency code.
 	Currency string `json:"currency"`
-	// A decimal-formatted numerical string that represents up to 9 decimal place precision.
+	// A decimal-formatted numerical string that represents up to 9 decimal place precision. For example, $12.987654321 is '12.987654321'.
 	ValueDecimal string `json:"valueDecimal"`
 }
 
