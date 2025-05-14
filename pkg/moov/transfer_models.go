@@ -131,21 +131,21 @@ type Transfer struct {
 // Fees charged to accounts involved in the transfer.
 type MoovFees struct {
 	// ID of the account that fees were charged to.
-	AccountID string `json:"accountID,omitempty"`
+	AccountID string `json:"accountID"`
 	// List of fee IDs that sum to the totalAmount.
-	FeeIDs []string `json:"feeIDs,omitempty"`
+	FeeIDs []string `json:"feeIDs"`
 	// The total amount of fees charged to the account.
-	TotalAmount TotalAmount `json:"totalAmount,omitempty"`
+	AmountDecimal AmountDecimal `json:"totalAmount"`
 	// Indicates whether the account charged was the partner, source, or destination of the transfer.
-	TransferParty string `json:"transferParty,omitempty"`
+	TransferParty string `json:"transferParty"`
 }
 
 // The total amount of fees charged to the account.
-type TotalAmount struct {
+type AmountDecimal struct {
 	// A 3-letter ISO 4217 currency code.
-	Currency string `json:"currency,omitempty"`
+	Currency string `json:"currency"`
 	// A decimal-formatted numerical string that represents up to 9 decimal place precision.
-	ValueDecimal string `json:"valueDecimal,omitempty"`
+	ValueDecimal string `json:"valueDecimal"`
 }
 
 // Amount A representation of money containing an integer value and its currency.
