@@ -113,3 +113,35 @@ func TestUpsertUnderwriting(t *testing.T) {
 		require.Equal(t, moov.UnderwritingStatusNotRequested, actual.Status)
 	})
 }
+
+func TestUpsertUnderwritingV2(t *testing.T) {
+	mc := NewTestClient(t)
+
+	account := CreateTemporaryTestAccount(t, mc, createTestBusinessAccount())
+
+	create := moov.UpsertUnderwriting{
+		GeographicReach: func() *moov.GeographicReach {
+			value := moov.GeographicReachUsAndInternational
+			return &value
+		}(),
+		CollectFunds: &moov.CollectFunds{
+			CardPayments: &moov.CollectFundsCardPayments{
+				EstimatedActivity: &moov.EstimatedActivity{
+					MonthlyVolumeRange: func() *moov.MonthlyVolumeRange {
+						value := moov.MonthlyVolumeRangeUnder10K
+						return &value
+					}(),
+				},
+			},
+		},
+	}
+
+	t.Run("insert", func(t *testing.T) {
+		actual, err := mc.UpsertUnderwritingV2(context.Background(), "v2025.07.00", account.AccountID, create)
+
+		NoResponseError(t, err)
+		require.NotNil(t, actual)
+		require.Equal(t, create.GeographicReach, actual.GeographicReach)
+		require.Equal(t, moov.UnderwritingStatusPending, actual.Status)
+	})
+}
