@@ -22,7 +22,7 @@ func (c Client) UpsertUnderwriting(ctx context.Context, accountID string, underw
 
 // UpsertUnderwriting adds or updates underwriting information for the given account.
 // Returns the underwriting information for the account.
-func (c Client) UpsertUnderwritingV2(ctx context.Context, version string, accountID string, underwriting UpsertUnderwriting) (*UnderwritingV2, error) {
+func (c Client) UpsertUnderwritingV2507(ctx context.Context, version string, accountID string, underwriting UpsertUnderwriting) (*UnderwritingV2507, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathUnderwriting, accountID),
 		Version(version),
@@ -32,7 +32,7 @@ func (c Client) UpsertUnderwritingV2(ctx context.Context, version string, accoun
 		return nil, err
 	}
 
-	return CompletedObjectOrError[UnderwritingV2](resp)
+	return CompletedObjectOrError[UnderwritingV2507](resp)
 }
 
 // GetUnderwriting returns the underwriting information for the given account.

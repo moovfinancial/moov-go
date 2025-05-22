@@ -137,7 +137,7 @@ func TestUpsertUnderwritingV2(t *testing.T) {
 	}
 
 	t.Run("insert", func(t *testing.T) {
-		actual, err := mc.UpsertUnderwritingV2(context.Background(), "v2025.07.00", account.AccountID, create)
+		actual, err := mc.UpsertUnderwritingV2507(context.Background(), "v2025.07.00", account.AccountID, create)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
