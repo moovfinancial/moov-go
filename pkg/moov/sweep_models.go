@@ -56,6 +56,15 @@ type Sweep struct {
 	// The text that appears on the banking statement.
 	// The default descriptor is a 10 character ID if an override is not set in the sweep configs statementDescriptor.
 	StatementDescriptor string `json:"statementDescriptor,omitempty"`
+
+	// A list of subtotals for each transaction type accrued in the sweep.
+	Subtotals []SweepSubtotal `json:"subtotals,omitempty"`
+}
+
+type SweepSubtotal struct {
+	Type   WalletTransactionType `json:"type"`
+	Count  int64                 `json:"count"`
+	Amount AmountDecimal         `json:"amount"`
 }
 
 type SweepStatus string
