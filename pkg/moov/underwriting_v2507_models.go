@@ -71,8 +71,8 @@ type VolumeShareByCustomerType struct {
 }
 
 type EstimatedActivity struct {
-	AverageTransactionAmount *int                `json:"averageTransactionAmount,omitempty"`
-	MaximumTransactionAmount *int                `json:"maximumTransactionAmount,omitempty"`
+	AverageTransactionAmount *int64              `json:"averageTransactionAmount,omitempty"`
+	MaximumTransactionAmount *int64              `json:"maximumTransactionAmount,omitempty"`
 	MonthlyVolumeRange       *MonthlyVolumeRange `json:"monthlyVolumeRange,omitempty"`
 }
 
