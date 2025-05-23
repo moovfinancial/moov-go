@@ -4,7 +4,7 @@ import (
 	"os"
 )
 
-const ENV_MOOV_HOST = "MOOV_HOST"
+const ENV_MOOV_URL = "MOOV_URL"
 const ENV_MOOV_PUBLIC_KEY = "MOOV_PUBLIC_KEY"
 const ENV_MOOV_SECRET_KEY = "MOOV_SECRET_KEY" // #nosec G101
 
@@ -17,9 +17,9 @@ func CredentialsFromEnv() Credentials {
 	creds.PublicKey = os.Getenv(ENV_MOOV_PUBLIC_KEY)
 	creds.SecretKey = os.Getenv(ENV_MOOV_SECRET_KEY)
 
-	creds.Host = os.Getenv(ENV_MOOV_HOST)
-	if creds.Host == "" {
-		creds.Host = "api.moov.io"
+	creds.URL = os.Getenv(ENV_MOOV_URL)
+	if creds.URL == "" {
+		creds.URL = "https://api.moov.io"
 	}
 
 	return creds
@@ -28,7 +28,7 @@ func CredentialsFromEnv() Credentials {
 type Credentials struct {
 	PublicKey string `yaml:"public_key,omitempty"`
 	SecretKey string `yaml:"secret_key,omitempty"`
-	Host      string `yaml:"host,omitempty"`
+	URL       string `yaml:"url,omitempty"`
 }
 
 func (c *Credentials) Validate() error {
