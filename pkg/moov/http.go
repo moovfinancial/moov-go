@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	moovgo "github.com/moovfinancial/moov-go"
@@ -24,7 +25,12 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 		return nil, err
 	}
 
-	url := fmt.Sprintf("https://%s%s", c.Credentials.Host, call.path)
+	moovUrlScheme, ok := os.LookupEnv("MOOV_URL_SCHEME")
+	if !ok || moovUrlScheme == "" {
+		moovUrlScheme = "https"
+	}
+
+	url := fmt.Sprintf("%s://%s%s", moovUrlScheme, c.Credentials.Host, call.path)
 
 	req, err := http.NewRequestWithContext(ctx, call.method, url, call.body)
 	if err != nil {
