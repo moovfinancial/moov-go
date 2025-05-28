@@ -1,3 +1,9 @@
+## v0.16.0 (Released 2025-05-28)
+
+ADDITIONS
+
+- wallets: add `Subtotals` fields to `Sweep` model
+
 ## v0.15.1 (Released 2025-05-27)
 
 ADDITIONS
