@@ -1,3 +1,9 @@
+## v0.15.1 (Released 2025-05-27)
+
+ADDITIONS
+
+- feat: allow configuring the URL schema for the Moov API client via `MOOV_URL_SCHEME` environment variable
+
 ## v0.15.0 (Released 2025-05-14)
 
 ADDITIONS
