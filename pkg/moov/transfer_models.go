@@ -15,10 +15,15 @@ type CreateTransfer struct {
 	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
-// CreateTransfer_Source Where funds for a transfer originate. For the source, you must include either a `paymentMethodID` or a `transferID`. A `transferID` is used to create a [transfer group](https://docs.moov.io/guides/money-movement/transfer-groups/), associating the new transfer with a parent transfer.
+// CreateTransfer_Source Where funds for a transfer originate. For the source,
+// you must include either a `paymentMethodID`,`transferID` or `paymentToken`.
+// A `transferID` is used to create a [transfer
+// group](https://docs.moov.io/guides/money-movement/transfer-groups/),
+// associating the new transfer with a parent transfer.
 type CreateTransfer_Source struct {
 	TransferID      string                            `json:"transferID,omitempty"`
 	PaymentMethodID string                            `json:"paymentMethodID,omitempty"`
+	PaymentToken    string                            `json:"paymentToken,omitempty"`
 	CardDetails     *CreateTransfer_CardDetailsSource `json:"cardDetails,omitempty"`
 	AchDetails      *CreateTransfer_AchDetailsSource  `json:"achDetails,omitempty"`
 }
