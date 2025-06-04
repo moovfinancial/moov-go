@@ -1,8 +1,10 @@
 package moov
 
 import (
+	"cmp"
 	"io"
 	"net/http"
+	"os"
 )
 
 type Client struct {
@@ -10,14 +12,19 @@ type Client struct {
 	HttpClient  *http.Client
 
 	decoder Decoder
+
+	moovURLScheme string
 }
+
+const defaultMoovURLScheme = "https"
 
 // NewClient returns a moov.Client with credentials read from environment variables.
 func NewClient(configurables ...ClientConfigurable) (*Client, error) {
 	// Default client configuration if no configurables were specificied
 	client := &Client{
-		Credentials: CredentialsFromEnv(),
-		HttpClient:  DefaultHttpClient(),
+		Credentials:   CredentialsFromEnv(),
+		HttpClient:    DefaultHttpClient(),
+		moovURLScheme: cmp.Or(os.Getenv("MOOV_URL_SCHEME"), defaultMoovURLScheme),
 	}
 
 	// Apply all the configurable functions to the client
@@ -56,6 +63,16 @@ type Decoder func(r io.Reader, contentType string, item any) error
 func WithDecoder(dec Decoder) ClientConfigurable {
 	return func(c *Client) error {
 		c.decoder = dec
+		return nil
+	}
+}
+
+func WithMoovURLScheme(scheme string) ClientConfigurable {
+	return func(c *Client) error {
+		if scheme == "" {
+			return nil // no-op
+		}
+		c.moovURLScheme = scheme
 		return nil
 	}
 }
