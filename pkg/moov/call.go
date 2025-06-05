@@ -119,6 +119,13 @@ func JsonBody(body any) callArg {
 	})
 }
 
+func Version(version string) callArg {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.headers["X-Moov-Version"] = version
+		return nil
+	})
+}
+
 type multipartFn func(w *multipart.Writer) error
 
 func MultipartField(key, value string) multipartFn {
