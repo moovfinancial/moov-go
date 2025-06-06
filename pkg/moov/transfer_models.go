@@ -131,6 +131,8 @@ type Transfer struct {
 
 	// Optional sales tax amount. Transfer.Amount.Value should be inclusive of any sales tax and represents the total amount charged.
 	SalesTaxAmount *Amount `json:"salesTaxAmount,omitempty"`
+
+	PaymentLinkCode *string `json:"paymentLinkCode,omitempty"`
 }
 
 // Fees charged to accounts involved in the transfer.
