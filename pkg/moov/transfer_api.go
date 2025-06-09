@@ -139,6 +139,13 @@ func WithTransferSchedule(scheduleID string) ListTransferFilter {
 	})
 }
 
+func WithTransferPaymentLinkCode(paymentLinkCode string) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["paymentLinkCode"] = paymentLinkCode
+		return nil
+	})
+}
+
 func WithTransferRefunded() ListTransferFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["refunded"] = "true"
