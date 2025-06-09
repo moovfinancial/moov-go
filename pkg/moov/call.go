@@ -121,7 +121,7 @@ func JsonBody(body any) callArg {
 
 func Version(version string) callArg {
 	return callBuilderFn(func(call *callBuilder) error {
-		call.headers["X-Moov-Version"] = version
+		call.headers[VersionHeader] = version
 		return nil
 	})
 }
