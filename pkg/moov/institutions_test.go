@@ -22,26 +22,29 @@ func (s *InstitutionTestSuite) SetupSuite() {}
 
 func (s *InstitutionTestSuite) TearDownSuite() {}
 
-func (s *InstitutionTestSuite) TestListInstitutions() {
+func (s *InstitutionTestSuite) TestSearchInstitutions() {
 	mc := NewTestClient(s.T())
 
 	ctx := context.Background()
-	resp, err := mc.ListInstitutions(ctx, moov.RailAch,
+	resp, err := mc.SearchInstitutions(ctx,
 		moov.WithInstitutionName("Chase"),
-		moov.WithInstitutionState("FL"),
 		moov.WithInstitutionLimit(5),
 	)
 	s.NoError(err)
+	s.NotNil(resp)
 
-	s.Greater(len(resp.AchParticipants), 0)
-	s.Len(resp.WireParticipants, 0)
+	s.Greater(len(resp.Ach), 0)
+	s.Greater(len(resp.Rtp), 0)
+	s.Greater(len(resp.Wire), 0)
 
-	resp, err = mc.ListInstitutions(ctx, moov.RailAch,
+	resp, err = mc.SearchInstitutions(ctx,
 		moov.WithInstitutionRoutingNumber("021000021"),
 		moov.WithInstitutionLimit(5),
 	)
 	s.NoError(err)
+	s.NotNil(resp)
 
-	s.Greater(len(resp.AchParticipants), 0)
-	s.Len(resp.WireParticipants, 0)
+	s.Greater(len(resp.Ach), 0)
+	s.Greater(len(resp.Rtp), 0)
+	s.Greater(len(resp.Wire), 0)
 }

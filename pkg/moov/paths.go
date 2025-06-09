@@ -54,7 +54,7 @@ const (
 	pathApplePaySessions = "/accounts/%s/apple-pay/sessions"
 	pathApplePayTokens   = "/accounts/%s/apple-pay/tokens" // #nosec G101
 
-	pathInstitutions = "/institutions/%s/search"
+	pathInstitutions = "/institutions"
 
 	pathTransferOptions = "/transfer-options"
 

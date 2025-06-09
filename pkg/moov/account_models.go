@@ -190,6 +190,10 @@ type Name struct {
 	Suffix string `json:"suffix,omitempty"`
 }
 
+type Contact struct {
+	Phone *Phone `json:"phone,omitempty"`
+}
+
 // Phone struct for Phone
 type Phone struct {
 	Number      string `json:"number,omitempty"`

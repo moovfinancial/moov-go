@@ -5,67 +5,8 @@ import (
 	"net/http"
 )
 
-type FinancialInstitutions struct {
-	AchParticipants  []AchParticipant  `json:"achParticipants"`
-	WireParticipants []WireParticipant `json:"wireParticipants"`
-}
-
-type AchParticipant struct {
-	RoutingNumber      string           `json:"routingNumber,omitempty"`
-	OfficeCode         string           `json:"officeCode,omitempty"`
-	ServicingFRBNumber string           `json:"servicingFRBNumber,omitempty"`
-	RecordTypeCode     string           `json:"recordTypeCode,omitempty"`
-	Revised            string           `json:"revised,omitempty"`
-	NewRoutingNumber   string           `json:"newRoutingNumber,omitempty"`
-	CustomerName       string           `json:"customerName,omitempty"`
-	PhoneNumber        string           `json:"phoneNumber,omitempty"`
-	StatusCode         string           `json:"statusCode,omitempty"`
-	ViewCode           string           `json:"viewCode,omitempty"`
-	CleanName          string           `json:"cleanName,omitempty"`
-	AchLocation        AchLocation      `json:"achLocation,omitempty"`
-	Logo               *InstitutionLogo `json:"logo,omitempty"`
-}
-
-type InstitutionLogo struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
-}
-
-type AchLocation struct {
-	Address             string `json:"address,omitempty"`
-	City                string `json:"city,omitempty"`
-	State               string `json:"state,omitempty"`
-	PostalCode          string `json:"postalCode,omitempty"`
-	PostalCodeExtension string `json:"postalCodeExtension,omitempty"`
-}
-
-type WireParticipant struct {
-	RoutingNumber                     string       `json:"routingNumber,omitempty"`
-	TelegraphicName                   string       `json:"telegraphicName,omitempty"`
-	CustomerName                      string       `json:"customerName,omitempty"`
-	Location                          WireLocation `json:"location,omitempty"`
-	FundsTransferStatus               string       `json:"fundsTransferStatus,omitempty"`
-	FundsSettlementOnlyStatus         string       `json:"fundsSettlementOnlyStatus,omitempty"`
-	BookEntrySecuritiesTransferStatus string       `json:"bookEntrySecuritiesTransferStatus,omitempty"`
-	Date                              string       `json:"date,omitempty"`
-}
-
-type WireLocation struct {
-	City  string `json:"city,omitempty"`
-	State string `json:"state,omitempty"`
-}
-
-type Rail string
-
-var (
-	RailAch  Rail = "ach"
-	RailWire Rail = "wire"
-)
-
-type ListInstitutionsFailter callArg
-
 // WithInstitutionName filters institutions by their name
-func WithInstitutionName(name string) ListTransactionFilter {
+func WithInstitutionName(name string) ListInstitutionsFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["name"] = name
 		return nil
@@ -73,32 +14,26 @@ func WithInstitutionName(name string) ListTransactionFilter {
 }
 
 // WithInstitutionRoutingNumber filters institutions by their name
-func WithInstitutionRoutingNumber(routingNumber string) ListTransactionFilter {
+func WithInstitutionRoutingNumber(routingNumber string) ListInstitutionsFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["routingNumber"] = routingNumber
 		return nil
 	})
 }
 
-// WithInstitutionState filters institutions by their state
-func WithInstitutionState(state string) ListTransactionFilter {
-	return callBuilderFn(func(call *callBuilder) error {
-		call.params["state"] = state
-		return nil
-	})
-}
-
 // WithInstitutionLimit filters institutions by their name
-func WithInstitutionLimit(limit int) ListTransactionFilter {
+func WithInstitutionLimit(limit int) ListInstitutionsFilter {
 	return Limit(limit)
 }
 
-func (c Client) ListInstitutions(ctx context.Context, rail Rail, opts ...ListInstitutionsFailter) (*FinancialInstitutions, error) {
+type ListInstitutionsFilter callArg
+
+// SearchInstitutions will return financial institution information for ACH, RTP, and Wire payment rails based on name and routing number searches.
+func (c Client) SearchInstitutions(ctx context.Context, opts ...ListInstitutionsFilter) (*InstitutionsSearchResponse, error) {
 	args := prependArgs(opts, AcceptJson())
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathInstitutions, string(rail)), args...)
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathInstitutions), args...)
 	if err != nil {
 		return nil, err
 	}
-
-	return CompletedObjectOrError[FinancialInstitutions](resp)
+	return CompletedObjectOrError[InstitutionsSearchResponse](resp)
 }
