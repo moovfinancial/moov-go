@@ -1,3 +1,7 @@
+## Future Releases
+
+Please refer to the [Github Releases](https://github.com/moovfinancial/moov-go/releases) page for moov-go for future updates.
+
 ## v0.16.0 (Released 2025-05-28)
 
 ADDITIONS
