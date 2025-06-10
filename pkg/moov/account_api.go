@@ -6,8 +6,15 @@ import (
 	"strconv"
 )
 
-// CreateAccount creates a new account.
-func (c Client) CreateAccount(ctx context.Context, account CreateAccount) (*Account, *Account, error) {
+// CreateAccount creates a new account with the provided configuration.
+//
+// It returns:
+//   - created (*Account): The fully created account when the server responds with a 200 status code.
+//   - started (*Account): The account details when the server responds with a 201 status code.
+//   - err (error): Any error encountered during the account creation process.
+//
+// Only one of created or started will be non-nil, depending on the server's response.
+func (c *Client) CreateAccount(ctx context.Context, account CreateAccount) (created, started *Account, err error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathAccounts),
 		AcceptJson(),
