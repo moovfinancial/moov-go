@@ -142,6 +142,11 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 		require.NotNil(t, actual)
 		require.Equal(t, create.GeographicReach, actual.GeographicReach)
 		require.Equal(t, create.CollectFunds, actual.CollectFunds)
+		require.Nil(t, actual.BusinessPresence)
+		require.Nil(t, actual.PendingLitigation)
+		require.Nil(t, actual.VolumeShareByCustomerType)
+		require.Nil(t, actual.SendFunds)
+		require.Nil(t, actual.MoneyTransfer)
 	})
 
 	t.Run("get", func(t *testing.T) {
@@ -151,6 +156,11 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 		require.NotNil(t, actual)
 		require.Equal(t, create.GeographicReach, actual.GeographicReach)
 		require.Equal(t, create.CollectFunds, actual.CollectFunds)
+		require.Nil(t, actual.BusinessPresence)
+		require.Nil(t, actual.PendingLitigation)
+		require.Nil(t, actual.VolumeShareByCustomerType)
+		require.Nil(t, actual.SendFunds)
+		require.Nil(t, actual.MoneyTransfer)
 	})
 
 	update := moov.UpsertUnderwriting{
@@ -188,6 +198,9 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
 		require.Equal(t, update.GeographicReach, actual.GeographicReach)
+		require.Equal(t, update.BusinessPresence, actual.BusinessPresence)
+		require.Equal(t, update.PendingLitigation, actual.PendingLitigation)
+		require.Equal(t, update.VolumeShareByCustomerType, actual.VolumeShareByCustomerType)
 		require.Equal(t, update.CollectFunds, actual.CollectFunds)
 		require.Equal(t, update.SendFunds, actual.SendFunds)
 		require.Equal(t, update.MoneyTransfer, actual.MoneyTransfer)
@@ -199,6 +212,9 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
 		require.Equal(t, update.GeographicReach, actual.GeographicReach)
+		require.Equal(t, update.BusinessPresence, actual.BusinessPresence)
+		require.Equal(t, update.PendingLitigation, actual.PendingLitigation)
+		require.Equal(t, update.VolumeShareByCustomerType, actual.VolumeShareByCustomerType)
 		require.Equal(t, update.CollectFunds, actual.CollectFunds)
 		require.Equal(t, update.SendFunds, actual.SendFunds)
 		require.Equal(t, update.MoneyTransfer, actual.MoneyTransfer)
