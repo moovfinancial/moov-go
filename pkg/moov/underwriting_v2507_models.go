@@ -12,6 +12,9 @@ type UpsertUnderwriting struct {
 
 // UnderwritingV2507 will have both legacy and V2507 fields for backward compatibility
 type UnderwritingV2507 struct {
+	// Legacy fields
+	// TEMP: TODO: Status will be removed once we release to prod
+	Status                          UnderwritingStatus     `json:"status"`
 	AverageTransactionSize          int64                  `json:"averageTransactionSize"`
 	MaxTransactionSize              int64                  `json:"maxTransactionSize"`
 	AverageMonthlyTransactionVolume int64                  `json:"averageMonthlyTransactionVolume"`
