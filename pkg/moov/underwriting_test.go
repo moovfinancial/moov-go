@@ -198,7 +198,9 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
-		require.Equal(t, create.GeographicReach, actual.GeographicReach)
-		require.Equal(t, create.CollectFunds, actual.CollectFunds)
+		require.Equal(t, update.GeographicReach, actual.GeographicReach)
+		require.Equal(t, update.CollectFunds, actual.CollectFunds)
+		require.Equal(t, update.SendFunds, actual.SendFunds)
+		require.Equal(t, update.MoneyTransfer, actual.MoneyTransfer)
 	})
 }
