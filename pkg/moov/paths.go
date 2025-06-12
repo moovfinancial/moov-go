@@ -56,7 +56,7 @@ const (
 
 	pathInstitutions = "/institutions"
 
-	pathTransferOptions = "/transfer-options"
+	pathTransferOptions = "/accounts/%s/transfer-options"
 
 	pathTransfers = "/accounts/%s/transfers"
 	pathTransfer  = "/accounts/%s/transfers/%s"

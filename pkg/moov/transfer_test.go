@@ -13,7 +13,7 @@ func Test_Transfers(t *testing.T) {
 
 	account := getLincolnBank(t, mc)
 
-	options, err := mc.TransferOptions(BgCtx(), moov.CreateTransferOptions{
+	options, err := mc.TransferOptions(BgCtx(), FACILITATOR_ID, moov.CreateTransferOptions{
 		Source: moov.CreateTransferOptionsTarget{
 			AccountID: account.AccountID,
 		},
@@ -91,7 +91,7 @@ func Test_Cancellations(t *testing.T) {
 	mc := NewTestClient(t)
 	account := getLincolnBank(t, mc)
 
-	options, err := mc.TransferOptions(BgCtx(), moov.CreateTransferOptions{
+	options, err := mc.TransferOptions(BgCtx(), FACILITATOR_ID, moov.CreateTransferOptions{
 		Source: moov.CreateTransferOptionsTarget{
 			AccountID: account.AccountID,
 		},

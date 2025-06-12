@@ -337,9 +337,9 @@ func (c Client) GetCancellation(ctx context.Context, accountID string, transferI
 
 // TransferOptions lists all transfer options between a source and destination
 // https://docs.moov.io/api/#tag/Transfers/operation/createTransferOptions
-func (c Client) TransferOptions(ctx context.Context, payload CreateTransferOptions) (*TransferOptions, error) {
+func (c Client) TransferOptions(ctx context.Context, partnerAccountID string, payload CreateTransferOptions) (*TransferOptions, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathTransferOptions),
+		Endpoint(http.MethodPost, pathTransferOptions, partnerAccountID),
 		AcceptJson(),
 		JsonBody(payload))
 	if err != nil {
