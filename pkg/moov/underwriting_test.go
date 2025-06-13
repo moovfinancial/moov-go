@@ -135,8 +135,20 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 			},
 		},
 	}
+
+	resp, err := mc.UnderwritingV2507().Get(context.Background(), account.AccountID)
+	require.NoError(t, err)
+	require.NotNil(t, resp)
+
+	resp, err = moov.UnderwritingGet[moov.UnderwritingV2507](context.Background(), *mc, account.AccountID, moov.WithVersion(moov.Q3_2025))
+	require.NoError(t, err)
+	require.NotNil(t, resp)
+
+	// uc := mc.Underwriting().Version(moov.Q3_2025)
+
 	t.Run("insert", func(t *testing.T) {
 		actual, err := mc.UpsertUnderwritingV2507(context.Background(), account.AccountID, create)
+		// actual, err := moov.UnderwritingUpsert[moov.UpsertUnderwriting, moov.UnderwritingV2507](context.Background(), uc, account.AccountID, create)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
@@ -150,7 +162,8 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 	})
 
 	// t.Run("get", func(t *testing.T) {
-	// 	actual, err := mc.GetUnderwritingV2507(context.Background(), account.AccountID)
+	// 	// actual, err := mc.GetUnderwritingV2507(context.Background(), account.AccountID)
+	// 	actual, err := moov.UnderwritingGet[moov.UnderwritingV2507](context.Background(), uc, account.AccountID)
 
 	// 	NoResponseError(t, err)
 	// 	require.NotNil(t, actual)

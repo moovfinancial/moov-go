@@ -14,6 +14,7 @@ import (
 
 const (
 	VersionHeader = "X-Moov-Version"
+	PreVersioning = "v2024.00.00"
 	Q3_2025       = "v2025.07.00"
 	Q4_2025       = "v2025.10.00"
 	Q1_2026       = "v2026.01.00"
