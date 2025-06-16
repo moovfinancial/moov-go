@@ -20,18 +20,6 @@ func (c Client) UpsertUnderwriting(ctx context.Context, accountID string, underw
 	return CompletedObjectOrError[Underwriting](resp)
 }
 
-// GetUnderwriting returns the underwriting information for the given account.
-func (c Client) GetUnderwriting(ctx context.Context, accountID string) (*Underwriting, error) {
-	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, pathUnderwriting, accountID),
-		AcceptJson())
-	if err != nil {
-		return nil, err
-	}
-
-	return CompletedObjectOrError[Underwriting](resp)
-}
-
 // UpsertUnderwriting adds or updates underwriting information for the given account.
 // Returns the underwriting information for the account.
 func (c Client) UpsertUnderwritingV2507(ctx context.Context, accountID string, underwriting UpsertUnderwriting) (*UnderwritingV2507, error) {
@@ -48,6 +36,17 @@ func (c Client) UpsertUnderwritingV2507(ctx context.Context, accountID string, u
 }
 
 // GetUnderwriting returns the underwriting information for the given account.
+func (c Client) GetUnderwriting(ctx context.Context, accountID string) (*Underwriting, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathUnderwriting, accountID),
+		AcceptJson())
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Underwriting](resp)
+}
+
 func (c Client) GetUnderwritingV2507(ctx context.Context, accountID string) (*UnderwritingV2507, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathUnderwriting, accountID),
