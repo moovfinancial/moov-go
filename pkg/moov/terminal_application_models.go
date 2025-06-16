@@ -1,5 +1,7 @@
 package moov
 
+import "time"
+
 type TerminalApplicationStatus string
 
 // List of TerminalApplicationStatus
@@ -26,6 +28,8 @@ type TerminalApplication struct {
 	PackageName           string                      `json:"packageName,omitempty"`
 	Sha256Digest          string                      `json:"sha256Digest,omitempty"`
 	VersionCode           string                      `json:"versionCode,omitempty"`
+	CreatedOn             time.Time                   `json:"createdOn"`
+	UpdatedOn             time.Time                   `json:"updatedOn"`
 }
 
 type TerminalApplicationRequest struct {

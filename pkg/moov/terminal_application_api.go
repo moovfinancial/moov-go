@@ -58,11 +58,13 @@ func (c Client) DeleteTerminalApplication(ctx context.Context, terminalApplicati
 	return CompletedNilOrError(resp)
 }
 
-func (c Client) CreateTerminalApplicationVersion(ctx context.Context, terminalApplicationID string, version TerminalApplicationVersion) (*TerminalApplicationVersion, error) {
+func (c Client) CreateTerminalApplicationVersion(ctx context.Context, terminalApplicationID, version string) (*TerminalApplicationVersion, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathTerminalApplicationVersions, terminalApplicationID),
 		AcceptJson(),
-		JsonBody(version))
+		JsonBody(TerminalApplicationVersion{
+			Version: version,
+		}))
 	if err != nil {
 		return nil, err
 	}
