@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/moovfinancial/moov-go/pkg/mhooks/mv2507"
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/pkg/mv2507"
 	"github.com/stretchr/testify/require"
 )
 
@@ -120,16 +120,16 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 
 	account := CreateTemporaryTestAccount(t, mc, createTestBusinessAccount())
 
-	create := moov.UpsertUnderwriting{
-		GeographicReach: func() *moov.GeographicReach {
-			value := moov.GeographicReachUsAndInternational
+	create := mv2507.UpsertUnderwriting{
+		GeographicReach: func() *mv2507.GeographicReach {
+			value := mv2507.GeographicReachUsAndInternational
 			return &value
 		}(),
-		CollectFunds: &moov.CollectFunds{
-			CardPayments: &moov.CollectFundsCardPayments{
-				EstimatedActivity: &moov.EstimatedActivity{
-					MonthlyVolumeRange: func() *moov.MonthlyVolumeRange {
-						value := moov.MonthlyVolumeRangeUnder10K
+		CollectFunds: &mv2507.CollectFunds{
+			CardPayments: &mv2507.CollectFundsCardPayments{
+				EstimatedActivity: &mv2507.EstimatedActivity{
+					MonthlyVolumeRange: func() *mv2507.MonthlyVolumeRange {
+						value := mv2507.MonthlyVolumeRangeUnder10K
 						return &value
 					}(),
 				},
@@ -139,7 +139,6 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 
 	t.Run("insert", func(t *testing.T) {
 		actual, err := mv2507.Underwriting.Upsert(context.Background(), *mc, account.AccountID, create)
-		// actual, err := mc.UpsertUnderwritingV2507(context.Background(), account.AccountID, create)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
@@ -154,7 +153,6 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 
 	t.Run("get", func(t *testing.T) {
 		actual, err := mv2507.Underwriting.Get(context.Background(), *mc, account.AccountID)
-		// actual, err := moov.UnderwritingGet[moov.UnderwritingV2507](context.Background(), uc, account.AccountID)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
@@ -167,38 +165,37 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 		require.Nil(t, actual.MoneyTransfer)
 	})
 
-	update := moov.UpsertUnderwriting{
-		GeographicReach:   func() *moov.GeographicReach { value := moov.GeographicReachUsOnly; return &value }(),
-		BusinessPresence:  func() *moov.BusinessPresence { value := moov.BusinessPresenceHomeBased; return &value }(),
-		PendingLitigation: func() *moov.PendingLitigation { value := moov.PendingLitigationNone; return &value }(),
-		VolumeShareByCustomerType: &moov.VolumeShareByCustomerType{
+	update := mv2507.UpsertUnderwriting{
+		GeographicReach:   func() *mv2507.GeographicReach { value := mv2507.GeographicReachUsOnly; return &value }(),
+		BusinessPresence:  func() *mv2507.BusinessPresence { value := mv2507.BusinessPresenceHomeBased; return &value }(),
+		PendingLitigation: func() *mv2507.PendingLitigation { value := mv2507.PendingLitigationNone; return &value }(),
+		VolumeShareByCustomerType: &mv2507.VolumeShareByCustomerType{
 			Business: func() *int { value := 70; return &value }(),
 			Consumer: func() *int { value := 30; return &value }(),
 			P2P:      func() *int { value := 0; return &value }(),
 		},
-		CollectFunds: &moov.CollectFunds{
-			CardPayments: &moov.CollectFundsCardPayments{
-				EstimatedActivity: &moov.EstimatedActivity{MonthlyVolumeRange: func() *moov.MonthlyVolumeRange { value := moov.MonthlyVolumeRange10K50K; return &value }()},
+		CollectFunds: &mv2507.CollectFunds{
+			CardPayments: &mv2507.CollectFundsCardPayments{
+				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: func() *mv2507.MonthlyVolumeRange { value := mv2507.MonthlyVolumeRange10K50K; return &value }()},
 			},
-			Ach: &moov.CollectFundsAch{
-				EstimatedActivity: &moov.EstimatedActivity{MonthlyVolumeRange: func() *moov.MonthlyVolumeRange { value := moov.MonthlyVolumeRangeUnder10K; return &value }()},
-			},
-		},
-		SendFunds: &moov.SendFunds{
-			Ach: &moov.SendFundsAch{
-				EstimatedActivity: &moov.EstimatedActivity{MonthlyVolumeRange: func() *moov.MonthlyVolumeRange { value := moov.MonthlyVolumeRangeUnder10K; return &value }()},
+			Ach: &mv2507.CollectFundsAch{
+				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: func() *mv2507.MonthlyVolumeRange { value := mv2507.MonthlyVolumeRangeUnder10K; return &value }()},
 			},
 		},
-		MoneyTransfer: &moov.MoneyTransfer{
-			PullFromCard: &moov.MoneyTransferPullFromCard{
-				EstimatedActivity: &moov.EstimatedActivity{MonthlyVolumeRange: func() *moov.MonthlyVolumeRange { value := moov.MonthlyVolumeRange10K50K; return &value }()},
+		SendFunds: &mv2507.SendFunds{
+			Ach: &mv2507.SendFundsAch{
+				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: func() *mv2507.MonthlyVolumeRange { value := mv2507.MonthlyVolumeRangeUnder10K; return &value }()},
+			},
+		},
+		MoneyTransfer: &mv2507.MoneyTransfer{
+			PullFromCard: &mv2507.MoneyTransferPullFromCard{
+				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: func() *mv2507.MonthlyVolumeRange { value := mv2507.MonthlyVolumeRange10K50K; return &value }()},
 			},
 		},
 	}
 
 	t.Run("update", func(t *testing.T) {
 		actual, err := mv2507.Underwriting.Upsert(context.Background(), *mc, account.AccountID, update)
-		// actual, err := mc.UpsertUnderwritingV2507(context.Background(), account.AccountID, update)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
@@ -213,7 +210,6 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 
 	t.Run("get after update", func(t *testing.T) {
 		actual, err := mv2507.Underwriting.Get(context.Background(), *mc, account.AccountID)
-		// actual, err := mc.GetUnderwritingV2507(context.Background(), account.AccountID)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
