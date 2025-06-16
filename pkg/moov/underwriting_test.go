@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/moovfinancial/moov-go/pkg/mhooks/mv2507"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
@@ -136,19 +137,9 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 		},
 	}
 
-	resp, err := mc.UnderwritingV2507().Get(context.Background(), account.AccountID)
-	require.NoError(t, err)
-	require.NotNil(t, resp)
-
-	resp, err = moov.UnderwritingGet[moov.UnderwritingV2507](context.Background(), *mc, account.AccountID, moov.WithVersion(moov.Q3_2025))
-	require.NoError(t, err)
-	require.NotNil(t, resp)
-
-	// uc := mc.Underwriting().Version(moov.Q3_2025)
-
 	t.Run("insert", func(t *testing.T) {
-		actual, err := mc.UpsertUnderwritingV2507(context.Background(), account.AccountID, create)
-		// actual, err := moov.UnderwritingUpsert[moov.UpsertUnderwriting, moov.UnderwritingV2507](context.Background(), uc, account.AccountID, create)
+		actual, err := mv2507.Underwriting.Upsert(context.Background(), *mc, account.AccountID, create)
+		// actual, err := mc.UpsertUnderwritingV2507(context.Background(), account.AccountID, create)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
@@ -161,20 +152,20 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 		require.Nil(t, actual.MoneyTransfer)
 	})
 
-	// t.Run("get", func(t *testing.T) {
-	// 	// actual, err := mc.GetUnderwritingV2507(context.Background(), account.AccountID)
-	// 	actual, err := moov.UnderwritingGet[moov.UnderwritingV2507](context.Background(), uc, account.AccountID)
+	t.Run("get", func(t *testing.T) {
+		actual, err := mv2507.Underwriting.Get(context.Background(), *mc, account.AccountID)
+		// actual, err := moov.UnderwritingGet[moov.UnderwritingV2507](context.Background(), uc, account.AccountID)
 
-	// 	NoResponseError(t, err)
-	// 	require.NotNil(t, actual)
-	// 	require.Equal(t, create.GeographicReach, actual.GeographicReach)
-	// 	require.Equal(t, create.CollectFunds, actual.CollectFunds)
-	// 	require.Nil(t, actual.BusinessPresence)
-	// 	require.Nil(t, actual.PendingLitigation)
-	// 	require.Nil(t, actual.VolumeShareByCustomerType)
-	// 	require.Nil(t, actual.SendFunds)
-	// 	require.Nil(t, actual.MoneyTransfer)
-	// })
+		NoResponseError(t, err)
+		require.NotNil(t, actual)
+		require.Equal(t, create.GeographicReach, actual.GeographicReach)
+		require.Equal(t, create.CollectFunds, actual.CollectFunds)
+		require.Nil(t, actual.BusinessPresence)
+		require.Nil(t, actual.PendingLitigation)
+		require.Nil(t, actual.VolumeShareByCustomerType)
+		require.Nil(t, actual.SendFunds)
+		require.Nil(t, actual.MoneyTransfer)
+	})
 
 	update := moov.UpsertUnderwriting{
 		GeographicReach:   func() *moov.GeographicReach { value := moov.GeographicReachUsOnly; return &value }(),
@@ -206,7 +197,8 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 	}
 
 	t.Run("update", func(t *testing.T) {
-		actual, err := mc.UpsertUnderwritingV2507(context.Background(), account.AccountID, update)
+		actual, err := mv2507.Underwriting.Upsert(context.Background(), *mc, account.AccountID, update)
+		// actual, err := mc.UpsertUnderwritingV2507(context.Background(), account.AccountID, update)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
@@ -219,17 +211,18 @@ func TestUpsertUnderwritingV2507(t *testing.T) {
 		require.Equal(t, update.MoneyTransfer, actual.MoneyTransfer)
 	})
 
-	// t.Run("get after update", func(t *testing.T) {
-	// 	actual, err := mc.GetUnderwritingV2507(context.Background(), account.AccountID)
+	t.Run("get after update", func(t *testing.T) {
+		actual, err := mv2507.Underwriting.Get(context.Background(), *mc, account.AccountID)
+		// actual, err := mc.GetUnderwritingV2507(context.Background(), account.AccountID)
 
-	// 	NoResponseError(t, err)
-	// 	require.NotNil(t, actual)
-	// 	require.Equal(t, update.GeographicReach, actual.GeographicReach)
-	// 	require.Equal(t, update.BusinessPresence, actual.BusinessPresence)
-	// 	require.Equal(t, update.PendingLitigation, actual.PendingLitigation)
-	// 	require.Equal(t, update.VolumeShareByCustomerType, actual.VolumeShareByCustomerType)
-	// 	require.Equal(t, update.CollectFunds, actual.CollectFunds)
-	// 	require.Equal(t, update.SendFunds, actual.SendFunds)
-	// 	require.Equal(t, update.MoneyTransfer, actual.MoneyTransfer)
-	// })
+		NoResponseError(t, err)
+		require.NotNil(t, actual)
+		require.Equal(t, update.GeographicReach, actual.GeographicReach)
+		require.Equal(t, update.BusinessPresence, actual.BusinessPresence)
+		require.Equal(t, update.PendingLitigation, actual.PendingLitigation)
+		require.Equal(t, update.VolumeShareByCustomerType, actual.VolumeShareByCustomerType)
+		require.Equal(t, update.CollectFunds, actual.CollectFunds)
+		require.Equal(t, update.SendFunds, actual.SendFunds)
+		require.Equal(t, update.MoneyTransfer, actual.MoneyTransfer)
+	})
 }
