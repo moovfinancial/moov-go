@@ -10,25 +10,18 @@ type UnderwritingClient[T any, V any] struct {
 }
 
 func (uc UnderwritingClient[T, V]) Get(ctx context.Context, client Client, accountID string) (*V, error) {
-	var zero *V
 	httpResp, err := client.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathUnderwriting, accountID),
 		Version(uc.Version),
 		AcceptJson())
 	if err != nil {
-		return zero, err
+		return nil, err
 	}
 
-	resp, err := CompletedObjectOrError[V](httpResp)
-	if err != nil {
-		return zero, err
-	}
-
-	return resp, nil
+	return CompletedObjectOrError[V](httpResp)
 }
 
 func (uc UnderwritingClient[T, V]) Upsert(ctx context.Context, client Client, accountID string, update T) (*V, error) {
-	var zero *V
 	httpResp, err := client.CallHttp(ctx,
 		Endpoint(http.MethodPut, pathUnderwriting, accountID),
 		Version(uc.Version),
@@ -38,12 +31,7 @@ func (uc UnderwritingClient[T, V]) Upsert(ctx context.Context, client Client, ac
 		return nil, err
 	}
 
-	resp, err := CompletedObjectOrError[V](httpResp)
-	if err != nil {
-		return zero, err
-	}
-
-	return resp, nil
+	return CompletedObjectOrError[V](httpResp)
 }
 
 // UpsertUnderwriting adds or updates underwriting information for the given account.
