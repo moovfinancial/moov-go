@@ -88,6 +88,11 @@ const (
 	pathEndToEndPublicKey = "/end-to-end-keys"
 	pathEndToEndTokenTest = "/debug/end-to-end-token" //nolint:gosec
 
-	pathTerminalApplications = "/terminal-applications"
-	pathTerminalApplication  = "/terminal-applications/%s"
+	pathTerminalApplications        = "/terminal-applications"
+	pathTerminalApplication         = "/terminal-applications/%s"
+	pathTerminalApplicationVersions = "/terminal-applications/%s/versions"
+
+	pathAccountTerminalApplication              = "/accounts/%s/terminal-applications/%s"
+	pathAccountTerminalApplications             = "/accounts/%s/terminal-applications"
+	pathAccountTerminalApplicationConfiguration = "/accounts/%s/terminal-applications/%s/configuration"
 )

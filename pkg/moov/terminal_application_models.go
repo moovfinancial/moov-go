@@ -39,3 +39,7 @@ type TerminalApplicationRequest struct {
 	// The app version of the terminal application. Required if platform is `android`.
 	VersionCode string `json:"versionCode,omitempty"`
 }
+
+type TerminalApplicationVersion struct {
+	Version string `json:"version"`
+}
