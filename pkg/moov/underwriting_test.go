@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
-	"github.com/moovfinancial/moov-go/pkg/q3_2025"
+	"github.com/moovfinancial/moov-go/pkg/mv2507"
 	"github.com/stretchr/testify/require"
 )
 
@@ -120,19 +120,19 @@ func TestUpsertUnderwriting_V2507(t *testing.T) {
 
 	account := CreateTemporaryTestAccount(t, mc, createTestBusinessAccount())
 
-	create := q3_2025.UpsertUnderwriting{
-		GeographicReach: moov.PtrOf(q3_2025.GeographicReachUsAndInternational),
-		CollectFunds: &q3_2025.CollectFunds{
-			CardPayments: &q3_2025.CollectFundsCardPayments{
-				EstimatedActivity: &q3_2025.EstimatedActivity{
-					MonthlyVolumeRange: moov.PtrOf(q3_2025.MonthlyVolumeRangeUnder10K),
+	create := mv2507.UpsertUnderwriting{
+		GeographicReach: moov.PtrOf(mv2507.GeographicReachUsAndInternational),
+		CollectFunds: &mv2507.CollectFunds{
+			CardPayments: &mv2507.CollectFundsCardPayments{
+				EstimatedActivity: &mv2507.EstimatedActivity{
+					MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRangeUnder10K),
 				},
 			},
 		},
 	}
 
 	t.Run("insert", func(t *testing.T) {
-		actual, err := q3_2025.Underwriting.Upsert(context.Background(), *mc, account.AccountID, create)
+		actual, err := mv2507.Underwriting.Upsert(context.Background(), *mc, account.AccountID, create)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
@@ -146,7 +146,7 @@ func TestUpsertUnderwriting_V2507(t *testing.T) {
 	})
 
 	t.Run("get", func(t *testing.T) {
-		actual, err := q3_2025.Underwriting.Get(context.Background(), *mc, account.AccountID)
+		actual, err := mv2507.Underwriting.Get(context.Background(), *mc, account.AccountID)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
@@ -159,37 +159,37 @@ func TestUpsertUnderwriting_V2507(t *testing.T) {
 		require.Nil(t, actual.MoneyTransfer)
 	})
 
-	update := q3_2025.UpsertUnderwriting{
-		GeographicReach:   moov.PtrOf(q3_2025.GeographicReachUsOnly),
-		BusinessPresence:  moov.PtrOf(q3_2025.BusinessPresenceHomeBased),
-		PendingLitigation: moov.PtrOf(q3_2025.PendingLitigationNone),
-		VolumeShareByCustomerType: &q3_2025.VolumeShareByCustomerType{
+	update := mv2507.UpsertUnderwriting{
+		GeographicReach:   moov.PtrOf(mv2507.GeographicReachUsOnly),
+		BusinessPresence:  moov.PtrOf(mv2507.BusinessPresenceHomeBased),
+		PendingLitigation: moov.PtrOf(mv2507.PendingLitigationNone),
+		VolumeShareByCustomerType: &mv2507.VolumeShareByCustomerType{
 			Business: moov.PtrOf(70),
 			Consumer: moov.PtrOf(30),
 			P2P:      moov.PtrOf(0),
 		},
-		CollectFunds: &q3_2025.CollectFunds{
-			CardPayments: &q3_2025.CollectFundsCardPayments{
-				EstimatedActivity: &q3_2025.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(q3_2025.MonthlyVolumeRange10K50K)},
+		CollectFunds: &mv2507.CollectFunds{
+			CardPayments: &mv2507.CollectFundsCardPayments{
+				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRange10K50K)},
 			},
-			Ach: &q3_2025.CollectFundsAch{
-				EstimatedActivity: &q3_2025.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(q3_2025.MonthlyVolumeRangeUnder10K)},
-			},
-		},
-		SendFunds: &q3_2025.SendFunds{
-			Ach: &q3_2025.SendFundsAch{
-				EstimatedActivity: &q3_2025.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(q3_2025.MonthlyVolumeRangeUnder10K)},
+			Ach: &mv2507.CollectFundsAch{
+				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRangeUnder10K)},
 			},
 		},
-		MoneyTransfer: &q3_2025.MoneyTransfer{
-			PullFromCard: &q3_2025.MoneyTransferPullFromCard{
-				EstimatedActivity: &q3_2025.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(q3_2025.MonthlyVolumeRange10K50K)},
+		SendFunds: &mv2507.SendFunds{
+			Ach: &mv2507.SendFundsAch{
+				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRangeUnder10K)},
+			},
+		},
+		MoneyTransfer: &mv2507.MoneyTransfer{
+			PullFromCard: &mv2507.MoneyTransferPullFromCard{
+				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRange10K50K)},
 			},
 		},
 	}
 
 	t.Run("update", func(t *testing.T) {
-		actual, err := q3_2025.Underwriting.Upsert(context.Background(), *mc, account.AccountID, update)
+		actual, err := mv2507.Underwriting.Upsert(context.Background(), *mc, account.AccountID, update)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
@@ -203,7 +203,7 @@ func TestUpsertUnderwriting_V2507(t *testing.T) {
 	})
 
 	t.Run("get after update", func(t *testing.T) {
-		actual, err := q3_2025.Underwriting.Get(context.Background(), *mc, account.AccountID)
+		actual, err := mv2507.Underwriting.Get(context.Background(), *mc, account.AccountID)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)

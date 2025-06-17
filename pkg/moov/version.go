@@ -13,15 +13,15 @@ var (
 	// Pre-versioned API
 	PreVersioning = Version{"v2024.00.00"}
 
-	Q1_2025 = NewVersion(2025, 1, 0)
-	Q2_2025 = NewVersion(2025, 4, 0)
-	Q3_2025 = NewVersion(2025, 7, 0)
-	Q4_2025 = NewVersion(2025, 10, 0)
+	Version2025_01 = NewVersion(2025, 1, 0)
+	Version2025_04 = NewVersion(2025, 4, 0)
+	Version2025_07 = NewVersion(2025, 7, 0)
+	Version2025_10 = NewVersion(2025, 10, 0)
 
-	Q1_2026 = NewVersion(2026, 1, 0)
-	Q2_2026 = NewVersion(2026, 4, 0)
-	Q3_2026 = NewVersion(2026, 7, 0)
-	Q4_2026 = NewVersion(2026, 10, 0)
+	Version2026_01 = NewVersion(2026, 1, 0)
+	Version2026_04 = NewVersion(2026, 4, 0)
+	Version2026_07 = NewVersion(2026, 7, 0)
+	Version2026_10 = NewVersion(2026, 10, 0)
 
 	// Selects the latest version that isn't Beta
 	Latest = Version{"v9000.00.00"}
