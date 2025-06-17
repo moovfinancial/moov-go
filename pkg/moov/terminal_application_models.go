@@ -1,5 +1,7 @@
 package moov
 
+import "time"
+
 type TerminalApplicationStatus string
 
 // List of TerminalApplicationStatus
@@ -26,6 +28,8 @@ type TerminalApplication struct {
 	PackageName           string                      `json:"packageName,omitempty"`
 	Sha256Digest          string                      `json:"sha256Digest,omitempty"`
 	VersionCode           string                      `json:"versionCode,omitempty"`
+	CreatedOn             time.Time                   `json:"createdOn"`
+	UpdatedOn             time.Time                   `json:"updatedOn"`
 }
 
 type TerminalApplicationRequest struct {
@@ -38,4 +42,8 @@ type TerminalApplicationRequest struct {
 	Sha256Digest string `json:"sha256Digest,omitempty"`
 	// The app version of the terminal application. Required if platform is `android`.
 	VersionCode string `json:"versionCode,omitempty"`
+}
+
+type TerminalApplicationVersion struct {
+	Version string `json:"version"`
 }
