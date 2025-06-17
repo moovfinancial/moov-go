@@ -9,6 +9,7 @@ type UnderwritingClient[T any, V any] struct {
 	Version Version
 }
 
+// GetUnderwriting returns the underwriting information for the given account.
 func (uc UnderwritingClient[T, V]) Get(ctx context.Context, client Client, accountID string) (*V, error) {
 	httpResp, err := client.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathUnderwriting, accountID),
