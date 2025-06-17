@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/moovfinancial/moov-go/pkg/Q3_2025"
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/pkg/q3_2025"
 	"github.com/stretchr/testify/require"
 )
 
@@ -120,25 +120,19 @@ func TestUpsertUnderwriting_V2507(t *testing.T) {
 
 	account := CreateTemporaryTestAccount(t, mc, createTestBusinessAccount())
 
-	create := Q3_2025.UpsertUnderwriting{
-		GeographicReach: func() *Q3_2025.GeographicReach {
-			value := Q3_2025.GeographicReachUsAndInternational
-			return &value
-		}(),
-		CollectFunds: &Q3_2025.CollectFunds{
-			CardPayments: &Q3_2025.CollectFundsCardPayments{
-				EstimatedActivity: &Q3_2025.EstimatedActivity{
-					MonthlyVolumeRange: func() *Q3_2025.MonthlyVolumeRange {
-						value := Q3_2025.MonthlyVolumeRangeUnder10K
-						return &value
-					}(),
+	create := q3_2025.UpsertUnderwriting{
+		GeographicReach: moov.PtrOf(q3_2025.GeographicReachUsAndInternational),
+		CollectFunds: &q3_2025.CollectFunds{
+			CardPayments: &q3_2025.CollectFundsCardPayments{
+				EstimatedActivity: &q3_2025.EstimatedActivity{
+					MonthlyVolumeRange: moov.PtrOf(q3_2025.MonthlyVolumeRangeUnder10K),
 				},
 			},
 		},
 	}
 
 	t.Run("insert", func(t *testing.T) {
-		actual, err := Q3_2025.Underwriting.Upsert(context.Background(), *mc, account.AccountID, create)
+		actual, err := q3_2025.Underwriting.Upsert(context.Background(), *mc, account.AccountID, create)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
@@ -152,7 +146,7 @@ func TestUpsertUnderwriting_V2507(t *testing.T) {
 	})
 
 	t.Run("get", func(t *testing.T) {
-		actual, err := Q3_2025.Underwriting.Get(context.Background(), *mc, account.AccountID)
+		actual, err := q3_2025.Underwriting.Get(context.Background(), *mc, account.AccountID)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
@@ -165,37 +159,37 @@ func TestUpsertUnderwriting_V2507(t *testing.T) {
 		require.Nil(t, actual.MoneyTransfer)
 	})
 
-	update := Q3_2025.UpsertUnderwriting{
-		GeographicReach:   func() *Q3_2025.GeographicReach { value := Q3_2025.GeographicReachUsOnly; return &value }(),
-		BusinessPresence:  func() *Q3_2025.BusinessPresence { value := Q3_2025.BusinessPresenceHomeBased; return &value }(),
-		PendingLitigation: func() *Q3_2025.PendingLitigation { value := Q3_2025.PendingLitigationNone; return &value }(),
-		VolumeShareByCustomerType: &Q3_2025.VolumeShareByCustomerType{
-			Business: func() *int { value := 70; return &value }(),
-			Consumer: func() *int { value := 30; return &value }(),
-			P2P:      func() *int { value := 0; return &value }(),
+	update := q3_2025.UpsertUnderwriting{
+		GeographicReach:   moov.PtrOf(q3_2025.GeographicReachUsOnly),
+		BusinessPresence:  moov.PtrOf(q3_2025.BusinessPresenceHomeBased),
+		PendingLitigation: moov.PtrOf(q3_2025.PendingLitigationNone),
+		VolumeShareByCustomerType: &q3_2025.VolumeShareByCustomerType{
+			Business: moov.PtrOf(70),
+			Consumer: moov.PtrOf(30),
+			P2P:      moov.PtrOf(0),
 		},
-		CollectFunds: &Q3_2025.CollectFunds{
-			CardPayments: &Q3_2025.CollectFundsCardPayments{
-				EstimatedActivity: &Q3_2025.EstimatedActivity{MonthlyVolumeRange: func() *Q3_2025.MonthlyVolumeRange { value := Q3_2025.MonthlyVolumeRange10K50K; return &value }()},
+		CollectFunds: &q3_2025.CollectFunds{
+			CardPayments: &q3_2025.CollectFundsCardPayments{
+				EstimatedActivity: &q3_2025.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(q3_2025.MonthlyVolumeRange10K50K)},
 			},
-			Ach: &Q3_2025.CollectFundsAch{
-				EstimatedActivity: &Q3_2025.EstimatedActivity{MonthlyVolumeRange: func() *Q3_2025.MonthlyVolumeRange { value := Q3_2025.MonthlyVolumeRangeUnder10K; return &value }()},
-			},
-		},
-		SendFunds: &Q3_2025.SendFunds{
-			Ach: &Q3_2025.SendFundsAch{
-				EstimatedActivity: &Q3_2025.EstimatedActivity{MonthlyVolumeRange: func() *Q3_2025.MonthlyVolumeRange { value := Q3_2025.MonthlyVolumeRangeUnder10K; return &value }()},
+			Ach: &q3_2025.CollectFundsAch{
+				EstimatedActivity: &q3_2025.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(q3_2025.MonthlyVolumeRangeUnder10K)},
 			},
 		},
-		MoneyTransfer: &Q3_2025.MoneyTransfer{
-			PullFromCard: &Q3_2025.MoneyTransferPullFromCard{
-				EstimatedActivity: &Q3_2025.EstimatedActivity{MonthlyVolumeRange: func() *Q3_2025.MonthlyVolumeRange { value := Q3_2025.MonthlyVolumeRange10K50K; return &value }()},
+		SendFunds: &q3_2025.SendFunds{
+			Ach: &q3_2025.SendFundsAch{
+				EstimatedActivity: &q3_2025.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(q3_2025.MonthlyVolumeRangeUnder10K)},
+			},
+		},
+		MoneyTransfer: &q3_2025.MoneyTransfer{
+			PullFromCard: &q3_2025.MoneyTransferPullFromCard{
+				EstimatedActivity: &q3_2025.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(q3_2025.MonthlyVolumeRange10K50K)},
 			},
 		},
 	}
 
 	t.Run("update", func(t *testing.T) {
-		actual, err := Q3_2025.Underwriting.Upsert(context.Background(), *mc, account.AccountID, update)
+		actual, err := q3_2025.Underwriting.Upsert(context.Background(), *mc, account.AccountID, update)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)
@@ -209,7 +203,7 @@ func TestUpsertUnderwriting_V2507(t *testing.T) {
 	})
 
 	t.Run("get after update", func(t *testing.T) {
-		actual, err := Q3_2025.Underwriting.Get(context.Background(), *mc, account.AccountID)
+		actual, err := q3_2025.Underwriting.Get(context.Background(), *mc, account.AccountID)
 
 		NoResponseError(t, err)
 		require.NotNil(t, actual)

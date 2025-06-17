@@ -1,4 +1,4 @@
-package Q3_2025
+package q3_2025
 
 import "github.com/moovfinancial/moov-go/pkg/moov"
 
