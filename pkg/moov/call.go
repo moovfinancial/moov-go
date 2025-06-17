@@ -119,7 +119,7 @@ func JsonBody(body any) callArg {
 	})
 }
 
-func Version(version mVersion) callArg {
+func MoovVersion(version Version) callArg {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.headers[VersionHeader] = version.String()
 		return nil

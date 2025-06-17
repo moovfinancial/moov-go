@@ -6,13 +6,13 @@ import (
 )
 
 type UnderwritingClient[T any, V any] struct {
-	Version mVersion
+	Version Version
 }
 
 func (uc UnderwritingClient[T, V]) Get(ctx context.Context, client Client, accountID string) (*V, error) {
 	httpResp, err := client.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathUnderwriting, accountID),
-		Version(uc.Version),
+		MoovVersion(uc.Version),
 		AcceptJson())
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func (uc UnderwritingClient[T, V]) Get(ctx context.Context, client Client, accou
 func (uc UnderwritingClient[T, V]) Upsert(ctx context.Context, client Client, accountID string, update T) (*V, error) {
 	httpResp, err := client.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathUnderwriting, accountID),
-		Version(uc.Version),
+		MoovVersion(uc.Version),
 		AcceptJson(),
 		JsonBody(update))
 	if err != nil {

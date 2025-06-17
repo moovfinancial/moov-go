@@ -8,10 +8,10 @@ const VersionHeader = "X-Moov-Version"
 
 var (
 	// Only selectable if beta is set.
-	WorkInProgress = mVersion{"v0001.00.00"}
+	WorkInProgress = Version{"v0001.00.00"}
 
 	// Pre-versioned API
-	PreVersioning = mVersion{"v2024.00.00"}
+	PreVersioning = Version{"v2024.00.00"}
 
 	Q1_2025 = NewVersion(2025, 1, 0)
 	Q2_2025 = NewVersion(2025, 4, 0)
@@ -24,18 +24,18 @@ var (
 	Q4_2026 = NewVersion(2026, 10, 0)
 
 	// Selects the latest version that isn't Beta
-	Latest = mVersion{"v9000.00.00"}
+	Latest = Version{"v9000.00.00"}
 )
 
-type mVersion struct {
+type Version struct {
 	version string
 }
 
-func (t mVersion) String() string {
+func (t Version) String() string {
 	return t.version
 }
 
 // Best to set to the anticipated release date or into the future until release.
-func NewVersion(year int, month int, build int) mVersion {
-	return mVersion{fmt.Sprintf("v%04d.%02d.%02d", year, month, build)}
+func NewVersion(year int, month int, build int) Version {
+	return Version{fmt.Sprintf("v%04d.%02d.%02d", year, month, build)}
 }
