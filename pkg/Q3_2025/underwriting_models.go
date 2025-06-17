@@ -2,7 +2,7 @@ package q3_2025
 
 import "github.com/moovfinancial/moov-go/pkg/moov"
 
-var Underwriting moov.UnderwritingClient[UpsertUnderwriting, UnderwritingResp] = moov.UnderwritingClient[UpsertUnderwriting, UnderwritingResp]{Version: moov.Q3_2025}
+var Underwriting = moov.UnderwritingClient[UpsertUnderwriting, UnderwritingResp]{Version: moov.Q3_2025}
 
 type UpsertUnderwriting struct {
 	GeographicReach           *GeographicReach           `json:"geographicReach,omitempty"`
