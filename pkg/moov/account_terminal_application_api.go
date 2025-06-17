@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// CreateTerminalApplication creates a new terminal application.
+// LinkAccountTerminalApplication links an account to a terminal application.
 func (c Client) LinkAccountTerminalApplication(ctx context.Context, accountID, terminalApplicationID string) (*AccountTerminalApplication, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathAccountTerminalApplications, accountID),
@@ -17,16 +17,10 @@ func (c Client) LinkAccountTerminalApplication(ctx context.Context, accountID, t
 		return nil, err
 	}
 
-	switch resp.Status() {
-	case StatusCompleted:
-		a, err := UnmarshalObjectResponse[AccountTerminalApplication](resp)
-		return a, err
-	default:
-		return nil, resp
-	}
+	return CompletedObjectOrError[AccountTerminalApplication](resp)
 }
 
-// GetTerminalApplication returns a terminal application based on terminalApplicationID.
+// GetAccountTerminalApplication gets an account-terminal application link.
 func (c Client) GetAccountTerminalApplication(ctx context.Context, accountID, terminalApplicationID string) (*AccountTerminalApplication, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathAccountTerminalApplication, accountID, terminalApplicationID),
@@ -38,7 +32,7 @@ func (c Client) GetAccountTerminalApplication(ctx context.Context, accountID, te
 	return CompletedObjectOrError[AccountTerminalApplication](resp)
 }
 
-// ListTerminalApplications returns a list of terminalApplications.
+// ListAccountTerminalApplications lists account-terminal application links for an account.
 func (c Client) ListAccountTerminalApplications(ctx context.Context, accountID string) ([]AccountTerminalApplication, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathAccountTerminalApplications, accountID),
@@ -50,7 +44,7 @@ func (c Client) ListAccountTerminalApplications(ctx context.Context, accountID s
 	return CompletedListOrError[AccountTerminalApplication](resp)
 }
 
-// GetTerminalApplication returns a terminal application based on terminalApplicationID.
+// GetAccountTerminalApplicationConfiguration gets configuration for a linked terminal application.
 func (c Client) GetAccountTerminalApplicationConfiguration(ctx context.Context, accountID, terminalApplicationID string) (*AccountTerminalApplicationConfiguration, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathAccountTerminalApplicationConfiguration, accountID, terminalApplicationID),

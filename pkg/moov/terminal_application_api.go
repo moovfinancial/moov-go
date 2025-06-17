@@ -15,13 +15,7 @@ func (c Client) CreateTerminalApplication(ctx context.Context, terminalApplicati
 		return nil, err
 	}
 
-	switch resp.Status() {
-	case StatusCompleted:
-		a, err := UnmarshalObjectResponse[TerminalApplication](resp)
-		return a, err
-	default:
-		return nil, resp
-	}
+	return CompletedObjectOrError[TerminalApplication](resp)
 }
 
 // GetTerminalApplication returns a terminal application based on terminalApplicationID.
@@ -58,6 +52,8 @@ func (c Client) DeleteTerminalApplication(ctx context.Context, terminalApplicati
 	return CompletedNilOrError(resp)
 }
 
+// CreateTerminalApplicationVersion registers a new version for a terminal
+// application. Value of Version code should be used for Android applications.
 func (c Client) CreateTerminalApplicationVersion(ctx context.Context, terminalApplicationID, version string) (*TerminalApplicationVersion, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathTerminalApplicationVersions, terminalApplicationID),
@@ -69,11 +65,5 @@ func (c Client) CreateTerminalApplicationVersion(ctx context.Context, terminalAp
 		return nil, err
 	}
 
-	switch resp.Status() {
-	case StatusCompleted:
-		a, err := UnmarshalObjectResponse[TerminalApplicationVersion](resp)
-		return a, err
-	default:
-		return nil, resp
-	}
+	return CompletedObjectOrError[TerminalApplicationVersion](resp)
 }
