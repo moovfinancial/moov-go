@@ -6,26 +6,16 @@ import (
 )
 
 // CreateTerminalApplication creates a new terminal application.
-func (c Client) CreateTerminalApplication(ctx context.Context, terminalApplication TerminalApplicationRequest) (*TerminalApplication, *TerminalApplication, error) {
+func (c Client) CreateTerminalApplication(ctx context.Context, terminalApplication TerminalApplicationRequest) (*TerminalApplication, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathTerminalApplications),
 		AcceptJson(),
-		WaitFor("connection"),
 		JsonBody(terminalApplication))
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	switch resp.Status() {
-	case StatusCompleted:
-		a, err := UnmarshalObjectResponse[TerminalApplication](resp)
-		return a, nil, err
-	case StatusStarted:
-		a, err := UnmarshalObjectResponse[TerminalApplication](resp)
-		return nil, a, err
-	default:
-		return nil, nil, resp
-	}
+	return CompletedObjectOrError[TerminalApplication](resp)
 }
 
 // GetTerminalApplication returns a terminal application based on terminalApplicationID.
@@ -60,4 +50,20 @@ func (c Client) DeleteTerminalApplication(ctx context.Context, terminalApplicati
 	}
 
 	return CompletedNilOrError(resp)
+}
+
+// CreateTerminalApplicationVersion registers a new version for a terminal
+// application. Value of Version code should be used for Android applications.
+func (c Client) CreateTerminalApplicationVersion(ctx context.Context, terminalApplicationID, version string) (*TerminalApplicationVersion, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathTerminalApplicationVersions, terminalApplicationID),
+		AcceptJson(),
+		JsonBody(TerminalApplicationVersion{
+			Version: version,
+		}))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[TerminalApplicationVersion](resp)
 }
