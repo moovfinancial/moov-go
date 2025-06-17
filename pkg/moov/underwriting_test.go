@@ -115,7 +115,7 @@ func TestUpsertUnderwriting(t *testing.T) {
 	})
 }
 
-func TestUpsertUnderwritingV2507(t *testing.T) {
+func TestUpsertUnderwriting_V2507(t *testing.T) {
 	mc := NewTestClient(t)
 
 	account := CreateTemporaryTestAccount(t, mc, createTestBusinessAccount())
