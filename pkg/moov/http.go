@@ -12,16 +12,6 @@ import (
 	moovgo "github.com/moovfinancial/moov-go"
 )
 
-const (
-	VersionHeader = "X-Moov-Version"
-	Q3_2025       = "v2025.07.00"
-	Q4_2025       = "v2025.10.00"
-	Q1_2026       = "v2026.01.00"
-	Q2_2026       = "v2026.04.00"
-	Q3_2026       = "v2026.07.00"
-	Q4_2026       = "v2026.10.00"
-)
-
 func DefaultHttpClient() *http.Client {
 	return &http.Client{
 		Transport: http.DefaultTransport,

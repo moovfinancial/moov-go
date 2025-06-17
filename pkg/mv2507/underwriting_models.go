@@ -1,4 +1,8 @@
-package moov
+package mv2507
+
+import "github.com/moovfinancial/moov-go/pkg/moov"
+
+var Underwriting moov.UnderwritingClient[UpsertUnderwriting, UnderwritingResp] = moov.UnderwritingClient[UpsertUnderwriting, UnderwritingResp]{Version: moov.Q3_2025}
 
 type UpsertUnderwriting struct {
 	GeographicReach           *GeographicReach           `json:"geographicReach,omitempty"`
@@ -11,16 +15,14 @@ type UpsertUnderwriting struct {
 }
 
 // UnderwritingV2507 will have both legacy and V2507 fields for backward compatibility
-type UnderwritingV2507 struct {
+type UnderwritingResp struct {
 	// Legacy fields
-	// TEMP: TODO: Status will be removed once we release to prod
-	Status                          UnderwritingStatus     `json:"status"`
-	AverageTransactionSize          int64                  `json:"averageTransactionSize"`
-	MaxTransactionSize              int64                  `json:"maxTransactionSize"`
-	AverageMonthlyTransactionVolume int64                  `json:"averageMonthlyTransactionVolume"`
-	VolumeByCustomerType            VolumeByCustomerType   `json:"volumeByCustomerType"`
-	CardVolumeDistribution          CardVolumeDistribution `json:"cardVolumeDistribution"`
-	Fulfillment                     Fulfillment            `json:"fulfillment"`
+	AverageTransactionSize          int64                       `json:"averageTransactionSize"`
+	MaxTransactionSize              int64                       `json:"maxTransactionSize"`
+	AverageMonthlyTransactionVolume int64                       `json:"averageMonthlyTransactionVolume"`
+	VolumeByCustomerType            moov.VolumeByCustomerType   `json:"volumeByCustomerType"`
+	CardVolumeDistribution          moov.CardVolumeDistribution `json:"cardVolumeDistribution"`
+	Fulfillment                     moov.Fulfillment            `json:"fulfillment"`
 
 	//V2507
 	GeographicReach           *GeographicReach           `json:"geographicReach,omitempty"`
