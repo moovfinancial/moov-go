@@ -42,7 +42,6 @@ func (uc UnderwritingClient[T, V]) Upsert(ctx context.Context, client Client, ac
 // The account must have a description and an MCC set to create underwriting.
 // Returns the underwriting information for the account.
 func (c Client) UpsertUnderwriting(ctx context.Context, accountID string, underwriting UpdateUnderwriting) (*Underwriting, error) {
-
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPut, pathUnderwriting, accountID),
 		AcceptJson(),
