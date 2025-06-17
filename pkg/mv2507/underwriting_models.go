@@ -18,13 +18,13 @@ type UpsertUnderwriting struct {
 type UnderwritingResp struct {
 	// Legacy fields
 	// TEMP: TODO: Status will be removed once we release to prod
-	Status                          UnderwritingStatus     `json:"status"`
-	AverageTransactionSize          int64                  `json:"averageTransactionSize"`
-	MaxTransactionSize              int64                  `json:"maxTransactionSize"`
-	AverageMonthlyTransactionVolume int64                  `json:"averageMonthlyTransactionVolume"`
-	VolumeByCustomerType            VolumeByCustomerType   `json:"volumeByCustomerType"`
-	CardVolumeDistribution          CardVolumeDistribution `json:"cardVolumeDistribution"`
-	Fulfillment                     Fulfillment            `json:"fulfillment"`
+	Status                          moov.UnderwritingStatus     `json:"status"`
+	AverageTransactionSize          int64                       `json:"averageTransactionSize"`
+	MaxTransactionSize              int64                       `json:"maxTransactionSize"`
+	AverageMonthlyTransactionVolume int64                       `json:"averageMonthlyTransactionVolume"`
+	VolumeByCustomerType            moov.VolumeByCustomerType   `json:"volumeByCustomerType"`
+	CardVolumeDistribution          moov.CardVolumeDistribution `json:"cardVolumeDistribution"`
+	Fulfillment                     moov.Fulfillment            `json:"fulfillment"`
 
 	//V2507
 	GeographicReach           *GeographicReach           `json:"geographicReach,omitempty"`
@@ -187,43 +187,4 @@ type SendFundsPushToCard struct {
 
 type SendFundsRtp struct {
 	EstimatedActivity *EstimatedActivity `json:"estimatedActivity,omitempty"`
-}
-
-// v1
-type UnderwritingStatus string
-
-const (
-	UnderwritingStatusApproved      UnderwritingStatus = "approved"
-	UnderwritingStatusRejected      UnderwritingStatus = "rejected"
-	UnderwritingStatusPendingReview UnderwritingStatus = "pendingReview"
-	UnderwritingStatusPending       UnderwritingStatus = "pending"
-	UnderwritingStatusNotRequested  UnderwritingStatus = "notRequested"
-)
-
-type VolumeByCustomerType struct {
-	BusinessToBusinessPercentage int32 `json:"businessToBusinessPercentage"`
-	ConsumerToBusinessPercentage int32 `json:"consumerToBusinessPercentage"`
-}
-
-type CardVolumeDistribution struct {
-	EcommercePercentage     int32 `json:"ecommercePercentage"`
-	CardPresentPercentage   int32 `json:"cardPresentPercentage"`
-	MailOrPhonePercentage   int32 `json:"mailOrPhonePercentage"`
-	DebtRepaymentPercentage int32 `json:"debtRepaymentPercentage"`
-}
-
-type ReturnPolicy string
-
-const (
-	NONE               ReturnPolicy = "none"
-	EXCHANGE_ONLY      ReturnPolicy = "exchangeOnly"
-	WITHIN_THIRTY_DAYS ReturnPolicy = "withinThirtyDays"
-	OTHER              ReturnPolicy = "other"
-)
-
-type Fulfillment struct {
-	HasPhysicalGoods     bool         `json:"hasPhysicalGoods"`
-	IsShippingProduct    bool         `json:"isShippingProduct"`
-	ShipmentDurationDays int32        `json:"shipmentDurationDays"`
-	ReturnPolicy         ReturnPolicy `json:"returnPolicy"`
 }
