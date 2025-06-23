@@ -17,6 +17,26 @@ const (
 	CapabilityName_SendFunds        CapabilityName = "send-funds"
 	CapabilityName_Transfers        CapabilityName = "transfers"
 	CapabilityName_Wallet           CapabilityName = "wallet"
+
+	// Granular Capability Names Platform
+	CapabilityName_PlatformProductionApp   CapabilityName = "platform.production-app"
+	CapabilityName_PlatformWalletTransfers CapabilityName = "platform.wallet-transfers"
+
+	// Granular Capability Names Wallet
+	Capability_NameWalletBalance CapabilityName = "wallet.balance"
+
+	// Granular Capability Names Collect Funds
+	CapabilityName_CollectFundsACH          CapabilityName = "collect-funds.ach"
+	CapabilityName_CollectFundsCardPayments CapabilityName = "collect-funds.card-payments"
+
+	// Granular Capability Names Money Transfer
+	CapabilityName_MoneyTransferPullFromCard CapabilityName = "money-transfer.pull-from-card"
+	CapabilityName_MoneyTransferPushToCard   CapabilityName = "money-transfer.push-to-card"
+
+	// Granular Capability Names Send Funds
+	CapabilityName_SendFundsACH        CapabilityName = "send-funds.ach"
+	CapabilityName_SendFundsRTP        CapabilityName = "send-funds.rtp"
+	CapabilityName_SendFundsPushToCard CapabilityName = "send-funds.push-to-card"
 )
 
 // Capability Describes an action or set of actions that an account is permitted to perform.
