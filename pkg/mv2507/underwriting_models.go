@@ -24,7 +24,7 @@ type UnderwritingResp struct {
 	CardVolumeDistribution          moov.CardVolumeDistribution `json:"cardVolumeDistribution"`
 	Fulfillment                     moov.Fulfillment            `json:"fulfillment"`
 
-	//V2507
+	// V2507
 	GeographicReach           *GeographicReach           `json:"geographicReach,omitempty"`
 	BusinessPresence          *BusinessPresence          `json:"businessPresence,omitempty"`
 	PendingLitigation         *PendingLitigation         `json:"pendingLitigation,omitempty"`
@@ -123,38 +123,44 @@ type CardPaymentFulfillment struct {
 
 type FulfillmentMethod string
 
-const FulfillmentMethodBillOrDebtPayment FulfillmentMethod = "bill-or-debt-payment"
-const FulfillmentMethodDigitalContent FulfillmentMethod = "digital-content"
-const FulfillmentMethodDonation FulfillmentMethod = "donation"
-const FulfillmentMethodInPersonService FulfillmentMethod = "in-person-service"
-const FulfillmentMethodLocalPickupOrDelivery FulfillmentMethod = "local-pickup-or-delivery"
-const FulfillmentMethodOther FulfillmentMethod = "other"
-const FulfillmentMethodRemoteService FulfillmentMethod = "remote-service"
-const FulfillmentMethodShippedPhysicalGoods FulfillmentMethod = "shipped-physical-goods"
-const FulfillmentMethodSubscriptionOrMembership FulfillmentMethod = "subscription-or-membership"
+const (
+	FulfillmentMethodBillOrDebtPayment        FulfillmentMethod = "bill-or-debt-payment"
+	FulfillmentMethodDigitalContent           FulfillmentMethod = "digital-content"
+	FulfillmentMethodDonation                 FulfillmentMethod = "donation"
+	FulfillmentMethodInPersonService          FulfillmentMethod = "in-person-service"
+	FulfillmentMethodLocalPickupOrDelivery    FulfillmentMethod = "local-pickup-or-delivery"
+	FulfillmentMethodOther                    FulfillmentMethod = "other"
+	FulfillmentMethodRemoteService            FulfillmentMethod = "remote-service"
+	FulfillmentMethodShippedPhysicalGoods     FulfillmentMethod = "shipped-physical-goods"
+	FulfillmentMethodSubscriptionOrMembership FulfillmentMethod = "subscription-or-membership"
+)
 
 type FulfillmentTimeframe string
 
-const FulfillmentTimeframeImmediate FulfillmentTimeframe = "immediate"
-const FulfillmentTimeframeOther FulfillmentTimeframe = "other"
-const FulfillmentTimeframeOver30Days FulfillmentTimeframe = "over-30-days"
-const FulfillmentTimeframePreOrder FulfillmentTimeframe = "pre-order"
-const FulfillmentTimeframeRecurringSchedule FulfillmentTimeframe = "recurring-schedule"
-const FulfillmentTimeframeScheduledEvent FulfillmentTimeframe = "scheduled-event"
-const FulfillmentTimeframeWithin30Days FulfillmentTimeframe = "within-30-days"
-const FulfillmentTimeframeWithin7Days FulfillmentTimeframe = "within-7-days"
+const (
+	FulfillmentTimeframeImmediate         FulfillmentTimeframe = "immediate"
+	FulfillmentTimeframeOther             FulfillmentTimeframe = "other"
+	FulfillmentTimeframeOver30Days        FulfillmentTimeframe = "over-30-days"
+	FulfillmentTimeframePreOrder          FulfillmentTimeframe = "pre-order"
+	FulfillmentTimeframeRecurringSchedule FulfillmentTimeframe = "recurring-schedule"
+	FulfillmentTimeframeScheduledEvent    FulfillmentTimeframe = "scheduled-event"
+	FulfillmentTimeframeWithin30Days      FulfillmentTimeframe = "within-30-days"
+	FulfillmentTimeframeWithin7Days       FulfillmentTimeframe = "within-7-days"
+)
 
 type RefundPolicy string
 
-const RefundPolicyConditionalRefund RefundPolicy = "conditional-refund"
-const RefundPolicyCustomPolicy RefundPolicy = "custom-policy"
-const RefundPolicyEventBasedPolicy RefundPolicy = "event-based-policy"
-const RefundPolicyFullRefundExtendedWindow RefundPolicy = "full-refund-extended-window"
-const RefundPolicyFullRefundWithin30Days RefundPolicy = "full-refund-within-30-days"
-const RefundPolicyNoRefunds RefundPolicy = "no-refunds"
-const RefundPolicyPartialRefund RefundPolicy = "partial-refund"
-const RefundPolicyProratedRefund RefundPolicy = "prorated-refund"
-const RefundPolicyStoreCreditOnly RefundPolicy = "store-credit-only"
+const (
+	RefundPolicyConditionalRefund        RefundPolicy = "conditional-refund"
+	RefundPolicyCustomPolicy             RefundPolicy = "custom-policy"
+	RefundPolicyEventBasedPolicy         RefundPolicy = "event-based-policy"
+	RefundPolicyFullRefundExtendedWindow RefundPolicy = "full-refund-extended-window"
+	RefundPolicyFullRefundWithin30Days   RefundPolicy = "full-refund-within-30-days"
+	RefundPolicyNoRefunds                RefundPolicy = "no-refunds"
+	RefundPolicyPartialRefund            RefundPolicy = "partial-refund"
+	RefundPolicyProratedRefund           RefundPolicy = "prorated-refund"
+	RefundPolicyStoreCreditOnly          RefundPolicy = "store-credit-only"
+)
 
 type MoneyTransfer struct {
 	PullFromCard *MoneyTransferPullFromCard `json:"pullFromCard,omitempty"`
