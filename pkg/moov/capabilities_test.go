@@ -42,6 +42,15 @@ func Test_Capabilities(t *testing.T) {
 		err := mc.DisableCapability(BgCtx(), account.AccountID, moov.CapabilityName_Transfers)
 		NoResponseError(t, err)
 	})
+
+	t.Run("cannot request granular capabilities", func(t *testing.T) {
+		requested, err := mc.RequestCapabilities(BgCtx(), account.AccountID, []moov.CapabilityName{
+			moov.CapabilityName_CollectFundsACH,
+		})
+
+		require.Error(t, err)
+		require.Nil(t, requested)
+	})
 }
 
 func Test_Capabilities_V2507(t *testing.T) {
@@ -51,11 +60,16 @@ func Test_Capabilities_V2507(t *testing.T) {
 
 	requested := mv2507.RequestedCapabilities{
 		Capabilities: []moov.CapabilityName{
-			moov.CapabilityName_1099,
-			moov.CapabilityName_CollectFunds,
-			moov.CapabilityName_SendFunds,
-			moov.CapabilityName_Transfers,
-			moov.CapabilityName_Wallet,
+			moov.CapabilityName_PlatformProductionApp,
+			moov.CapabilityName_PlatformWalletTransfers,
+			moov.Capability_NameWalletBalance,
+			moov.CapabilityName_CollectFundsACH,
+			moov.CapabilityName_CollectFundsCardPayments,
+			moov.CapabilityName_MoneyTransferPullFromCard,
+			moov.CapabilityName_MoneyTransferPushToCard,
+			moov.CapabilityName_SendFundsACH,
+			moov.CapabilityName_SendFundsRTP,
+			moov.CapabilityName_SendFundsPushToCard,
 		},
 	}
 
