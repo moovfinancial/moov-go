@@ -71,11 +71,25 @@ func Test_Capabilities_V2507(t *testing.T) {
 		},
 	}
 
+	private := mv2507.RequestedCapabilities{
+		Capabilities: []moov.CapabilityName{
+			moov.CapabilityName_PlatformProductionApp,
+			moov.CapabilityName_PlatformWalletTransfers,
+		},
+	}
+
 	t.Run("requested", func(t *testing.T) {
-		requested, err := mv2507.Capabilities.Request(BgCtx(), *mc, account.AccountID, requested)
+		resp, err := mv2507.Capabilities.Request(BgCtx(), *mc, account.AccountID, requested)
 
 		NoResponseError(t, err)
-		require.NotEmpty(t, requested)
+		require.NotEmpty(t, resp)
+	})
+
+	t.Run("requested private", func(t *testing.T) {
+		resp, err := mv2507.Capabilities.Request(BgCtx(), *mc, account.AccountID, private)
+
+		require.Error(t, err)
+		require.Nil(t, resp)
 	})
 
 	t.Run("list", func(t *testing.T) {
