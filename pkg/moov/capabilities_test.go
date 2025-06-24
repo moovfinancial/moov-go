@@ -60,8 +60,6 @@ func Test_Capabilities_V2507(t *testing.T) {
 
 	requested := mv2507.RequestedCapabilities{
 		Capabilities: []moov.CapabilityName{
-			moov.CapabilityName_PlatformProductionApp,
-			moov.CapabilityName_PlatformWalletTransfers,
 			moov.Capability_NameWalletBalance,
 			moov.CapabilityName_CollectFundsACH,
 			moov.CapabilityName_CollectFundsCardPayments,
