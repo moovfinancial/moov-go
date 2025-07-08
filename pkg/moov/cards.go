@@ -62,7 +62,7 @@ type CardDetails struct {
 	FailedOn          *time.Time            `json:"failedOn,omitempty"`
 	CanceledOn        *time.Time            `json:"canceledOn,omitempty"`
 	CompletedOn       *time.Time            `json:"completedOn,omitempty"`
-	// This field has been deprecated in favor of `FeeProgram`.
+	// Deprecated: This field has been deprecated, use `FeeProgram` instead.
 	InterchangeQualification string `json:"interchangeQualification,omitempty"`
 }
 
