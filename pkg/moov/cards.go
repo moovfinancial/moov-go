@@ -55,15 +55,15 @@ type CardDetails struct {
 	FailureCode       string                `json:"failureCode,omitempty"`
 	DynamicDescriptor string                `json:"dynamicDescriptor,omitempty"`
 	TransactionSource string                `json:"transactionSource,omitempty"`
+	FeeProgram        *string               `json:"feeProgram,omitempty"`
+	InitiatedOn       *time.Time            `json:"initiatedOn,omitempty"`
+	ConfirmedOn       *time.Time            `json:"confirmedOn,omitempty"`
+	SettledOn         *time.Time            `json:"settledOn,omitempty"`
+	FailedOn          *time.Time            `json:"failedOn,omitempty"`
+	CanceledOn        *time.Time            `json:"canceledOn,omitempty"`
+	CompletedOn       *time.Time            `json:"completedOn,omitempty"`
 	// This field has been deprecated in favor of `FeeProgram`.
-	InterchangeQualification string     `json:"interchangeQualification,omitempty"`
-	FeeProgram               *string    `json:"feeProgram,omitempty"`
-	InitiatedOn              *time.Time `json:"initiatedOn,omitempty"`
-	ConfirmedOn              *time.Time `json:"confirmedOn,omitempty"`
-	SettledOn                *time.Time `json:"settledOn,omitempty"`
-	FailedOn                 *time.Time `json:"failedOn,omitempty"`
-	CanceledOn               *time.Time `json:"canceledOn,omitempty"`
-	CompletedOn              *time.Time `json:"completedOn,omitempty"`
+	InterchangeQualification string `json:"interchangeQualification,omitempty"`
 }
 
 // CardTransactionStatus represents the status of a card transaction within a Transfer
