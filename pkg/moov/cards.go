@@ -56,6 +56,7 @@ type CardDetails struct {
 	DynamicDescriptor string                `json:"dynamicDescriptor,omitempty"`
 	TransactionSource string                `json:"transactionSource,omitempty"`
 	FeeProgram        *string               `json:"feeProgram,omitempty"`
+	AuthorizationCode *string               `json:"authorizationCode,omitempty"`
 	InitiatedOn       *time.Time            `json:"initiatedOn,omitempty"`
 	ConfirmedOn       *time.Time            `json:"confirmedOn,omitempty"`
 	SettledOn         *time.Time            `json:"settledOn,omitempty"`
