@@ -225,16 +225,17 @@ type Cancellation struct {
 
 // TransferSource struct for TransferSource
 type TransferSource struct {
-	PaymentMethodID   string                    `json:"paymentMethodID,omitempty"`
-	PaymentMethodType PaymentMethodType         `json:"paymentMethodType,omitempty"`
-	Account           TransferAccount           `json:"account,omitempty"`
-	BankAccount       *BankAccountPaymentMethod `json:"bankAccount,omitempty"`
-	Wallet            *WalletPaymentMethod      `json:"wallet,omitempty"`
-	Card              *CardPaymentMethod        `json:"card,omitempty"`
-	ApplePay          *ApplePayPaymentMethod    `json:"applePay,omitempty"`
-	AchDetails        *AchDetailsSource         `json:"achDetails,omitempty"`
-	CardDetails       *CardDetails              `json:"cardDetails,omitempty"`
-	TransferID        string                    `json:"transferID,omitempty"`
+	PaymentMethodID   string                     `json:"paymentMethodID,omitempty"`
+	PaymentMethodType PaymentMethodType          `json:"paymentMethodType,omitempty"`
+	Account           TransferAccount            `json:"account,omitempty"`
+	BankAccount       *BankAccountPaymentMethod  `json:"bankAccount,omitempty"`
+	Wallet            *WalletPaymentMethod       `json:"wallet,omitempty"`
+	Card              *CardPaymentMethod         `json:"card,omitempty"`
+	ApplePay          *ApplePayPaymentMethod     `json:"applePay,omitempty"`
+	AchDetails        *AchDetailsSource          `json:"achDetails,omitempty"`
+	CardDetails       *CardDetails               `json:"cardDetails,omitempty"`
+	TerminalCard      *TerminalCardPaymentMethod `json:"terminalCard,omitempty"`
+	TransferID        string                     `json:"transferID,omitempty"`
 }
 
 // TransferAccount struct for TransferAccount
