@@ -165,3 +165,36 @@ const (
 	DomesticPullFromCard_Supported    DomesticPullFromCard = "supported"
 	DomesticPullFromCard_Unknown      DomesticPullFromCard = "unknown"
 )
+
+type EntryMode string
+
+const (
+	EntryModeContactless EntryMode = "contactless"
+)
+
+// TerminalCard - Describes payment card details captured with tap or in-person payment.
+type TerminalCardPaymentMethod struct {
+	// How the card information was entered into the point of sale terminal.
+	EntryMode EntryMode `json:"entryMode,omitempty"`
+	// The card brand.
+	Brand CardBrand `json:"brand,omitempty"`
+	Bin   string    `json:"bin,omitempty"`
+	// The type of the card.
+	CardType CardType `json:"cardType,omitempty"`
+	// The expiration date of the card or token.
+	Expiration CardExpiration `json:"expiration,omitempty"`
+	// Uniquely identifies a terminal card.
+	Fingerprint string `json:"fingerprint,omitempty"`
+	// The name of the cardholder as it appears on the card.
+	HolderName string `json:"holderName,omitempty"`
+	// Financial institution that issued the card.
+	Issuer string `json:"issuer,omitempty"`
+	// Country where the card was issued.
+	IssuerCountry string `json:"issuerCountry,omitempty"`
+	// Last four digits of the card number
+	LastFourCardNumber string `json:"lastFourCardNumber,omitempty"`
+	// Identifier for the point of sale terminal application.
+	ApplicationID string `json:"applicationID,omitempty"`
+	// Name label for the point of sale terminal application.
+	ApplicationName string `json:"applicationName,omitempty"`
+}
