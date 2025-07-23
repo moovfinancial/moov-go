@@ -52,7 +52,7 @@ func Test_SweepConfig_CRUD_Endpoints(t *testing.T) {
 	require.NoError(t, err)
 
 	// Get by ID
-	sweepConfig, err = mc.GetSweepConfig(ctx, accountID, sweepConfig.SweepConfigID)
+	_, err = mc.GetSweepConfig(ctx, accountID, sweepConfig.SweepConfigID)
 	require.NoError(t, err)
 }
 

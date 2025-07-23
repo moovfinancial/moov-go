@@ -128,26 +128,6 @@ func CreateTemporaryTestAccount(t *testing.T, mc *moov.Client, create moov.Creat
 	return account
 }
 
-func createTemporaryBankAccount(t *testing.T, mc *moov.Client, accountID string) *moov.BankAccount {
-	resp, err := mc.CreateBankAccount(BgCtx(), accountID, moov.WithBankAccount(moov.BankAccountRequest{
-		HolderName:    "Schedule deposit target",
-		HolderType:    moov.HolderType_Individual,
-		AccountType:   moov.BankAccountType_Checking,
-		AccountNumber: randomBankAccountNumber(),
-		RoutingNumber: "273976369",
-	}), moov.WaitForPaymentMethod())
-	require.NoError(t, err)
-
-	t.Cleanup(func() {
-		if resp != nil {
-			_ = mc.DeleteBankAccount(BgCtx(), accountID, resp.BankAccountID)
-		}
-	})
-
-	require.NotEmpty(t, resp.PaymentMethods)
-	return resp
-}
-
 func createTemporaryCard(t *testing.T, mc *moov.Client, accountID string) *moov.Card {
 	exp := time.Now().UTC().AddDate(0, 7, 0)
 
