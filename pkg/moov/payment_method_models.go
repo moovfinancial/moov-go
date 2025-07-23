@@ -21,16 +21,17 @@ type PaymentMethodType string
 
 // List of PaymentMethodType
 const (
-	PaymentMethodType_MoovWallet        PaymentMethodType = "moov-wallet"
-	PaymentMethodType_AchDebitFund      PaymentMethodType = "ach-debit-fund"
-	PaymentMethodType_AchDebitCollect   PaymentMethodType = "ach-debit-collect"
-	PaymentMethodType_AchCreditStandard PaymentMethodType = "ach-credit-standard"
-	PaymentMethodType_AchCreditSameDay  PaymentMethodType = "ach-credit-same-day" // #nosec G101
-	PaymentMethodType_RtpCredit         PaymentMethodType = "rtp-credit"
-	PaymentMethodType_CardPayment       PaymentMethodType = "card-payment"
-	PaymentMethodType_ApplePay          PaymentMethodType = "apple-pay"
-	PaymentMethodType_PushToCard        PaymentMethodType = "push-to-card"
-	PaymentMethodType_PullFromCard      PaymentMethodType = "pull-from-card"
+	PaymentMethodType_MoovWallet         PaymentMethodType = "moov-wallet"
+	PaymentMethodType_AchDebitFund       PaymentMethodType = "ach-debit-fund"
+	PaymentMethodType_AchDebitCollect    PaymentMethodType = "ach-debit-collect"
+	PaymentMethodType_AchCreditStandard  PaymentMethodType = "ach-credit-standard"
+	PaymentMethodType_AchCreditSameDay   PaymentMethodType = "ach-credit-same-day" // #nosec G101
+	PaymentMethodType_RtpCredit          PaymentMethodType = "rtp-credit"
+	PaymentMethodType_CardPayment        PaymentMethodType = "card-payment"
+	PaymentMethodType_ApplePay           PaymentMethodType = "apple-pay"
+	PaymentMethodType_PushToCard         PaymentMethodType = "push-to-card"
+	PaymentMethodType_PullFromCard       PaymentMethodType = "pull-from-card"
+	PaymentMethodType_CardPresentPayment PaymentMethodType = "card-present-payment"
 )
 
 // WalletPaymentMethod A Moov wallet to store funds for transfers.
