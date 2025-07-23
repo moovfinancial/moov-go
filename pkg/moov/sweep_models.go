@@ -6,7 +6,7 @@ type SweepConfig struct {
 	SweepConfigID string            `json:"sweepConfigID"`
 	WalletID      string            `json:"walletID"`
 	Status        SweepConfigStatus `json:"status"`
-	// The payment method used to push funds to a bank account. `ach-credit-standard` or `ach-credit-same-day` is required.
+	// The payment method used to push funds to a bank account. `ach-credit-standard`, `ach-credit-same-day`, or `rtp-credit` is required.
 	PushPaymentMethod SweepConfigPaymentMethod `json:"pushPaymentMethod"`
 	// The payment method used to pull funds from a bank account. An `ach-debit-fund` payment method is required.
 	PullPaymentMethod SweepConfigPaymentMethod `json:"pullPaymentMethod"`
