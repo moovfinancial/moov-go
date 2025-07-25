@@ -12,6 +12,7 @@ type UpsertUnderwriting struct {
 	CollectFunds              *CollectFunds              `json:"collectFunds,omitempty"`
 	MoneyTransfer             *MoneyTransfer             `json:"moneyTransfer,omitempty"`
 	SendFunds                 *SendFunds                 `json:"sendFunds,omitempty"`
+	SubmissionIntent          *SubmissionIntent          `json:"submissionIntent,omitempty"`
 }
 
 // UnderwritingV2507 will have both legacy and V2507 fields for backward compatibility
@@ -192,3 +193,8 @@ type SendFundsPushToCard struct {
 type SendFundsRtp struct {
 	EstimatedActivity *EstimatedActivity `json:"estimatedActivity,omitempty"`
 }
+
+type SubmissionIntent string
+
+const SubmissionIntentWait SubmissionIntent = "wait"
+const SubmissionIntentSubmit SubmissionIntent = "submit"

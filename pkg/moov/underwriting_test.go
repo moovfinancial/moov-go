@@ -129,6 +129,7 @@ func TestUpsertUnderwriting_V2507(t *testing.T) {
 				},
 			},
 		},
+		SubmissionIntent: moov.PtrOf(mv2507.SubmissionIntentWait),
 	}
 
 	t.Run("insert", func(t *testing.T) {
@@ -186,6 +187,7 @@ func TestUpsertUnderwriting_V2507(t *testing.T) {
 				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRange10K50K)},
 			},
 		},
+		SubmissionIntent: moov.PtrOf(mv2507.SubmissionIntentSubmit),
 	}
 
 	t.Run("update", func(t *testing.T) {
