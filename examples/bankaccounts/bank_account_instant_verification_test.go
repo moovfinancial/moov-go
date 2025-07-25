@@ -71,7 +71,8 @@ func TestBankAccount_InstantVerificationExample(t *testing.T) {
 	// Initiate instant verification
 	baErr := mc.InstantVerificationInitiate(ctx, account.AccountID, bankAccount.BankAccountID)
 	require.NoError(t, baErr)
-	time.Sleep(2 * time.Second)
+
+	time.Sleep(5 * time.Second)
 
 	// Fetch the Bank Account Verification's status
 	bav, err := mc.GetInstantBankAccountVerfication(ctx, account.AccountID, bankAccount.BankAccountID)
