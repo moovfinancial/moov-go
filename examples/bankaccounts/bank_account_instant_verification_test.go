@@ -72,14 +72,20 @@ func TestBankAccount_InstantVerificationExample(t *testing.T) {
 	baErr := mc.InstantVerificationInitiate(ctx, account.AccountID, bankAccount.BankAccountID)
 	require.NoError(t, baErr)
 
-	time.Sleep(5 * time.Second)
-
 	// Fetch the Bank Account Verification's status
-	bav, err := mc.GetInstantBankAccountVerfication(ctx, account.AccountID, bankAccount.BankAccountID)
-	require.NoError(t, baErr)
-	require.Equal(t, moov.BankAccountVerificationMethodInstant, bav.VerificationMethod)
-	require.Equal(t, moov.BankAccountVerificationStatusSentCredit, bav.Status)
-	require.Nil(t, bav.ExceptionDetails)
+	require.Eventually(t, func() bool {
+		bav, err := mc.GetInstantBankAccountVerfication(ctx, account.AccountID, bankAccount.BankAccountID)
+		require.NoError(t, err)
+
+		require.NotNil(t, bav)
+		require.Nil(t, bav.ExceptionDetails)
+		require.Equal(t, moov.BankAccountVerificationMethodInstant, bav.VerificationMethod)
+
+		if bav.Status == moov.BankAccountVerificationStatusSentCredit {
+			return true
+		}
+		return false
+	}, 20*time.Second, time.Second)
 
 	// Complete instant verification
 	code := "MV0001" // Sandbox code is always MV0001
