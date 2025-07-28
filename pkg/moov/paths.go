@@ -95,4 +95,8 @@ const (
 	pathAccountTerminalApplication              = "/accounts/%s/terminal-applications/%s"
 	pathAccountTerminalApplications             = "/accounts/%s/terminal-applications"
 	pathAccountTerminalApplicationConfiguration = "/accounts/%s/terminal-applications/%s/configuration"
+
+	pathTickets        = "/accounts/%s/tickets"
+	pathTicket         = "/accounts/%s/tickets/%s"
+	pathTicketMessages = "/accounts/%s/tickets/%s/messages"
 )
