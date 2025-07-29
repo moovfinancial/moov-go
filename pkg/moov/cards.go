@@ -116,7 +116,7 @@ func (c Client) CreateCard(ctx context.Context, accountID string, card CreateCar
 	case StatusCompleted:
 		return UnmarshalObjectResponse[Card](resp)
 	case StatusNotFound:
-		return nil, errors.Join(ErrAccountNotFound, resp)
+		return nil, errors.Join(ErrResourceNotFound, resp)
 	case StatusStateConflict:
 		return nil, errors.Join(ErrAlreadyExists, resp)
 	default:

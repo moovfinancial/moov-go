@@ -30,6 +30,7 @@ func errorAsA[A interface{}](err error) *A {
 var (
 	ErrCredentialsNotSet            = errors.New("api credentials not set")
 	ErrAccountNotFound              = errors.New("no account with the specified accountID was found")
+	ErrResourceNotFound             = errors.New("the requested resource was not found")
 	ErrAlreadyExists                = errors.New("resource already exists")
 	ErrMicroDepositAmountsIncorrect = errors.New("the amounts provided are incorrect or the bank account is in an unexpected state")
 	ErrInstantVerificationFailed    = errors.New("attempted verification failed")
