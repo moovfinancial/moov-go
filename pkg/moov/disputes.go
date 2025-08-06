@@ -145,6 +145,13 @@ func WithDisputeOrderBy(orderBy string) DisputeListFilter {
 	})
 }
 
+func WithDisputeTransferIds(transferIds []string) DisputeListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["transferIDs"] = fmt.Sprintf("%v", transferIds)
+		return nil
+	})
+}
+
 type EvidenceType string
 
 const (
