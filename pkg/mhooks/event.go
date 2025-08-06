@@ -33,7 +33,7 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 	switch event.EventType {
 	case EventTypeAccountCreated:
 		eventData = &event.accountCreated
-	case EventTypeAccountDeleted:
+	case EventTypeAccountDisconnected:
 		eventData = &event.accountDeleted
 	case EventTypeAccountUpdated:
 		eventData = &event.accountUpdated
@@ -106,7 +106,7 @@ type Event struct {
 	Data      json.RawMessage `json:"data"`
 
 	accountCreated           *AccountCreated
-	accountDeleted           *AccountDeleted
+	accountDeleted           *AccountDisconnected
 	accountUpdated           *AccountUpdated
 	balanceUpdated           *BalanceUpdated
 	bankAccountCreated       *BankAccountCreated
@@ -143,9 +143,9 @@ func (e Event) AccountCreated() (*AccountCreated, error) {
 	return e.accountCreated, nil
 }
 
-func (e Event) AccountDeleted() (*AccountDeleted, error) {
-	if e.EventType != EventTypeAccountDeleted {
-		return nil, newInvalidEventTypeError(EventTypeAccountDeleted, e.EventType)
+func (e Event) AccountDisconnected() (*AccountDisconnected, error) {
+	if e.EventType != EventTypeAccountDisconnected {
+		return nil, newInvalidEventTypeError(EventTypeAccountDisconnected, e.EventType)
 	}
 
 	return e.accountDeleted, nil
