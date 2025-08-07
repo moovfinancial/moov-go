@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -141,6 +142,13 @@ func WithDisputeEndDate(t time.Time) DisputeListFilter {
 func WithDisputeOrderBy(orderBy string) DisputeListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["orderBy"] = orderBy
+		return nil
+	})
+}
+
+func WithDisputeTransferIds(transferIds []string) DisputeListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["transferIDs"] = strings.Join(transferIds, ",")
 		return nil
 	})
 }
