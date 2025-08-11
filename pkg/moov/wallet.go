@@ -42,6 +42,13 @@ type WalletTransaction struct {
 	SweepID                 *string                     `json:"sweepID,omitempty"`
 }
 
+type WalletStatus string
+
+const (
+	WalletStatus_Active WalletStatus = "active"
+	WalletStatus_Closed WalletStatus = "closed"
+)
+
 type WalletTransactionStatus string
 
 const (
