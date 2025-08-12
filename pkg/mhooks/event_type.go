@@ -10,7 +10,7 @@ type EventType string
 
 const (
 	EventTypeAccountCreated           EventType = "account.created"
-	EventTypeAccountDeleted           EventType = "account.deleted"
+	EventTypeAccountDisconnected      EventType = "account.disconnected"
 	EventTypeAccountUpdated           EventType = "account.updated"
 	EventTypeBalanceUpdated           EventType = "balance.updated"
 	EventTypeBankAccountCreated       EventType = "bankAccount.created"
@@ -45,7 +45,7 @@ type AccountCreated struct {
 	ForeignID string `json:"foreignID,omitempty"`
 }
 
-type AccountDeleted struct {
+type AccountDisconnected struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
 	ForeignID string `json:"foreignID,omitempty"`
