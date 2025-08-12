@@ -306,8 +306,6 @@ type WalletCreated struct {
 	AccountID string `json:"accountID"`
 	// ID of the wallet
 	WalletID string `json:"walletID"`
-	// Name of the wallet
-	Name string `json:"name"`
 }
 
 type WalletUpdated struct {
@@ -315,8 +313,6 @@ type WalletUpdated struct {
 	AccountID string `json:"accountID"`
 	// ID of the wallet
 	WalletID string `json:"walletID"`
-	// Name of the wallet
-	Name string `json:"name"`
 	// Status of the wallet
 	Status moov.WalletStatus `json:"status"`
 }
