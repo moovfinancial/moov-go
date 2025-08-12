@@ -357,6 +357,22 @@ func (e Event) TransferUpdated() (*TransferUpdated, error) {
 	return e.transferUpdated, nil
 }
 
+func (e Event) WalletCreated() (*WalletCreated, error) {
+	if e.EventType != EventTypeWalletCreated {
+		return nil, newInvalidEventTypeError(EventTypeWalletCreated, e.EventType)
+	}
+
+	return e.walletCreated, nil
+}
+
+func (e Event) WalletUpdated() (*WalletUpdated, error) {
+	if e.EventType != EventTypeWalletUpdated {
+		return nil, newInvalidEventTypeError(EventTypeWalletUpdated, e.EventType)
+	}
+
+	return e.walletUpdated, nil
+}
+
 func (e Event) WalletTransactionUpdated() (*WalletTransactionUpdated, error) {
 	if e.EventType != EventTypeWalletTransactionUpdated {
 		return nil, newInvalidEventTypeError(EventTypeWalletTransactionUpdated, e.EventType)
