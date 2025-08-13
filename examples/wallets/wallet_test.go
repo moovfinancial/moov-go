@@ -1,0 +1,62 @@
+package wallets
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/moovfinancial/moov-go/pkg/moov"
+)
+
+func ExampleClient_wallet() {
+	mc, err := moov.NewClient()
+	if err != nil {
+		fmt.Errorf("new Moov client: %v\n", err)
+		return
+	}
+
+	var (
+		ctx              = context.Background()
+		partnerAccountID = "00000000-00000000-00000000-00000000"
+		accountID        = "00000000-00000000-00000000-00000000"
+	)
+
+	create := moov.CreateWallet{
+		Name:             "my general wallet",
+		PartnerAccountID: partnerAccountID,
+		Description:      "testing",
+		Metadata:         map[string]string{"foo": "bar"},
+	}
+	createdWallet, err := mc.CreateWallet(ctx, accountID, create)
+	if err != nil {
+		fmt.Printf("creating wallet: %v\n", err)
+		return
+	}
+	fmt.Printf("Created wallet: %+v\n", createdWallet)
+
+	fetchedWallet, err := mc.GetWallet(ctx, accountID, createdWallet.WalletID)
+	if err != nil {
+		fmt.Printf("getting wallet: %v\n", err)
+		return
+	}
+	fmt.Printf("getting wallet: %+v\n", fetchedWallet)
+
+	update := moov.UpdateWallet{
+		Name:        "updated name",
+		Description: "inactive wallet",
+		Status:      moov.WalletStatus_Closed,
+		Metadata:    map[string]string{"foo": "baz"},
+	}
+	updatedWallet, err := mc.UpdateWallet(ctx, accountID, createdWallet.WalletID, update)
+	if err != nil {
+		fmt.Printf("updating wallet: %v\n", err)
+		return
+	}
+	fmt.Printf("Updated wallet: %+v\n", updatedWallet)
+
+	listedWallets, err := mc.ListWallets(ctx, accountID)
+	if err != nil {
+		fmt.Printf("listing wallets: %v\n", err)
+		return
+	}
+	fmt.Printf("listed wallets: %+v\n", listedWallets)
+}
