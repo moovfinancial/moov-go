@@ -10,7 +10,7 @@ import (
 func ExampleClient_CancelTransfer() {
 	mc, err := moov.NewClient()
 	if err != nil {
-		fmt.Errorf("new Moov client: %v\n", err)
+		fmt.Printf("new Moov client: %v\n", err)
 		return
 	}
 
@@ -32,7 +32,7 @@ func ExampleClient_CancelTransfer() {
 func ExampleClient_GetCancellation() {
 	mc, err := moov.NewClient()
 	if err != nil {
-		fmt.Errorf("new Moov client: %v\n", err)
+		fmt.Printf("new Moov client: %v\n", err)
 		return
 	}
 

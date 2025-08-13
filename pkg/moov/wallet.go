@@ -142,10 +142,11 @@ func (c Client) CreateWallet(ctx context.Context, accountID string, create Creat
 }
 
 type UpdateWallet struct {
-	Name        string            `json:"name"`
-	Description string            `json:"description"`
-	Status      WalletStatus      `json:"status"`
-	Metadata    map[string]string `json:"metadata"`
+	Name        *string       `json:"name,omitempty"`
+	Status      *WalletStatus `json:"status,omitempty"`
+	Description *string       `json:"description,omitempty"`
+	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 // TODO(vince,08/13/2025): add docs link
