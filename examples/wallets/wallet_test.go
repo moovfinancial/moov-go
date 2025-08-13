@@ -7,7 +7,7 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
-func ExampleClient_Wallets() {
+func ExampleClient_wallet() {
 	mc, err := moov.NewClient()
 	if err != nil {
 		fmt.Printf("new Moov client: %v\n", err)
