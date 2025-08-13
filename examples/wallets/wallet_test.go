@@ -7,10 +7,10 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
-func ExampleClient_wallet() {
+func ExampleClient_Wallets() {
 	mc, err := moov.NewClient()
 	if err != nil {
-		fmt.Errorf("new Moov client: %v\n", err)
+		fmt.Printf("new Moov client: %v\n", err)
 		return
 	}
 
@@ -41,9 +41,9 @@ func ExampleClient_wallet() {
 	fmt.Printf("getting wallet: %+v\n", fetchedWallet)
 
 	update := moov.UpdateWallet{
-		Name:        "updated name",
-		Description: "inactive wallet",
-		Status:      moov.WalletStatus_Closed,
+		Name:        moov.PtrOf("updated name"),
+		Description: moov.PtrOf("inactive wallet"),
+		Status:      moov.PtrOf(moov.WalletStatus_Closed),
 		Metadata:    map[string]string{"foo": "baz"},
 	}
 	updatedWallet, err := mc.UpdateWallet(ctx, accountID, createdWallet.WalletID, update)
