@@ -34,6 +34,9 @@ const (
 	EventTypeSweepCreated             EventType = "sweep.created"
 	EventTypeSweepUpdated             EventType = "sweep.updated"
 	EventTypeTestPing                 EventType = "event.test"
+	EventTypeTicketCreated            EventType = "ticket.created"
+	EventTypeTicketStatusChanged      EventType = "ticket.statusChanged"
+	EventTypeTicketMessageAdded       EventType = "ticket.messageAdded"
 	EventTypeTransferCreated          EventType = "transfer.created"
 	EventTypeTransferUpdated          EventType = "transfer.updated"
 	EventTypeWalletTransactionUpdated EventType = "walletTransaction.updated"
@@ -240,6 +243,29 @@ type SweepUpdated struct {
 
 type TestPing struct {
 	Ping bool `json:"ping"`
+}
+
+type TicketCreated struct {
+	// ID of the account
+	AccountID string `json:"accountID"`
+	// ID of the ticket
+	TicketID string `json:"ticketID"`
+}
+
+type TicketStatusChanged struct {
+	// ID of the account
+	AccountID string `json:"accountID"`
+	// ID of the ticket
+	TicketID string `json:"ticketID"`
+	// Status of the ticket
+	Status moov.TicketStatus `json:"status"`
+}
+
+type TicketMessageAdded struct {
+	// ID of the account
+	AccountID string `json:"accountID"`
+	// ID of the ticket
+	TicketID string `json:"ticketID"`
 }
 
 type TransferCreated struct {
