@@ -35,7 +35,7 @@ const (
 	EventTypeSweepUpdated             EventType = "sweep.updated"
 	EventTypeTestPing                 EventType = "event.test"
 	EventTypeTicketCreated            EventType = "ticket.created"
-	EventTypeTicketStatusChanged      EventType = "ticket.statusChanged"
+	EventTypeTicketUpdated            EventType = "ticket.updated"
 	EventTypeTicketMessageAdded       EventType = "ticket.messageAdded"
 	EventTypeTransferCreated          EventType = "transfer.created"
 	EventTypeTransferUpdated          EventType = "transfer.updated"
@@ -252,7 +252,7 @@ type TicketCreated struct {
 	TicketID string `json:"ticketID"`
 }
 
-type TicketStatusChanged struct {
+type TicketUpdated struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
 	// ID of the ticket

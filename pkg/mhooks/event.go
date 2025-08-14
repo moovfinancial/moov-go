@@ -83,8 +83,8 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 		eventData = &event.testPing
 	case EventTypeTicketCreated:
 		eventData = &event.ticketCreated
-	case EventTypeTicketStatusChanged:
-		eventData = &event.ticketStatusChanged
+	case EventTypeTicketUpdated:
+		eventData = &event.ticketUpdated
 	case EventTypeTicketMessageAdded:
 		eventData = &event.ticketMessageAdded
 	case EventTypeTransferCreated:
@@ -137,7 +137,7 @@ type Event struct {
 	sweepUpdated             *SweepUpdated
 	testPing                 *TestPing
 	ticketCreated            *TicketCreated
-	ticketStatusChanged      *TicketStatusChanged
+	ticketUpdated            *TicketUpdated
 	ticketMessageAdded       *TicketMessageAdded
 	transferCreated          *TransferCreated
 	transferUpdated          *TransferUpdated
@@ -352,12 +352,12 @@ func (e Event) TicketCreated() (*TicketCreated, error) {
 	return e.ticketCreated, nil
 }
 
-func (e Event) TicketStatusChanged() (*TicketStatusChanged, error) {
-	if e.EventType != EventTypeTicketStatusChanged {
-		return nil, newInvalidEventTypeError(EventTypeTicketStatusChanged, e.EventType)
+func (e Event) TicketUpdated() (*TicketUpdated, error) {
+	if e.EventType != EventTypeTicketUpdated {
+		return nil, newInvalidEventTypeError(EventTypeTicketUpdated, e.EventType)
 	}
 
-	return e.ticketStatusChanged, nil
+	return e.ticketUpdated, nil
 }
 
 func (e Event) TicketMessageAdded() (*TicketMessageAdded, error) {
