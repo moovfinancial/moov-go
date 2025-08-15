@@ -87,8 +87,6 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 		eventData = &event.transferUpdated
 	case EventTypeWalletTransactionUpdated:
 		eventData = &event.walletTransactionUpdated
-	case EventTypeBillingStatementCreated:
-		eventData = &event.billingStatementCreated
 	default:
 		return nil, fmt.Errorf("invalid event type: %v", event.EventType)
 	}
@@ -135,7 +133,6 @@ type Event struct {
 	transferCreated          *TransferCreated
 	transferUpdated          *TransferUpdated
 	walletTransactionUpdated *WalletTransactionUpdated
-	billingStatementCreated  *BillingStatementCreated
 }
 
 func (e Event) AccountCreated() (*AccountCreated, error) {
@@ -360,14 +357,6 @@ func (e Event) WalletTransactionUpdated() (*WalletTransactionUpdated, error) {
 	}
 
 	return e.walletTransactionUpdated, nil
-}
-
-func (e Event) BillingStatementCreated() (*BillingStatementCreated, error) {
-	if e.EventType != EventTypeBillingStatementCreated {
-		return nil, newInvalidEventTypeError(EventTypeBillingStatementCreated, e.EventType)
-	}
-
-	return e.billingStatementCreated, nil
 }
 
 func newInvalidEventTypeError(expected, got EventType) error {
