@@ -37,7 +37,7 @@ const (
 	EventTypeTransferCreated          EventType = "transfer.created"
 	EventTypeTransferUpdated          EventType = "transfer.updated"
 	EventTypeWalletTransactionUpdated EventType = "walletTransaction.updated"
-	EventTypeStatementCreated         EventType = "statement.created"
+	EventTypeBillingStatementCreated  EventType = "billingStatement.created"
 )
 
 type AccountCreated struct {
@@ -313,6 +313,6 @@ type WalletTransactionUpdated struct {
 	AvailableBalance *moov.AvailableBalance `json:"availableBalance,omitempty"`
 }
 
-type StatementCreated struct {
+type BillingStatementCreated struct {
 	StatementID string `json:"statementID"`
 }
