@@ -88,7 +88,7 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 	case EventTypeWalletTransactionUpdated:
 		eventData = &event.walletTransactionUpdated
 	case EventTypeBillingStatementCreated:
-		eventData = &event.statementCreated
+		eventData = &event.billingStatementCreated
 	default:
 		return nil, fmt.Errorf("invalid event type: %v", event.EventType)
 	}
@@ -362,7 +362,7 @@ func (e Event) WalletTransactionUpdated() (*WalletTransactionUpdated, error) {
 	return e.walletTransactionUpdated, nil
 }
 
-func (e Event) StatementCreated() (*BillingStatementCreated, error) {
+func (e Event) BillingStatementCreated() (*BillingStatementCreated, error) {
 	if e.EventType != EventTypeBillingStatementCreated {
 		return nil, newInvalidEventTypeError(EventTypeBillingStatementCreated, e.EventType)
 	}
