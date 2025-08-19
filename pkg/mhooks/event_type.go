@@ -39,6 +39,8 @@ const (
 	EventTypeTicketMessageAdded       EventType = "ticket.messageAdded"
 	EventTypeTransferCreated          EventType = "transfer.created"
 	EventTypeTransferUpdated          EventType = "transfer.updated"
+	EventTypeWalletCreated            EventType = "wallet.created"
+	EventTypeWalletUpdated            EventType = "wallet.updated"
 	EventTypeWalletTransactionUpdated EventType = "walletTransaction.updated"
 )
 
@@ -323,6 +325,22 @@ type PaymentMethodPartial struct {
 	AccountID string `json:"accountID"`
 	// ID of the payment method
 	PaymentMethodID string `json:"paymentMethodID"`
+}
+
+type WalletCreated struct {
+	// ID of the account
+	AccountID string `json:"accountID"`
+	// ID of the wallet
+	WalletID string `json:"walletID"`
+}
+
+type WalletUpdated struct {
+	// ID of the account
+	AccountID string `json:"accountID"`
+	// ID of the wallet
+	WalletID string `json:"walletID"`
+	// Status of the wallet
+	Status moov.WalletStatus `json:"status"`
 }
 
 type WalletTransactionUpdated struct {
