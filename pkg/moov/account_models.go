@@ -278,10 +278,11 @@ type PrimaryRegulator string
 
 // List of PrimaryRegulator
 const (
-	PrimaryRegulator_OCC  PrimaryRegulator = "OCC"
-	PrimaryRegulator_FDIC PrimaryRegulator = "FDIC"
-	PrimaryRegulator_NCUA PrimaryRegulator = "NCUA"
-	PrimaryRegulator_FRB  PrimaryRegulator = "FRB"
+	PrimaryRegulator_OCC                PrimaryRegulator = "OCC"
+	PrimaryRegulator_FDIC               PrimaryRegulator = "FDIC"
+	PrimaryRegulator_NCUA               PrimaryRegulator = "NCUA"
+	PrimaryRegulator_FRB                PrimaryRegulator = "FRB"
+	PrimaryRegulator_State_CU_Regulator PrimaryRegulator = "state-cu-regulator"
 )
 
 // TermsOfService Describes the acceptance of the Terms of Service.

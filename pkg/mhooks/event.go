@@ -33,7 +33,7 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 	switch event.EventType {
 	case EventTypeAccountCreated:
 		eventData = &event.accountCreated
-	case EventTypeAccountDeleted:
+	case EventTypeAccountDisconnected:
 		eventData = &event.accountDeleted
 	case EventTypeAccountUpdated:
 		eventData = &event.accountUpdated
@@ -81,6 +81,12 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 		eventData = &event.sweepUpdated
 	case EventTypeTestPing:
 		eventData = &event.testPing
+	case EventTypeTicketCreated:
+		eventData = &event.ticketCreated
+	case EventTypeTicketUpdated:
+		eventData = &event.ticketUpdated
+	case EventTypeTicketMessageAdded:
+		eventData = &event.ticketMessageAdded
 	case EventTypeTransferCreated:
 		eventData = &event.transferCreated
 	case EventTypeTransferUpdated:
@@ -110,7 +116,7 @@ type Event struct {
 	Data      json.RawMessage `json:"data"`
 
 	accountCreated           *AccountCreated
-	accountDeleted           *AccountDeleted
+	accountDeleted           *AccountDisconnected
 	accountUpdated           *AccountUpdated
 	balanceUpdated           *BalanceUpdated
 	bankAccountCreated       *BankAccountCreated
@@ -134,6 +140,9 @@ type Event struct {
 	sweepCreated             *SweepCreated
 	sweepUpdated             *SweepUpdated
 	testPing                 *TestPing
+	ticketCreated            *TicketCreated
+	ticketUpdated            *TicketUpdated
+	ticketMessageAdded       *TicketMessageAdded
 	transferCreated          *TransferCreated
 	transferUpdated          *TransferUpdated
 	walletCreated            *WalletCreated
@@ -149,9 +158,9 @@ func (e Event) AccountCreated() (*AccountCreated, error) {
 	return e.accountCreated, nil
 }
 
-func (e Event) AccountDeleted() (*AccountDeleted, error) {
-	if e.EventType != EventTypeAccountDeleted {
-		return nil, newInvalidEventTypeError(EventTypeAccountDeleted, e.EventType)
+func (e Event) AccountDisconnected() (*AccountDisconnected, error) {
+	if e.EventType != EventTypeAccountDisconnected {
+		return nil, newInvalidEventTypeError(EventTypeAccountDisconnected, e.EventType)
 	}
 
 	return e.accountDeleted, nil
@@ -339,6 +348,30 @@ func (e Event) TestPing() (*TestPing, error) {
 	}
 
 	return e.testPing, nil
+}
+
+func (e Event) TicketCreated() (*TicketCreated, error) {
+	if e.EventType != EventTypeTicketCreated {
+		return nil, newInvalidEventTypeError(EventTypeTicketCreated, e.EventType)
+	}
+
+	return e.ticketCreated, nil
+}
+
+func (e Event) TicketUpdated() (*TicketUpdated, error) {
+	if e.EventType != EventTypeTicketUpdated {
+		return nil, newInvalidEventTypeError(EventTypeTicketUpdated, e.EventType)
+	}
+
+	return e.ticketUpdated, nil
+}
+
+func (e Event) TicketMessageAdded() (*TicketMessageAdded, error) {
+	if e.EventType != EventTypeTicketMessageAdded {
+		return nil, newInvalidEventTypeError(EventTypeTicketMessageAdded, e.EventType)
+	}
+
+	return e.ticketMessageAdded, nil
 }
 
 func (e Event) TransferCreated() (*TransferCreated, error) {

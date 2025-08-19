@@ -10,7 +10,7 @@ type EventType string
 
 const (
 	EventTypeAccountCreated           EventType = "account.created"
-	EventTypeAccountDeleted           EventType = "account.deleted"
+	EventTypeAccountDisconnected      EventType = "account.disconnected"
 	EventTypeAccountUpdated           EventType = "account.updated"
 	EventTypeBalanceUpdated           EventType = "balance.updated"
 	EventTypeBankAccountCreated       EventType = "bankAccount.created"
@@ -34,6 +34,9 @@ const (
 	EventTypeSweepCreated             EventType = "sweep.created"
 	EventTypeSweepUpdated             EventType = "sweep.updated"
 	EventTypeTestPing                 EventType = "event.test"
+	EventTypeTicketCreated            EventType = "ticket.created"
+	EventTypeTicketUpdated            EventType = "ticket.updated"
+	EventTypeTicketMessageAdded       EventType = "ticket.messageAdded"
 	EventTypeTransferCreated          EventType = "transfer.created"
 	EventTypeTransferUpdated          EventType = "transfer.updated"
 	EventTypeWalletCreated            EventType = "wallet.created"
@@ -47,7 +50,7 @@ type AccountCreated struct {
 	ForeignID string `json:"foreignID,omitempty"`
 }
 
-type AccountDeleted struct {
+type AccountDisconnected struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
 	ForeignID string `json:"foreignID,omitempty"`
@@ -242,6 +245,29 @@ type SweepUpdated struct {
 
 type TestPing struct {
 	Ping bool `json:"ping"`
+}
+
+type TicketCreated struct {
+	// ID of the account
+	AccountID string `json:"accountID"`
+	// ID of the ticket
+	TicketID string `json:"ticketID"`
+}
+
+type TicketUpdated struct {
+	// ID of the account
+	AccountID string `json:"accountID"`
+	// ID of the ticket
+	TicketID string `json:"ticketID"`
+	// Status of the ticket
+	Status moov.TicketStatus `json:"status"`
+}
+
+type TicketMessageAdded struct {
+	// ID of the account
+	AccountID string `json:"accountID"`
+	// ID of the ticket
+	TicketID string `json:"ticketID"`
 }
 
 type TransferCreated struct {
