@@ -8,8 +8,18 @@ import (
 
 // TODO(vince,08/13/2025): move all of these models to a separate file to match pattern for other domains
 type Wallet struct {
-	WalletID         string           `json:"walletID,omitempty"`
-	AvailableBalance AvailableBalance `json:"availableBalance,omitempty"`
+	WalletID         string           `json:"walletID"`
+	AvailableBalance AvailableBalance `json:"availableBalance"`
+
+	PartnerAccountID string       `json:"partnerAccountID"`
+	Name             string       `json:"name"`
+	Status           WalletStatus `json:"status"`
+	WalletType       WalletType   `json:"walletType"`
+	CreatedOn        time.Time    `json:"createdOn"`
+
+	Metadata    map[string]string `json:"metadata,omitempty"`
+	Description string            `json:"description,omitempty"`
+	ClosedOn    *time.Time        `json:"closedOn,omitempty"`
 }
 
 type AvailableBalance struct {
@@ -48,6 +58,13 @@ type WalletStatus string
 const (
 	WalletStatus_Active WalletStatus = "active"
 	WalletStatus_Closed WalletStatus = "closed"
+)
+
+type WalletType string
+
+const (
+	WalletType_Default WalletType = "default"
+	WalletType_General WalletType = "general"
 )
 
 type WalletTransactionStatus string
