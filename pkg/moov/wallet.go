@@ -8,19 +8,18 @@ import (
 
 // TODO(vince,08/13/2025): move all of these models to a separate file to match pattern for other domains
 type Wallet struct {
-	WalletID         string           `json:"walletID,omitempty"`
-	AvailableBalance AvailableBalance `json:"availableBalance,omitempty"`
+	WalletID         string           `json:"walletID"`
+	AvailableBalance AvailableBalance `json:"availableBalance"`
 
-	PartnerAccountID string       `json:"partnerAccountID,omitempty"`
-	Name             string       `json:"name,omitempty"`
-	Status           WalletStatus `json:"status,omitempty"`
-	WalletType       WalletType   `json:"walletType,omitempty"`
-	CreatedOn        time.Time    `json:"createdOn,omitempty"`
-	UpdatedOn        time.Time    `json:"updatedOn,omitempty"`
+	PartnerAccountID string       `json:"partnerAccountID"`
+	Name             string       `json:"name"`
+	Status           WalletStatus `json:"status"`
+	WalletType       WalletType   `json:"walletType"`
+	CreatedOn        time.Time    `json:"createdOn"`
 
-	Description *string            `json:"description,omitempty"`
-	Metadata    *map[string]string `json:"metadata,omitempty"`
-	ClosedOn    *time.Time         `json:"closedOn,omitempty"`
+	Metadata    map[string]string `json:"metadata,omitempty"`
+	Description *string           `json:"description,omitempty"`
+	ClosedOn    *time.Time        `json:"closedOn,omitempty"`
 }
 
 type AvailableBalance struct {
