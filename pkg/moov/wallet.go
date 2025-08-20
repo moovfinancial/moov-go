@@ -18,7 +18,7 @@ type Wallet struct {
 	CreatedOn        time.Time    `json:"createdOn"`
 
 	Metadata    map[string]string `json:"metadata,omitempty"`
-	Description *string           `json:"description,omitempty"`
+	Description string            `json:"description,omitempty"`
 	ClosedOn    *time.Time        `json:"closedOn,omitempty"`
 }
 
