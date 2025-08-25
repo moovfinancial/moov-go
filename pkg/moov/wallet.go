@@ -116,11 +116,36 @@ const (
 	WalletTransactionSourceTypeFee                    WalletTransactionSourceType = "fee"
 )
 
-// TODO(vince,08/13/2025): update this with new query params
+type ListWalletFilter callArg
+
+func WithWalletType(v WalletType) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["walletType"] = string(v)
+		return nil
+	})
+}
+
+func WithWalletStatus(status WalletStatus) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["status"] = string(status)
+		return nil
+	})
+}
+
+func WithWalletSkip(skip int) ListWalletFilter {
+	return Skip(skip)
+}
+
+func WithWalletCount(count int) ListWalletFilter {
+	return Count(count)
+}
+
 // ListWallets lists all wallets that are associated with a Moov account
 // https://docs.moov.io/api/index.html#tag/Wallets/operation/listWalletsForAccount
-func (c Client) ListWallets(ctx context.Context, accountID string) ([]Wallet, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWallets, accountID), AcceptJson())
+func (c Client) ListWallets(ctx context.Context, accountID string, filters ...ListWalletFilter) ([]Wallet, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathWallets, accountID),
+		prependArgs(filters, AcceptJson())...)
 	if err != nil {
 		return nil, err
 	}
@@ -140,14 +165,11 @@ func (c Client) GetWallet(ctx context.Context, accountID string, walletID string
 }
 
 type CreateWallet struct {
-	Name string `json:"name"`
-	// TODO(vince,08/13/2025): we may decide to remove this as a required field, fix before merging
-	PartnerAccountID string            `json:"partnerAccountID"`
-	Description      string            `json:"description"`
-	Metadata         map[string]string `json:"metadata"`
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	Metadata    map[string]string `json:"metadata"`
 }
 
-// TODO(vince,08/13/2025): add docs link
 // CreateWallet creates a general wallet
 func (c Client) CreateWallet(ctx context.Context, accountID string, create CreateWallet) (*Wallet, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathWallets, accountID), AcceptJson(), JsonBody(create))
@@ -166,8 +188,6 @@ type UpdateWallet struct {
 	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
-// TODO(vince,08/13/2025): add docs link
-//
 // UpdateWallet updates a wallet
 func (c Client) UpdateWallet(ctx context.Context, accountID string, walletID string, update UpdateWallet) (*Wallet, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPatch, pathWallet, accountID, walletID), AcceptJson(), JsonBody(update))

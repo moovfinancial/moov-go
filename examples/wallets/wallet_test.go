@@ -15,16 +15,14 @@ func ExampleClient_wallet() {
 	}
 
 	var (
-		ctx              = context.Background()
-		partnerAccountID = "00000000-00000000-00000000-00000000"
-		accountID        = "00000000-00000000-00000000-00000000"
+		ctx       = context.Background()
+		accountID = "00000000-00000000-00000000-00000000"
 	)
 
 	create := moov.CreateWallet{
-		Name:             "my general wallet",
-		PartnerAccountID: partnerAccountID,
-		Description:      "testing",
-		Metadata:         map[string]string{"foo": "bar"},
+		Name:        "my general wallet",
+		Description: "testing",
+		Metadata:    map[string]string{"foo": "bar"},
 	}
 	createdWallet, err := mc.CreateWallet(ctx, accountID, create)
 	if err != nil {
@@ -53,10 +51,10 @@ func ExampleClient_wallet() {
 	}
 	fmt.Printf("Updated wallet: %+v\n", updatedWallet)
 
-	listedWallets, err := mc.ListWallets(ctx, accountID)
+	listedWallets, err := mc.ListWallets(ctx, accountID, moov.WithWalletStatus(moov.WalletStatus_Active))
 	if err != nil {
-		fmt.Printf("listing wallets: %v\n", err)
+		fmt.Printf("listing active wallets: %v\n", err)
 		return
 	}
-	fmt.Printf("listed wallets: %+v\n", listedWallets)
+	fmt.Printf("listed active wallets: %+v\n", listedWallets)
 }
