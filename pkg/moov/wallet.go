@@ -6,9 +6,20 @@ import (
 	"time"
 )
 
+// TODO(vince,08/13/2025): move all of these models to a separate file to match pattern for other domains
 type Wallet struct {
-	WalletID         string           `json:"walletID,omitempty"`
-	AvailableBalance AvailableBalance `json:"availableBalance,omitempty"`
+	WalletID         string           `json:"walletID"`
+	AvailableBalance AvailableBalance `json:"availableBalance"`
+
+	PartnerAccountID string       `json:"partnerAccountID"`
+	Name             string       `json:"name"`
+	Status           WalletStatus `json:"status"`
+	WalletType       WalletType   `json:"walletType"`
+	CreatedOn        time.Time    `json:"createdOn"`
+
+	Metadata    map[string]string `json:"metadata,omitempty"`
+	Description string            `json:"description,omitempty"`
+	ClosedOn    *time.Time        `json:"closedOn,omitempty"`
 }
 
 type AvailableBalance struct {
@@ -47,6 +58,13 @@ type WalletStatus string
 const (
 	WalletStatus_Active WalletStatus = "active"
 	WalletStatus_Closed WalletStatus = "closed"
+)
+
+type WalletType string
+
+const (
+	WalletType_Default WalletType = "default"
+	WalletType_General WalletType = "general"
 )
 
 type WalletTransactionStatus string
@@ -98,10 +116,36 @@ const (
 	WalletTransactionSourceTypeFee                    WalletTransactionSourceType = "fee"
 )
 
+type ListWalletFilter callArg
+
+func WithWalletType(v WalletType) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["walletType"] = string(v)
+		return nil
+	})
+}
+
+func WithWalletStatus(status WalletStatus) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["status"] = string(status)
+		return nil
+	})
+}
+
+func WithWalletSkip(skip int) ListWalletFilter {
+	return Skip(skip)
+}
+
+func WithWalletCount(count int) ListWalletFilter {
+	return Count(count)
+}
+
 // ListWallets lists all wallets that are associated with a Moov account
 // https://docs.moov.io/api/index.html#tag/Wallets/operation/listWalletsForAccount
-func (c Client) ListWallets(ctx context.Context, accountID string) ([]Wallet, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWallets, accountID), AcceptJson())
+func (c Client) ListWallets(ctx context.Context, accountID string, filters ...ListWalletFilter) ([]Wallet, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathWallets, accountID),
+		prependArgs(filters, AcceptJson())...)
 	if err != nil {
 		return nil, err
 	}
@@ -113,6 +157,40 @@ func (c Client) ListWallets(ctx context.Context, accountID string) ([]Wallet, er
 // https://docs.moov.io/api/index.html#tag/Wallets/operation/getWalletForAccount
 func (c Client) GetWallet(ctx context.Context, accountID string, walletID string) (*Wallet, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWallet, accountID, walletID), AcceptJson())
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Wallet](resp)
+}
+
+type CreateWallet struct {
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	Metadata    map[string]string `json:"metadata"`
+}
+
+// CreateWallet creates a general wallet
+func (c Client) CreateWallet(ctx context.Context, accountID string, create CreateWallet) (*Wallet, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathWallets, accountID), AcceptJson(), JsonBody(create))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Wallet](resp)
+}
+
+type UpdateWallet struct {
+	Name        *string       `json:"name,omitempty"`
+	Status      *WalletStatus `json:"status,omitempty"`
+	Description *string       `json:"description,omitempty"`
+	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
+	Metadata map[string]string `json:"metadata,omitempty"`
+}
+
+// UpdateWallet updates a wallet
+func (c Client) UpdateWallet(ctx context.Context, accountID string, walletID string, update UpdateWallet) (*Wallet, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPatch, pathWallet, accountID, walletID), AcceptJson(), JsonBody(update))
 	if err != nil {
 		return nil, err
 	}
