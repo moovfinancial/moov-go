@@ -6,9 +6,33 @@ import (
 	"time"
 )
 
+type WalletStatus string
+
+const (
+	WalletStatus_Closed = "closed"
+	WalletStatus_Active = "active"
+)
+
+type WalletType string
+
+const (
+	WalletType_Default = "default"
+	WalletType_General = "general"
+)
+
+type Metadata map[string]string
+
 type Wallet struct {
 	WalletID         string           `json:"walletID,omitempty"`
-	AvailableBalance AvailableBalance `json:"availableBalance,omitempty"`
+	AvailableBalance AvailableBalance `json:"availableBalance"`
+	PartnerAccountID string           `json:"partnerAccountID,omitempty"`
+	Name             string           `json:"name,omitempty" otel:"name"`
+	Status           WalletStatus     `json:"status,omitempty" otel:"status"`
+	WalletType       WalletType       `json:"walletType,omitempty" otel:"walletType"`
+	Description      *string          `json:"description,omitempty" otel:"description"`
+	Metadata         *Metadata        `json:"metadata,omitempty" otel:"metadata"`
+	CreatedOn        time.Time        `json:"createdOn" otel:"createdOn"`
+	ClosedOn         *time.Time       `json:"closedOn,omitempty" otel:"closedOn"`
 }
 
 type AvailableBalance struct {
