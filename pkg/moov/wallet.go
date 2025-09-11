@@ -6,34 +6,36 @@ import (
 	"time"
 )
 
+type Wallet struct {
+	WalletID         string           `json:"walletID" otel:"walletID"`
+	AvailableBalance AvailableBalance `json:"availableBalance" otel:"availableBalance"`
+
+	PartnerAccountID string       `json:"partnerAccountID" otel:"partnerAccountID"`
+	Name             string       `json:"name" otel:"name"`
+	Status           WalletStatus `json:"status" otel:"status"`
+	WalletType       WalletType   `json:"walletType" otel:"walletType"`
+	CreatedOn        time.Time    `json:"createdOn" otel:"createdOn"`
+
+	Metadata    map[string]string `json:"metadata,omitempty" otel:"metadata"`
+	Description string            `json:"description,omitempty" otel:"description"`
+	ClosedOn    *time.Time        `json:"closedOn,omitempty" otel:"closedOn"`
+}
+
 type WalletStatus string
 
 const (
-	WalletStatus_Closed = "closed"
-	WalletStatus_Active = "active"
+	WalletStatus_Closed WalletStatus = "closed"
+	WalletStatus_Active WalletStatus = "active"
 )
 
 type WalletType string
 
 const (
-	WalletType_Default = "default"
-	WalletType_General = "general"
+	WalletType_Default WalletType = "default"
+	WalletType_General WalletType = "general"
 )
 
 type Metadata map[string]string
-
-type Wallet struct {
-	WalletID         string           `json:"walletID,omitempty"`
-	AvailableBalance AvailableBalance `json:"availableBalance"`
-	PartnerAccountID string           `json:"partnerAccountID,omitempty"`
-	Name             string           `json:"name,omitempty" otel:"name"`
-	Status           WalletStatus     `json:"status,omitempty" otel:"status"`
-	WalletType       WalletType       `json:"walletType,omitempty" otel:"walletType"`
-	Description      *string          `json:"description,omitempty" otel:"description"`
-	Metadata         *Metadata        `json:"metadata,omitempty" otel:"metadata"`
-	CreatedOn        time.Time        `json:"createdOn" otel:"createdOn"`
-	ClosedOn         *time.Time       `json:"closedOn,omitempty" otel:"closedOn"`
-}
 
 type AvailableBalance struct {
 	// A 3-letter ISO 4217 currency code.
@@ -115,10 +117,36 @@ const (
 	WalletTransactionSourceTypeFee                    WalletTransactionSourceType = "fee"
 )
 
+type ListWalletFilter callArg
+
+func WithWalletType(v WalletType) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["walletType"] = string(v)
+		return nil
+	})
+}
+
+func WithWalletStatus(status WalletStatus) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["status"] = string(status)
+		return nil
+	})
+}
+
+func WithWalletSkip(skip int) ListWalletFilter {
+	return Skip(skip)
+}
+
+func WithWalletCount(count int) ListWalletFilter {
+	return Count(count)
+}
+
 // ListWallets lists all wallets that are associated with a Moov account
 // https://docs.moov.io/api/index.html#tag/Wallets/operation/listWalletsForAccount
-func (c Client) ListWallets(ctx context.Context, accountID string) ([]Wallet, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWallets, accountID), AcceptJson())
+func (c Client) ListWallets(ctx context.Context, accountID string, filters ...ListWalletFilter) ([]Wallet, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathWallets, accountID),
+		prependArgs(filters, AcceptJson())...)
 	if err != nil {
 		return nil, err
 	}
@@ -130,6 +158,40 @@ func (c Client) ListWallets(ctx context.Context, accountID string) ([]Wallet, er
 // https://docs.moov.io/api/index.html#tag/Wallets/operation/getWalletForAccount
 func (c Client) GetWallet(ctx context.Context, accountID string, walletID string) (*Wallet, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathWallet, accountID, walletID), AcceptJson())
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Wallet](resp)
+}
+
+type CreateWallet struct {
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	Metadata    map[string]string `json:"metadata"`
+}
+
+// CreateWallet creates a general wallet
+func (c Client) CreateWallet(ctx context.Context, accountID string, create CreateWallet) (*Wallet, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathWallets, accountID), AcceptJson(), JsonBody(create))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Wallet](resp)
+}
+
+type UpdateWallet struct {
+	Name        *string       `json:"name,omitempty"`
+	Status      *WalletStatus `json:"status,omitempty"`
+	Description *string       `json:"description,omitempty"`
+	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
+	Metadata map[string]string `json:"metadata,omitempty"`
+}
+
+// UpdateWallet updates a wallet
+func (c Client) UpdateWallet(ctx context.Context, accountID string, walletID string, update UpdateWallet) (*Wallet, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPatch, pathWallet, accountID, walletID), AcceptJson(), JsonBody(update))
 	if err != nil {
 		return nil, err
 	}
