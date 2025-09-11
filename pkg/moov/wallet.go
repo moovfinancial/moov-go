@@ -6,21 +6,36 @@ import (
 	"time"
 )
 
-// TODO(vince,08/13/2025): move all of these models to a separate file to match pattern for other domains
 type Wallet struct {
-	WalletID         string           `json:"walletID"`
-	AvailableBalance AvailableBalance `json:"availableBalance"`
+	WalletID         string           `json:"walletID" otel:"walletID"`
+	AvailableBalance AvailableBalance `json:"availableBalance" otel:"availableBalance"`
 
-	PartnerAccountID string       `json:"partnerAccountID"`
-	Name             string       `json:"name"`
-	Status           WalletStatus `json:"status"`
-	WalletType       WalletType   `json:"walletType"`
-	CreatedOn        time.Time    `json:"createdOn"`
+	PartnerAccountID string       `json:"partnerAccountID" otel:"partnerAccountID"`
+	Name             string       `json:"name" otel:"name"`
+	Status           WalletStatus `json:"status" otel:"status"`
+	WalletType       WalletType   `json:"walletType" otel:"walletType"`
+	CreatedOn        time.Time    `json:"createdOn" otel:"createdOn"`
 
-	Metadata    map[string]string `json:"metadata,omitempty"`
-	Description string            `json:"description,omitempty"`
-	ClosedOn    *time.Time        `json:"closedOn,omitempty"`
+	Metadata    map[string]string `json:"metadata,omitempty" otel:"metadata"`
+	Description string            `json:"description,omitempty" otel:"description"`
+	ClosedOn    *time.Time        `json:"closedOn,omitempty" otel:"closedOn"`
 }
+
+type WalletStatus string
+
+const (
+	WalletStatus_Closed WalletStatus = "closed"
+	WalletStatus_Active WalletStatus = "active"
+)
+
+type WalletType string
+
+const (
+	WalletType_Default WalletType = "default"
+	WalletType_General WalletType = "general"
+)
+
+type Metadata map[string]string
 
 type AvailableBalance struct {
 	// A 3-letter ISO 4217 currency code.
@@ -52,20 +67,6 @@ type WalletTransaction struct {
 	AvailableBalanceDecimal string                      `json:"availableBalanceDecimal,omitempty"`
 	SweepID                 *string                     `json:"sweepID,omitempty"`
 }
-
-type WalletStatus string
-
-const (
-	WalletStatus_Active WalletStatus = "active"
-	WalletStatus_Closed WalletStatus = "closed"
-)
-
-type WalletType string
-
-const (
-	WalletType_Default WalletType = "default"
-	WalletType_General WalletType = "general"
-)
 
 type WalletTransactionStatus string
 
