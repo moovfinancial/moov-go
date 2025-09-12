@@ -180,6 +180,7 @@ type SendFunds struct {
 	Ach        *SendFundsAch        `json:"ach,omitempty"`
 	PushToCard *SendFundsPushToCard `json:"pushToCard,omitempty"`
 	Rtp        *SendFundsRtp        `json:"rtp,omitempty"`
+	FedNow     *SendFundsFedNow     `json:"fedNow,omitempty"`
 }
 
 type SendFundsAch struct {
@@ -191,6 +192,10 @@ type SendFundsPushToCard struct {
 }
 
 type SendFundsRtp struct {
+	EstimatedActivity *EstimatedActivity `json:"estimatedActivity,omitempty"`
+}
+
+type SendFundsFedNow struct {
 	EstimatedActivity *EstimatedActivity `json:"estimatedActivity,omitempty"`
 }
 
