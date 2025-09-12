@@ -37,6 +37,7 @@ const (
 	CapabilityName_SendFundsACH        CapabilityName = "send-funds.ach"
 	CapabilityName_SendFundsRTP        CapabilityName = "send-funds.rtp"
 	CapabilityName_SendFundsPushToCard CapabilityName = "send-funds.push-to-card"
+	CapabilityName_SendFundsFedNow     CapabilityName = "send-funds.fednow"
 )
 
 // Capability Describes an action or set of actions that an account is permitted to perform.
