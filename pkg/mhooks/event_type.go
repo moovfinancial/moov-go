@@ -251,14 +251,16 @@ type TicketCreated struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
 	// ID of the ticket
-	TicketID string `json:"ticketID"`
+	TicketID  string `json:"ticketID"`
+	ForeignID string `json:"foreignID,omitempty"`
 }
 
 type TicketUpdated struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
 	// ID of the ticket
-	TicketID string `json:"ticketID"`
+	TicketID  string `json:"ticketID"`
+	ForeignID string `json:"foreignID,omitempty"`
 	// Status of the ticket
 	Status moov.TicketStatus `json:"status"`
 }
@@ -267,7 +269,8 @@ type TicketMessageAdded struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
 	// ID of the ticket
-	TicketID string `json:"ticketID"`
+	TicketID  string `json:"ticketID"`
+	ForeignID string `json:"foreignID,omitempty"`
 }
 
 type TransferCreated struct {

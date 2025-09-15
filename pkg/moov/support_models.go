@@ -5,7 +5,8 @@ import (
 )
 
 type Ticket struct {
-	ID string `json:"ticketID"`
+	ID        string `json:"ticketID"`
+	ForeignID string `json:"foreignID,omitempty"`
 
 	Number  int           `json:"number"`
 	Title   string        `json:"title"`
@@ -55,6 +56,12 @@ type CreateTicket struct {
 	Title   string        `json:"title"`
 	Body    string        `json:"body"`
 	Contact TicketContact `json:"contact"`
+
+	// Optional field to override the initial message's author
+	Author string `json:"author,omitempty"`
+
+	// Optional foreign ID
+	ForeignID string `json:"foreignID,omitempty"`
 }
 
 type UpdateTicket struct {
