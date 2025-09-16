@@ -6,7 +6,11 @@ import (
 	"strconv"
 )
 
-// CreateAccount creates a new account with the provided configuration.
+type AccountClient[T any, V any] struct {
+	Version Version
+}
+
+// Create creates a new account with the provided configuration.
 //
 // It returns:
 //   - created (*Account): The fully created account when the server responds with a 200 status code.
@@ -14,6 +18,86 @@ import (
 //   - err (error): Any error encountered during the account creation process.
 //
 // Only one of created or started will be non-nil, depending on the server's response.
+func (ac *AccountClient[T, V]) Create(ctx context.Context, client Client, account T) (created, started *V, err error) {
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathAccounts),
+		MoovVersion(ac.Version),
+		AcceptJson(),
+		WaitFor("connection"),
+		JsonBody(account))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	switch resp.Status() {
+	case StatusCompleted:
+		a, err := UnmarshalObjectResponse[V](resp)
+		return a, nil, err
+	case StatusStarted:
+		a, err := UnmarshalObjectResponse[V](resp)
+		return nil, a, err
+	default:
+		return nil, nil, resp
+	}
+}
+
+// Get returns an account based on accountID.
+func (ac AccountClient[T, V]) Get(ctx context.Context, client Client, accountID string) (*V, error) {
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathAccount, accountID),
+		MoovVersion(ac.Version),
+		AcceptJson())
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[V](resp)
+}
+
+// Patch updates an account.
+func (ac AccountClient[T, V]) Patch(ctx context.Context, client Client, accountID string, account PatchAccount) (*V, error) {
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodPatch, pathAccount, accountID),
+		MoovVersion(ac.Version),
+		AcceptJson(),
+		JsonBody(account))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[V](resp)
+}
+
+// List returns a list of accounts.
+func (ac AccountClient[T, V]) List(ctx context.Context, client Client, opts ...ListAccountFilter) ([]V, error) {
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathAccounts),
+		prependArgs(opts, MoovVersion(ac.Version), AcceptJson())...)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[V](resp)
+}
+
+// Disconnect severs the connection between you and the account specified.
+// It will no longer be listed as active in the list of accounts.
+// This also means you'll only have read-only access to the account going forward for reporting purposes.
+func (ac AccountClient[T, V]) Disconnect(ctx context.Context, client Client, accountID string) error {
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodDelete, pathAccount, accountID),
+		MoovVersion(ac.Version),
+		AcceptJson())
+	if err != nil {
+		return err
+	}
+
+	return CompletedNilOrError(resp)
+}
+
+// Legacy
+
+// Only use for Preversioned API calls. Use mvxxxx.Accounts.Create(...) instead.
 func (c *Client) CreateAccount(ctx context.Context, account CreateAccount) (created, started *Account, err error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathAccounts),
@@ -36,6 +120,7 @@ func (c *Client) CreateAccount(ctx context.Context, account CreateAccount) (crea
 	}
 }
 
+// Use only for Preversioned API calls. Use mvxxxx.Accounts.Get(...) instead.
 // GetAccount returns an account based on accountID.
 func (c Client) GetAccount(ctx context.Context, accountID string) (*Account, error) {
 	resp, err := c.CallHttp(ctx,
@@ -62,6 +147,7 @@ func (c Client) UpdateAccount(ctx context.Context, account Account) (*Account, e
 	return CompletedObjectOrError[Account](resp)
 }
 
+// Use only for Preversioned API calls. Use mvxxxx.Accounts.Patch(...) instead.
 // PatchAccount updates an account.
 func (c Client) PatchAccount(ctx context.Context, accountID string, account PatchAccount) (*Account, error) {
 	resp, err := c.CallHttp(ctx,
@@ -142,6 +228,7 @@ func WithAccountSkip(skip int) ListAccountFilter {
 	})
 }
 
+// Only use for Preversioned API calls. Use mvxxxx.Accounts.List(...) instead.
 // ListAccounts returns a list of accounts.
 func (c Client) ListAccounts(ctx context.Context, opts ...ListAccountFilter) ([]Account, error) {
 	resp, err := c.CallHttp(ctx,
@@ -154,6 +241,7 @@ func (c Client) ListAccounts(ctx context.Context, opts ...ListAccountFilter) ([]
 	return CompletedListOrError[Account](resp)
 }
 
+// Only use for Preversioned API calls. Use mvxxxx.Accounts.Disconnect(...) instead.
 func (c Client) DisconnectAccount(ctx context.Context, accountID string) error {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodDelete, pathAccount, accountID),

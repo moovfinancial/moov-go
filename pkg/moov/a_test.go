@@ -11,6 +11,7 @@ import (
 
 	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/pkg/mv2507"
 	"github.com/stretchr/testify/require"
 )
 
@@ -42,6 +43,25 @@ func randomBankAccountNumber() string {
 func createTestIndividualAccount() moov.CreateAccount {
 	return moov.CreateAccount{
 		Type: moov.AccountType_Individual,
+		Profile: moov.CreateProfile{
+			Individual: &moov.CreateIndividualProfile{
+				Name: moov.Name{
+					FirstName: "John",
+					LastName:  "Doe",
+				},
+				Email: "noreply@moov.io",
+				Phone: &moov.Phone{
+					Number:      "555-555-5555",
+					CountryCode: "1",
+				},
+			},
+		},
+	}
+}
+
+func createTestIndividualAccount_V2507() mv2507.CreateAccount {
+	return mv2507.CreateAccount{
+		Type: mv2507.CreateAccountType_Individual,
 		Profile: moov.CreateProfile{
 			Individual: &moov.CreateIndividualProfile{
 				Name: moov.Name{
