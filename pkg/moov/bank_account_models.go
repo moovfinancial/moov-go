@@ -37,6 +37,7 @@ type HolderType string
 const (
 	HolderType_Individual HolderType = "individual"
 	HolderType_Business   HolderType = "business"
+	HolderType_Guest      HolderType = "guest"
 )
 
 type PlaidRequest struct {
