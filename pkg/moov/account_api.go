@@ -98,6 +98,14 @@ func (ac AccountClient[T, V]) Disconnect(ctx context.Context, client Client, acc
 // Legacy
 
 // Only use for Preversioned API calls. Use mvxxxx.Accounts.Create(...) instead.
+// CreateAccount creates a new account with the provided configuration.
+//
+// It returns:
+//   - created (*Account): The fully created account when the server responds with a 200 status code.
+//   - started (*Account): The account details when the server responds with a 201 status code.
+//   - err (error): Any error encountered during the account creation process.
+//
+// Only one of created or started will be non-nil, depending on the server's response.
 func (c *Client) CreateAccount(ctx context.Context, account CreateAccount) (created, started *Account, err error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathAccounts),
