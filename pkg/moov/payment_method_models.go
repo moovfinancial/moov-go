@@ -36,7 +36,9 @@ const (
 
 // WalletPaymentMethod A Moov wallet to store funds for transfers.
 type WalletPaymentMethod struct {
-	WalletID string `json:"walletID,omitempty"`
+	WalletID         string     `json:"walletID,omitempty"`
+	PartnerAccountID string     `json:"partnerAccountID,omitempty"`
+	WalletType       WalletType `json:"walletType,omitempty"`
 }
 
 type BankAccountPaymentMethod BankAccount
