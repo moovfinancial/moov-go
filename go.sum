@@ -4,6 +4,8 @@ github.com/go-faker/faker/v4 v4.6.1 h1:xUyVpAjEtB04l6XFY0V/29oR332rOSPWV4lU8RwDt
 github.com/go-faker/faker/v4 v4.6.1/go.mod h1:arSdxNCSt7mOhdk8tEolvHeIJ7eX4OX80wXjKKvkKBY=
 github.com/go-faker/faker/v4 v4.6.2 h1:IR1uQUYotFZnuTL7Iuy0FDGtHM5Rt1Q+2nipH9gnqKs=
 github.com/go-faker/faker/v4 v4.6.2/go.mod h1:u1dIRP5neLB6kTzgyVjdBOV5R1uP7BdxkcWk7tiKQXk=
+github.com/go-faker/faker/v4 v4.7.0 h1:VboC02cXHl/NuQh5lM2W8b87yp4iFXIu59x4w0RZi4E=
+github.com/go-faker/faker/v4 v4.7.0/go.mod h1:u1dIRP5neLB6kTzgyVjdBOV5R1uP7BdxkcWk7tiKQXk=
 github.com/go-jose/go-jose/v4 v4.1.0 h1:cYSYxd3pw5zd2FSXk2vGdn9igQU2PS8MuxrCOCl0FdY=
 github.com/go-jose/go-jose/v4 v4.1.0/go.mod h1:GG/vqmYm3Von2nYiB2vGTXzdoNKE5tix5tuc6iAd+sw=
 github.com/go-jose/go-jose/v4 v4.1.2 h1:TK/7NqRQZfgAh+Td8AlsrvtPoUyiHh0LqVvokh+1vHI=
