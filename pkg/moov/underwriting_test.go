@@ -187,7 +187,7 @@ func TestUpsertUnderwriting_V2507(t *testing.T) {
 			PushToCard: &mv2507.SendFundsPushToCard{
 				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRangeUnder10K)},
 			},
-			FedNow: &mv2507.SendFundsFedNow{
+			InstantBank: &mv2507.SendFundsInstantBank{
 				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRangeUnder10K)},
 			},
 		},

@@ -67,7 +67,7 @@ func Test_Capabilities_V2507(t *testing.T) {
 			moov.CapabilityName_MoneyTransferPushToCard,
 			moov.CapabilityName_SendFundsACH,
 			moov.CapabilityName_SendFundsRTP,
-			moov.CapabilityName_SendFundsFedNow,
+			moov.CapabilityName_SendFundsInstantBank,
 			moov.CapabilityName_SendFundsPushToCard,
 		},
 	}
