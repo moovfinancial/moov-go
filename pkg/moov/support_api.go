@@ -46,6 +46,14 @@ func WithTicketStatus(status TicketStatus) ListTicketFilter {
 	})
 }
 
+// WithTicketForeignID selects tickets with the specified foreign ID
+func WithTicketForeignID(foreignID string) ListTicketFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["foreignID"] = foreignID
+		return nil
+	})
+}
+
 func (c Client) ListTickets(ctx context.Context, accountID string, filters ...ListTicketFilter) (*ListTicket, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathTickets, accountID),

@@ -18,8 +18,10 @@ func Test_Tickets(t *testing.T) {
 	)
 
 	const (
-		ticketTitle = "moov-go SDK Test Ticket"
-		ticketBody  = "Testing the moov-go SDK ticket creation"
+		ticketTitle     = "moov-go SDK Test Ticket"
+		ticketBody      = "Testing the moov-go SDK ticket creation"
+		ticketAuthor    = "Override Author"
+		ticketForeignID = "ticket-foreign-id"
 	)
 
 	t.Run("create ticket", func(t *testing.T) {
@@ -31,6 +33,8 @@ func Test_Tickets(t *testing.T) {
 			Contact: moov.TicketContact{
 				Email: "moovbot@moov.io",
 			},
+			Author:    ticketAuthor,
+			ForeignID: ticketForeignID,
 		})
 
 		require.NoError(t, err)
@@ -66,6 +70,19 @@ func Test_Tickets(t *testing.T) {
 		require.Len(t, tickets.Items, 1)
 		require.Nil(t, tickets.NextPage)
 		require.Contains(t, tickets.Items, *ticket1)
+
+		tickets, err = mc.ListTickets(BgCtx(), customer.AccountID, moov.WithTicketStatus(moov.TicketStatusNew))
+		require.NoError(t, err)
+		require.Len(t, tickets.Items, 2)
+		require.Nil(t, tickets.NextPage)
+		require.Contains(t, tickets.Items, *ticket1)
+		require.Contains(t, tickets.Items, *ticket2)
+
+		tickets, err = mc.ListTickets(BgCtx(), customer.AccountID, moov.WithTicketForeignID(ticketForeignID))
+		require.NoError(t, err)
+		require.Len(t, tickets.Items, 1)
+		require.Nil(t, tickets.NextPage)
+		require.Contains(t, tickets.Items, *ticket1)
 	})
 
 	t.Run("list ticket messages", func(t *testing.T) {
@@ -77,6 +94,7 @@ func Test_Tickets(t *testing.T) {
 
 		ticketMessage := ticketMessages[0]
 		require.Equal(t, ticketBody, ticketMessage.Body)
+		require.Equal(t, ticketAuthor, ticketMessage.Author)
 	})
 
 	t.Run("get ticket", func(t *testing.T) {

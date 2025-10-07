@@ -42,6 +42,7 @@ const (
 	EventTypeWalletCreated            EventType = "wallet.created"
 	EventTypeWalletUpdated            EventType = "wallet.updated"
 	EventTypeWalletTransactionUpdated EventType = "walletTransaction.updated"
+	EventTypeBillingStatementCreated  EventType = "billingStatement.created"
 )
 
 type AccountCreated struct {
@@ -251,14 +252,16 @@ type TicketCreated struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
 	// ID of the ticket
-	TicketID string `json:"ticketID"`
+	TicketID  string `json:"ticketID"`
+	ForeignID string `json:"foreignID,omitempty"`
 }
 
 type TicketUpdated struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
 	// ID of the ticket
-	TicketID string `json:"ticketID"`
+	TicketID  string `json:"ticketID"`
+	ForeignID string `json:"foreignID,omitempty"`
 	// Status of the ticket
 	Status moov.TicketStatus `json:"status"`
 }
@@ -267,7 +270,8 @@ type TicketMessageAdded struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
 	// ID of the ticket
-	TicketID string `json:"ticketID"`
+	TicketID  string `json:"ticketID"`
+	ForeignID string `json:"foreignID,omitempty"`
 }
 
 type TransferCreated struct {
@@ -354,4 +358,8 @@ type WalletTransactionUpdated struct {
 	Status moov.WalletTransactionStatus `json:"status"`
 	// Available balance of the wallet.
 	AvailableBalance *moov.AvailableBalance `json:"availableBalance,omitempty"`
+}
+
+type BillingStatementCreated struct {
+	StatementID string `json:"statementID"`
 }

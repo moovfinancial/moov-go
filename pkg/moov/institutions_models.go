@@ -1,9 +1,10 @@
 package moov
 
 type InstitutionsSearchResponse struct {
-	Ach  []ACHInstitution  `json:"ach"`
-	Rtp  []RTPInstitution  `json:"rtp"`
-	Wire []WireInstitution `json:"wire"`
+	Ach    []ACHInstitution    `json:"ach"`
+	Rtp    []RTPInstitution    `json:"rtp"`
+	Wire   []WireInstitution   `json:"wire"`
+	FedNow []FedNowInstitution `json:"fednow"`
 }
 
 type ACHInstitution struct {
@@ -40,4 +41,19 @@ type WireServices struct {
 	FundsSettlementOnlyStatus bool `json:"fundsSettlementOnlyStatus"`
 	// The institution's capability to handle transfers of securities.
 	BookEntrySecuritiesTransferStatus bool `json:"bookEntrySecuritiesTransferStatus"`
+}
+
+type FedNowInstitution struct {
+	Name          string         `json:"name"`
+	RoutingNumber string         `json:"routingNumber"`
+	Services      FedNowServices `json:"services"`
+}
+
+type FedNowServices struct {
+	// ReceivePayments indicates whether the institution can receive payments.
+	ReceivePayments bool `json:"receivePayments"`
+	// SendPayments indicates whether the institution can send payments.
+	SendPayments bool `json:"sendPayments"`
+	// RequestForPayment indicates whether the institution can process request for payment messages.
+	RequestForPayment bool `json:"requestForPayment"`
 }
