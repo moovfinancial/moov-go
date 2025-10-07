@@ -181,10 +181,22 @@ func TestUpsertUnderwriting_V2507(t *testing.T) {
 			Ach: &mv2507.SendFundsAch{
 				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRangeUnder10K)},
 			},
+			Rtp: &mv2507.SendFundsRtp{
+				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRangeUnder10K)},
+			},
+			PushToCard: &mv2507.SendFundsPushToCard{
+				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRangeUnder10K)},
+			},
+			InstantBank: &mv2507.SendFundsInstantBank{
+				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRangeUnder10K)},
+			},
 		},
 		MoneyTransfer: &mv2507.MoneyTransfer{
 			PullFromCard: &mv2507.MoneyTransferPullFromCard{
 				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRange10K50K)},
+			},
+			PushToCard: &mv2507.MoneyTransferPushToCard{
+				EstimatedActivity: &mv2507.EstimatedActivity{MonthlyVolumeRange: moov.PtrOf(mv2507.MonthlyVolumeRangeUnder10K)},
 			},
 		},
 		SubmissionIntent: moov.PtrOf(mv2507.SubmissionIntentSubmit),
