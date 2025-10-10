@@ -9,6 +9,7 @@ import (
 func WithRateLimit(rps int) ClientConfigurable {
 	return func(c *Client) error {
 		c.rateLimiter = rate.NewLimiter(rate.Limit(rps), 1)
+		return nil
 	}
 }
 
