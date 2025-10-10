@@ -19,6 +19,9 @@ func DefaultHttpClient() *http.Client {
 }
 
 func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...callArg) (CallResponse, error) {
+	// Request a slot from the rate limiter
+	c.waitForSlot(ctx)
+
 	call, err := newCall(endpoint, args...)
 	if err != nil {
 		return nil, err

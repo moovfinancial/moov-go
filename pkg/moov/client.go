@@ -5,11 +5,14 @@ import (
 	"io"
 	"net/http"
 	"os"
+
+	"golang.org/x/time/rate"
 )
 
 type Client struct {
 	Credentials Credentials
 	HttpClient  *http.Client
+	rateLimiter *rate.Limiter
 
 	decoder Decoder
 
