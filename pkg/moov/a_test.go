@@ -86,11 +86,7 @@ func createTestBusinessAccount() moov.CreateAccount {
 				Name:        "John Does Hobbies",
 				Type:        moov.BusinessType_Llc,
 				Description: "moov-go SDK testing",
-				IndustryCodes: &moov.IndustryCodes{
-					Mcc:   "6012",
-					Naics: "522110",
-					Sic:   "6021",
-				},
+				Industry:    "electronics-appliances",
 			},
 		},
 	}

@@ -285,6 +285,7 @@ func TestPatchBusinessAccount(t *testing.T) {
 			require.Equal(t, "US", result.CustomerSupport.Address.Country)
 			require.Equal(t, "Moov", result.Settings.CardPayment.StatementDescriptor)
 			require.Equal(t, "Moov", result.Settings.AchPayment.CompanyName)
+			require.Equal(t, "electronics-appliances", result.Profile.Business.Industry)
 		}
 
 		result, err := mc.PatchAccount(context.Background(), account.AccountID, patchAccount)
@@ -332,6 +333,7 @@ func TestPatchBusinessAccount(t *testing.T) {
 			require.Equal(t, "1", result.Profile.Business.Phone.CountryCode)
 			require.Equal(t, "https://moov.io", result.Profile.Business.Website)
 			require.Equal(t, "Moov Inc.", result.Profile.Business.LegalBusinessName)
+			require.Equal(t, "electronics-appliances", result.Profile.Business.Industry)
 			require.True(t, result.Profile.Business.TaxIDProvided)
 		}
 
