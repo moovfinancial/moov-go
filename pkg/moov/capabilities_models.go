@@ -103,6 +103,7 @@ const (
 	RequirementId_Business_AverageMonthlyTransactionVolume RequirementId = "business.average-monthly-transaction-volume"
 	RequirementId_Business_Description                     RequirementId = "business.description"
 	RequirementId_Business_UnderwritingDocumentsTierOne    RequirementId = "business.underwriting-documents-tier-one"
+	RequirementId_Business_Industry                                      = "business.industry"
 	RequirementId_BankAccounts_Name                        RequirementId = "bank-accounts.name"
 	RequirementId_BankAccounts_RoutingNumber               RequirementId = "bank-accounts.routing-number"
 	RequirementId_BankAccounts_AccountNumber               RequirementId = "bank-accounts.account-number"
