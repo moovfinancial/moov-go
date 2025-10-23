@@ -91,6 +91,7 @@ func createTestBusinessAccount() moov.CreateAccount {
 					Naics: "522110",
 					Sic:   "6021",
 				},
+				Industry: "electronics-appliances",
 			},
 		},
 	}

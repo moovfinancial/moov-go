@@ -63,6 +63,7 @@ type CreateBusinessProfile struct {
 	Description      string            `json:"description,omitempty"`
 	TaxID            *TaxID            `json:"taxID,omitempty"`
 	IndustryCodes    *IndustryCodes    `json:"industryCodes,omitempty"`
+	Industry         string            `json:"industry,omitempty"`
 	PrimaryRegulator *PrimaryRegulator `json:"primaryRegulator,omitempty"`
 }
 
@@ -124,6 +125,7 @@ type PatchBusinessProfile struct {
 	Website          string            `json:"website,omitempty"`
 	Description      string            `json:"description,omitempty"`
 	OwnersProvided   bool              `json:"ownersProvided,omitempty"`
+	Industry         string            `json:"industry,omitempty"`
 	IndustryCodes    *IndustryCodes    `json:"industryCodes,omitempty"`
 	PrimaryRegulator *PrimaryRegulator `json:"primaryRegulator,omitempty"`
 	TaxID            *TaxID            `json:"taxID"`
@@ -236,6 +238,7 @@ type Business struct {
 	Representatives  []Representative  `json:"representatives,omitempty"`
 	OwnersProvided   bool              `json:"ownersProvided"`
 	IndustryCodes    *IndustryCodes    `json:"industryCodes,omitempty"`
+	Industry         string            `json:"industry,omitempty"`
 	PrimaryRegulator *PrimaryRegulator `json:"primaryRegulator,omitempty"`
 }
 
