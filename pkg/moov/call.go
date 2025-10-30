@@ -189,6 +189,13 @@ func AcceptJson() callArg {
 	})
 }
 
+func AcceptContentType(contentType string) callArg {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.headers["Accept"] = contentType
+		return nil
+	})
+}
+
 func WaitFor(state string) callArg {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.headers["X-Wait-For"] = state
