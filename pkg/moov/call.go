@@ -3,6 +3,7 @@ package moov
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -191,6 +192,9 @@ func AcceptJson() callArg {
 
 func AcceptContentType(contentType string) callArg {
 	return callBuilderFn(func(call *callBuilder) error {
+		if contentType == "" {
+			return errors.New("AcceptContentType cannot be empty")
+		}
 		call.headers["Accept"] = contentType
 		return nil
 	})
