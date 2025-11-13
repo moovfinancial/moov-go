@@ -23,7 +23,8 @@ const (
 	CapabilityName_PlatformWalletTransfers CapabilityName = "platform.wallet-transfers"
 
 	// Granular Capability Names Wallet
-	Capability_NameWalletBalance CapabilityName = "wallet.balance"
+	Capability_NameWalletBalance CapabilityName = "wallet.balance" // Deprecated: use CapabilityName_WalletBalance instead
+	CapabilityName_WalletBalance CapabilityName = "wallet.balance"
 
 	// Granular Capability Names Collect Funds
 	CapabilityName_CollectFundsACH          CapabilityName = "collect-funds.ach"
