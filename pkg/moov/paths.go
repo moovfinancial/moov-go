@@ -99,4 +99,6 @@ const (
 	pathTickets        = "/accounts/%s/tickets"
 	pathTicket         = "/accounts/%s/tickets/%s"
 	pathTicketMessages = "/accounts/%s/tickets/%s/messages"
+
+	pathFeePlanAgreements = "/accounts/%s/fee-plan-agreements"
 )
