@@ -25,7 +25,7 @@ func Test_ListFeePlanAgreements_WithFilters(t *testing.T) {
 		FACILITATOR_ID,
 		moov.WithFeePlanAgreementCount(10),
 		moov.WithFeePlanAgreementSkip(0),
-		moov.WithFeePlanAgreementStatuses([]string{"active"}),
+		moov.WithFeePlanAgreementStatuses([]moov.FeePlanAgreementStatus{moov.FeePlanAgreementStatus_Active}),
 	)
 	require.NoError(t, err)
 	require.NotNil(t, agreements)
@@ -61,7 +61,7 @@ func Test_ListFeePlanAgreements_WithStatuses(t *testing.T) {
 	agreements, err := mc.ListFeePlanAgreements(
 		context.Background(),
 		FACILITATOR_ID,
-		moov.WithFeePlanAgreementStatuses([]string{"active"}),
+		moov.WithFeePlanAgreementStatuses([]moov.FeePlanAgreementStatus{moov.FeePlanAgreementStatus_Active}),
 	)
 	require.NoError(t, err)
 	require.NotNil(t, agreements)
@@ -73,7 +73,10 @@ func Test_ListFeePlanAgreements_WithMultipleStatuses(t *testing.T) {
 	agreements, err := mc.ListFeePlanAgreements(
 		context.Background(),
 		FACILITATOR_ID,
-		moov.WithFeePlanAgreementStatuses([]string{"active", "inactive"}),
+		moov.WithFeePlanAgreementStatuses([]moov.FeePlanAgreementStatus{
+			moov.FeePlanAgreementStatus_Active,
+			moov.FeePlanAgreementStatus_Terminated,
+		}),
 	)
 	require.NoError(t, err)
 	require.NotNil(t, agreements)
