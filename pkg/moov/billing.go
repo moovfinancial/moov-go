@@ -14,13 +14,13 @@ type FeePlanAgreement struct {
 	PlanID             string                 `json:"planID,omitempty"`
 	AccountID          string                 `json:"accountID,omitempty"`
 	Name               string                 `json:"name,omitempty"`
-	Description        string                 `json:"description,omitempty"`
+	Description        *string                `json:"description,omitempty"`
 	AcceptedOn         time.Time              `json:"acceptedOn,omitempty"`
 	Status             FeePlanAgreementStatus `json:"status,omitempty"`
 	CardAcquiringModel CardAcquiringModel     `json:"cardAcquiringModel,omitempty"`
 	BillableFees       []BillableFee          `json:"billableFees,omitempty"`
-	MinimumCommitment  *AmountDecimal         `json:"minimumCommitment,omitempty"`
-	MonthlyPlatformFee *AmountDecimal         `json:"monthlyPlatformFee,omitempty"`
+	MinimumCommitment  AmountDecimal          `json:"minimumCommitment,omitempty"`
+	MonthlyPlatformFee AmountDecimal          `json:"monthlyPlatformFee,omitempty"`
 }
 
 // BillableFee represents a billable fee within a fee plan agreement
@@ -37,7 +37,7 @@ type BillableFee struct {
 // FeeProperties represents the properties of a fee, including amounts and rates
 type FeeProperties struct {
 	FixedAmount       *AmountDecimal `json:"fixedAmount,omitempty"`
-	VariableRate      string         `json:"variableRate,omitempty"`
+	VariableRate      *string        `json:"variableRate,omitempty"`
 	MinPerTransaction *AmountDecimal `json:"minPerTransaction,omitempty"`
 	MaxPerTransaction *AmountDecimal `json:"maxPerTransaction,omitempty"`
 	VolumeRanges      []VolumeRange  `json:"volumeRanges,omitempty"`
@@ -45,8 +45,8 @@ type FeeProperties struct {
 
 // VolumeRange represents a volume-based pricing range
 type VolumeRange struct {
-	FromValue     int            `json:"fromValue,omitempty"`
-	ToValue       int            `json:"toValue,omitempty"`
+	FromValue     *int           `json:"fromValue,omitempty"`
+	ToValue       *int           `json:"toValue,omitempty"`
 	FlatAmount    *AmountDecimal `json:"flatAmount,omitempty"`
 	PerUnitAmount *AmountDecimal `json:"perUnitAmount,omitempty"`
 }
