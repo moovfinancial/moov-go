@@ -45,10 +45,10 @@ type FeeProperties struct {
 
 // VolumeRange represents a volume-based pricing range
 type VolumeRange struct {
-	FromValue     *int           `json:"fromValue,omitempty"`
-	ToValue       *int           `json:"toValue,omitempty"`
-	FlatAmount    *AmountDecimal `json:"flatAmount,omitempty"`
-	PerUnitAmount *AmountDecimal `json:"perUnitAmount,omitempty"`
+	FromValue     *int          `json:"fromValue,omitempty"`
+	ToValue       *int          `json:"toValue,omitempty"`
+	FlatAmount    AmountDecimal `json:"flatAmount,omitempty"`
+	PerUnitAmount AmountDecimal `json:"perUnitAmount,omitempty"`
 }
 
 // FeeConditions represents conditions under which a fee applies.
