@@ -60,7 +60,7 @@ func (r CreateTransferBuilder) Started() (*TransferStarted, error) {
 	}
 
 	switch resp.Status() {
-	case StatusCompleted:
+	case StatusCompleted, StatusStarted:
 		st, err := UnmarshalObjectResponse[TransferStarted](resp)
 		return st, err
 	case StatusStateConflict:
