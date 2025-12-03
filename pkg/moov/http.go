@@ -100,9 +100,7 @@ func (r *httpCallResponse) Status() CallStatus {
 	switch r.resp.StatusCode {
 	case http.StatusOK, http.StatusNoContent:
 		return StatusCompleted
-	case http.StatusCreated:
-		return StatusStarted
-	case http.StatusAccepted:
+	case http.StatusCreated, http.StatusAccepted:
 		return StatusStarted
 
 	case http.StatusBadRequest:
