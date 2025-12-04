@@ -184,9 +184,9 @@ func (c Client) ListFeePlans(ctx context.Context, accountID string, filters ...F
 
 // CreateFeePlanAgreement creates a FeePlanAgreement for a Moov account
 // https://docs.moov.io/api/moov-accounts/billing/create-agreement/
-func (c Client) CreateFeePlanAgreement(ctx context.Context, moovAccountID string, request FeePlanAgreementRequest) (*FeePlanAgreement, error) {
+func (c Client) CreateFeePlanAgreement(ctx context.Context, accountID string, request FeePlanAgreementRequest) (*FeePlanAgreement, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPost, pathFeePlanAgreements, moovAccountID),
+		Endpoint(http.MethodPost, pathFeePlanAgreements, accountID),
 		AcceptJson(),
 		JsonBody(request))
 	if err != nil {
