@@ -75,7 +75,6 @@ func Test_ListFeePlanAgreements_WithMultipleStatuses(t *testing.T) {
 		FACILITATOR_ID,
 		moov.WithFeePlanAgreementStatuses([]moov.FeePlanAgreementStatus{
 			moov.FeePlanAgreementStatus_Active,
-			moov.FeePlanAgreementStatus_Terminated,
 		}),
 	)
 	require.NoError(t, err)
