@@ -5,15 +5,15 @@ import (
 	"net/http"
 )
 
+type BrandColor struct {
+	Accent string `json:"accent"`
+}
+type BrandColors struct {
+	Dark  BrandColor `json:"dark"`
+	Light BrandColor `json:"light"`
+}
 type Brand struct {
-	Colors struct {
-		Dark struct {
-			Accent string `json:"accent"`
-		} `json:"dark"`
-		Light struct {
-			Accent string `json:"accent"`
-		} `json:"light"`
-	} `json:"colors"`
+	Colors BrandColors `json:"colors"`
 }
 
 // CreateAccountBranding creates branding (colors) for the specified account.

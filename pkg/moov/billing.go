@@ -9,14 +9,14 @@ import (
 )
 
 type FeePlan struct {
-	BillableFees       []BillableFee      `json:"billableFees"`
-	CardAcquiringModel string             `json:"cardAcquiringModel"`
-	CreatedAt          time.Time          `json:"createdAt"`
-	Description        string             `json:"description"`
-	MinimumCommitment  MinimumCommitment  `json:"minimumCommitment"`
-	MonthlyPlatformFee MonthlyPlatformFee `json:"monthlyPlatformFee"`
-	Name               string             `json:"name"`
-	PlanID             string             `json:"planID"`
+	BillableFees       []BillableFee `json:"billableFees"`
+	CardAcquiringModel string        `json:"cardAcquiringModel"`
+	CreatedAt          time.Time     `json:"createdAt"`
+	Description        string        `json:"description"`
+	MinimumCommitment  AmountDecimal `json:"minimumCommitment"`
+	MonthlyPlatformFee AmountDecimal `json:"monthlyPlatformFee"`
+	Name               string        `json:"name"`
+	PlanID             string        `json:"planID"`
 }
 
 // FeePlanAgreement represents a billing fee plan agreement for a Moov account
@@ -64,16 +64,6 @@ type VolumeRange struct {
 	ToValue       *int          `json:"toValue,omitempty"`
 	FlatAmount    AmountDecimal `json:"flatAmount,omitempty"`
 	PerUnitAmount AmountDecimal `json:"perUnitAmount,omitempty"`
-}
-
-type MinimumCommitment struct {
-	Currency     string `json:"currency"`
-	ValueDecimal string `json:"valueDecimal"`
-}
-
-type MonthlyPlatformFee struct {
-	Currency     string `json:"currency"`
-	ValueDecimal string `json:"valueDecimal"`
 }
 
 // FeeConditions represents conditions under which a fee applies.

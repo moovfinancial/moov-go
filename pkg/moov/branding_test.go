@@ -23,22 +23,11 @@ func Test_CreateAccountBranding(t *testing.T) {
 	account := CreateTemporaryTestAccount(t, mc, createTestIndividualAccount())
 
 	brand := moov.Brand{
-		Colors: struct {
-			Dark struct {
-				Accent string `json:"accent"`
-			} `json:"dark"`
-			Light struct {
-				Accent string `json:"accent"`
-			} `json:"light"`
-		}{
-			Dark: struct {
-				Accent string `json:"accent"`
-			}{
+		Colors: moov.BrandColors{
+			Dark: moov.BrandColor{
 				Accent: "#1a1a1a",
 			},
-			Light: struct {
-				Accent string `json:"accent"`
-			}{
+			Light: moov.BrandColor{
 				Accent: "#ffffff",
 			},
 		},
@@ -58,22 +47,11 @@ func Test_GetAccountBranding(t *testing.T) {
 
 	// First create branding
 	brand := moov.Brand{
-		Colors: struct {
-			Dark struct {
-				Accent string `json:"accent"`
-			} `json:"dark"`
-			Light struct {
-				Accent string `json:"accent"`
-			} `json:"light"`
-		}{
-			Dark: struct {
-				Accent string `json:"accent"`
-			}{
+		Colors: moov.BrandColors{
+			Dark: moov.BrandColor{
 				Accent: "#2b2b2b",
 			},
-			Light: struct {
-				Accent string `json:"accent"`
-			}{
+			Light: moov.BrandColor{
 				Accent: "#f0f0f0",
 			},
 		},
@@ -97,23 +75,12 @@ func Test_PatchAccountBranding(t *testing.T) {
 
 	// First create branding
 	initialBrand := moov.Brand{
-		Colors: struct {
-			Dark struct {
-				Accent string `json:"accent"`
-			} `json:"dark"`
-			Light struct {
-				Accent string `json:"accent"`
-			} `json:"light"`
-		}{
-			Dark: struct {
-				Accent string `json:"accent"`
-			}{
-				Accent: "#000000",
+		Colors: moov.BrandColors{
+			Dark: moov.BrandColor{
+				Accent: "#444444",
 			},
-			Light: struct {
-				Accent string `json:"accent"`
-			}{
-				Accent: "#ffffff",
+			Light: moov.BrandColor{
+				Accent: "#dddddd",
 			},
 		},
 	}
@@ -123,22 +90,11 @@ func Test_PatchAccountBranding(t *testing.T) {
 
 	// Now patch the branding
 	patchBrand := moov.Brand{
-		Colors: struct {
-			Dark struct {
-				Accent string `json:"accent"`
-			} `json:"dark"`
-			Light struct {
-				Accent string `json:"accent"`
-			} `json:"light"`
-		}{
-			Dark: struct {
-				Accent string `json:"accent"`
-			}{
+		Colors: moov.BrandColors{
+			Dark: moov.BrandColor{
 				Accent: "#333333",
 			},
-			Light: struct {
-				Accent string `json:"accent"`
-			}{
+			Light: moov.BrandColor{
 				Accent: "#eeeeee",
 			},
 		},
@@ -158,22 +114,11 @@ func Test_UpsertAccountBranding(t *testing.T) {
 
 	// Upsert branding (should create since it doesn't exist)
 	brand := moov.Brand{
-		Colors: struct {
-			Dark struct {
-				Accent string `json:"accent"`
-			} `json:"dark"`
-			Light struct {
-				Accent string `json:"accent"`
-			} `json:"light"`
-		}{
-			Dark: struct {
-				Accent string `json:"accent"`
-			}{
+		Colors: moov.BrandColors{
+			Dark: moov.BrandColor{
 				Accent: "#444444",
 			},
-			Light: struct {
-				Accent string `json:"accent"`
-			}{
+			Light: moov.BrandColor{
 				Accent: "#dddddd",
 			},
 		},
@@ -187,22 +132,11 @@ func Test_UpsertAccountBranding(t *testing.T) {
 
 	// Upsert again (should update existing branding)
 	updatedBrand := moov.Brand{
-		Colors: struct {
-			Dark struct {
-				Accent string `json:"accent"`
-			} `json:"dark"`
-			Light struct {
-				Accent string `json:"accent"`
-			} `json:"light"`
-		}{
-			Dark: struct {
-				Accent string `json:"accent"`
-			}{
+		Colors: moov.BrandColors{
+			Dark: moov.BrandColor{
 				Accent: "#555555",
 			},
-			Light: struct {
-				Accent string `json:"accent"`
-			}{
+			Light: moov.BrandColor{
 				Accent: "#cccccc",
 			},
 		},

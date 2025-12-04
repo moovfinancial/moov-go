@@ -190,32 +190,3 @@ func Test_CreateFeePlanAgreement(t *testing.T) {
 		t.Skip("No fee plans available for testing")
 	}
 }
-
-func Test_CreateFeePlanAgreement_WithValidPlanID(t *testing.T) {
-	mc := NewTestClient(t)
-
-	// First, get available plans
-	plans, err := mc.ListFeePlans(context.Background(), FACILITATOR_ID)
-	require.NoError(t, err)
-
-	if len(plans) > 0 {
-		// Create a temporary test account
-		account := CreateTemporaryTestAccount(t, mc, createTestBusinessAccount())
-
-		// Create a fee plan agreement
-		request := moov.FeePlanAgreementRequest{
-			PlanID: plans[0].PlanID,
-		}
-
-		agreement, err := mc.CreateFeePlanAgreement(context.Background(), account.AccountID, request)
-		require.NoError(t, err)
-		require.NotNil(t, agreement)
-
-		// Verify the agreement status is active
-		assert.Equal(t, moov.FeePlanAgreementStatus_Active, agreement.Status)
-		assert.Equal(t, plans[0].PlanID, agreement.PlanID)
-		assert.NotEmpty(t, agreement.AgreementID)
-	} else {
-		t.Skip("No fee plans available for testing")
-	}
-}
