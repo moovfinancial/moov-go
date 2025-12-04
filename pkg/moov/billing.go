@@ -8,6 +8,17 @@ import (
 	"time"
 )
 
+type FeePlan struct {
+	BillableFees       []BillableFee      `json:"billableFees"`
+	CardAcquiringModel string             `json:"cardAcquiringModel"`
+	CreatedAt          time.Time          `json:"createdAt"`
+	Description        string             `json:"description"`
+	MinimumCommitment  MinimumCommitment  `json:"minimumCommitment"`
+	MonthlyPlatformFee MonthlyPlatformFee `json:"monthlyPlatformFee"`
+	Name               string             `json:"name"`
+	PlanID             string             `json:"planID"`
+}
+
 // FeePlanAgreement represents a billing fee plan agreement for a Moov account
 type FeePlanAgreement struct {
 	AgreementID        string                 `json:"agreementID,omitempty"`
@@ -21,6 +32,10 @@ type FeePlanAgreement struct {
 	BillableFees       []BillableFee          `json:"billableFees,omitempty"`
 	MinimumCommitment  AmountDecimal          `json:"minimumCommitment,omitempty"`
 	MonthlyPlatformFee AmountDecimal          `json:"monthlyPlatformFee,omitempty"`
+}
+
+type FeePlanAgreementRequest struct {
+	PlanID string `json:"planID"`
 }
 
 // BillableFee represents a billable fee within a fee plan agreement
@@ -49,6 +64,16 @@ type VolumeRange struct {
 	ToValue       *int          `json:"toValue,omitempty"`
 	FlatAmount    AmountDecimal `json:"flatAmount,omitempty"`
 	PerUnitAmount AmountDecimal `json:"perUnitAmount,omitempty"`
+}
+
+type MinimumCommitment struct {
+	Currency     string `json:"currency"`
+	ValueDecimal string `json:"valueDecimal"`
+}
+
+type MonthlyPlatformFee struct {
+	Currency     string `json:"currency"`
+	ValueDecimal string `json:"valueDecimal"`
 }
 
 // FeeConditions represents conditions under which a fee applies.
@@ -102,6 +127,8 @@ const (
 
 type FeePlanAgreementListFilter callArg
 
+type FeePlanListFilter callArg
+
 func WithFeePlanAgreementCount(c int) FeePlanAgreementListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["count"] = fmt.Sprintf("%d", c)
@@ -134,6 +161,13 @@ func WithFeePlanAgreementIds(agreementIds []string) FeePlanAgreementListFilter {
 	})
 }
 
+func WithFeePlanIds(planIds []string) FeePlanListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["planIds"] = strings.Join(planIds, ",")
+		return nil
+	})
+}
+
 // ListFeePlanAgreements lists of FeePlanAgreements that are associated with a Moov account
 // https://docs.moov.io/api/moov-accounts/billing/list-agreements/
 func (c Client) ListFeePlanAgreements(ctx context.Context, accountID string, filters ...FeePlanAgreementListFilter) ([]FeePlanAgreement, error) {
@@ -144,4 +178,35 @@ func (c Client) ListFeePlanAgreements(ctx context.Context, accountID string, fil
 	}
 
 	return CompletedListOrError[FeePlanAgreement](resp)
+}
+
+// ListFeePlans lists available FeePlans for a Moov account
+// https://docs.moov.io/api/moov-accounts/billing/list-plans/
+func (c Client) ListFeePlans(ctx context.Context, accountID string, filters ...FeePlanListFilter) ([]FeePlan, error) {
+	args := prependArgs(filters, AcceptJson())
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathFeePlans, accountID), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[FeePlan](resp)
+}
+
+// CreateFeePlanAgreement creates a FeePlanAgreement for a Moov account
+// https://docs.moov.io/api/moov-accounts/billing/create-agreement/
+func (c Client) CreateFeePlanAgreement(ctx context.Context, moovAccountID string, request FeePlanAgreementRequest) (*FeePlanAgreement, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathFeePlanAgreements, moovAccountID),
+		AcceptJson(),
+		JsonBody(request))
+	if err != nil {
+		return nil, err
+	}
+
+	switch resp.Status() {
+	case StatusStarted, StatusCompleted:
+		return UnmarshalObjectResponse[FeePlanAgreement](resp)
+	default:
+		return nil, resp
+	}
 }
