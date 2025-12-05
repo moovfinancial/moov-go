@@ -9,14 +9,14 @@ import (
 )
 
 type FeePlan struct {
-	BillableFees       []BillableFee `json:"billableFees"`
-	CardAcquiringModel string        `json:"cardAcquiringModel"`
-	CreatedAt          time.Time     `json:"createdAt"`
-	Description        string        `json:"description"`
-	MinimumCommitment  AmountDecimal `json:"minimumCommitment"`
-	MonthlyPlatformFee AmountDecimal `json:"monthlyPlatformFee"`
-	Name               string        `json:"name"`
-	PlanID             string        `json:"planID"`
+	BillableFees       []BillableFee `json:"billableFees,omitempty"`
+	CardAcquiringModel string        `json:"cardAcquiringModel,omitempty"`
+	CreatedAt          time.Time     `json:"createdAt,omitempty"`
+	Description        string        `json:"description,omitempty"`
+	MinimumCommitment  AmountDecimal `json:"minimumCommitment,omitempty"`
+	MonthlyPlatformFee AmountDecimal `json:"monthlyPlatformFee,omitempty"`
+	Name               string        `json:"name,omitempty"`
+	PlanID             string        `json:"planID,omitempty"`
 }
 
 // FeePlanAgreement represents a billing fee plan agreement for a Moov account
