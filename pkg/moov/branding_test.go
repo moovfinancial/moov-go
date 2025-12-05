@@ -67,46 +67,6 @@ func Test_GetAccountBranding(t *testing.T) {
 	assert.Equal(t, "#2b2b2b", result.Colors.Dark.Accent)
 	assert.Equal(t, "#f0f0f0", result.Colors.Light.Accent)
 }
-
-func Test_PatchAccountBranding(t *testing.T) {
-	mc := NewTestClient(t)
-
-	account := CreateTemporaryTestAccount(t, mc, createTestIndividualAccount())
-
-	// First create branding
-	initialBrand := moov.Brand{
-		Colors: moov.BrandColors{
-			Dark: moov.BrandColor{
-				Accent: "#444444",
-			},
-			Light: moov.BrandColor{
-				Accent: "#dddddd",
-			},
-		},
-	}
-
-	_, err := mc.CreateAccountBranding(context.Background(), account.AccountID, initialBrand)
-	require.NoError(t, err)
-
-	// Now patch the branding
-	patchBrand := moov.Brand{
-		Colors: moov.BrandColors{
-			Dark: moov.BrandColor{
-				Accent: "#333333",
-			},
-			Light: moov.BrandColor{
-				Accent: "#eeeeee",
-			},
-		},
-	}
-
-	result, err := mc.PatchAccountBranding(context.Background(), account.AccountID, patchBrand)
-	require.NoError(t, err)
-	require.NotNil(t, result)
-	assert.Equal(t, "#333333", result.Colors.Dark.Accent)
-	assert.Equal(t, "#eeeeee", result.Colors.Light.Accent)
-}
-
 func Test_UpsertAccountBranding(t *testing.T) {
 	mc := NewTestClient(t)
 

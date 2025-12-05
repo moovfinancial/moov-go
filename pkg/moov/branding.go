@@ -43,20 +43,6 @@ func (c Client) GetAccountBranding(ctx context.Context, accountID string) (*Bran
 	return CompletedObjectOrError[Brand](resp)
 }
 
-// PatchAccountBranding updates branding (colors) for the specified account.
-// https://docs.moov.io/api/enrichment/branding/patch/
-func (c Client) PatchAccountBranding(ctx context.Context, accountID string, colorBrand Brand) (*Brand, error) {
-	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPatch, pathBrandings, accountID),
-		AcceptJson(),
-		JsonBody(colorBrand))
-	if err != nil {
-		return nil, err
-	}
-
-	return CompletedObjectOrError[Brand](resp)
-}
-
 // UpsertAccountBranding updates branding (colors) for the specified account.
 // https://docs.moov.io/api/enrichment/branding/put/
 func (c Client) UpsertAccountBranding(ctx context.Context, accountID string, colorBrand Brand) (*Brand, error) {
