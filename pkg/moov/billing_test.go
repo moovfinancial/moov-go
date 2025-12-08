@@ -4,9 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
 func Test_ListFeePlanAgreements(t *testing.T) {
@@ -75,6 +76,7 @@ func Test_ListFeePlanAgreements_WithMultipleStatuses(t *testing.T) {
 		FACILITATOR_ID,
 		moov.WithFeePlanAgreementStatuses([]moov.FeePlanAgreementStatus{
 			moov.FeePlanAgreementStatus_Active,
+			moov.FeePlanAgreementStatus_Terminated,
 		}),
 	)
 	require.NoError(t, err)
