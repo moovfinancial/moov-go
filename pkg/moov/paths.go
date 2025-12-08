@@ -36,6 +36,8 @@ const (
 
 	pathBankAccountInstantVerification = "/accounts/%s/bank-accounts/%s/verify"
 
+	pathBrandings = "/accounts/%s/branding"
+
 	pathWallets = "/accounts/%s/wallets"
 	pathWallet  = "/accounts/%s/wallets/%s"
 
@@ -101,4 +103,5 @@ const (
 	pathTicketMessages = "/accounts/%s/tickets/%s/messages"
 
 	pathFeePlanAgreements = "/accounts/%s/fee-plan-agreements"
+	pathFeePlans          = "/accounts/%s/fee-plans"
 )
