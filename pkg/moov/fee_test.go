@@ -12,7 +12,7 @@ import (
 func Test_ListFees(t *testing.T) {
 	mc := NewTestClient(t)
 
-	fees, err := mc.ListFees(t.Context(), FACILITATOR_ID)
+	fees, err := mc.GetFees(t.Context(), FACILITATOR_ID)
 	require.NoError(t, err)
 	require.NotNil(t, fees)
 }
@@ -20,7 +20,7 @@ func Test_ListFees(t *testing.T) {
 func Test_ListFees_WithCount(t *testing.T) {
 	mc := NewTestClient(t)
 
-	fees, err := mc.ListFees(
+	fees, err := mc.GetFees(
 		t.Context(),
 		FACILITATOR_ID,
 		moov.WithFeeCount(5),
@@ -35,7 +35,7 @@ func Test_ListFees_WithCount(t *testing.T) {
 func Test_ListFees_WithSkip(t *testing.T) {
 	mc := NewTestClient(t)
 
-	fees, err := mc.ListFees(
+	fees, err := mc.GetFees(
 		t.Context(),
 		FACILITATOR_ID,
 		moov.WithFeeSkip(2),
@@ -48,7 +48,7 @@ func Test_ListFees_WithTransferID(t *testing.T) {
 	mc := NewTestClient(t)
 
 	// First get some fees to find a transferID
-	allFees, err := mc.ListFees(t.Context(), FACILITATOR_ID, moov.WithFeeCount(100))
+	allFees, err := mc.GetFees(t.Context(), FACILITATOR_ID, moov.WithFeeCount(100))
 	require.NoError(t, err)
 
 	// Find a fee with a transferID
@@ -61,7 +61,7 @@ func Test_ListFees_WithTransferID(t *testing.T) {
 	}
 
 	if transferID != "" {
-		fees, err := mc.ListFees(
+		fees, err := mc.GetFees(
 			t.Context(),
 			FACILITATOR_ID,
 			moov.WithFeeTransferID(transferID),
@@ -71,9 +71,9 @@ func Test_ListFees_WithTransferID(t *testing.T) {
 
 		// Verify all returned fees are for the specified transfer
 		for _, fee := range fees {
-			if fee.GeneratedBy != nil && fee.GeneratedBy.TransferID != nil {
-				assert.Equal(t, transferID, *fee.GeneratedBy.TransferID)
-			}
+			require.NotNil(t, fee.GeneratedBy)
+			require.NotNil(t, fee.GeneratedBy.TransferID)
+			assert.Equal(t, transferID, *fee.GeneratedBy.TransferID)
 		}
 	}
 }
@@ -82,7 +82,7 @@ func Test_ListFees_WithDisputeID(t *testing.T) {
 	mc := NewTestClient(t)
 
 	// First get some fees to find a disputeID
-	allFees, err := mc.ListFees(t.Context(), FACILITATOR_ID, moov.WithFeeCount(100))
+	allFees, err := mc.GetFees(t.Context(), FACILITATOR_ID, moov.WithFeeCount(100))
 	require.NoError(t, err)
 
 	// Find a fee with a disputeID
@@ -95,7 +95,7 @@ func Test_ListFees_WithDisputeID(t *testing.T) {
 	}
 
 	if disputeID != "" {
-		fees, err := mc.ListFees(
+		fees, err := mc.GetFees(
 			t.Context(),
 			FACILITATOR_ID,
 			moov.WithFeeDisputeID(disputeID),
@@ -105,9 +105,9 @@ func Test_ListFees_WithDisputeID(t *testing.T) {
 
 		// Verify all returned fees are for the specified dispute
 		for _, fee := range fees {
-			if fee.GeneratedBy != nil && fee.GeneratedBy.DisputeID != nil {
-				assert.Equal(t, disputeID, *fee.GeneratedBy.DisputeID)
-			}
+			require.NotNil(t, fee.GeneratedBy)
+			require.NotNil(t, fee.GeneratedBy.DisputeID)
+			assert.Equal(t, disputeID, *fee.GeneratedBy.DisputeID)
 		}
 	}
 }
@@ -115,7 +115,7 @@ func Test_ListFees_WithDisputeID(t *testing.T) {
 func Test_ListFees_WithDateTimeRange(t *testing.T) {
 	mc := NewTestClient(t)
 
-	fees, err := mc.ListFees(
+	fees, err := mc.GetFees(
 		t.Context(),
 		FACILITATOR_ID,
 		moov.WithFeeStartDateTime("2024-01-01T00:00:00Z"),
@@ -129,7 +129,7 @@ func Test_FetchFees(t *testing.T) {
 	mc := NewTestClient(t)
 
 	// First list some fees to get feeIDs
-	allFees, err := mc.ListFees(t.Context(), FACILITATOR_ID, moov.WithFeeCount(5))
+	allFees, err := mc.GetFees(t.Context(), FACILITATOR_ID, moov.WithFeeCount(5))
 	require.NoError(t, err)
 
 	if len(allFees) > 0 {
@@ -143,11 +143,11 @@ func Test_FetchFees(t *testing.T) {
 
 		if len(feeIDs) > 0 {
 			// Fetch fees by IDs
-			request := moov.FeeFetchRequest{
+			request := moov.FeeListRequest{
 				FeeIDs: feeIDs,
 			}
 
-			fetchedFees, err := mc.FetchFees(t.Context(), FACILITATOR_ID, request)
+			fetchedFees, err := mc.ListFees(t.Context(), FACILITATOR_ID, request)
 			require.NoError(t, err)
 			require.NotNil(t, fetchedFees)
 			assert.Equal(t, len(feeIDs), len(fetchedFees))

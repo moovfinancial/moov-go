@@ -59,50 +59,50 @@ func (g *GeneratedBy) GetBankAccountID() *string {
 	return g.BankAccountID
 }
 
-type FeeListFilter callArg
+type FeeGetFilter callArg
 
-func WithFeeCount(c int) FeeListFilter {
+func WithFeeCount(c int) FeeGetFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["count"] = fmt.Sprintf("%d", c)
 		return nil
 	})
 }
 
-func WithFeeSkip(c int) FeeListFilter {
+func WithFeeSkip(c int) FeeGetFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["skip"] = fmt.Sprintf("%d", c)
 		return nil
 	})
 }
 
-func WithFeeTransferID(transferID string) FeeListFilter {
+func WithFeeTransferID(transferID string) FeeGetFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["transferID"] = transferID
 		return nil
 	})
 }
 
-func WithFeeDisputeID(disputeID string) FeeListFilter {
+func WithFeeDisputeID(disputeID string) FeeGetFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["disputeID"] = disputeID
 		return nil
 	})
 }
 
-func WithFeeStartDateTime(start string) FeeListFilter {
+func WithFeeStartDateTime(start string) FeeGetFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["startDateTime"] = start
 		return nil
 	})
 }
 
-func WithFeeEndDateTime(end string) FeeListFilter {
+func WithFeeEndDateTime(end string) FeeGetFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["endDateTime"] = end
 		return nil
 	})
 }
 
-type FeeFetchRequest struct {
+type FeeListRequest struct {
 	FeeIDs []string `json:"feeIDs"`
 }
