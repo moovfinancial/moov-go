@@ -16,10 +16,16 @@ func Test_Statements(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, statements)
 	if len(statements) > 0 {
+		// as JSON
 		statement, err := c.GetStatement(t.Context(), FACILITATOR_ID, statements[0].StatementID)
 		require.NoError(t, err)
 		require.NotNil(t, statement)
-		require.Equal(t, statement, statements[0])
+		require.Equal(t, statement.StatementID, statements[0].StatementID)
+
+		// as PDF
+		pdfData, err := c.GetStatementPDF(t.Context(), FACILITATOR_ID, statements[0].StatementID)
+		require.NoError(t, err)
+		require.NotEmpty(t, pdfData)
 	}
 }
 

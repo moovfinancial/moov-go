@@ -24,19 +24,31 @@ type Statement struct {
 }
 
 type Summary struct {
-	CardAcquiring   SummaryDetails  `json:"cardAcquiring,omitempty"`
-	ACH             *SummaryDetails `json:"ach,omitempty"`
-	AdjustmentFees  *AmountDecimal  `json:"adjustmentFees,omitempty"`
-	InstantPayments *SummaryDetails `json:"instantPayments,omitempty"`
-	OtherFees       *AmountDecimal  `json:"otherFees,omitempty"`
-	PlatformFees    *AmountDecimal  `json:"platformFees,omitempty"`
-	Total           *AmountDecimal  `json:"total,omitempty"`
+	CardAcquiring   SummaryDetailsWithInterchange `json:"cardAcquiring,omitempty"`
+	ACH             *SummaryDetails               `json:"ach,omitempty"`
+	InstantPayments *SummaryDetails               `json:"instantPayments,omitempty"`
+	PlatformFees    *AmountDecimal                `json:"platformFees,omitempty"`
+	AdjustmentFees  *AmountDecimal                `json:"adjustmentFees,omitempty"`
+	OtherFees       *AmountDecimal                `json:"otherFees,omitempty"`
+	Total           *AmountDecimal                `json:"total,omitempty"`
 }
 
 type SummaryDetails struct {
 	FeeAmount    *AmountDecimal `json:"feeAmount,omitempty"`
 	VolumeAmount *AmountDecimal `json:"volumeAmount,omitempty"`
 	VolumeCount  *int64         `json:"volumeCount,omitempty"`
+}
+
+type SummaryDetailsWithInterchange struct {
+	SummaryDetails
+	InterchangeFees *InterchangeSummaryFees `json:"interchangeFees,omitempty"`
+}
+
+type InterchangeSummaryFees struct {
+	Visa            AmountDecimal `json:"visa,omitempty"`
+	Mastercard      AmountDecimal `json:"mastercard,omitempty"`
+	Discover        AmountDecimal `json:"discover,omitempty"`
+	AmericanExpress AmountDecimal `json:"americanExpress,omitempty"`
 }
 
 type CardAcquiringFees struct {
