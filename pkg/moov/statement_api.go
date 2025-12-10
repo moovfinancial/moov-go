@@ -1,6 +1,7 @@
 package moov
 
 import (
+	"bytes"
 	"context"
 	"net/http"
 )
@@ -27,14 +28,14 @@ func (c Client) GetStatementPDF(ctx context.Context, accountID, statementID stri
 		AcceptContentType("application/pdf"),
 	)
 	if err != nil {
-		return nil, err
+		return []byte{}, err
 	}
 
-	var b []byte
-	if err = resp.Unmarshal(&b); err != nil {
-		return nil, err
+	buf, err := CompletedObjectOrError[bytes.Buffer](resp)
+	if err != nil {
+		return []byte{}, err
 	}
-	return b, nil
+	return buf.Bytes(), nil
 }
 
 // ListStatements lists statements for a Moov account
