@@ -81,7 +81,7 @@ func Test_ListStatements_WithBillingPeriodStartDateTime(t *testing.T) {
 func Test_ListStatements_WithBillingPeriodEndDateTime(t *testing.T) {
 	mc := NewTestClient(t)
 
-	endDate := time.Now().UTC()
+	endDate := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
 
 	statements, err := mc.ListStatements(
 		t.Context(),
@@ -104,7 +104,7 @@ func Test_ListStatements_WithDateRange(t *testing.T) {
 	mc := NewTestClient(t)
 
 	startDate := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-	endDate := time.Now().UTC()
+	endDate := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
 
 	statements, err := mc.ListStatements(
 		t.Context(),
