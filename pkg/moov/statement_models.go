@@ -34,9 +34,7 @@ type Summary struct {
 }
 
 type SummaryDetails struct {
-	FeeAmount    *AmountDecimal `json:"feeAmount,omitempty"`
-	VolumeAmount *AmountDecimal `json:"volumeAmount,omitempty"`
-	VolumeCount  *int64         `json:"volumeCount,omitempty"`
+	FeeAmount *AmountDecimal `json:"feeAmount,omitempty"`
 }
 
 type SummaryDetailsWithInterchange struct {
