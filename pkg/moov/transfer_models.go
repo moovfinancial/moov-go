@@ -12,7 +12,8 @@ type CreateTransfer struct {
 	// An optional description of the transfer for your own internal use.
 	Description string `json:"description,omitempty"`
 	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
-	Metadata map[string]string `json:"metadata,omitempty"`
+	Metadata  map[string]string `json:"metadata,omitempty"`
+	LineItems LineItems         `json:"lineItems,omitempty"`
 }
 
 // CreateTransfer_Source Where funds for a transfer originate. For the source,
@@ -369,6 +370,28 @@ type CreateTransferOptionsTarget struct {
 type TransferOptions struct {
 	SourceOptions      []PaymentMethod `json:"sourceOptions,omitempty"`
 	DestinationOptions []PaymentMethod `json:"destinationOptions,omitempty"`
+}
+
+// LineItems struct for LineItems
+type LineItems struct {
+	Items []LineItem `json:"items"`
+}
+
+// LineItem struct for LineItem
+type LineItem struct {
+	Name      string           `json:"name"`
+	ProductId *string          `json:"productId,omitempty"`
+	BasePrice Amount           `json:"basePrice"`
+	Quantity  int              `json:"quantity"`
+	Options   []LineItemOption `json:"options"`
+}
+
+// LineItemOption struct for LineItemOption
+type LineItemOption struct {
+	Group         string `json:"group"`
+	Name          string `json:"name"`
+	PriceModifier Amount `json:"priceModifier"`
+	Quantity      int    `json:"quantity,omitempty"`
 }
 
 /* ======== enumerations ======== */
