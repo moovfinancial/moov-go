@@ -380,7 +380,7 @@ type LineItems struct {
 // LineItem represents a single item in a transfer.
 type LineItem struct {
 	Name      string           `json:"name"`
-	ProductId *string          `json:"productId,omitempty"`
+	ProductID *string          `json:"productId,omitempty"`
 	BasePrice Amount           `json:"basePrice"`
 	Quantity  int              `json:"quantity"`
 	Options   []LineItemOption `json:"options"`
