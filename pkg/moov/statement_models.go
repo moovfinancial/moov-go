@@ -16,25 +16,34 @@ type Statement struct {
 	CreatedOn                  time.Time           `json:"createdOn,omitempty"`
 	UpdatedOn                  time.Time           `json:"updatedOn,omitempty"`
 	Summary                    Summary             `json:"summary,omitempty"`
-	CardAcquiringFees          CardAcquiringFees   `json:"cardAcquiringFees,omitempty,omitempty"`
-	ACHFees                    *ACHFees            `json:"achFees,omitempty,omitempty"`
-	InstantPaymentFees         *InstantPaymentFees `json:"instantPaymentFees,omitempty,omitempty"`
-	PlatformFees               *PlatformFees       `json:"platformFees,omitempty,omitempty"`
-	OtherCardFees              *OtherCardFees      `json:"otherCardFees,omitempty,omitempty"`
+	CardAcquiringFees          CardAcquiringFees   `json:"cardAcquiringFees,omitempty"`
+	ACHFees                    *ACHFees            `json:"achFees,omitempty"`
+	InstantPaymentFees         *InstantPaymentFees `json:"instantPaymentFees,omitempty"`
+	PlatformFees               *PlatformFees       `json:"platformFees,omitempty"`
+	OtherCardFees              *OtherCardFees      `json:"otherCardFees,omitempty"`
+	PartnerFees                *PartnerFees        `json:"partnerFees,omitempty"`
 }
 
 type Summary struct {
-	CardAcquiring   SummaryDetailsWithInterchange `json:"cardAcquiring,omitempty"`
-	ACH             *SummaryDetails               `json:"ach,omitempty"`
-	InstantPayments *SummaryDetails               `json:"instantPayments,omitempty"`
-	PlatformFees    *AmountDecimal                `json:"platformFees,omitempty"`
-	AdjustmentFees  *AmountDecimal                `json:"adjustmentFees,omitempty"`
-	OtherFees       *AmountDecimal                `json:"otherFees,omitempty"`
-	Total           *AmountDecimal                `json:"total,omitempty"`
+	CardAcquiring       SummaryDetailsWithInterchange `json:"cardAcquiring,omitempty"`
+	ACH                 *SummaryDetails               `json:"ach,omitempty"`
+	InstantPayments     *SummaryDetails               `json:"instantPayments,omitempty"`
+	PlatformFees        *AmountDecimal                `json:"platformFees,omitempty"`
+	AdjustmentFees      *AmountDecimal                `json:"adjustmentFees,omitempty"`
+	OtherFees           *AmountDecimal                `json:"otherFees,omitempty"`
+	Total               *AmountDecimal                `json:"total,omitempty"`
+	NetIncomeSubtotal   *SummaryDetails               `json:"netIncomeSubtotal,omitempty"`
+	RevenueShare        *string                       `json:"revenueShare,omitempty"`
+	ResidualSubtotal    *AmountDecimal                `json:"residualSubtotal,omitempty"`
+	MonthlyPartnerCosts *PartnerFees                  `json:"monthlyPartnerCosts,omitempty"`
+	NetPartnerPayment   *AmountDecimal                `json:"netPartnerPayment,omitempty"`
 }
 
 type SummaryDetails struct {
-	FeeAmount *AmountDecimal `json:"feeAmount,omitempty"`
+	FeeAmount             *AmountDecimal `json:"feeAmount,omitempty"`
+	MerchantFeesCollected *AmountDecimal `json:"merchantFeesCollected,omitempty"`
+	PartnerFeesAssessed   *AmountDecimal `json:"partnerFeesAssessed,omitempty"`
+	NetIncome             *AmountDecimal `json:"netIncome,omitempty"`
 }
 
 type SummaryDetailsWithInterchange struct {
@@ -117,6 +126,12 @@ type OtherCardFees struct {
 	Disputes           CountAndAmount `json:"disputes,omitempty"`
 	NameVerification   CountAndAmount `json:"nameVerification,omitempty"`
 	Total              CountAndAmount `json:"total,omitempty"`
+}
+
+type PartnerFees struct {
+	MinimumCommitment *CountAndAmount `json:"minimumCommitment,omitempty"`
+	MonthlyPlatform   *CountAndAmount `json:"monthlyPlatform,omitempty"`
+	Total             CountAndAmount  `json:"total,omitempty"`
 }
 
 type ListStatementFilter callArg
