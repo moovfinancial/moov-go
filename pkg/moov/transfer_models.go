@@ -383,7 +383,7 @@ type LineItem struct {
 	ProductID *string          `json:"productId,omitempty"`
 	BasePrice Amount           `json:"basePrice"`
 	Quantity  int              `json:"quantity"`
-	Options   []LineItemOption `json:"options"`
+	Options   []LineItemOption `json:"options,omitempty"`
 }
 
 // LineItemOption represents an option for a line item.
