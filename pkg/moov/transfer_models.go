@@ -372,12 +372,12 @@ type TransferOptions struct {
 	DestinationOptions []PaymentMethod `json:"destinationOptions,omitempty"`
 }
 
-// LineItems struct for LineItems
+// LineItems contains Items for nested structure
 type LineItems struct {
 	Items []LineItem `json:"items"`
 }
 
-// LineItem struct for LineItem
+// LineItem represents a single item in a transfer.
 type LineItem struct {
 	Name      string           `json:"name"`
 	ProductId *string          `json:"productId,omitempty"`
@@ -386,7 +386,7 @@ type LineItem struct {
 	Options   []LineItemOption `json:"options"`
 }
 
-// LineItemOption struct for LineItemOption
+// LineItemOption represents an option for a line item.
 type LineItemOption struct {
 	Group         string `json:"group"`
 	Name          string `json:"name"`
