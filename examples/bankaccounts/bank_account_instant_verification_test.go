@@ -74,7 +74,7 @@ func TestBankAccount_InstantVerificationExample(t *testing.T) {
 
 	// Fetch the Bank Account Verification's status
 	require.Eventually(t, func() bool {
-		bav, err := mc.GetInstantBankAccountVerfication(ctx, account.AccountID, bankAccount.BankAccountID)
+		bav, err := mc.GetInstantBankAccountVerification(ctx, account.AccountID, bankAccount.BankAccountID)
 		require.NoError(t, err)
 
 		require.NotNil(t, bav)
