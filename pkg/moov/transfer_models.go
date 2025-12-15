@@ -380,7 +380,7 @@ type CreateTransferLineItems struct {
 // CreateTransferLineItem represents a single item in a transfer.
 type CreateTransferLineItem struct {
 	Name      string                         `json:"name"`
-	ProductID *string                        `json:"productId,omitempty"`
+	ProductID *string                        `json:"productID,omitempty"`
 	BasePrice AmountDecimal                  `json:"basePrice"`
 	Quantity  int                            `json:"quantity"`
 	Options   []CreateTransferLineItemOption `json:"options,omitempty"`
