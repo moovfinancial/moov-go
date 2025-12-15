@@ -12,8 +12,8 @@ type CreateTransfer struct {
 	// An optional description of the transfer for your own internal use.
 	Description string `json:"description,omitempty"`
 	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
-	Metadata  map[string]string `json:"metadata,omitempty"`
-	LineItems *LineItems         `json:"lineItems,omitempty"`
+	Metadata  map[string]string        `json:"metadata,omitempty"`
+	LineItems *CreateTransferLineItems `json:"lineItems,omitempty"`
 }
 
 // CreateTransfer_Source Where funds for a transfer originate. For the source,
@@ -372,26 +372,26 @@ type TransferOptions struct {
 	DestinationOptions []PaymentMethod `json:"destinationOptions,omitempty"`
 }
 
-// LineItems contains Items for nested structure
-type LineItems struct {
-	Items []LineItem `json:"items"`
+// CreateTransferLineItems contains Items for nested structure
+type CreateTransferLineItems struct {
+	Items []CreateTransferLineItem `json:"items"`
 }
 
-// LineItem represents a single item in a transfer.
-type LineItem struct {
-	Name      string           `json:"name"`
-	ProductID *string          `json:"productId,omitempty"`
-	BasePrice AmountDecimal           `json:"basePrice"`
-	Quantity  int              `json:"quantity"`
-	Options   []LineItemOption `json:"options,omitempty"`
+// CreateTransferLineItem represents a single item in a transfer.
+type CreateTransferLineItem struct {
+	Name      string                         `json:"name"`
+	ProductID *string                        `json:"productId,omitempty"`
+	BasePrice AmountDecimal                  `json:"basePrice"`
+	Quantity  int                            `json:"quantity"`
+	Options   []CreateTransferLineItemOption `json:"options,omitempty"`
 }
 
-// LineItemOption represents an option for a line item.
-type LineItemOption struct {
-	Group         *string `json:"group,omitempty"`
-	Name          string `json:"name"`
+// CreateTransferLineItemOption represents an option for a line item.
+type CreateTransferLineItemOption struct {
+	Group         string         `json:"group"`
+	Name          string         `json:"name"`
 	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
-	Quantity      int    `json:"quantity"`
+	Quantity      int            `json:"quantity"`
 }
 
 /* ======== enumerations ======== */
