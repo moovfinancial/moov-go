@@ -54,6 +54,7 @@ jobs:
       run: choco install -y make mingw
 
     - name: Check
+      if: github.repository == 'moovfinancial/moov-go'
       run: make check
       env:
         SKIP_LINTERS: yes
