@@ -18,7 +18,9 @@ import (
 const FACILITATOR_ID = testtools.PARTNER_ID
 const FACILITATOR_WALLET_PM_ID = testtools.PARTNER_WALLET_PM_ID
 
+const MERCHANT_ID = testtools.MERCHANT_ID
 const MERCHANT_WALLET_PM_ID = testtools.MERCHANT_WALLET_PM_ID
+const MERCHANT_WALLET_ID = testtools.MERCHANT_WALLET_ID
 
 func getLincolnBank(t *testing.T, mc *moov.Client) *moov.Account {
 	accounts, err := mc.ListAccounts(context.Background(), moov.WithAccountName("Lincoln National Corporation"))

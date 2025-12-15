@@ -5,3 +5,4 @@ const PARTNER_WALLET_PM_ID = "041fdc88-c93d-4cb4-80aa-b2dde9a4fe2e"
 
 const MERCHANT_ID = "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
 const MERCHANT_WALLET_PM_ID = "67ebda6c-de48-474c-b49d-2cd3aa7d3f92"
+const MERCHANT_WALLET_ID = "4dbac313-d505-4d51-a0fe-c11787916fcf"
