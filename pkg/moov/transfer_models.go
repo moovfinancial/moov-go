@@ -13,7 +13,7 @@ type CreateTransfer struct {
 	Description string `json:"description,omitempty"`
 	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
 	Metadata  map[string]string `json:"metadata,omitempty"`
-	LineItems LineItems         `json:"lineItems,omitempty"`
+	LineItems *LineItems         `json:"lineItems,omitempty"`
 }
 
 // CreateTransfer_Source Where funds for a transfer originate. For the source,
@@ -381,17 +381,17 @@ type LineItems struct {
 type LineItem struct {
 	Name      string           `json:"name"`
 	ProductID *string          `json:"productId,omitempty"`
-	BasePrice Amount           `json:"basePrice"`
+	BasePrice AmountDecimal           `json:"basePrice"`
 	Quantity  int              `json:"quantity"`
 	Options   []LineItemOption `json:"options,omitempty"`
 }
 
 // LineItemOption represents an option for a line item.
 type LineItemOption struct {
-	Group         string `json:"group"`
+	Group         *string `json:"group,omitempty"`
 	Name          string `json:"name"`
-	PriceModifier Amount `json:"priceModifier"`
-	Quantity      int    `json:"quantity,omitempty"`
+	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
+	Quantity      int    `json:"quantity"`
 }
 
 /* ======== enumerations ======== */
