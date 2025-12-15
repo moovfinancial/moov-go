@@ -17,7 +17,7 @@ type Statement struct {
 	UpdatedOn                  time.Time           `json:"updatedOn,omitempty"`
 	Summary                    Summary             `json:"summary,omitempty"`
 	CardAcquiringFees          *CardAcquiringFees  `json:"cardAcquiringFees,omitempty"`
-	AchFees                    *ACHFees            `json:"achFees,omitempty"`
+	ACHFees                    *ACHFees            `json:"achFees,omitempty"`
 	InstantPaymentFees         *InstantPaymentFees `json:"instantPaymentFees,omitempty"`
 	PlatformFees               *PlatformFees       `json:"platformFees,omitempty"`
 	AccountFees                *AccountFees        `json:"accountFees,omitempty"`
@@ -27,7 +27,7 @@ type Statement struct {
 
 type Summary struct {
 	CardAcquiring       *SummaryDetailsWithInterchange `json:"cardAcquiring,omitempty"`
-	Ach                 *SummaryDetails                `json:"ach,omitempty"`
+	ACH                 *SummaryDetails                `json:"ach,omitempty"`
 	InstantPayments     *SummaryDetails                `json:"instantPayments,omitempty"`
 	PlatformFees        *AmountDecimal                 `json:"platformFees,omitempty"`
 	AccountFees         *SummaryDetails                `json:"accountFees,omitempty"`
@@ -126,8 +126,8 @@ type PlatformFees struct {
 type AccountFees struct {
 	WalletFee                AmountDecimal  `json:"walletFee,omitempty"`
 	MerchantPCIFee           AmountDecimal  `json:"merchantPCIFee,omitempty"`
-	KybFee                   *AmountDecimal `json:"kybFee,omitempty"`
-	KycFee                   *AmountDecimal `json:"kycFee,omitempty"`
+	KYBFee                   *AmountDecimal `json:"kybFee,omitempty"`
+	KYCFee                   *AmountDecimal `json:"kycFee,omitempty"`
 	TransactionMonitoringFee *AmountDecimal `json:"transactionMonitoringFee,omitempty"`
 	Total                    AmountDecimal  `json:"total,omitempty"`
 }
