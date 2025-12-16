@@ -14,11 +14,10 @@ func (c Client) CreateInvoice(ctx context.Context, accountID string, invoice Cre
 		JsonBody(invoice),
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("calling http: %w", err)
 	}
 
-	out, err := UnmarshalObjectResponse[Invoice](resp)
-	return out, err
+	return StartedObjectOrError[Invoice](resp)
 }
 
 // GetInvoice retrieves an invoice by ID
@@ -28,7 +27,7 @@ func (c Client) GetInvoice(ctx context.Context, accountID, invoiceID string) (*I
 		AcceptJson(),
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("calling http: %w", err)
 	}
 
 	return CompletedObjectOrError[Invoice](resp)
@@ -42,7 +41,7 @@ func (c Client) UpdateInvoice(ctx context.Context, accountID, invoiceID string, 
 		JsonBody(invoice),
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("calling http: %w", err)
 	}
 
 	return CompletedObjectOrError[Invoice](resp)
@@ -56,7 +55,7 @@ func (c Client) MarkInvoicePaid(ctx context.Context, accountID, invoiceID string
 		JsonBody(payment),
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("calling http: %w", err)
 	}
 
 	return CompletedObjectOrError[Invoice](resp)
@@ -70,7 +69,7 @@ func (c Client) MarkInvoicePaid(ctx context.Context, accountID, invoiceID string
 // 		AcceptJson(),
 // 	)
 // 	if err != nil {
-// 		return nil, err
+// 		return nil, fmt.Errorf("calling http: %w), err
 // 	}
 
 // 	return CompletedObjectOrError[Invoice](resp)
@@ -117,7 +116,7 @@ func (c Client) ListInvoices(ctx context.Context, accountID string, filters ...L
 	args := prependArgs(filters, AcceptJson())
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathInvoices, accountID), args...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("calling http: %w", err)
 	}
 
 	return CompletedListOrError[Invoice](resp)
