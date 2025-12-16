@@ -16,6 +16,7 @@ const (
 	EventTypeBankAccountCreated       EventType = "bankAccount.created"
 	EventTypeBankAccountDeleted       EventType = "bankAccount.deleted"
 	EventTypeBankAccountUpdated       EventType = "bankAccount.updated"
+	EventTypeBillingStatementCreated  EventType = "billingStatement.created"
 	EventTypeCancellationCreated      EventType = "cancellation.created"
 	EventTypeCancellationUpdated      EventType = "cancellation.updated"
 	EventTypeCardAutoUpdated          EventType = "card.autoUpdated"
@@ -23,6 +24,8 @@ const (
 	EventTypeCapabilityUpdated        EventType = "capability.updated"
 	EventTypeDisputeCreated           EventType = "dispute.created"
 	EventTypeDisputeUpdated           EventType = "dispute.updated"
+	EventTypeInvoiceCreated           EventType = "invoice.created"
+	EventTypeInvoiceUpdated           EventType = "invoice.updated"
 	EventTypeNetworkIDUpdated         EventType = "networkID.updated"
 	EventTypePaymentMethodDisabled    EventType = "paymentMethod.disabled"
 	EventTypePaymentMethodEnabled     EventType = "paymentMethod.enabled"
@@ -42,7 +45,6 @@ const (
 	EventTypeWalletCreated            EventType = "wallet.created"
 	EventTypeWalletUpdated            EventType = "wallet.updated"
 	EventTypeWalletTransactionUpdated EventType = "walletTransaction.updated"
-	EventTypeBillingStatementCreated  EventType = "billingStatement.created"
 )
 
 type AccountCreated struct {
@@ -93,6 +95,10 @@ type BankAccountUpdated struct {
 	Status           moov.BankAccountStatus       `json:"status"`
 	StatusReason     moov.BankAccountStatusReason `json:"statusReason"`
 	ExceptionDetails *moov.ExceptionDetails       `json:"exceptionDetails,omitempty"`
+}
+
+type BillingStatementCreated struct {
+	StatementID string `json:"statementID"`
 }
 
 type CancellationCreated struct {
@@ -155,6 +161,16 @@ type DisputeUpdated struct {
 	DisputeID string             `json:"disputeID"`
 	Status    moov.DisputeStatus `json:"status"`
 	Phase     moov.DisputePhase  `json:"phase"`
+}
+type InvoiceCreated struct {
+	AccountID string `json:"accountID"`
+	InvoiceID string `json:"invoiceID"`
+}
+
+type InvoiceUpdated struct {
+	AccountID string             `json:"accountID"`
+	InvoiceID string             `json:"invoiceID"`
+	Status    moov.InvoiceStatus `json:"status"`
 }
 
 type NetworkIDUpdated struct {
@@ -358,8 +374,4 @@ type WalletTransactionUpdated struct {
 	Status moov.WalletTransactionStatus `json:"status"`
 	// Available balance of the wallet.
 	AvailableBalance *moov.AvailableBalance `json:"availableBalance,omitempty"`
-}
-
-type BillingStatementCreated struct {
-	StatementID string `json:"statementID"`
 }
