@@ -264,3 +264,45 @@ func WithIssuedCardAuthorizationEventSkip(skip int) ListIssuedCardAuthorizationE
 func WithIssuedCardAuthorizationEventCount(count int) ListIssuedCardAuthorizationEventsFilter {
 	return Count(count)
 }
+
+type IssuedCardTransaction struct {
+	CardTransactionID string                        `json:"cardTransactionID"`
+	IssuedCardID      string                        `json:"issuedCardID"`
+	FundingWalletID   string                        `json:"fundingWalletID"`
+	Amount            string                        `json:"amount"`
+	AuthorizationID   *string                       `json:"authorizationID,omitempty"`
+	CreatedOn         time.Time                     `json:"createdOn"`
+	AuthorizedOn      time.Time                     `json:"authorizedOn"`
+	MerchantData      IssuedCardTransactionMerchant `json:"merchantData"`
+}
+
+type ListIssuedCardTransactionsFilter callArg
+
+func WithIssuedCardTransactionCardID(cardID string) ListIssuedCardTransactionsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["issuedCardID"] = cardID
+		return nil
+	})
+}
+
+func WithIssuedCardTransactionSkip(skip int) ListIssuedCardTransactionsFilter {
+	return Skip(skip)
+}
+
+func WithIssuedCardTransactionCount(count int) ListIssuedCardTransactionsFilter {
+	return Count(count)
+}
+
+func WithIssuedCardTransactionStartDate(t time.Time) ListIssuedCardTransactionsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["startDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}
+
+func WithIssuedCardTransactionEndDate(t time.Time) ListIssuedCardTransactionsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["endDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}

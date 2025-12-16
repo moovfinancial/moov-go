@@ -81,8 +81,14 @@ func Test_CardIssuing(t *testing.T) {
 	require.Equal(t, string(closed), string(card.State))
 
 	// list issued card authorizations
-	auths, err := mc.ListIssuedCardAuthorizations(BgCtx(), MERCHANT_ID,
+	authorizations, err := mc.ListIssuedCardAuthorizations(BgCtx(), MERCHANT_ID,
 		moov.WithIssuedCardAuthorizationCardID(card.IssuedCardID))
 	NoResponseError(t, err)
-	require.Empty(t, auths)
+	require.Empty(t, authorizations)
+
+	// list issued card transactions
+	transactions, err := mc.ListIssuedCardTransactions(BgCtx(), MERCHANT_ID,
+		moov.WithIssuedCardTransactionCardID(card.IssuedCardID))
+	NoResponseError(t, err)
+	require.Empty(t, transactions)
 }
