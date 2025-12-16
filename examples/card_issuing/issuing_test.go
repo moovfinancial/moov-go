@@ -62,11 +62,11 @@ func TestCardIssuing(t *testing.T) {
 	created, err := mc.CreateIssuedCard(ctx, accountID, create)
 	require.NoError(t, err)
 	t.Cleanup(func() {
-		require.NoError(t, disableIssuedCard(ctx, mc, accountID, created.IssuedCardID))
+		require.NoError(t, closeIssuedCard(ctx, mc, accountID, created.IssuedCardID))
 	})
 }
 
-func disableIssuedCard(ctx context.Context, mc *moov.Client, accountID, cardID string) error {
+func closeIssuedCard(ctx context.Context, mc *moov.Client, accountID, cardID string) error {
 	closed := moov.UpdateIssuedCardState_Closed
 	update := moov.UpdateIssuedCard{
 		State: &closed,
