@@ -110,4 +110,9 @@ const (
 
 	pathStatements = "/accounts/%s/statements"
 	pathStatement  = "/accounts/%s/statements/%s"
+
+	pathInvoices        = "/accounts/%s/invoices"
+	pathInvoice         = "/accounts/%s/invoices/%s"
+	pathInvoiceMarkPaid = "/accounts/%s/invoices/%s/mark-paid"
+	pathInvoiceSend     = "/accounts/%s/invoices/%s/send"
 )
