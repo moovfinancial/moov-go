@@ -115,4 +115,12 @@ const (
 	pathInvoice         = "/accounts/%s/invoices/%s"
 	pathInvoiceMarkPaid = "/accounts/%s/invoices/%s/mark-paid"
 	pathInvoiceSend     = "/accounts/%s/invoices/%s/send"
+
+	pathIssuedCards                = "/issuing/%s/issued-cards"
+	pathIssuedCard                 = "/issuing/%s/issued-cards/%s"
+	pathIssuingAuthorizations      = "/issuing/%s/authorizations"
+	pathIssuingAuthorization       = "/issuing/%s/authorizations/%s"
+	pathIssuingAuthorizationEvents = "/issuing/%s/authorizations/%s/events"
+	pathIssuingTransactions        = "/issuing/%s/card-transactions"
+	pathIssuingTransaction         = "/issuing/%s/card-transactions/%s"
 )
