@@ -58,7 +58,11 @@ func Test_CardIssuing(t *testing.T) {
 	require.NotNil(t, created)
 
 	// list issued cards
-	requested, err := mc.ListIssuedCards(BgCtx(), MERCHANT_ID)
+	requested, err := mc.ListIssuedCards(BgCtx(), MERCHANT_ID,
+		moov.WithIssuedCardStates([]moov.IssuedCardState{
+			moov.IssuedCardState_Active,
+			moov.IssuedCardState_PendingVerification,
+		}))
 	NoResponseError(t, err)
 	require.NotEmpty(t, requested)
 

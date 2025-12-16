@@ -21,10 +21,10 @@ func (c Client) CreateIssuedCard(ctx context.Context, accountID string, card Cre
 
 // ListIssuedCards retrieves all issued cards for the given account
 // https://docs.moov.io/api/money-movement/issuing/list/
-func (c Client) ListIssuedCards(ctx context.Context, accountID string) ([]IssuedCard, error) {
+func (c Client) ListIssuedCards(ctx context.Context, accountID string, filters ...ListIssuedCardsFilter) ([]IssuedCard, error) {
 	httpResp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathIssuedCards, accountID),
-		AcceptJson())
+		prependArgs(filters, AcceptJson())...)
 	if err != nil {
 		return nil, err
 	}

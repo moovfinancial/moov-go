@@ -1,6 +1,9 @@
 package moov
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 type IssuedCard struct {
 	IssuedCardID       string               `json:"issuedCardID"`
@@ -82,6 +85,27 @@ type IssuingIntervalLimit string
 const (
 	IssuingIntervalLimit_PerTransaction IssuingIntervalLimit = "per-transaction"
 )
+
+type ListIssuedCardsFilter callArg
+
+func WithIssuedCardStates(states []IssuedCardState) ListIssuedCardsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		stateStrings := make([]string, len(states))
+		for i, state := range states {
+			stateStrings[i] = string(state)
+		}
+		call.params["states"] = strings.Join(stateStrings, ",")
+		return nil
+	})
+}
+
+func WithIssuedCardSkip(skip int) ListIssuedCardsFilter {
+	return Skip(skip)
+}
+
+func WithIssuedCardCount(count int) ListIssuedCardsFilter {
+	return Count(count)
+}
 
 type CreateIssuedCard struct {
 	FundingWalletID string                `json:"fundingWalletID"`
