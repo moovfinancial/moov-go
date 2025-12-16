@@ -58,3 +58,42 @@ func (c Client) UpdateIssuedCard(ctx context.Context, accountID string, cardID s
 
 	return CompletedNilOrError(httpResp)
 }
+
+// ListIssuedCardAuthorizations retrieves all issued card authorizations for the given account
+// https://docs.moov.io/api/money-movement/issuing/list-authorizations/
+func (c Client) ListIssuedCardAuthorizations(ctx context.Context, accountID string, filters ...ListIssuedCardAuthorizationsFilter) ([]IssuedCardAuthorization, error) {
+	httpResp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathIssuingAuthorizations, accountID),
+		prependArgs(filters, AcceptJson())...)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[IssuedCardAuthorization](httpResp)
+}
+
+// GetIssuedCardAuthorization retrieves the details of an issued card authorization for the given account
+// https://docs.moov.io/api/money-movement/issuing/get-authorization/
+func (c Client) GetIssuedCardAuthorization(ctx context.Context, accountID string, authorizationID string) (*IssuedCardAuthorization, error) {
+	httpResp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathIssuingAuthorization, accountID, authorizationID),
+		AcceptJson())
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[IssuedCardAuthorization](httpResp)
+}
+
+// ListIssuedCardAuthorizationEvents retrieves all events that affect an issued card authorization for the given account
+// https://docs.moov.io/api/money-movement/issuing/list-authorization-events/
+func (c Client) ListIssuedCardAuthorizationEvents(ctx context.Context, accountID string, authorizationID string, filters ...ListIssuedCardAuthorizationEventsFilter) ([]IssuedCardAuthorizationEvent, error) {
+	httpResp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathIssuingAuthorizationEvents, accountID, authorizationID),
+		prependArgs(filters, AcceptJson())...)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[IssuedCardAuthorizationEvent](httpResp)
+}

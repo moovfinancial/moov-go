@@ -139,3 +139,128 @@ type UpdateIssuedCardState string
 const (
 	UpdateIssuedCardState_Closed UpdateIssuedCardState = "closed"
 )
+
+type IssuedCardAuthorization struct {
+	AuthorizationID  string                        `json:"authorizationID"`
+	IssuedCardID     string                        `json:"issuedCardID"`
+	FundingWalletID  string                        `json:"fundingWalletID"`
+	CreatedOn        time.Time                     `json:"createdOn"`
+	Network          IssuedCardTransactionNetwork  `json:"network"`
+	AuthorizedAmount string                        `json:"authorizedAmount"`
+	Status           IssuedCardAuthorizationStatus `json:"status"`
+	MerchantData     IssuedCardTransactionMerchant `json:"merchantData"`
+	CardTransactions []string                      `json:"cardTransactions,omitempty"`
+}
+
+// IssuedCardTransactionNetwork represents name of the network a card transaction is routed through
+type IssuedCardTransactionNetwork string
+
+const (
+	IssuedCardTransactionNetwork_Discover IssuedCardTransactionNetwork = "discover"
+	IssuedCardTransactionNetwork_Shazam   IssuedCardTransactionNetwork = "shazam"
+	IssuedCardTransactionNetwork_Visa     IssuedCardTransactionNetwork = "visa"
+)
+
+// IssuedCardAuthorizationStatus represents the status of the authorization
+type IssuedCardAuthorizationStatus string
+
+const (
+	IssuedCardAuthorizationStatus_Pending  IssuedCardAuthorizationStatus = "pending"
+	IssuedCardAuthorizationStatus_Declined IssuedCardAuthorizationStatus = "declined"
+	IssuedCardAuthorizationStatus_Canceled IssuedCardAuthorizationStatus = "canceled"
+	IssuedCardAuthorizationStatus_Cleared  IssuedCardAuthorizationStatus = "cleared"
+	IssuedCardAuthorizationStatus_Expired  IssuedCardAuthorizationStatus = "expired"
+)
+
+type IssuedCardTransactionMerchant struct {
+	// External identifier used to identify the merchant with the card brand
+	NetworkID string  `json:"networkID"`
+	Name      *string `json:"name,omitempty"`
+	City      *string `json:"city,omitempty"`
+	// Two-letter code of the merchant country
+	Country string `json:"country"`
+	// Five digit postal code of merchant
+	PostalCode *string `json:"postalCode,omitempty"`
+	// Two-letter code of merchant state
+	State *string `json:"state,omitempty"`
+	Mcc   string  `json:"mcc"`
+}
+
+type ListIssuedCardAuthorizationsFilter callArg
+
+func WithIssuedCardAuthorizationStatuses(statuses []IssuedCardAuthorizationStatus) ListIssuedCardAuthorizationsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		statusStrings := make([]string, len(statuses))
+		for i, status := range statuses {
+			statusStrings[i] = string(status)
+		}
+		call.params["statuses"] = strings.Join(statusStrings, ",")
+		return nil
+	})
+}
+
+func WithIssuedCardAuthorizationCardID(cardID string) ListIssuedCardAuthorizationsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["issuedCardID"] = cardID
+		return nil
+	})
+}
+
+func WithIssuedCardAuthorizationSkip(skip int) ListIssuedCardAuthorizationsFilter {
+	return Skip(skip)
+}
+
+func WithIssuedCardAuthorizationCount(count int) ListIssuedCardAuthorizationsFilter {
+	return Count(count)
+}
+
+func WithIssuedCardAuthorizationStartDate(t time.Time) ListIssuedCardAuthorizationsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["startDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}
+
+func WithIssuedCardAuthorizationEndDate(t time.Time) ListIssuedCardAuthorizationsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["endDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}
+
+type IssuedCardAuthorizationEvent struct {
+	EventID   string                             `json:"eventID"`
+	EventType IssuedCardEventType                `json:"eventType"`
+	CreatedOn time.Time                          `json:"createdOn"`
+	Amount    string                             `json:"amount"`
+	Result    IssuedCardAuthorizationEventResult `json:"result"`
+}
+
+type IssuedCardEventType string
+
+const (
+	IssuedCardEventType_Authorization            IssuedCardEventType = "authorization"
+	IssuedCardEventType_Reversal                 IssuedCardEventType = "reversal"
+	IssuedCardEventType_AuthorizationAdvice      IssuedCardEventType = "authorization-advice"
+	IssuedCardEventType_AuthorizationExpiration  IssuedCardEventType = "authorization-expiration"
+	IssuedCardEventType_AuthorizationIncremental IssuedCardEventType = "authorization-incremental"
+	IssuedCardEventType_Clearing                 IssuedCardEventType = "clearing"
+)
+
+type IssuedCardAuthorizationEventResult string
+
+const (
+	IssuedCardAuthorizationEventResult_Approved  IssuedCardAuthorizationEventResult = "approved"
+	IssuedCardAuthorizationEventResult_Declined  IssuedCardAuthorizationEventResult = "declined"
+	IssuedCardAuthorizationEventResult_Processed IssuedCardAuthorizationEventResult = "processed"
+)
+
+type ListIssuedCardAuthorizationEventsFilter callArg
+
+func WithIssuedCardAuthorizationEventSkip(skip int) ListIssuedCardAuthorizationEventsFilter {
+	return Skip(skip)
+}
+
+func WithIssuedCardAuthorizationEventCount(count int) ListIssuedCardAuthorizationEventsFilter {
+	return Count(count)
+}

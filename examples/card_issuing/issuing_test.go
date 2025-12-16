@@ -47,7 +47,7 @@ func TestCardIssuing(t *testing.T) {
 	// For now just using a known existing wallet for the account
 	walletID := "4dbac313-d505-4d51-a0fe-c11787916fcf"
 
-	// Step 4: create an issued card
+	// Step 5: create an issued card
 
 	memo := "example"
 	create := moov.CreateIssuedCard{
