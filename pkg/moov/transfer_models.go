@@ -13,6 +13,8 @@ type CreateTransfer struct {
 	Description string `json:"description,omitempty"`
 	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
 	Metadata map[string]string `json:"metadata,omitempty"`
+	// ForeignID an optional alias from a foreign/external system which can be used to reference this resource
+	ForeignID *string `json:"foreignID,omitempty"`
 }
 
 // CreateTransfer_Source Where funds for a transfer originate. For the source,
@@ -127,6 +129,9 @@ type Transfer struct {
 	ScheduleID *string `json:"scheduleID,omitempty"`
 	// ID of the associated occurrence.
 	OccurrenceID *string `json:"occurrenceID,omitempty"`
+	// ForeignID an optional alias from a foreign/external system which can be used to reference this resource
+	ForeignID *string `json:"foreignID,omitempty"`
+
 	// The total refunded amount for a card transfer, representing one refunded amount, or multiple partial refunded amounts. Contains an integer value and its currency. See the `refunds` array for additional details.
 	RefundedAmount *Amount `json:"refundedAmount,omitempty"`
 	// A list of refunds for a card transfer.
