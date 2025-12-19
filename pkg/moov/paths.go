@@ -6,14 +6,17 @@ const (
 	pathOAuth2Token  = "/oauth2/token" // #nosec G101
 	pathOAuth2Revoke = "/oauth2/revoke"
 
-	pathAccounts = "/accounts"
-	pathAccount  = "/accounts/%s"
+	pathAccounts          = "/accounts"
+	pathAccount           = "/accounts/%s"
+	pathAccountsConnected = "/accounts/%s/connected-accounts"
 
 	pathApplications    = "/applications"
 	pathApplicationKeys = "/applications/%s/keys"
 
 	pathCapabilities = "/accounts/%s/capabilities"
 	pathCapability   = "/accounts/%s/capabilities/%s"
+
+	pathConnections = "/accounts/%s/connections"
 
 	pathUnderwriting = "/accounts/%s/underwriting"
 
