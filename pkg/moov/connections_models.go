@@ -3,7 +3,7 @@ package moov
 // This allows for a connections to a partner account to be shared with another account on that partner account.
 //
 // Allows for going from the customer and merchant only being connected to the partner to being able for the merchant to be connected to the customer as well.
-//   customer ---> partner <---- maerchant
+//   customer ---> partner <---- merchant
 //
 // to
 //   +--> customer ----> partner <---- merchant --+
