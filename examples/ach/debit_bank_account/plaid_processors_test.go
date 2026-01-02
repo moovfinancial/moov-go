@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 
 	"github.com/go-faker/faker/v4"
@@ -29,10 +30,10 @@ func TestPlaidProcessorExample(t *testing.T) {
 	require.NoError(t, err)
 
 	// The account facilitating the transfer
-	partnerAccountID := "5352b013-ae58-4a63-8a3f-97f316a917cf" // example
+	partnerAccountID := testtools.PARTNER_ID // example
 
 	// The account we'll send funds to
-	destinationAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9" // example
+	destinationAccountID := testtools.MERCHANT_ID // example
 
 	// Create a new context or use an existing one
 	ctx := context.Background()

@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 
 	"github.com/go-faker/faker/v4"
@@ -126,7 +127,7 @@ func TestBankAccount_InstantVerificationExample(t *testing.T) {
 	// Step 6: create transfer
 
 	// The account facilitating the transfer
-	partnerAccountID := "5352b013-ae58-4a63-8a3f-97f316a917cf" // example
+	partnerAccountID := testtools.PARTNER_ID // example
 
 	completedTransfer, _, err := mc.CreateTransfer(
 		ctx,

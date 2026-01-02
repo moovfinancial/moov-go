@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
@@ -21,11 +22,11 @@ func TestVisaSandboxPush(t *testing.T) {
 	require.NoError(t, err)
 
 	// The account facilitating the transfer
-	partnerAccountID := "5352b013-ae58-4a63-8a3f-97f316a917cf" // example
+	partnerAccountID := testtools.PARTNER_ID // example
 
 	// sourceAccountID is the account from which we will pull money. This
 	// account should be properly configured (e.g. MCC should be set)
-	sourceAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9" // example
+	sourceAccountID := testtools.MERCHANT_ID // example
 
 	// Create a new context or use an existing one
 	ctx := context.Background()
