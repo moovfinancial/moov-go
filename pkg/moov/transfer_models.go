@@ -12,7 +12,8 @@ type CreateTransfer struct {
 	// An optional description of the transfer for your own internal use.
 	Description string `json:"description,omitempty"`
 	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
-	Metadata map[string]string `json:"metadata,omitempty"`
+	Metadata  map[string]string        `json:"metadata,omitempty"`
+	LineItems *CreateTransferLineItems `json:"lineItems,omitempty"`
 }
 
 // CreateTransfer_Source Where funds for a transfer originate. For the source,
@@ -78,6 +79,28 @@ type CreateTransfer_FacilitatorFee struct {
 	MarkupDecimal *string `json:"markupDecimal,omitempty"`
 }
 
+// CreateTransferLineItems contains line item information to include on the created transfer.
+type CreateTransferLineItems struct {
+	Items []CreateTransferLineItem `json:"items"`
+}
+
+// CreateTransferLineItem represents a single item in a transfer.
+type CreateTransferLineItem struct {
+	Name      string                         `json:"name"`
+	ProductID *string                        `json:"productID,omitempty"`
+	BasePrice AmountDecimal                  `json:"basePrice"`
+	Quantity  int                            `json:"quantity"`
+	Options   []CreateTransferLineItemOption `json:"options,omitempty"`
+}
+
+// CreateTransferLineItemOption represents an option for a line item.
+type CreateTransferLineItemOption struct {
+	Group         *string        `json:"group,omitempty"`
+	Name          string         `json:"name"`
+	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
+	Quantity      int            `json:"quantity"`
+}
+
 // TransferStarted is where the request to create a transfer was recorded and kicked off but hasn't completed yet
 type TransferStarted struct {
 	// Identifier for the transfer.
@@ -133,6 +156,8 @@ type Transfer struct {
 	SalesTaxAmount *Amount `json:"salesTaxAmount,omitempty"`
 
 	PaymentLinkCode *string `json:"paymentLinkCode,omitempty"`
+
+	LineItems *TransferLineItems `json:"lineItems,omitempty"`
 }
 
 // Fees charged to accounts involved in the transfer.
@@ -369,6 +394,28 @@ type CreateTransferOptionsTarget struct {
 type TransferOptions struct {
 	SourceOptions      []PaymentMethod `json:"sourceOptions,omitempty"`
 	DestinationOptions []PaymentMethod `json:"destinationOptions,omitempty"`
+}
+
+// TransferLineItems contains line item information on a created transfer.
+type TransferLineItems struct {
+	Items []TransferLineItem `json:"items"`
+}
+
+// TransferLineItem represents a single item on a created transfer.
+type TransferLineItem struct {
+	Name      string                   `json:"name"`
+	ProductID *string                  `json:"productID,omitempty"`
+	BasePrice AmountDecimal            `json:"basePrice"`
+	Quantity  int                      `json:"quantity"`
+	Options   []TransferLineItemOption `json:"options,omitempty"`
+}
+
+// TransferLineItemOption represents an option for a line item on a created transfer.
+type TransferLineItemOption struct {
+	Group         *string        `json:"group,omitempty"`
+	Name          string         `json:"name"`
+	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
+	Quantity      int            `json:"quantity"`
 }
 
 /* ======== enumerations ======== */
