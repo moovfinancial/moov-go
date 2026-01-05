@@ -85,6 +85,99 @@ func Test_Transfers(t *testing.T) {
 		require.Greater(t, len(transfers), 0)
 	})
 
+	t.Run("with line items", func(t *testing.T) {
+		completed, _, err := mc.CreateTransfer(BgCtx(),
+			FACILITATOR_ID,
+			moov.CreateTransfer{
+				Source: moov.CreateTransfer_Source{
+					PaymentMethodID: source,
+				},
+				Destination: moov.CreateTransfer_Destination{
+					PaymentMethodID: dest,
+				},
+				Amount: moov.Amount{
+					Currency: "USD",
+					Value:    11,
+				},
+				LineItems: &moov.CreateTransferLineItems{
+					Items: []moov.CreateTransferLineItem{
+						{
+							Name:      "Bagel",
+							ProductID: moov.PtrOf("1e262367-de3e-4acb-ae02-7f56e83632ee"),
+							BasePrice: moov.AmountDecimal{
+								Currency:     "USD",
+								ValueDecimal: "0.03",
+							},
+							Options: []moov.CreateTransferLineItemOption{
+								{
+									Name:     "Everything Bagel",
+									Quantity: 1,
+								},
+								{
+									Group: moov.PtrOf("Toppings"),
+									Name:  "Cream Cheese",
+									PriceModifier: &moov.AmountDecimal{
+										Currency:     "USD",
+										ValueDecimal: "0.01",
+									},
+									Quantity: 2,
+								},
+							},
+							Quantity: 2,
+						},
+						{
+							Name: "Water",
+							BasePrice: moov.AmountDecimal{
+								Currency:     "USD",
+								ValueDecimal: "0.01",
+							},
+							Quantity: 1,
+						},
+					},
+				},
+			}).WaitForRailResponse()
+		NoResponseError(t, err)
+
+		require.NotNil(t, completed)
+		wantLineItems := &moov.TransferLineItems{
+			Items: []moov.TransferLineItem{
+				{
+					Name:      "Bagel",
+					ProductID: moov.PtrOf("1e262367-de3e-4acb-ae02-7f56e83632ee"),
+					BasePrice: moov.AmountDecimal{
+						Currency:     "USD",
+						ValueDecimal: "0.03",
+					},
+					Options: []moov.TransferLineItemOption{
+						{
+							Name:     "Everything Bagel",
+							Quantity: 1,
+						},
+						{
+							Group: moov.PtrOf("Toppings"),
+							Name:  "Cream Cheese",
+							PriceModifier: &moov.AmountDecimal{
+								Currency:     "USD",
+								ValueDecimal: "0.01",
+							},
+							Quantity: 2,
+						},
+					},
+					Quantity: 2,
+				},
+				{
+					Name: "Water",
+					BasePrice: moov.AmountDecimal{
+						Currency:     "USD",
+						ValueDecimal: "0.01",
+					},
+					Quantity: 1,
+				},
+			},
+		}
+		require.Equal(t, wantLineItems, completed.LineItems)
+	})
+
 }
 
 func Test_Cancellations(t *testing.T) {
