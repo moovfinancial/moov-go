@@ -17,10 +17,10 @@ func TestCreateWebhook(t *testing.T) {
 		URL:         "https://example.com/webhook",
 		Description: "Test webhook",
 		Status:      moov.WebhookStatusEnabled,
-		EventTypeIdentifiers: []moov.WebhookEventType{
-			moov.WEBHOOKEVENTTYPE_ACCOUNT_CREATED,
-			moov.WEBHOOKEVENTTYPE_ACCOUNT_DISCONNECTED,
-			moov.WEBHOOKEVENTTYPE_ACCOUNT_UPDATED,
+		EventTypes: []moov.EventType{
+			moov.EventTypeAccountCreated,
+			moov.EventTypeAccountDisconnected,
+			moov.EventTypeAccountUpdated,
 		},
 	}
 
@@ -33,6 +33,7 @@ func TestCreateWebhook(t *testing.T) {
 	t.Cleanup(func() {
 		if createdWebhook != nil {
 			mc.DeleteWebhook(context.Background(), createdWebhook.WebhookID)
+			createdWebhook = nil
 		}
 	})
 
@@ -60,15 +61,17 @@ func TestCreateWebhook(t *testing.T) {
 			URL:         "https://example.com/webhook-new",
 			Description: "Test webhook new",
 			Status:      moov.WebhookStatusEnabled,
-			EventTypeIdentifiers: []moov.WebhookEventType{
-				moov.WEBHOOKEVENTTYPE_ACCOUNT_CREATED,
-				moov.WEBHOOKEVENTTYPE_ACCOUNT_DISCONNECTED,
-				moov.WEBHOOKEVENTTYPE_ACCOUNT_UPDATED,
+			EventTypes: []moov.EventType{
+				moov.EventTypeAccountCreated,
+				moov.EventTypeAccountDisconnected,
+				moov.EventTypeAccountUpdated,
 			},
 		})
 		normalizeWebhook(webhook)
 		require.NoError(t, err)
 		require.NotNil(t, webhook)
+		require.Equal(t, "https://example.com/webhook-new", webhook.URL)
+		require.Equal(t, "Test webhook new", webhook.Description)
 	})
 
 	t.Run("delete webhook", func(t *testing.T) {
