@@ -60,12 +60,12 @@ type UpsertWebhook struct {
 }
 
 type Webhook struct {
-	WebhookID   string        `json:"webhookID" otel:"webhook_id"`
-	URL         string        `json:"url" otel:"url"`
-	Description string        `json:"description,omitempty" otel:"description"`
-	Status      WebhookStatus `json:"status" otel:"status"`
-	LastUsedOn  *time.Time    `json:"lastUsedOn,omitempty" otel:"last_used_on"`
-	EventTypes  []EventType   `json:"eventTypes" otel:"event_types"`
-	CreatedOn   time.Time     `json:"createdOn" otel:"created_on"`
-	UpdatedOn   time.Time     `json:"updatedOn" otel:"updated_on"`
+	WebhookID   string        `json:"webhookID"`
+	URL         string        `json:"url"`
+	Description string        `json:"description,omitempty"`
+	Status      WebhookStatus `json:"status"`
+	LastUsedOn  *time.Time    `json:"lastUsedOn,omitempty"`
+	EventTypes  []EventType   `json:"eventTypes"`
+	CreatedOn   time.Time     `json:"createdOn"`
+	UpdatedOn   time.Time     `json:"updatedOn"`
 }
