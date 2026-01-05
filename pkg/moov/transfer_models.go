@@ -79,6 +79,28 @@ type CreateTransfer_FacilitatorFee struct {
 	MarkupDecimal *string `json:"markupDecimal,omitempty"`
 }
 
+// CreateTransferLineItems contains line item information to include on the created transfer.
+type CreateTransferLineItems struct {
+	Items []CreateTransferLineItem `json:"items"`
+}
+
+// CreateTransferLineItem represents a single item in a transfer.
+type CreateTransferLineItem struct {
+	Name      string                         `json:"name"`
+	ProductID *string                        `json:"productID,omitempty"`
+	BasePrice AmountDecimal                  `json:"basePrice"`
+	Quantity  int                            `json:"quantity"`
+	Options   []CreateTransferLineItemOption `json:"options,omitempty"`
+}
+
+// CreateTransferLineItemOption represents an option for a line item.
+type CreateTransferLineItemOption struct {
+	Group         *string        `json:"group,omitempty"`
+	Name          string         `json:"name"`
+	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
+	Quantity      int            `json:"quantity"`
+}
+
 // TransferStarted is where the request to create a transfer was recorded and kicked off but hasn't completed yet
 type TransferStarted struct {
 	// Identifier for the transfer.
@@ -134,6 +156,8 @@ type Transfer struct {
 	SalesTaxAmount *Amount `json:"salesTaxAmount,omitempty"`
 
 	PaymentLinkCode *string `json:"paymentLinkCode,omitempty"`
+
+	LineItems *TransferLineItems `json:"lineItems,omitempty"`
 }
 
 // Fees charged to accounts involved in the transfer.
@@ -372,22 +396,22 @@ type TransferOptions struct {
 	DestinationOptions []PaymentMethod `json:"destinationOptions,omitempty"`
 }
 
-// CreateTransferLineItems contains Items for nested structure
-type CreateTransferLineItems struct {
-	Items []CreateTransferLineItem `json:"items"`
+// TransferLineItems contains line item information on a created transfer.
+type TransferLineItems struct {
+	Items []TransferLineItem `json:"items"`
 }
 
-// CreateTransferLineItem represents a single item in a transfer.
-type CreateTransferLineItem struct {
-	Name      string                         `json:"name"`
-	ProductID *string                        `json:"productID,omitempty"`
-	BasePrice AmountDecimal                  `json:"basePrice"`
-	Quantity  int                            `json:"quantity"`
-	Options   []CreateTransferLineItemOption `json:"options,omitempty"`
+// TransferLineItem represents a single item on a created transfer.
+type TransferLineItem struct {
+	Name      string                   `json:"name"`
+	ProductID *string                  `json:"productID,omitempty"`
+	BasePrice AmountDecimal            `json:"basePrice"`
+	Quantity  int                      `json:"quantity"`
+	Options   []TransferLineItemOption `json:"options,omitempty"`
 }
 
-// CreateTransferLineItemOption represents an option for a line item.
-type CreateTransferLineItemOption struct {
+// TransferLineItemOption represents an option for a line item on a created transfer.
+type TransferLineItemOption struct {
 	Group         *string        `json:"group,omitempty"`
 	Name          string         `json:"name"`
 	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
