@@ -2,6 +2,7 @@ package moov_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/moovfinancial/moov-go/pkg/mv2507"
@@ -28,7 +29,14 @@ func Test_ShareConnection(t *testing.T) {
 	})
 
 	t.Run("list accounts connected to merchant from the partner perspective", func(t *testing.T) {
-		connections, err := mv2507.Accounts.ListConnected(BgCtx(), *mc, merchant.AccountID)
+		var connections []mv2507.Account
+		var err error
+
+		require.Eventually(t, func() bool {
+			connections, err = mv2507.Accounts.ListConnected(BgCtx(), *mc, merchant.AccountID)
+			return err == nil && len(connections) > 0
+		}, time.Second*1, time.Millisecond*100)
+
 		require.NoError(t, err)
 		require.NotNil(t, connections)
 		require.Len(t, connections, 1)

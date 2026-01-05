@@ -6,45 +6,45 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
-type EventType string
+type EventType = moov.EventType
 
 const (
-	EventTypeAccountCreated           EventType = "account.created"
-	EventTypeAccountDisconnected      EventType = "account.disconnected"
-	EventTypeAccountUpdated           EventType = "account.updated"
-	EventTypeBalanceUpdated           EventType = "balance.updated"
-	EventTypeBankAccountCreated       EventType = "bankAccount.created"
-	EventTypeBankAccountDeleted       EventType = "bankAccount.deleted"
-	EventTypeBankAccountUpdated       EventType = "bankAccount.updated"
-	EventTypeBillingStatementCreated  EventType = "billingStatement.created"
-	EventTypeCancellationCreated      EventType = "cancellation.created"
-	EventTypeCancellationUpdated      EventType = "cancellation.updated"
-	EventTypeCardAutoUpdated          EventType = "card.autoUpdated"
-	EventTypeCapabilityRequested      EventType = "capability.requested"
-	EventTypeCapabilityUpdated        EventType = "capability.updated"
-	EventTypeDisputeCreated           EventType = "dispute.created"
-	EventTypeDisputeUpdated           EventType = "dispute.updated"
-	EventTypeInvoiceCreated           EventType = "invoice.created"
-	EventTypeInvoiceUpdated           EventType = "invoice.updated"
-	EventTypeNetworkIDUpdated         EventType = "networkID.updated"
-	EventTypePaymentMethodDisabled    EventType = "paymentMethod.disabled"
-	EventTypePaymentMethodEnabled     EventType = "paymentMethod.enabled"
-	EventTypeRefundCreated            EventType = "refund.created"
-	EventTypeRefundUpdated            EventType = "refund.updated"
-	EventTypeRepresentativeCreated    EventType = "representative.created"
-	EventTypeRepresentativeDeleted    EventType = "representative.deleted"
-	EventTypeRepresentativeUpdated    EventType = "representative.updated"
-	EventTypeSweepCreated             EventType = "sweep.created"
-	EventTypeSweepUpdated             EventType = "sweep.updated"
-	EventTypeTestPing                 EventType = "event.test"
-	EventTypeTicketCreated            EventType = "ticket.created"
-	EventTypeTicketUpdated            EventType = "ticket.updated"
-	EventTypeTicketMessageAdded       EventType = "ticket.messageAdded"
-	EventTypeTransferCreated          EventType = "transfer.created"
-	EventTypeTransferUpdated          EventType = "transfer.updated"
-	EventTypeWalletCreated            EventType = "wallet.created"
-	EventTypeWalletUpdated            EventType = "wallet.updated"
-	EventTypeWalletTransactionUpdated EventType = "walletTransaction.updated"
+	EventTypeAccountCreated           = moov.EventTypeAccountCreated
+	EventTypeAccountDisconnected      = moov.EventTypeAccountDisconnected
+	EventTypeAccountUpdated           = moov.EventTypeAccountUpdated
+	EventTypeBalanceUpdated           = moov.EventTypeBalanceUpdated
+	EventTypeBankAccountCreated       = moov.EventTypeBankAccountCreated
+	EventTypeBankAccountDeleted       = moov.EventTypeBankAccountDeleted
+	EventTypeBankAccountUpdated       = moov.EventTypeBankAccountUpdated
+	EventTypeBillingStatementCreated  = moov.EventTypeBillingStatementCreated
+	EventTypeCancellationCreated      = moov.EventTypeCancellationCreated
+	EventTypeCancellationUpdated      = moov.EventTypeCancellationUpdated
+	EventTypeCardAutoUpdated          = moov.EventTypeCardAutoUpdated
+	EventTypeCapabilityRequested      = moov.EventTypeCapabilityRequested
+	EventTypeCapabilityUpdated        = moov.EventTypeCapabilityUpdated
+	EventTypeDisputeCreated           = moov.EventTypeDisputeCreated
+	EventTypeDisputeUpdated           = moov.EventTypeDisputeUpdated
+	EventTypeInvoiceCreated           = moov.EventTypeInvoiceCreated
+	EventTypeInvoiceUpdated           = moov.EventTypeInvoiceUpdated
+	EventTypeNetworkIDUpdated         = moov.EventTypeNetworkIDUpdated
+	EventTypePaymentMethodDisabled    = moov.EventTypePaymentMethodDisabled
+	EventTypePaymentMethodEnabled     = moov.EventTypePaymentMethodEnabled
+	EventTypeRefundCreated            = moov.EventTypeRefundCreated
+	EventTypeRefundUpdated            = moov.EventTypeRefundUpdated
+	EventTypeRepresentativeCreated    = moov.EventTypeRepresentativeCreated
+	EventTypeRepresentativeDeleted    = moov.EventTypeRepresentativeDeleted
+	EventTypeRepresentativeUpdated    = moov.EventTypeRepresentativeUpdated
+	EventTypeSweepCreated             = moov.EventTypeSweepCreated
+	EventTypeSweepUpdated             = moov.EventTypeSweepUpdated
+	EventTypeTestPing                 = moov.EventTypeTestPing
+	EventTypeTicketCreated            = moov.EventTypeTicketCreated
+	EventTypeTicketUpdated            = moov.EventTypeTicketUpdated
+	EventTypeTicketMessageAdded       = moov.EventTypeTicketMessageAdded
+	EventTypeTransferCreated          = moov.EventTypeTransferCreated
+	EventTypeTransferUpdated          = moov.EventTypeTransferUpdated
+	EventTypeWalletCreated            = moov.EventTypeWalletCreated
+	EventTypeWalletUpdated            = moov.EventTypeWalletUpdated
+	EventTypeWalletTransactionUpdated = moov.EventTypeWalletTransactionUpdated
 )
 
 type AccountCreated struct {
