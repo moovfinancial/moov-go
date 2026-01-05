@@ -388,7 +388,7 @@ type CreateTransferLineItem struct {
 
 // CreateTransferLineItemOption represents an option for a line item.
 type CreateTransferLineItemOption struct {
-	Group         string         `json:"group"`
+	Group         *string        `json:"group,omitempty"`
 	Name          string         `json:"name"`
 	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
 	Quantity      int            `json:"quantity"`
