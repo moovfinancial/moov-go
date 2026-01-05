@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (c *Client) CreateWebhook(ctx context.Context, webhook CreateWebhook) (*Webhook, error) {
+func (c *Client) CreateWebhook(ctx context.Context, webhook UpsertWebhook) (*Webhook, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathWebhooks),
 		AcceptJson(),
@@ -39,7 +39,7 @@ func (c *Client) GetWebhook(ctx context.Context, webhookID string) (*Webhook, er
 	return CompletedObjectOrError[Webhook](resp)
 }
 
-func (c *Client) UpdateWebhook(ctx context.Context, webhookID string, webhook UpdateWebhook) (*Webhook, error) {
+func (c *Client) UpdateWebhook(ctx context.Context, webhookID string, webhook UpsertWebhook) (*Webhook, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPut, pathWebhook, webhookID),
 		AcceptJson(),

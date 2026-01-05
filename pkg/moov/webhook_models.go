@@ -54,14 +54,7 @@ const (
 
 type WebhookStatus string
 
-type CreateWebhook struct {
-	URL                  string             `json:"url"`
-	Description          string             `json:"description"`
-	Status               WebhookStatus      `json:"status"`
-	EventTypeIdentifiers []WebhookEventType `json:"eventTypes"`
-}
-
-type UpdateWebhook struct {
+type UpsertWebhook struct {
 	URL                  string             `json:"url"`
 	Description          string             `json:"description"`
 	Status               WebhookStatus      `json:"status"`
