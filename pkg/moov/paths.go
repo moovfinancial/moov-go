@@ -47,6 +47,9 @@ const (
 	pathWalletTransactions = "/accounts/%s/wallets/%s/transactions"
 	pathWalletTransaction  = "/accounts/%s/wallets/%s/transactions/%s"
 
+	pathWebhooks = "/webhooks"
+	pathWebhook  = "/webhooks/%s"
+
 	pathSweepConfigs = "/accounts/%s/sweep-configs"
 	pathSweepConfig  = "/accounts/%s/sweep-configs/%s"
 
