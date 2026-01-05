@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
@@ -18,7 +19,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 	// configuration file.
 
 	// The account facilitating the transfer
-	partnerAccountID := "5352b013-ae58-4a63-8a3f-97f316a917cf" // example
+	partnerAccountID := testtools.PARTNER_ID // example
 
 	mc, err := moov.NewClient(moov.WithCredentials(moov.CredentialsFromEnv()))
 	require.NoError(t, err)
@@ -32,7 +33,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 
 	// Step 2: create account for the user
 	// For now just using a known existing account
-	accountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
+	accountID := testtools.MERCHANT_ID // example
 
 	// Step 3: add (link) user's card
 

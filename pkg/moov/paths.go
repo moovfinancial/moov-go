@@ -6,14 +6,17 @@ const (
 	pathOAuth2Token  = "/oauth2/token" // #nosec G101
 	pathOAuth2Revoke = "/oauth2/revoke"
 
-	pathAccounts = "/accounts"
-	pathAccount  = "/accounts/%s"
+	pathAccounts          = "/accounts"
+	pathAccount           = "/accounts/%s"
+	pathAccountsConnected = "/accounts/%s/connected-accounts"
 
 	pathApplications    = "/applications"
 	pathApplicationKeys = "/applications/%s/keys"
 
 	pathCapabilities = "/accounts/%s/capabilities"
 	pathCapability   = "/accounts/%s/capabilities/%s"
+
+	pathConnections = "/accounts/%s/connections"
 
 	pathUnderwriting = "/accounts/%s/underwriting"
 
@@ -110,4 +113,17 @@ const (
 
 	pathStatements = "/accounts/%s/statements"
 	pathStatement  = "/accounts/%s/statements/%s"
+
+	pathInvoices        = "/accounts/%s/invoices"
+	pathInvoice         = "/accounts/%s/invoices/%s"
+	pathInvoiceMarkPaid = "/accounts/%s/invoices/%s/mark-paid"
+	pathInvoiceSend     = "/accounts/%s/invoices/%s/send"
+
+	pathIssuedCards                = "/issuing/%s/issued-cards"
+	pathIssuedCard                 = "/issuing/%s/issued-cards/%s"
+	pathIssuingAuthorizations      = "/issuing/%s/authorizations"
+	pathIssuingAuthorization       = "/issuing/%s/authorizations/%s"
+	pathIssuingAuthorizationEvents = "/issuing/%s/authorizations/%s/events"
+	pathIssuingTransactions        = "/issuing/%s/card-transactions"
+	pathIssuingTransaction         = "/issuing/%s/card-transactions/%s"
 )

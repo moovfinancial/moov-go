@@ -24,7 +24,7 @@ func callStatus(name string, retryable bool) CallStatus {
 }
 
 var (
-	StatusCompleted = callStatus("completed", false) // Completely fully
+	StatusCompleted = callStatus("completed", false) // Completed fully
 	StatusStarted   = callStatus("started", true)    // Returned as async. This can be due to timing out, or started as async
 
 	StatusBadRequest       = callStatus("bad_request", false)       // bad request, body, headers, etc...
@@ -290,6 +290,16 @@ func CompletedListOrError[A interface{}](resp CallResponse) ([]A, error) {
 	switch resp.Status() {
 	case StatusCompleted:
 		return UnmarshalListResponse[A](resp)
+	default:
+		return nil, resp
+	}
+}
+
+// Helper for a common pattern of successful API calls returning an object body or an error
+func StartedObjectOrError[A interface{}](resp CallResponse) (*A, error) {
+	switch resp.Status() {
+	case StatusStarted:
+		return UnmarshalObjectResponse[A](resp)
 	default:
 		return nil, resp
 	}
