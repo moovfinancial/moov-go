@@ -135,24 +135,6 @@ func MultipartField(key, value string) multipartFn {
 	}
 }
 
-func MultipartBinary(key string, data io.Reader) multipartFn {
-	return func(w *multipart.Writer) error {
-		h := make(textproto.MIMEHeader)
-		h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"`, escapeQuotes(key)))
-		part, err := w.CreatePart(h)
-		if err != nil {
-			return err
-		}
-
-		_, err = io.Copy(part, data)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-}
-
 func MultipartFile(key, filename string, file io.Reader, contentType string) multipartFn {
 	return func(w *multipart.Writer) error {
 		h := make(textproto.MIMEHeader)

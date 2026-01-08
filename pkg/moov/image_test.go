@@ -11,6 +11,7 @@ import (
 	"io"
 	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
@@ -46,43 +47,46 @@ func TestImageMetadataMarshal(t *testing.T) {
 func Test_Images(t *testing.T) {
 	mc := NewTestClient(t)
 	ctx := context.Background()
+	accountID := MERCHANT_ID
 
 	uploadedImageID := ""
 
 	t.Run("upload image", func(t *testing.T) {
-		_, imgReader := RandomImage(t, 20, 20, EncodePNG)
+		_, imgReader := randomImage(t, 100, 100, encodePNG)
 		metadata := &moov.ImageMetadataRequest{
 			AltText: "Test image from moov-go SDK",
 		}
 
-		uploaded, err := mc.UploadImage(ctx, FACILITATOR_ID, imgReader, metadata)
+		uploaded, err := mc.UploadImage(ctx, accountID, imgReader, metadata)
 		require.NoError(t, err)
 		require.NotNil(t, uploaded)
 		require.NotEmpty(t, uploaded.ImageID)
 		require.NotEmpty(t, uploaded.PublicID)
 		require.NotEmpty(t, uploaded.Link)
 		require.Equal(t, metadata.AltText, uploaded.AltText)
+
+		uploadedImageID = uploaded.ImageID
 	})
 
 	t.Run("list images", func(t *testing.T) {
-		gotImages, err := mc.ListImageMetadata(ctx, FACILITATOR_ID)
+		gotImages, err := mc.ListImageMetadata(ctx, accountID)
 		require.NoError(t, err)
 		require.Greater(t, len(gotImages), 0)
 	})
 
 	t.Run("get image", func(t *testing.T) {
-		got, err := mc.GetImageMetadata(ctx, FACILITATOR_ID, uploadedImageID)
+		got, err := mc.GetImageMetadata(ctx, accountID, uploadedImageID)
 		require.NoError(t, err)
 		require.NotNil(t, got)
 	})
 
 	t.Run("update image", func(t *testing.T) {
-		_, imgReader := RandomImage(t, 20, 20, EncodeJPEG)
+		_, imgReader := randomImage(t, 100, 100, encodeJPEG)
 		metadata := &moov.ImageMetadataRequest{
 			AltText: "Updated test image",
 		}
 
-		updated, err := mc.UpdateImage(ctx, FACILITATOR_ID, uploadedImageID, imgReader, metadata)
+		updated, err := mc.UpdateImage(ctx, accountID, uploadedImageID, imgReader, metadata)
 		require.NoError(t, err)
 		require.NotNil(t, updated)
 		require.Equal(t, metadata.AltText, updated.AltText)
@@ -93,40 +97,40 @@ func Test_Images(t *testing.T) {
 			AltText: "Updated metadata only",
 		}
 
-		updated, err := mc.UpdateImageMetadata(ctx, FACILITATOR_ID, uploadedImageID, metadata)
+		updated, err := mc.UpdateImageMetadata(ctx, accountID, uploadedImageID, metadata)
 		require.NoError(t, err)
 		require.NotNil(t, updated)
 		require.Equal(t, metadata.AltText, updated.AltText)
 	})
 
 	t.Run("delete image", func(t *testing.T) {
-		err := mc.DeleteImage(ctx, FACILITATOR_ID, uploadedImageID)
+		err := mc.DeleteImage(ctx, accountID, uploadedImageID)
 		require.NoError(t, err)
 	})
 }
 
-type EncoderFunc func(img image.Image) (io.Reader, error)
+type encoderFunc func(img image.Image) (io.Reader, error)
 
-func EncodePNG(img image.Image) (io.Reader, error) {
+func encodePNG(img image.Image) (io.Reader, error) {
 	var buf bytes.Buffer
 	err := png.Encode(&buf, img)
 	return &buf, err
 }
 
-func EncodeJPEG(img image.Image) (io.Reader, error) {
+func encodeJPEG(img image.Image) (io.Reader, error) {
 	var buf bytes.Buffer
 	err := jpeg.Encode(&buf, img, nil)
 	return &buf, err
 }
 
-func RandomImage(t *testing.T, w, h int, enc EncoderFunc) (image.Image, io.Reader) {
+func randomImage(t *testing.T, w, h int, enc encoderFunc) (image.Image, io.Reader) {
 	t.Helper()
 
 	if w <= 0 || h <= 0 {
 		t.Fatalf("invalid dimensions: %dx%d", w, h)
 	}
 
-	rnd := rand.New(rand.NewSource(42))
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	img := image.NewRGBA(image.Rect(0, 0, w, h))
 	for y := 0; y < h; y++ {

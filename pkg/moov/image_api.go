@@ -12,7 +12,7 @@ import (
 // https://docs.moov.io/api/tools/images/post/
 func (c Client) UploadImage(ctx context.Context, accountID string, file io.Reader, metadata *ImageMetadataRequest) (*ImageMetadata, error) {
 	var multiParts []multipartFn
-	multiParts = append(multiParts, MultipartBinary("image", file))
+	multiParts = append(multiParts, MultipartFile("image", "image", file, "application/octet-stream"))
 
 	if metadata != nil {
 		mdJson, err := json.Marshal(metadata)
@@ -60,7 +60,7 @@ func (c Client) GetImageMetadata(ctx context.Context, accountID string, imageID 
 // https://docs.moov.io/api/tools/images/put-image/
 func (c Client) UpdateImage(ctx context.Context, accountID string, imageID string, file io.Reader, metadata *ImageMetadataRequest) (*ImageMetadata, error) {
 	var multiParts []multipartFn
-	multiParts = append(multiParts, MultipartBinary("image", file))
+	multiParts = append(multiParts, MultipartFile("image", "image", file, "application/octet-stream"))
 
 	if metadata != nil {
 		mdJson, err := json.Marshal(metadata)
