@@ -37,7 +37,7 @@ func TestImageMetadataMarshal(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", metadata.ImageID)
 	require.Equal(t, "qJRAaAwwF5hmfeAFdHjIb", metadata.PublicID)
-	require.Equal(t, "Test image", metadata.AltText)
+	require.Equal(t, "Test image", *metadata.AltText)
 	require.Equal(t, "https://api.moov.io/images/qJRAaAwwF5hmfeAFdHjIb", metadata.Link)
 	require.NotNil(t, metadata.CreatedOn)
 	require.NotNil(t, metadata.UpdatedOn)
@@ -54,7 +54,7 @@ func Test_Images(t *testing.T) {
 	t.Run("upload image", func(t *testing.T) {
 		_, imgReader := randomImage(t, 100, 100, encodePNG)
 		metadata := &moov.ImageMetadataRequest{
-			AltText: "Test image from moov-go SDK",
+			AltText: moov.PtrOf("Test image from moov-go SDK"),
 		}
 
 		uploaded, err := mc.UploadImage(ctx, accountID, imgReader, metadata)
@@ -83,7 +83,7 @@ func Test_Images(t *testing.T) {
 	t.Run("update image", func(t *testing.T) {
 		_, imgReader := randomImage(t, 100, 100, encodeJPEG)
 		metadata := &moov.ImageMetadataRequest{
-			AltText: "Updated test image",
+			AltText: moov.PtrOf("Updated test image"),
 		}
 
 		updated, err := mc.UpdateImage(ctx, accountID, uploadedImageID, imgReader, metadata)
@@ -94,7 +94,7 @@ func Test_Images(t *testing.T) {
 
 	t.Run("update image metadata", func(t *testing.T) {
 		metadata := moov.ImageMetadataRequest{
-			AltText: "Updated metadata only",
+			AltText: moov.PtrOf("Updated metadata only"),
 		}
 
 		updated, err := mc.UpdateImageMetadata(ctx, accountID, uploadedImageID, metadata)
