@@ -31,7 +31,7 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 					},
 					Quantity: 1,
 					Options: []moov.CreateInvoiceLineItemOption{
-						moov.CreateInvoiceLineItemOption{
+						{
 							Name:     "big TIP",
 							Quantity: 1,
 							PriceModifier: &moov.AmountDecimal{
@@ -68,4 +68,30 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 	updatedInvoice, err := mc.UpdateInvoice(ctx, accountID, createdInvoice.InvoiceID, update)
 	require.NoError(t, err)
 	require.Equal(t, now, *updatedInvoice.DueDate)
+
+	// Update invoice status to 'unpaid' to send the invoice to the customer.
+	updatedInvoice, err = mc.UpdateInvoice(ctx, accountID, createdInvoice.InvoiceID, moov.UpdateInvoice{Status: moov.PtrOf(moov.InvoiceStatusUnpaid)})
+	require.NoError(t, err)
+	require.Equal(t, moov.InvoiceStatusUnpaid, updatedInvoice.Status)
+
+	// Create an external payment for the invoice to mark it as paid.
+	createdPayment, err := mc.CreateInvoicePayment(ctx, accountID, createdInvoice.InvoiceID, moov.CreateInvoicePayment{
+		ForeignID:   moov.PtrOf("abc123"),
+		Description: moov.PtrOf("Customer paid with check"),
+	})
+	require.NoError(t, err)
+	require.Equal(t, moov.InvoicePaymentTypeExternal, createdPayment.InvoicePaymentType)
+	wantExternal := moov.InvoiceExternalPayment{
+		ForeignID:   "abc123",
+		Description: "Customer paid with check",
+		Amount:      createdInvoice.TotalAmount,
+	}
+	require.Equal(t, wantExternal, *createdPayment.External)
+
+	// Confirm the invoice is paid
+	paidInvoice, err := mc.GetInvoice(ctx, accountID, createdInvoice.InvoiceID)
+	require.NoError(t, err)
+	require.Equal(t, moov.InvoiceStatusPaid, paidInvoice.Status)
+	require.NotNil(t, paidInvoice.PaidOn)
+	require.Equal(t, *createdPayment, paidInvoice.Payments[0])
 }
