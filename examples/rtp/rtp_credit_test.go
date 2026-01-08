@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 
 	"github.com/go-faker/faker/v4"
@@ -29,10 +30,10 @@ func TestRTPCreditExample(t *testing.T) {
 	require.NoError(t, err)
 
 	// The account facilitating the transfer
-	partnerAccountID := "5352b013-ae58-4a63-8a3f-97f316a917cf" // example
+	partnerAccountID := testtools.PARTNER_ID // example
 
 	// Account IDs used
-	sourceAccountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
+	sourceAccountID := testtools.MERCHANT_ID // example
 
 	// Step 2: Get the source wallet for our RTP transfer
 	sourcePaymentMethods, err := mc.ListPaymentMethods(ctx, sourceAccountID, moov.WithPaymentMethodType("moov-wallet"))
