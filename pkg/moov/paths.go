@@ -134,4 +134,7 @@ const (
 	pathImage         = "/accounts/%s/images/%s"
 	pathImageMetadata = "/accounts/%s/images/%s/metadata"
 	pathPublicImage   = "/images/%s"
+
+	pathProducts = "/accounts/%s/products"
+	pathProduct  = "/accounts/%s/products/%s"
 )
