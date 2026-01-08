@@ -50,7 +50,7 @@ const (
 	pathWebhooks      = "/webhooks"
 	pathWebhook       = "/webhooks/%s"
 	pathWebhookPing   = "/webhooks/%s/ping"
-	pathWebhookSecret = "/webhooks/%s/secret"
+	pathWebhookSecret = "/webhooks/%s/secret" // #nosec G101 - false positive, this is a URL path not a credential
 	pathEventTypes    = "/event-types"
 
 	pathSweepConfigs = "/accounts/%s/sweep-configs"
