@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
@@ -57,34 +58,63 @@ func TestProductMarshal(t *testing.T) {
 		"disabledOn": null
 	}`)
 
-	product := new(moov.Product)
+	createdOn, _ := time.Parse(time.RFC3339, "2024-01-15T10:30:00Z")
+	updatedOn, _ := time.Parse(time.RFC3339, "2024-01-15T10:30:00Z")
+
+	want := moov.Product{
+		ProductID:   "ec7e1848-dc80-4ab0-8827-dd7fc0737b43",
+		Title:       "Test Product",
+		Description: moov.PtrOf("A test product description"),
+		BasePrice: moov.AmountDecimal{
+			Currency:     "USD",
+			ValueDecimal: "19.99",
+		},
+		OptionGroups: []moov.ProductOptionGroup{
+			{
+				Name:        "Size",
+				Description: moov.PtrOf("Choose a size"),
+				MinSelect:   1,
+				MaxSelect:   1,
+				Options: []moov.ProductOption{
+					{
+						Name:        "Small",
+						Description: moov.PtrOf("Small size"),
+						PriceModifier: &moov.AmountDecimal{
+							Currency:     "USD",
+							ValueDecimal: "0.00",
+						},
+					},
+					{
+						Name: "Large",
+						PriceModifier: &moov.AmountDecimal{
+							Currency:     "USD",
+							ValueDecimal: "5.00",
+						},
+					},
+				},
+			},
+		},
+		Images: []moov.ProductImageMetadata{
+			{
+				ImageID:  "ec7e1848-dc80-4ab0-8827-dd7fc0737b43",
+				AltText:  moov.PtrOf("Product image"),
+				Link:     "https://api.moov.io/images/qJRAaAwwF5hmfeAFdHjIb",
+				PublicID: "qJRAaAwwF5hmfeAFdHjIb",
+			},
+		},
+		CreatedOn:  createdOn,
+		UpdatedOn:  updatedOn,
+		DisabledOn: nil,
+	}
+
+	got := new(moov.Product)
 
 	dec := json.NewDecoder(bytes.NewReader(input))
 	dec.DisallowUnknownFields()
 
-	err := dec.Decode(&product)
+	err := dec.Decode(&got)
 	require.NoError(t, err)
-	require.Equal(t, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", product.ProductID)
-	require.Equal(t, "Test Product", product.Title)
-	require.Equal(t, "A test product description", *product.Description)
-	require.Equal(t, "USD", product.BasePrice.Currency)
-	require.Equal(t, "19.99", product.BasePrice.ValueDecimal)
-	require.Len(t, product.OptionGroups, 1)
-	require.Equal(t, "Size", product.OptionGroups[0].Name)
-	require.Equal(t, "Choose a size", *product.OptionGroups[0].Description)
-	require.Equal(t, int32(1), product.OptionGroups[0].MinSelect)
-	require.Equal(t, int32(1), product.OptionGroups[0].MaxSelect)
-	require.Len(t, product.OptionGroups[0].Options, 2)
-	require.Equal(t, "Small", product.OptionGroups[0].Options[0].Name)
-	require.Equal(t, "Small size", *product.OptionGroups[0].Options[0].Description)
-	require.Equal(t, "Large", product.OptionGroups[0].Options[1].Name)
-	require.Nil(t, product.OptionGroups[0].Options[1].Description)
-	require.Len(t, product.Images, 1)
-	require.Equal(t, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", product.Images[0].ImageID)
-	require.Equal(t, "Product image", *product.Images[0].AltText)
-	require.NotNil(t, product.CreatedOn)
-	require.NotNil(t, product.UpdatedOn)
-	require.Nil(t, product.DisabledOn)
+	require.Equal(t, want, *got)
 }
 
 func Test_Products(t *testing.T) {
