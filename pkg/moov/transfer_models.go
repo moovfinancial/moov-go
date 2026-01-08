@@ -12,7 +12,9 @@ type CreateTransfer struct {
 	// An optional description of the transfer for your own internal use.
 	Description string `json:"description,omitempty"`
 	// Free-form key-value pair list. Useful for storing information that is not captured elsewhere.
-	Metadata  map[string]string        `json:"metadata,omitempty"`
+	Metadata map[string]string `json:"metadata,omitempty"`
+	// ForeignID an optional alias from a foreign/external system which can be used to reference this resource
+	ForeignID *string                  `json:"foreignID,omitempty"`
 	LineItems *CreateTransferLineItems `json:"lineItems,omitempty"`
 }
 
@@ -44,6 +46,13 @@ type CreateTransfer_AchDetailsSource struct {
 	OriginatingCompanyName string           `json:"originatingCompanyName,omitempty"`
 	DebitHoldPeriod        *DebitHoldPeriod `json:"debitHoldPeriod,omitempty"`
 	SecCode                *SecCode         `json:"secCode,omitempty"`
+	// Addenda optional ACH addenda to include on the transfer
+	Addenda []CreateTransfer_AchAddendaRecord `json:"addenda,omitempty"`
+}
+
+type CreateTransfer_AchAddendaRecord struct {
+	// Record an ACH addenda record. Must comply with the NACHA character set and be 80 characters or less
+	Record string
 }
 
 // CreateTransfer_Destination The final stage of a transfer and the ultimate recipient of the funds.
@@ -65,6 +74,8 @@ type CreateTransfer_AchDetailsBase struct {
 	CompanyEntryDescription string `json:"companyEntryDescription,omitempty"`
 	// An optional override of the default NACHA company name for a transfer.
 	OriginatingCompanyName string `json:"originatingCompanyName,omitempty"`
+	// Addenda optional ACH addenda to include on the transfer
+	Addenda []CreateTransfer_AchAddendaRecord `json:"addenda,omitempty"`
 }
 
 // CreateTransfer_FacilitatorFee Total or markup fee.
@@ -141,6 +152,9 @@ type Transfer struct {
 	ScheduleID *string `json:"scheduleID,omitempty"`
 	// ID of the associated occurrence.
 	OccurrenceID *string `json:"occurrenceID,omitempty"`
+	// ForeignID an optional alias from a foreign/external system which can be used to reference this resource
+	ForeignID *string `json:"foreignID,omitempty"`
+
 	// The total refunded amount for a card transfer, representing one refunded amount, or multiple partial refunded amounts. Contains an integer value and its currency. See the `refunds` array for additional details.
 	RefundedAmount *Amount `json:"refundedAmount,omitempty"`
 	// A list of refunds for a card transfer.
@@ -281,15 +295,23 @@ type AchDetailsSource struct {
 	// An optional override of the default NACHA company entry description for a transfer.
 	CompanyEntryDescription string `json:"companyEntryDescription,omitempty"`
 	// An optional override of the default NACHA company name for a transfer.
-	OriginatingCompanyName string          `json:"originatingCompanyName,omitempty"`
-	SecCode                SecCode         `json:"secCode,omitempty"`
-	InitiatedOn            *time.Time      `json:"initiatedOn,omitempty"`
-	OriginatedOn           *time.Time      `json:"originatedOn,omitempty"`
-	CorrectedOn            *time.Time      `json:"correctedOn,omitempty"`
-	ReturnedOn             *time.Time      `json:"returnedOn,omitempty"`
-	CompletedOn            *time.Time      `json:"completedOn,omitempty"`
-	CanceledOn             *time.Time      `json:"canceledOn,omitempty"`
-	DebitHoldPeriod        DebitHoldPeriod `json:"debitHoldPeriod,omitempty"`
+	OriginatingCompanyName string             `json:"originatingCompanyName,omitempty"`
+	SecCode                SecCode            `json:"secCode,omitempty"`
+	InitiatedOn            *time.Time         `json:"initiatedOn,omitempty"`
+	OriginatedOn           *time.Time         `json:"originatedOn,omitempty"`
+	CorrectedOn            *time.Time         `json:"correctedOn,omitempty"`
+	ReturnedOn             *time.Time         `json:"returnedOn,omitempty"`
+	CompletedOn            *time.Time         `json:"completedOn,omitempty"`
+	CanceledOn             *time.Time         `json:"canceledOn,omitempty"`
+	DebitHoldPeriod        DebitHoldPeriod    `json:"debitHoldPeriod,omitempty"`
+	Addenda                []AchAddendaRecord `json:"addenda,omitempty"`
+}
+
+type AchAddendaRecord struct {
+	// Record an ACH addenda record. Must comply with the NACHA character set and be 80 characters or less
+	Record string
+	// IsMasked indicates whether the original addenda record has been masked to obscure PII
+	IsMasked bool
 }
 
 // AchException struct for AchException
@@ -322,14 +344,15 @@ type AchDetails struct {
 	// An optional override of the default NACHA company entry description for a transfer.
 	CompanyEntryDescription string `json:"companyEntryDescription,omitempty"`
 	// An optional override of the default NACHA company name for a transfer.
-	OriginatingCompanyName string     `json:"originatingCompanyName,omitempty"`
-	SecCode                SecCode    `json:"secCode,omitempty"`
-	InitiatedOn            *time.Time `json:"initiatedOn,omitempty"`
-	OriginatedOn           *time.Time `json:"originatedOn,omitempty"`
-	CorrectedOn            *time.Time `json:"correctedOn,omitempty"`
-	ReturnedOn             *time.Time `json:"returnedOn,omitempty"`
-	CompletedOn            *time.Time `json:"completedOn,omitempty"`
-	CanceledOn             *time.Time `json:"canceledOn,omitempty"`
+	OriginatingCompanyName string             `json:"originatingCompanyName,omitempty"`
+	SecCode                SecCode            `json:"secCode,omitempty"`
+	InitiatedOn            *time.Time         `json:"initiatedOn,omitempty"`
+	OriginatedOn           *time.Time         `json:"originatedOn,omitempty"`
+	CorrectedOn            *time.Time         `json:"correctedOn,omitempty"`
+	ReturnedOn             *time.Time         `json:"returnedOn,omitempty"`
+	CompletedOn            *time.Time         `json:"completedOn,omitempty"`
+	CanceledOn             *time.Time         `json:"canceledOn,omitempty"`
+	Addenda                []AchAddendaRecord `json:"addenda,omitempty"`
 }
 
 // RtpDetails RTP specific details about the transaction.
