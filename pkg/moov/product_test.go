@@ -153,7 +153,14 @@ func Test_Products(t *testing.T) {
 		products, err := mc.ListProducts(ctx, accountID)
 		require.NoError(t, err)
 		require.NotNil(t, products)
-		require.Greater(t, len(products), 0)
+		var found bool
+		for _, p := range products {
+			if p.ProductID == createdProduct.ProductID {
+				found = true
+				break
+			}
+		}
+		require.True(t, found, "created product not found in list")
 	})
 
 	t.Run("get product", func(t *testing.T) {
@@ -179,6 +186,8 @@ func Test_Products(t *testing.T) {
 		require.Equal(t, product.Title, updated.Title)
 		require.Equal(t, product.Description, updated.Description)
 		require.Equal(t, product.BasePrice.ValueDecimal, updated.BasePrice.ValueDecimal)
+		require.Empty(t, updated.Images)
+		require.Empty(t, updated.OptionGroups)
 	})
 
 	t.Run("disable product", func(t *testing.T) {
