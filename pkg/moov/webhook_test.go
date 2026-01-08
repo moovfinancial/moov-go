@@ -13,7 +13,7 @@ import (
 func TestCreateWebhook(t *testing.T) {
 	mc := NewTestClient(t)
 
-	createWebhook := moov.UpsertWebhook{
+	createWebhook := moov.CreateWebhook{
 		URL:         "https://example.com/webhook",
 		Description: "Test webhook",
 		Status:      moov.WebhookStatusEnabled,
@@ -56,8 +56,14 @@ func TestCreateWebhook(t *testing.T) {
 		require.Equal(t, createdWebhook, webhook)
 	})
 
+	t.Run("get webhook secret", func(t *testing.T) {
+		secret, err := mc.GetWebhookSecret(context.Background(), createdWebhook.WebhookID)
+		require.NoError(t, err)
+		require.NotEmpty(t, secret.Secret)
+	})
+
 	t.Run("update webhook", func(t *testing.T) {
-		webhook, err := mc.UpdateWebhook(context.Background(), createdWebhook.WebhookID, moov.UpsertWebhook{
+		webhook, err := mc.UpdateWebhook(context.Background(), createdWebhook.WebhookID, moov.UpdateWebhook{
 			URL:         "https://example.com/webhook-new",
 			Description: "Test webhook new",
 			Status:      moov.WebhookStatusEnabled,
