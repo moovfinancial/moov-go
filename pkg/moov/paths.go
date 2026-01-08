@@ -47,8 +47,11 @@ const (
 	pathWalletTransactions = "/accounts/%s/wallets/%s/transactions"
 	pathWalletTransaction  = "/accounts/%s/wallets/%s/transactions/%s"
 
-	pathWebhooks = "/webhooks"
-	pathWebhook  = "/webhooks/%s"
+	pathWebhooks      = "/webhooks"
+	pathWebhook       = "/webhooks/%s"
+	pathWebhookPing   = "/webhooks/%s/ping"
+	pathWebhookSecret = "/webhooks/%s/secret" // #nosec G101 - false positive, this is a URL path not a credential
+	pathEventTypes    = "/event-types"
 
 	pathSweepConfigs = "/accounts/%s/sweep-configs"
 	pathSweepConfig  = "/accounts/%s/sweep-configs/%s"

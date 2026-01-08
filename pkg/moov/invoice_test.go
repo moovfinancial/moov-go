@@ -31,7 +31,7 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 					},
 					Quantity: 1,
 					Options: []moov.CreateInvoiceLineItemOption{
-						moov.CreateInvoiceLineItemOption{
+						{
 							Name:     "big TIP",
 							Quantity: 1,
 							PriceModifier: &moov.AmountDecimal{
