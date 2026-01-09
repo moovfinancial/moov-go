@@ -98,18 +98,20 @@ type CreateTransferLineItems struct {
 // CreateTransferLineItem represents a single item in a transfer.
 type CreateTransferLineItem struct {
 	Name      string                         `json:"name"`
-	ProductID *string                        `json:"productID,omitempty"`
 	BasePrice AmountDecimal                  `json:"basePrice"`
 	Quantity  int                            `json:"quantity"`
 	Options   []CreateTransferLineItemOption `json:"options,omitempty"`
+	ImageIDs  []string                       `json:"imageIDs,omitempty"`
+	ProductID *string                        `json:"productID,omitempty"`
 }
 
 // CreateTransferLineItemOption represents an option for a line item.
 type CreateTransferLineItemOption struct {
-	Group         *string        `json:"group,omitempty"`
 	Name          string         `json:"name"`
-	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
 	Quantity      int            `json:"quantity"`
+	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
+	ImageIDs      []string       `json:"imageIDs,omitempty"`
+	Group         *string        `json:"group,omitempty"`
 }
 
 // TransferStarted is where the request to create a transfer was recorded and kicked off but hasn't completed yet
@@ -426,19 +428,28 @@ type TransferLineItems struct {
 
 // TransferLineItem represents a single item on a created transfer.
 type TransferLineItem struct {
-	Name      string                   `json:"name"`
-	ProductID *string                  `json:"productID,omitempty"`
-	BasePrice AmountDecimal            `json:"basePrice"`
-	Quantity  int                      `json:"quantity"`
-	Options   []TransferLineItemOption `json:"options,omitempty"`
+	Name      string                          `json:"name"`
+	BasePrice AmountDecimal                   `json:"basePrice"`
+	Quantity  int                             `json:"quantity"`
+	Options   []TransferLineItemOption        `json:"options,omitempty"`
+	Images    []TransferLineItemImageMetadata `json:"images,omitempty"`
+	ProductID *string                         `json:"productID,omitempty"`
 }
 
 // TransferLineItemOption represents an option for a line item on a created transfer.
 type TransferLineItemOption struct {
-	Group         *string        `json:"group,omitempty"`
-	Name          string         `json:"name"`
-	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
-	Quantity      int            `json:"quantity"`
+	Name          string                          `json:"name"`
+	Quantity      int                             `json:"quantity"`
+	PriceModifier *AmountDecimal                  `json:"priceModifier,omitempty"`
+	Images        []TransferLineItemImageMetadata `json:"images,omitempty"`
+	Group         *string                         `json:"group,omitempty"`
+}
+
+type TransferLineItemImageMetadata struct {
+	ImageID  string  `json:"imageID"`
+	AltText  *string `json:"altText,omitempty"`
+	Link     string  `json:"link"`
+	PublicID string  `json:"publicID"`
 }
 
 /* ======== enumerations ======== */

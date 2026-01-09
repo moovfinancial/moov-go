@@ -86,6 +86,18 @@ func Test_Transfers(t *testing.T) {
 	})
 
 	t.Run("with line items", func(t *testing.T) {
+		// upload an image to reference in line items
+		_, imgReader := randomImage(t, 100, 100, encodePNG)
+		metadata := &moov.ImageMetadataRequest{
+			AltText: moov.PtrOf("Test image from moov-go SDK"),
+		}
+		uploaded, err := mc.UploadImage(BgCtx(), account.AccountID, imgReader, metadata)
+		require.NoError(t, err)
+		require.NotNil(t, uploaded)
+		t.Cleanup(func() {
+			_ = mc.DeleteImage(BgCtx(), account.AccountID, uploaded.ImageID)
+		})
+
 		completed, _, err := mc.CreateTransfer(BgCtx(),
 			FACILITATOR_ID,
 			moov.CreateTransfer{
@@ -108,10 +120,12 @@ func Test_Transfers(t *testing.T) {
 								Currency:     "USD",
 								ValueDecimal: "0.03",
 							},
+							ImageIDs: []string{uploaded.ImageID},
 							Options: []moov.CreateTransferLineItemOption{
 								{
 									Name:     "Everything Bagel",
 									Quantity: 1,
+									ImageIDs: []string{uploaded.ImageID},
 								},
 								{
 									Group: moov.PtrOf("Toppings"),
@@ -148,10 +162,26 @@ func Test_Transfers(t *testing.T) {
 						Currency:     "USD",
 						ValueDecimal: "0.03",
 					},
+					Images: []moov.TransferLineItemImageMetadata{
+						{
+							ImageID:  uploaded.ImageID,
+							AltText:  uploaded.AltText,
+							Link:     uploaded.Link,
+							PublicID: uploaded.PublicID,
+						},
+					},
 					Options: []moov.TransferLineItemOption{
 						{
 							Name:     "Everything Bagel",
 							Quantity: 1,
+							Images: []moov.TransferLineItemImageMetadata{
+								{
+									ImageID:  uploaded.ImageID,
+									AltText:  uploaded.AltText,
+									Link:     uploaded.Link,
+									PublicID: uploaded.PublicID,
+								},
+							},
 						},
 						{
 							Group: moov.PtrOf("Toppings"),
@@ -177,7 +207,6 @@ func Test_Transfers(t *testing.T) {
 		}
 		require.Equal(t, wantLineItems, completed.LineItems)
 	})
-
 }
 
 func Test_Cancellations(t *testing.T) {
