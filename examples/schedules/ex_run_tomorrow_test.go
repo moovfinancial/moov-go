@@ -24,12 +24,13 @@ func Test_Run_Tomorrow_Example(t *testing.T) {
 		Occurrences: []moov.CreateOccurrence{
 			{
 				RunOn: runDate,
-				RunTransfer: moov.RunTransfer{
+				RunTransfer: moov.CreateRunTransfer{
 					Description: "Payment for ...",
 					Amount: moov.ScheduleAmount{
 						Value:    2,
 						Currency: "USD",
 					},
+					PartnerAccountID: env.PartnerID,
 					Source: moov.SchedulePaymentMethod{
 						PaymentMethodID: env.CustomerPmId,
 					},

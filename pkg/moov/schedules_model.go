@@ -45,15 +45,25 @@ func (s Schedule) ToUpdateSchedule() UpdateSchedule {
 	for i, occ := range s.Occurrences {
 		upsOccs[i] = UpdateOccurrence{
 			OccurrenceID: &occ.OccurrenceID,
-			RunTransfer:  occ.RunTransfer,
+			RunTransfer:  occ.RunTransfer.ToCreateRunTransfer(),
 			RunOn:        occ.RunOn,
 			Canceled:     nil,
 		}
 	}
 
+	var createRecur *CreateRecur
+	if s.Recur != nil {
+		createRecur = &CreateRecur{
+			Start:          s.Recur.Start,
+			RecurrenceRule: s.Recur.RecurrenceRule,
+			RunTransfer:    s.Recur.RunTransfer.ToCreateRunTransfer(),
+			Indefinite:     s.Recur.Indefinite,
+		}
+	}
+
 	return UpdateSchedule{
 		Description: s.Description,
-		Recur:       s.Recur,
+		Recur:       createRecur,
 		Occurrences: upsOccs,
 	}
 }
@@ -127,18 +137,84 @@ type CreateSchedule struct {
 	Description string `json:"description,omitempty"`
 
 	// If specified will generate Scheduled transfers based on its configuration
-	Recur *Recur `json:"recur,omitempty"`
+	Recur *CreateRecur `json:"recur,omitempty"`
 
 	// On creating the schedule we can use these occurrences as they planned the schedule
 	Occurrences []CreateOccurrence `json:"occurrences,omitempty"`
 }
 
+// https://www.rfc-editor.org/rfc/rfc5545#section-3.3.10
+type CreateRecur struct {
+	// If omitted the start time for the occurrence will be the timestamp of when the schedule was created.
+	Start *time.Time `json:"start,omitempty"`
+
+	// This is the recurrence rule that is used to generate occurrences.
+	// Generator available here: https://jkbrzt.github.io/rrule/
+	// You can read the details of the format here: https://www.rfc-editor.org/rfc/rfc5545#section-3.3.10
+	RecurrenceRule string `json:"recurrenceRule,omitempty"`
+
+	// RunTransfer values to use to create the transfer based on the recurRule
+	// When changed, should just modify the transfer of the schedules
+	RunTransfer CreateRunTransfer `json:"runTransfer,omitempty"`
+
+	// If the recurrence rule ends up being indefinite
+	Indefinite bool `json:"indefinite,omitempty"`
+}
+
 type CreateOccurrence struct {
 	// RunTransfer details that will be used.
-	RunTransfer RunTransfer `json:"runTransfer,omitempty"`
+	RunTransfer CreateRunTransfer `json:"runTransfer,omitempty"`
 
 	// Time to kick off the run. Normalize to UTC.
 	RunOn time.Time `json:"runOn,omitempty"`
+}
+
+type CreateRunTransfer struct {
+	Description string `json:"description"`
+
+	Amount         ScheduleAmount  `json:"amount"`
+	SalesTaxAmount *ScheduleAmount `json:"salesTaxAmount,omitempty"`
+
+	PartnerAccountID string                            `json:"partnerAccountID"`
+	Source           SchedulePaymentMethod             `json:"source"`
+	Destination      SchedulePaymentMethod             `json:"destination"`
+	LineItems        *CreateScheduledTransferLineItems `json:"lineItems,omitempty"`
+}
+
+// CreateScheduledTransferLineItems An optional collection of line items for a scheduled transfer. When line items are provided their total must equal `amount` minus `salesTaxAmount`.
+type CreateScheduledTransferLineItems struct {
+	// The list of line items.
+	Items []CreateScheduledTransferLineItem `json:"items"`
+}
+
+// CreateScheduledTransferLineItem Represents a single item in a scheduled transfer, including optional modifiers and quantity.
+type CreateScheduledTransferLineItem struct {
+	// The name of the item.
+	Name string `json:"name"`
+	// The base price of the item before applying option modifiers.
+	BasePrice AmountDecimal `json:"basePrice"`
+	// The quantity of this item.
+	Quantity int32 `json:"quantity"`
+	// Optional list of modifiers applied to this item (e.g., toppings, upgrades, customizations).
+	Options []CreateScheduledTransferLineItemOption `json:"options,omitempty"`
+	// Optional unique identifier associating the line item with a product.
+	ProductID *string `json:"productID,omitempty"`
+	// Optional list of images associated with this line item.
+	ImageIDs []string `json:"imageIDs,omitempty"`
+}
+
+// CreateScheduledTransferLineItemOption Represents a modifier or option applied to a scheduled transfer line item.
+type CreateScheduledTransferLineItemOption struct {
+	// The name of the option or modifier.
+	Name string `json:"name"`
+	// The quantity of this option.
+	Quantity int32 `json:"quantity"`
+	// Optional price modification applied by this option. Can be positive, negative, or zero.
+	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
+	// Optional group identifier to categorize related options (e.g., 'toppings').
+	Group *string `json:"group,omitempty"`
+	// Optional list of images associated with this line item.
+	ImageIDs []string `json:"imageIDs,omitempty"`
 }
 
 type UpdateSchedule struct {
@@ -146,7 +222,7 @@ type UpdateSchedule struct {
 	Description string `json:"description,omitempty"`
 
 	// If specified will generate Scheduled transfers based on its configuration
-	Recur *Recur `json:"recur,omitempty"`
+	Recur *CreateRecur `json:"recur,omitempty"`
 
 	// On creating the schedule we can use these occurrences as they planned the schedule
 	Occurrences []UpdateOccurrence `json:"occurrences,omitempty"`
@@ -157,7 +233,7 @@ type UpdateOccurrence struct {
 	OccurrenceID *string `json:"occurrenceID,omitempty"`
 
 	// RunTransfer details that will be used.
-	RunTransfer RunTransfer `json:"runTransfer,omitempty"`
+	RunTransfer CreateRunTransfer `json:"runTransfer,omitempty"`
 
 	// Time to kick off the run. Normalize to UTC.
 	RunOn time.Time `json:"runOn,omitempty"`
@@ -175,6 +251,68 @@ type RunTransfer struct {
 	PartnerAccountID string                `json:"partnerAccountID,omitempty"`
 	Source           SchedulePaymentMethod `json:"source,omitempty"`
 	Destination      SchedulePaymentMethod `json:"destination,omitempty"`
+
+	LineItems *ScheduledTransferLineItems `json:"lineItems,omitempty"`
+}
+
+func (r RunTransfer) ToCreateRunTransfer() CreateRunTransfer {
+	crt := CreateRunTransfer{
+		Description:      r.Description,
+		Amount:           r.Amount,
+		SalesTaxAmount:   r.SalesTaxAmount,
+		PartnerAccountID: r.PartnerAccountID,
+		Source:           r.Source,
+		Destination:      r.Destination,
+	}
+
+	if r.LineItems != nil {
+		crt.LineItems = &CreateScheduledTransferLineItems{
+			Items: make([]CreateScheduledTransferLineItem, len(r.LineItems.Items)),
+		}
+		for i, item := range r.LineItems.Items {
+			createItem := CreateScheduledTransferLineItem{
+				Name:      item.Name,
+				BasePrice: item.BasePrice,
+				Quantity:  item.Quantity,
+				ProductID: item.ProductID,
+			}
+
+			// Convert Images to ImageIDs
+			if len(item.Images) > 0 {
+				createItem.ImageIDs = make([]string, len(item.Images))
+				for j, img := range item.Images {
+					createItem.ImageIDs[j] = img.ImageID
+				}
+			}
+
+			// Convert Options
+			if len(item.Options) > 0 {
+				createItem.Options = make([]CreateScheduledTransferLineItemOption, len(item.Options))
+				for j, opt := range item.Options {
+					createOpt := CreateScheduledTransferLineItemOption{
+						Name:          opt.Name,
+						Quantity:      opt.Quantity,
+						PriceModifier: opt.PriceModifier,
+						Group:         opt.Group,
+					}
+
+					// Convert option Images to ImageIDs
+					if len(opt.Images) > 0 {
+						createOpt.ImageIDs = make([]string, len(opt.Images))
+						for k, img := range opt.Images {
+							createOpt.ImageIDs[k] = img.ImageID
+						}
+					}
+
+					createItem.Options[j] = createOpt
+				}
+			}
+
+			crt.LineItems.Items[i] = createItem
+		}
+	}
+
+	return crt
 }
 
 type ScheduleAmount struct {
@@ -196,4 +334,52 @@ type ScheduleAchDetails struct {
 
 type ScheduleCardDetails struct {
 	DynamicDescriptor *string `json:"dynamicDescriptor,omitempty"`
+}
+
+// ScheduledTransferLineItems Line items for a scheduled transfer.
+type ScheduledTransferLineItems struct {
+	// The list of line items.
+	Items []ScheduledTransferLineItem `json:"items"`
+}
+
+// ScheduledTransferLineItem Represents a single item in a scheduled transfer, including optional modifiers and quantity.
+type ScheduledTransferLineItem struct {
+	// The name of the item.
+	Name string `json:"name"`
+	// The base price of the item before applying option modifiers.
+	BasePrice AmountDecimal `json:"basePrice"`
+	// The quantity of this item.
+	Quantity int32 `json:"quantity"`
+	// Optional list of modifiers applied to this item (e.g., toppings, upgrades, customizations).
+	Options []ScheduledTransferLineItemOption `json:"options,omitempty"`
+	// Optional unique identifier associating the line item with a product.
+	ProductID *string `json:"productID,omitempty"`
+	// Optional list of images associated with this line item.
+	Images []ScheduledTransferImageMetadata `json:"images,omitempty"`
+}
+
+// ScheduledTransferLineItemOption Represents a modifier or option applied to a scheduled transfer line item.
+type ScheduledTransferLineItemOption struct {
+	// The name of the option or modifier.
+	Name string `json:"name"`
+	// The quantity of this option.
+	Quantity int32 `json:"quantity"`
+	// Optional price modification applied by this option. Can be positive, negative, or zero.
+	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
+	// Optional group identifier to categorize related options (e.g., 'toppings').
+	Group *string `json:"group,omitempty"`
+	// Optional list of images associated with this line item.
+	Images []ScheduledTransferImageMetadata `json:"images,omitempty"`
+}
+
+// ScheduledTransferImageMetadata struct for ScheduledTransferImageMetadata
+type ScheduledTransferImageMetadata struct {
+	// Unique identifier for a image resource.
+	ImageID string `json:"imageID"`
+	// Alternative text for the image.
+	AltText *string `json:"altText,omitempty"`
+	// The image's public URL.
+	Link string `json:"link"`
+	// A unique identifier for an image, used in public image links.
+	PublicID string `json:"publicID" validate:"regexp=[A-Za-z0-9_-]{21}"`
 }

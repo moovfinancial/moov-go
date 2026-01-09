@@ -36,12 +36,13 @@ func Test_Schedules(t *testing.T) {
 		Occurrences: []moov.CreateOccurrence{
 			{
 				RunOn: now,
-				RunTransfer: moov.RunTransfer{
+				RunTransfer: moov.CreateRunTransfer{
 					Description: "setup fee and first month example",
 					Amount: moov.ScheduleAmount{
 						Value:    200,
 						Currency: "USD",
 					},
+					PartnerAccountID: partnerId,
 					Source: moov.SchedulePaymentMethod{
 						PaymentMethodID: customerPmId,
 					},
@@ -53,15 +54,16 @@ func Test_Schedules(t *testing.T) {
 		},
 
 		// Setup a recurring transfer to handle repayment of say a loan with 6 periods
-		Recur: &moov.Recur{
+		Recur: &moov.CreateRecur{
 			Start:          &start,
 			RecurrenceRule: "FREQ=MONTHLY;COUNT=6",
-			RunTransfer: moov.RunTransfer{
+			RunTransfer: moov.CreateRunTransfer{
 				Description: "example of a description for all of the occurrences",
 				Amount: moov.ScheduleAmount{
 					Value:    100,
 					Currency: "USD",
 				},
+				PartnerAccountID: partnerId,
 				Source: moov.SchedulePaymentMethod{
 					PaymentMethodID: customerPmId,
 				},
@@ -128,7 +130,7 @@ func Test_Schedules(t *testing.T) {
 		// Add a new one time occurrence to charge a fee in an hour from now
 		upsert.Occurrences = append(upsert.Occurrences, moov.UpdateOccurrence{
 			RunOn: now.Add(time.Hour),
-			RunTransfer: moov.RunTransfer{
+			RunTransfer: moov.CreateRunTransfer{
 				Description: "late fee fine",
 				Amount: moov.ScheduleAmount{
 					Value:    1,
@@ -171,5 +173,199 @@ func Test_Schedules(t *testing.T) {
 	t.Run("Cancel", func(t *testing.T) {
 		err := mc.CancelSchedule(ctx, partnerId, schedule.ScheduleID)
 		require.NoError(t, err)
+	})
+}
+
+func Test_Schedules_LineItems(t *testing.T) {
+	ctx := BgCtx()
+	mc := NewTestClient(t)
+
+	now := time.Date(2040, time.March, 1, 0, 0, 0, 0, time.UTC)
+	start := now.AddDate(0, 1, 0)
+
+	partnerId := FACILITATOR_ID
+	merchantAccountId := testtools.MERCHANT_ID
+	merchantPmId := testtools.MERCHANT_WALLET_PM_ID
+
+	customer := CreateTemporaryTestAccount(t, mc, createTestIndividualAccount())
+	customerCard := createTemporaryCard(t, mc, customer.AccountID)
+	customerPmId := customerCard.PaymentMethods[0].PaymentMethodID
+
+	// Upload test images
+	_, imgReader1 := randomImage(t, 100, 100, encodePNG)
+	image1, err := mc.UploadImage(ctx, merchantAccountId, imgReader1, &moov.ImageMetadataRequest{
+		AltText: moov.PtrOf("Latte image"),
+	})
+	require.NoError(t, err)
+	require.NotNil(t, image1)
+
+	t.Cleanup(func() {
+		mc.DeleteImage(ctx, merchantAccountId, image1.ImageID)
+	})
+
+	runTransfer := moov.CreateRunTransfer{
+		Description: "recurring transfer",
+		Amount: moov.ScheduleAmount{
+			Value:    550,
+			Currency: "USD",
+		},
+		PartnerAccountID: partnerId,
+		Source: moov.SchedulePaymentMethod{
+			PaymentMethodID: customerPmId,
+		},
+		Destination: moov.SchedulePaymentMethod{
+			PaymentMethodID: merchantPmId,
+		},
+		LineItems: &moov.CreateScheduledTransferLineItems{
+			Items: []moov.CreateScheduledTransferLineItem{
+				{
+					Name: "Cappuccino",
+					BasePrice: moov.AmountDecimal{
+						Currency:     "USD",
+						ValueDecimal: "4.00",
+					},
+					Quantity:  1,
+					ProductID: moov.PtrOf("11d58aa0-fb14-4aaf-ac04-8b7cfc282ca4"),
+					ImageIDs:  []string{image1.ImageID},
+					Options: []moov.CreateScheduledTransferLineItemOption{
+						{
+							Name:     "Oat Milk",
+							Quantity: 1,
+							PriceModifier: &moov.AmountDecimal{
+								Currency:     "USD",
+								ValueDecimal: "1.50",
+							},
+							Group:    moov.PtrOf("Milk"),
+							ImageIDs: []string{image1.ImageID},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	schedule, err := mc.CreateSchedule(ctx, partnerId, moov.CreateSchedule{
+		Description: "schedule with line items",
+		Occurrences: []moov.CreateOccurrence{
+			{
+				RunOn:       now,
+				RunTransfer: runTransfer,
+			},
+		},
+		Recur: &moov.CreateRecur{
+			Start:          &start,
+			RecurrenceRule: "FREQ=MONTHLY;COUNT=3",
+			RunTransfer:    runTransfer,
+		},
+	})
+
+	t.Cleanup(func() {
+		if schedule != nil {
+			mc.CancelSchedule(ctx, partnerId, schedule.ScheduleID)
+		}
+	})
+
+	wantLineItems := &moov.ScheduledTransferLineItems{
+		Items: []moov.ScheduledTransferLineItem{
+			{
+				Name: "Cappuccino",
+				BasePrice: moov.AmountDecimal{
+					Currency:     "USD",
+					ValueDecimal: "4.00",
+				},
+				Quantity:  1,
+				ProductID: moov.PtrOf("11d58aa0-fb14-4aaf-ac04-8b7cfc282ca4"),
+				Images: []moov.ScheduledTransferImageMetadata{
+					{
+						ImageID:  image1.ImageID,
+						AltText:  image1.AltText,
+						Link:     image1.Link,
+						PublicID: image1.PublicID,
+					},
+				},
+				Options: []moov.ScheduledTransferLineItemOption{
+					{
+						Name:     "Oat Milk",
+						Quantity: 1,
+						PriceModifier: &moov.AmountDecimal{
+							Currency:     "USD",
+							ValueDecimal: "1.50",
+						},
+						Group: moov.PtrOf("Milk"),
+						Images: []moov.ScheduledTransferImageMetadata{
+							{
+								ImageID:  image1.ImageID,
+								AltText:  image1.AltText,
+								Link:     image1.Link,
+								PublicID: image1.PublicID,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	t.Run("created with line items", func(t *testing.T) {
+		require.NoError(t, err)
+		require.NotNil(t, schedule)
+
+		require.Equal(t, wantLineItems, schedule.Recur.RunTransfer.LineItems)
+		for _, occur := range schedule.Occurrences {
+			require.Equal(t, wantLineItems, occur.RunTransfer.LineItems)
+		}
+	})
+
+	t.Run("update line items", func(t *testing.T) {
+		upsert := schedule.ToUpdateSchedule()
+		require.Len(t, upsert.Occurrences, 4) // 1 one-time + 3 recurring
+
+		// Update the recur line items - change price
+		require.NotNil(t, upsert.Recur)
+		require.NotNil(t, upsert.Recur.RunTransfer.LineItems)
+		upsert.Recur.RunTransfer.LineItems.Items[0].Name = "Latte"
+
+		// Update first occurrence line items - add a new option
+		require.NotNil(t, upsert.Occurrences[0].RunTransfer.LineItems)
+		upsert.Occurrences[0].RunTransfer.LineItems.Items[0].Options = append(
+			upsert.Occurrences[0].RunTransfer.LineItems.Items[0].Options,
+			moov.CreateScheduledTransferLineItemOption{
+				Name:     "Vanilla Syrup",
+				Quantity: 1,
+				PriceModifier: &moov.AmountDecimal{
+					Currency:     "USD",
+					ValueDecimal: "0.75",
+				},
+				Group:    moov.PtrOf("Flavors"),
+				ImageIDs: []string{image1.ImageID},
+			},
+		)
+		upsert.Occurrences[0].RunTransfer.Amount.Value = 625
+
+		// Leave out other occurrences from the update - they should update from the change to recur
+		upsert.Occurrences = upsert.Occurrences[:1]
+
+		updated, err := mc.UpdateSchedule(ctx, partnerId, schedule.ScheduleID, upsert)
+		require.NoError(t, err)
+		require.NotNil(t, updated)
+
+		// Verify recur line items were updated
+		require.NotNil(t, updated.Recur)
+		require.NotNil(t, updated.Recur.RunTransfer.LineItems)
+		require.Equal(t, "Latte", updated.Recur.RunTransfer.LineItems.Items[0].Name)
+
+		// Verify first occurrence has new option
+		require.Len(t, updated.Occurrences[0].RunTransfer.LineItems.Items[0].Options, 2)
+		require.Equal(t, "Vanilla Syrup", updated.Occurrences[0].RunTransfer.LineItems.Items[0].Options[1].Name)
+		require.Equal(t, "0.75", updated.Occurrences[0].RunTransfer.LineItems.Items[0].Options[1].PriceModifier.ValueDecimal)
+		require.Equal(t, moov.PtrOf("Flavors"), updated.Occurrences[0].RunTransfer.LineItems.Items[0].Options[1].Group)
+
+		// Verify recurring occurrences reflect updated recur line items
+		for i := 1; i < 4; i++ {
+			require.NotNil(t, updated.Occurrences[i].RunTransfer.LineItems)
+			require.Equal(t, "Latte", updated.Occurrences[i].RunTransfer.LineItems.Items[0].Name)
+		}
+
+		schedule = updated
 	})
 }
