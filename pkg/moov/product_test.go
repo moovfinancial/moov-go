@@ -125,7 +125,7 @@ func Test_Products(t *testing.T) {
 	// upload image for use with product test
 	_, imgReader := randomImage(t, 100, 100, encodePNG)
 	metadata := &moov.ImageMetadataRequest{
-		AltText: "Test product image",
+		AltText: moov.PtrOf("Test product image"),
 	}
 	image, err := mc.UploadImage(ctx, accountID, imgReader, metadata)
 	require.NoError(t, err)
