@@ -38,7 +38,7 @@ type ProductOption struct {
 // ProductImageMetadata represents metadata about an image associated with a product or option.
 type ProductImageMetadata struct {
 	ImageID  string  `json:"imageID"`
-	AltText  *string `json:"altText"`
+	AltText  *string `json:"altText,omitempty"`
 	Link     string  `json:"link"`
 	PublicID string  `json:"publicID"`
 }
