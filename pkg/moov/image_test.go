@@ -28,6 +28,8 @@ func TestImageMetadataMarshal(t *testing.T) {
 		"disabledOn": "2024-01-15T10:30:00Z"
 	}`)
 
+	time, _ := time.Parse(time.RFC3339, "2024-01-15T10:30:00Z")
+
 	metadata := new(moov.ImageMetadata)
 
 	dec := json.NewDecoder(bytes.NewReader(input))
@@ -35,13 +37,17 @@ func TestImageMetadataMarshal(t *testing.T) {
 
 	err := dec.Decode(&metadata)
 	require.NoError(t, err)
-	require.Equal(t, "ec7e1848-dc80-4ab0-8827-dd7fc0737b43", metadata.ImageID)
-	require.Equal(t, "qJRAaAwwF5hmfeAFdHjIb", metadata.PublicID)
-	require.Equal(t, "Test image", *metadata.AltText)
-	require.Equal(t, "https://api.moov.io/images/qJRAaAwwF5hmfeAFdHjIb", metadata.Link)
-	require.NotNil(t, metadata.CreatedOn)
-	require.NotNil(t, metadata.UpdatedOn)
-	require.NotNil(t, metadata.DisabledOn)
+
+	want := moov.ImageMetadata{
+		ImageID:    "ec7e1848-dc80-4ab0-8827-dd7fc0737b43",
+		PublicID:   "qJRAaAwwF5hmfeAFdHjIb",
+		AltText:    moov.PtrOf("Test image"),
+		Link:       "https://api.moov.io/images/qJRAaAwwF5hmfeAFdHjIb",
+		CreatedOn:  time,
+		UpdatedOn:  time,
+		DisabledOn: &time,
+	}
+	require.Equal(t, want, *metadata)
 }
 
 func Test_Images(t *testing.T) {
