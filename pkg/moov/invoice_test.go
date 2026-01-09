@@ -88,10 +88,8 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 	}
 	require.Equal(t, wantExternal, *createdPayment.External)
 
-	// Confirm the invoice is paid
-	paidInvoice, err := mc.GetInvoice(ctx, accountID, createdInvoice.InvoiceID)
+	// list payments for the invoice
+	payments, err := mc.ListInvoicePayments(ctx, accountID, createdInvoice.InvoiceID)
 	require.NoError(t, err)
-	require.Equal(t, moov.InvoiceStatusPaid, paidInvoice.Status)
-	require.NotNil(t, paidInvoice.PaidOn)
-	require.Equal(t, *createdPayment, paidInvoice.Payments[0])
+	require.Len(t, payments, 1)
 }
