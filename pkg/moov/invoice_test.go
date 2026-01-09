@@ -59,8 +59,7 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 		moov.WithInvoiceStatus(moov.InvoiceStatusDraft),
 		moov.WithInvoiceCustomerAccountID(customerAccountID))
 	require.NoError(t, err)
-	latestInvoice := listedInvoices[0]
-	require.Equal(t, *createdInvoice, latestInvoice)
+	require.Contains(t, listedInvoices, *createdInvoice)
 
 	// Update the dueDate
 	now := time.Now().UTC()

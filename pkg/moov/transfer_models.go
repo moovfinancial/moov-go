@@ -571,7 +571,7 @@ type AchStatus string
 
 // List of ACHStatus
 const (
-	AchStatus_Initied    AchStatus = "initiated"
+	AchStatus_Initiated  AchStatus = "initiated"
 	AchStatus_Originated AchStatus = "originated"
 	AchStatus_Corrected  AchStatus = "corrected"
 	AchStatus_Returned   AchStatus = "returned"
