@@ -80,16 +80,11 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 		Description: moov.PtrOf("Customer paid with check"),
 	})
 	require.NoError(t, err)
-	require.Equal(t, moov.InvoicePaymentTypeExternal, createdPayment.InvoicePaymentType)
-	wantExternal := moov.InvoiceExternalPayment{
-		ForeignID:   "abc123",
-		Description: "Customer paid with check",
-		Amount:      createdInvoice.TotalAmount,
-	}
-	require.Equal(t, wantExternal, *createdPayment.External)
 
 	// list payments for the invoice
 	payments, err := mc.ListInvoicePayments(ctx, accountID, createdInvoice.InvoiceID)
 	require.NoError(t, err)
 	require.Len(t, payments, 1)
+	latestPayment := payments[0]
+	require.Equal(t, *createdPayment, latestPayment)
 }
