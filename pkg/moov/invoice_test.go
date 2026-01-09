@@ -68,4 +68,23 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 	updatedInvoice, err := mc.UpdateInvoice(ctx, accountID, createdInvoice.InvoiceID, update)
 	require.NoError(t, err)
 	require.Equal(t, now, *updatedInvoice.DueDate)
+
+	// Update invoice status to 'unpaid' to send the invoice to the customer.
+	updatedInvoice, err = mc.UpdateInvoice(ctx, accountID, createdInvoice.InvoiceID, moov.UpdateInvoice{Status: moov.PtrOf(moov.InvoiceStatusUnpaid)})
+	require.NoError(t, err)
+	require.Equal(t, moov.InvoiceStatusUnpaid, updatedInvoice.Status)
+
+	// Create an external payment for the invoice to mark it as paid.
+	createdPayment, err := mc.CreateInvoicePayment(ctx, accountID, createdInvoice.InvoiceID, moov.CreateInvoicePayment{
+		ForeignID:   moov.PtrOf("abc123"),
+		Description: moov.PtrOf("Customer paid with check"),
+	})
+	require.NoError(t, err)
+
+	// list payments for the invoice
+	payments, err := mc.ListInvoicePayments(ctx, accountID, createdInvoice.InvoiceID)
+	require.NoError(t, err)
+	require.Len(t, payments, 1)
+	latestPayment := payments[0]
+	require.Equal(t, *createdPayment, latestPayment)
 }

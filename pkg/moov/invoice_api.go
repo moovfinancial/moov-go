@@ -47,10 +47,10 @@ func (c Client) UpdateInvoice(ctx context.Context, accountID, invoiceID string, 
 	return CompletedObjectOrError[Invoice](resp)
 }
 
-// MarkInvoicePaid marks an invoice as paid outside of the Moov platform
-func (c Client) MarkInvoicePaid(ctx context.Context, accountID, invoiceID string, payment MarkInvoicePaid) (*Invoice, error) {
+// CreateInvoicePayment marks an invoice as paid outside of the Moov platform
+func (c Client) CreateInvoicePayment(ctx context.Context, accountID, invoiceID string, payment CreateInvoicePayment) (*InvoicePayment, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPut, pathInvoiceMarkPaid, accountID, invoiceID),
+		Endpoint(http.MethodPost, pathInvoicePayments, accountID, invoiceID),
 		AcceptJson(),
 		JsonBody(payment),
 	)
@@ -58,22 +58,8 @@ func (c Client) MarkInvoicePaid(ctx context.Context, accountID, invoiceID string
 		return nil, fmt.Errorf("calling http: %w", err)
 	}
 
-	return CompletedObjectOrError[Invoice](resp)
+	return StartedObjectOrError[InvoicePayment](resp)
 }
-
-// TODO(vince,12/15/2025): Uncomment once this is fully supported in production.
-// SendInvoice finalizes an invoice, creates and sends a payment link
-// func (c Client) SendInvoice(ctx context.Context, accountID, invoiceID string) (*Invoice, error) {
-// 	resp, err := c.CallHttp(ctx,
-// 		Endpoint(http.MethodPost, pathInvoiceSend, accountID, invoiceID),
-// 		AcceptJson(),
-// 	)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("calling http: %w), err
-// 	}
-
-// 	return CompletedObjectOrError[Invoice](resp)
-// }
 
 // ListInvoiceFilter represents a filter option for listing invoices
 type ListInvoiceFilter callArg
@@ -120,4 +106,14 @@ func (c Client) ListInvoices(ctx context.Context, accountID string, filters ...L
 	}
 
 	return CompletedListOrError[Invoice](resp)
+}
+
+// ListInvoicePayments lists all payments for an invoice for a Moov account
+func (c Client) ListInvoicePayments(ctx context.Context, accountID, invoiceID string) ([]InvoicePayment, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathInvoicePayments, accountID, invoiceID))
+	if err != nil {
+		return nil, fmt.Errorf("calling http: %w", err)
+	}
+
+	return CompletedListOrError[InvoicePayment](resp)
 }

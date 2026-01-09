@@ -39,9 +39,10 @@ const (
 )
 
 type InvoicePayment struct {
-	PaymentType InvoicePaymentType      `json:"paymentType"`
-	Transfer    *InvoiceTransferPayment `json:"transfer"`
-	External    *InvoiceExternalPayment `json:"external"`
+	InvoicePaymentID   string                  `json:"invoicePaymentID"`
+	InvoicePaymentType InvoicePaymentType      `json:"invoicePaymentType"`
+	Transfer           *InvoiceTransferPayment `json:"transfer"`
+	External           *InvoiceExternalPayment `json:"external"`
 }
 
 // InvoicePaymentType represents the type of payment
@@ -85,8 +86,8 @@ type UpdateInvoice struct {
 	TaxAmount   *AmountDecimal          `json:"taxAmount,omitempty"`
 }
 
-// MarkInvoicePaid represents the request to mark an invoice as paid externally
-type MarkInvoicePaid struct {
+// CreateInvoicePayment represents the request to create an external payment for an invoice
+type CreateInvoicePayment struct {
 	ForeignID   *string    `json:"foreignID,omitempty"`
 	Description *string    `json:"description,omitempty"`
 	PaymentDate *time.Time `json:"paymentDate,omitempty"`

@@ -122,8 +122,7 @@ const (
 
 	pathInvoices        = "/accounts/%s/invoices"
 	pathInvoice         = "/accounts/%s/invoices/%s"
-	pathInvoiceMarkPaid = "/accounts/%s/invoices/%s/mark-paid"
-	pathInvoiceSend     = "/accounts/%s/invoices/%s/send"
+	pathInvoicePayments = "/accounts/%s/invoices/%s/payments"
 
 	pathIssuedCards                = "/issuing/%s/issued-cards"
 	pathIssuedCard                 = "/issuing/%s/issued-cards/%s"
