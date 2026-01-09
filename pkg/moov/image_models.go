@@ -7,17 +7,17 @@ import (
 
 // ImageMetadataRequest represents the request body for creating or updating image metadata.
 type ImageMetadataRequest struct {
-	AltText string `json:"altText,omitempty"`
+	AltText *string `json:"altText,omitempty"`
 }
 
 // ImageMetadata represents metadata about an uploaded image.
 type ImageMetadata struct {
-	ImageID    string     `json:"imageID,omitempty"`
-	PublicID   string     `json:"publicID,omitempty"`
-	AltText    string     `json:"altText,omitempty"`
-	Link       string     `json:"link,omitempty"`
-	CreatedOn  time.Time  `json:"createdOn,omitempty"`
-	UpdatedOn  time.Time  `json:"updatedOn,omitempty"`
+	ImageID    string     `json:"imageID"`
+	PublicID   string     `json:"publicID"`
+	AltText    *string    `json:"altText,omitempty"`
+	Link       string     `json:"link"`
+	CreatedOn  time.Time  `json:"createdOn"`
+	UpdatedOn  time.Time  `json:"updatedOn"`
 	DisabledOn *time.Time `json:"disabledOn,omitempty"`
 }
 
