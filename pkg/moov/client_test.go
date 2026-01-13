@@ -21,7 +21,7 @@ func BgCtx() context.Context {
 }
 
 func NewTestClient(t testing.TB, c ...moov.ClientConfigurable) *moov.Client {
-	// If we have a 5352b013-ae58-4a63-8a3f-97f316a917cf file written read that and populate the test environment
+	// If we have a secrets.env file written read that and populate the test environment
 	secretsPath := filepath.Join("..", "..", "secrets.env")
 
 	if _, err := os.Stat(secretsPath); err == nil {
