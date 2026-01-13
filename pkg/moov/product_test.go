@@ -7,8 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
+
+	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
 func TestProductMarshal(t *testing.T) {
@@ -191,6 +192,20 @@ func Test_Products(t *testing.T) {
 			}
 		}
 		require.True(t, found, "created product not found in list")
+	})
+
+	t.Run("list products - title filter", func(t *testing.T) {
+		products, err := mc.ListProducts(ctx, accountID, moov.WithProductTitle("sdk"))
+		require.NoError(t, err)
+		require.NotNil(t, products)
+		var found bool
+		for _, p := range products {
+			if p.ProductID == createdProduct.ProductID {
+				found = true
+				break
+			}
+		}
+		require.True(t, found, "created product not found in filtered list")
 	})
 
 	t.Run("get product", func(t *testing.T) {

@@ -92,3 +92,11 @@ func WithProductCount(count int) ProductListFilter {
 		return nil
 	})
 }
+
+// WithProductTitle filters products by title. This supports partial matches and is case-insensitive
+func WithProductTitle(title string) ProductListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["title"] = title
+		return nil
+	})
+}
