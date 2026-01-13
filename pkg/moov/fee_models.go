@@ -14,6 +14,7 @@ type IncurredFee struct {
 	Amount      AmountDecimal `json:"amount,omitempty"`
 	GeneratedBy *GeneratedBy  `json:"generatedBy,omitempty"`
 	FeeGroup    string        `json:"feeGroup,omitempty"`
+	ResidualID  *string       `json:"residualID,omitempty"`
 }
 
 type GeneratedBy struct {
@@ -85,6 +86,13 @@ func WithFeeTransferID(transferID string) FeeGetFilter {
 func WithFeeDisputeID(disputeID string) FeeGetFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["disputeID"] = disputeID
+		return nil
+	})
+}
+
+func WithFeeResidualID(residualID string) FeeGetFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["residualID"] = residualID
 		return nil
 	})
 }
