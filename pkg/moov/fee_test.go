@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/google/uuid"
 )
 
 func Test_ListFees(t *testing.T) {
@@ -110,6 +111,20 @@ func Test_ListFees_WithDisputeID(t *testing.T) {
 			assert.Equal(t, disputeID, *fee.GeneratedBy.DisputeID)
 		}
 	}
+}
+
+func Test_ListFees_WithResidualID(t *testing.T) {
+	mc := NewTestClient(t)
+
+	// there are no fees in production with a residualID yet
+	fees, err := mc.GetFees(
+		t.Context(),
+		FACILITATOR_ID,
+		moov.WithFeeResidualID(uuid.NewString()),
+	)
+	require.NoError(t, err)
+	require.NotNil(t, fees)
+	require.Len(t, fees, 0)
 }
 
 func Test_ListFees_WithDateTimeRange(t *testing.T) {
