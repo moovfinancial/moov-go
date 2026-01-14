@@ -7,6 +7,7 @@ import (
 
 	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -198,7 +199,6 @@ func Test_Schedules_LineItems(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotNil(t, image1)
-
 	t.Cleanup(func() {
 		mc.DeleteImage(ctx, merchantAccountId, image1.ImageID)
 	})
@@ -244,20 +244,28 @@ func Test_Schedules_LineItems(t *testing.T) {
 		},
 	}
 
-	schedule, err := mc.CreateSchedule(ctx, partnerId, moov.CreateSchedule{
-		Description: "schedule with line items",
-		Occurrences: []moov.CreateOccurrence{
-			{
-				RunOn:       now,
-				RunTransfer: runTransfer,
+	// Schedules may take a moment to be aware of an uploaded image
+	var schedule *moov.Schedule
+	success := assert.Eventually(t, func() bool {
+		var err error
+		schedule, err = mc.CreateSchedule(ctx, partnerId, moov.CreateSchedule{
+			Description: "schedule with line items",
+			Occurrences: []moov.CreateOccurrence{
+				{
+					RunOn:       now,
+					RunTransfer: runTransfer,
+				},
 			},
-		},
-		Recur: &moov.CreateRecur{
-			Start:          &start,
-			RecurrenceRule: "FREQ=MONTHLY;COUNT=3",
-			RunTransfer:    runTransfer,
-		},
-	})
+			Recur: &moov.CreateRecur{
+				Start:          &start,
+				RecurrenceRule: "FREQ=MONTHLY;COUNT=3",
+				RunTransfer:    runTransfer,
+			},
+		})
+		return err == nil
+	}, 5*time.Second, 250*time.Millisecond)
+	require.True(t, success, "failed to create schedule")
+	require.NotNil(t, schedule)
 
 	t.Cleanup(func() {
 		if schedule != nil {

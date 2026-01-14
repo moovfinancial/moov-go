@@ -2,7 +2,9 @@ package moov_test
 
 import (
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
@@ -98,61 +100,68 @@ func Test_Transfers(t *testing.T) {
 			_ = mc.DeleteImage(BgCtx(), account.AccountID, uploaded.ImageID)
 		})
 
-		completed, _, err := mc.CreateTransfer(BgCtx(),
-			FACILITATOR_ID,
-			moov.CreateTransfer{
-				Source: moov.CreateTransfer_Source{
-					PaymentMethodID: source,
-				},
-				Destination: moov.CreateTransfer_Destination{
-					PaymentMethodID: dest,
-				},
-				Amount: moov.Amount{
-					Currency: "USD",
-					Value:    11,
-				},
-				LineItems: &moov.CreateTransferLineItems{
-					Items: []moov.CreateTransferLineItem{
-						{
-							Name:      "Bagel",
-							ProductID: moov.PtrOf("1e262367-de3e-4acb-ae02-7f56e83632ee"),
-							BasePrice: moov.AmountDecimal{
-								Currency:     "USD",
-								ValueDecimal: "0.03",
-							},
-							ImageIDs: []string{uploaded.ImageID},
-							Options: []moov.CreateTransferLineItemOption{
-								{
-									Name:     "Everything Bagel",
-									Quantity: 1,
-									ImageIDs: []string{uploaded.ImageID},
-								},
-								{
-									Group: moov.PtrOf("Toppings"),
-									Name:  "Cream Cheese",
-									PriceModifier: &moov.AmountDecimal{
-										Currency:     "USD",
-										ValueDecimal: "0.01",
-									},
-									Quantity: 2,
-								},
-							},
-							Quantity: 2,
+		createTrasfer := moov.CreateTransfer{
+			Source: moov.CreateTransfer_Source{
+				PaymentMethodID: source,
+			},
+			Destination: moov.CreateTransfer_Destination{
+				PaymentMethodID: dest,
+			},
+			Amount: moov.Amount{
+				Currency: "USD",
+				Value:    11,
+			},
+			LineItems: &moov.CreateTransferLineItems{
+				Items: []moov.CreateTransferLineItem{
+					{
+						Name:      "Bagel",
+						ProductID: moov.PtrOf("1e262367-de3e-4acb-ae02-7f56e83632ee"),
+						BasePrice: moov.AmountDecimal{
+							Currency:     "USD",
+							ValueDecimal: "0.03",
 						},
-						{
-							Name: "Water",
-							BasePrice: moov.AmountDecimal{
-								Currency:     "USD",
-								ValueDecimal: "0.01",
+						ImageIDs: []string{uploaded.ImageID},
+						Options: []moov.CreateTransferLineItemOption{
+							{
+								Name:     "Everything Bagel",
+								Quantity: 1,
+								ImageIDs: []string{uploaded.ImageID},
 							},
-							Quantity: 1,
+							{
+								Group: moov.PtrOf("Toppings"),
+								Name:  "Cream Cheese",
+								PriceModifier: &moov.AmountDecimal{
+									Currency:     "USD",
+									ValueDecimal: "0.01",
+								},
+								Quantity: 2,
+							},
 						},
+						Quantity: 2,
+					},
+					{
+						Name: "Water",
+						BasePrice: moov.AmountDecimal{
+							Currency:     "USD",
+							ValueDecimal: "0.01",
+						},
+						Quantity: 1,
 					},
 				},
-			}).WaitForRailResponse()
-		NoResponseError(t, err)
+			},
+		}
 
+		builder := mc.CreateTransfer(BgCtx(), FACILITATOR_ID, createTrasfer)
+		// transfers may take a moment to be aware of uploaded image
+		var completed *moov.Transfer
+		success := assert.Eventually(t, func() bool {
+			var err error
+			completed, _, err = builder.WaitForRailResponse()
+			return err == nil
+		}, 5*time.Second, 250*time.Millisecond)
+		require.True(t, success)
 		require.NotNil(t, completed)
+
 		wantLineItems := &moov.TransferLineItems{
 			Items: []moov.TransferLineItem{
 				{

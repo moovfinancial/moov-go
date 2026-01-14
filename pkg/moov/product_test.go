@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -130,6 +131,9 @@ func Test_Products(t *testing.T) {
 	image, err := mc.UploadImage(ctx, accountID, imgReader, metadata)
 	require.NoError(t, err)
 	require.NotNil(t, image)
+	t.Cleanup(func() {
+		_ = mc.DeleteImage(ctx, accountID, image.ImageID)
+	})
 
 	var createdProduct moov.Product
 
@@ -172,10 +176,15 @@ func Test_Products(t *testing.T) {
 			},
 		}
 
-		created, err := mc.CreateProduct(ctx, accountID, product)
-		require.NoError(t, err)
+		// Products may take a moment to be aware of an uploaded image
+		var created *moov.Product
+		success := assert.Eventually(t, func() bool {
+			var err error
+			created, err = mc.CreateProduct(ctx, accountID, product)
+			return err == nil
+		}, 5*time.Second, 250*time.Millisecond)
+		require.True(t, success, "failed to create product")
 		require.NotNil(t, created)
-
 		createdProduct = *created
 	})
 
