@@ -339,15 +339,15 @@ type TransferDestination struct {
 
 // AchDetails ACH specific details about the transaction.
 type AchDetails struct {
-	Status      AchStatus     `json:"status"`
-	TraceNumber string        `json:"traceNumber"`
+	Status      *AchStatus    `json:"status,omitempty"`
+	TraceNumber *string       `json:"traceNumber,omitempty"`
 	Return      *AchException `json:"return,omitempty"`
 	Correction  *AchException `json:"correction,omitempty"`
 	// An optional override of the default NACHA company entry description for a transfer.
-	CompanyEntryDescription string `json:"companyEntryDescription,omitempty"`
+	CompanyEntryDescription *string `json:"companyEntryDescription,omitempty"`
 	// An optional override of the default NACHA company name for a transfer.
-	OriginatingCompanyName string             `json:"originatingCompanyName,omitempty"`
-	SecCode                SecCode            `json:"secCode,omitempty"`
+	OriginatingCompanyName *string            `json:"originatingCompanyName,omitempty"`
+	SecCode                *SecCode           `json:"secCode,omitempty"`
 	InitiatedOn            *time.Time         `json:"initiatedOn,omitempty"`
 	OriginatedOn           *time.Time         `json:"originatedOn,omitempty"`
 	CorrectedOn            *time.Time         `json:"correctedOn,omitempty"`
@@ -359,7 +359,7 @@ type AchDetails struct {
 
 // RtpDetails RTP specific details about the transaction.
 type RtpDetails struct {
-	Status RtpStatus `json:"status"`
+	Status *RtpStatus `json:"status,omitempty"`
 	// Code returned by rail network on failure.
 	NetworkResponseCode      *string         `json:"networkResponseCode,omitempty"`
 	FailureCode              *RtpFailureCode `json:"failureCode,omitempty"`
