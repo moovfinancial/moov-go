@@ -54,7 +54,7 @@ type CardDetails struct {
 	Status            *CardTransactionStatus `json:"status,omitempty"`
 	FailureCode       *string                `json:"failureCode,omitempty"`
 	DynamicDescriptor *string                `json:"dynamicDescriptor,omitempty"`
-	TransactionSource *string                `json:"transactionSource,omitempty"`
+	TransactionSource *TransactionSource       `json:"transactionSource,omitempty"`
 	FeeProgram        *string                `json:"feeProgram,omitempty"`
 	AuthorizationCode *string                `json:"authorizationCode,omitempty"`
 	InitiatedOn       *time.Time             `json:"initiatedOn,omitempty"`
