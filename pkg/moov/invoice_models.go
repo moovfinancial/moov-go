@@ -39,6 +39,7 @@ const (
 )
 
 type InvoicePayment struct {
+	Amount             AmountDecimal           `json:"amount"`
 	InvoicePaymentID   string                  `json:"invoicePaymentID"`
 	InvoicePaymentType InvoicePaymentType      `json:"invoicePaymentType"`
 	Transfer           *InvoiceTransferPayment `json:"transfer"`
@@ -60,10 +61,9 @@ type InvoiceTransferPayment struct {
 
 // InvoiceExternalPayment represents a payment made outside Moov
 type InvoiceExternalPayment struct {
-	Description string        `json:"description"`
-	ForeignID   string        `json:"foreignID,omitempty"`
-	PaymentDate *time.Time    `json:"paymentDate,omitempty"`
-	Amount      AmountDecimal `json:"amount"`
+	Description string     `json:"description"`
+	ForeignID   string     `json:"foreignID,omitempty"`
+	PaymentDate *time.Time `json:"paymentDate,omitempty"`
 }
 
 // CreateInvoice represents the request to create an invoice
@@ -88,9 +88,10 @@ type UpdateInvoice struct {
 
 // CreateInvoicePayment represents the request to create an external payment for an invoice
 type CreateInvoicePayment struct {
-	ForeignID   *string    `json:"foreignID,omitempty"`
-	Description *string    `json:"description,omitempty"`
-	PaymentDate *time.Time `json:"paymentDate,omitempty"`
+	Amount      AmountDecimal `json:"amount"`
+	ForeignID   *string       `json:"foreignID,omitempty"`
+	Description *string       `json:"description,omitempty"`
+	PaymentDate *time.Time    `json:"paymentDate,omitempty"`
 }
 
 // InvoiceLineItems represents a collection of line items for an invoice
