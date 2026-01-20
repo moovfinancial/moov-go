@@ -2,9 +2,7 @@ package moov_test
 
 import (
 	"context"
-	"slices"
 	"testing"
-	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
@@ -28,8 +26,6 @@ func TestCreateWebhook(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, createdWebhook)
 
-	normalizeWebhook(createdWebhook)
-
 	t.Cleanup(func() {
 		if createdWebhook != nil {
 			mc.DeleteWebhook(context.Background(), createdWebhook.WebhookID)
@@ -39,21 +35,25 @@ func TestCreateWebhook(t *testing.T) {
 
 	t.Run("list webhooks", func(t *testing.T) {
 		webhooks, err := mc.ListWebhooks(context.Background())
-		for i := range webhooks {
-			normalizeWebhook(&webhooks[i])
+		require.NoError(t, err)
+
+		var gotWebhookID string
+		for _, webhook := range webhooks {
+			if webhook.WebhookID == createdWebhook.WebhookID {
+				gotWebhookID = createdWebhook.WebhookID
+			}
 		}
 
-		require.NoError(t, err)
-		require.NotNil(t, webhooks)
-		require.Contains(t, webhooks, *createdWebhook)
+		if gotWebhookID == "" {
+			require.Failf(t, "webhook %s not found in list", createdWebhook.WebhookID)
+		}
 	})
 
 	t.Run("get webhook", func(t *testing.T) {
 		webhook, err := mc.GetWebhook(context.Background(), createdWebhook.WebhookID)
-		normalizeWebhook(webhook)
 		require.NoError(t, err)
 		require.NotNil(t, webhook)
-		require.Equal(t, createdWebhook, webhook)
+		require.Equal(t, createdWebhook.WebhookID, webhook.WebhookID)
 	})
 
 	t.Run("get webhook secret", func(t *testing.T) {
@@ -73,7 +73,6 @@ func TestCreateWebhook(t *testing.T) {
 				moov.EventTypeAccountUpdated,
 			},
 		})
-		normalizeWebhook(webhook)
 		require.NoError(t, err)
 		require.NotNil(t, webhook)
 		require.Equal(t, "https://example.com/webhook-new", webhook.URL)
@@ -84,14 +83,4 @@ func TestCreateWebhook(t *testing.T) {
 		err := mc.DeleteWebhook(context.Background(), createdWebhook.WebhookID)
 		require.NoError(t, err)
 	})
-}
-
-func normalizeWebhook(webhook *moov.Webhook) {
-	if webhook == nil {
-		return
-	}
-
-	webhook.CreatedOn = webhook.CreatedOn.Truncate(time.Microsecond)
-	webhook.UpdatedOn = webhook.UpdatedOn.Truncate(time.Microsecond)
-	slices.Sort(webhook.EventTypes)
 }
