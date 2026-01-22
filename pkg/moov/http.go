@@ -7,9 +7,15 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"strings"
 
 	moovgo "github.com/moovfinancial/moov-go"
+)
+
+const (
+	dumpRequest  = false
+	dumpResponse = false
 )
 
 func DefaultHttpClient() *http.Client {
@@ -51,11 +57,23 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 		req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 	}
 
+	if dumpRequest {
+		bs, _ := httputil.DumpRequest(req, true)
+		fmt.Printf("\nRequest:\n")
+		fmt.Printf("%s\n", string(bs))
+	}
+
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if dumpResponse {
+		bs, _ := httputil.DumpResponse(resp, true)
+		fmt.Printf("\nResponse:\n")
+		fmt.Printf("%s\n", string(bs))
+	}
 
 	body, _ := io.ReadAll(resp.Body)
 

@@ -8,6 +8,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestHTTPDebug(t *testing.T) {
+	// never allow these to be true
+	require.False(t, dumpRequest)
+	require.False(t, dumpResponse)
+}
+
 func TestHTTPCallResponse(t *testing.T) {
 	t.Run("400", func(t *testing.T) {
 		resp := &httpCallResponse{

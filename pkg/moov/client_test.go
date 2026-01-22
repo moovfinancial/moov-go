@@ -11,9 +11,9 @@ import (
 	"testing"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
-	"github.com/stretchr/testify/require"
 
 	"github.com/joho/godotenv"
+	"github.com/stretchr/testify/require"
 )
 
 func BgCtx() context.Context {
@@ -27,6 +27,10 @@ func NewTestClient(t testing.TB, c ...moov.ClientConfigurable) *moov.Client {
 	if _, err := os.Stat(secretsPath); err == nil {
 		secrets, err := godotenv.Read(secretsPath)
 		require.NoError(t, err)
+
+		if len(secrets) > 0 {
+			t.Logf("loading %d secrets from %s", len(secrets), secretsPath)
+		}
 
 		for k, v := range secrets {
 			t.Setenv(k, v)
