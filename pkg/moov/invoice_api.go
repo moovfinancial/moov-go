@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 // CreateInvoice creates a new invoice for a Moov account
@@ -92,6 +93,38 @@ func WithInvoiceCount(count int) ListInvoiceFilter {
 func WithInvoiceSkip(skip int) ListInvoiceFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["skip"] = fmt.Sprintf("%d", skip)
+		return nil
+	})
+}
+
+// WithInvoiceCreatedStartDateTime filters invoices created on or after the specified date/time
+func WithInvoiceCreatedStartDateTime(t time.Time) ListInvoiceFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["createdStartDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}
+
+// WithInvoiceCreatedEndDateTime filters invoices created on or before the specified date/time
+func WithInvoiceCreatedEndDateTime(t time.Time) ListInvoiceFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["createdEndDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}
+
+// WithInvoiceDueStartDateTime filters invoices with a due date on or after the specified date/time
+func WithInvoiceDueStartDateTime(t time.Time) ListInvoiceFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["dueStartDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}
+
+// WithInvoiceDueEndDateTime filters invoices with a due date on or before the specified date/time
+func WithInvoiceDueEndDateTime(t time.Time) ListInvoiceFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["dueEndDateTime"] = t.Format(time.RFC3339)
 		return nil
 	})
 }
