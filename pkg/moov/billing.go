@@ -115,9 +115,59 @@ const (
 	FeePlanAgreementStatus_Terminated FeePlanAgreementStatus = "terminated"
 )
 
+// Residual represents a partner residual payment calculation
+type Residual struct {
+	ResidualID       string        `json:"residualID"`
+	PartnerAccountID string        `json:"partnerAccountID"`
+	PeriodStart      time.Time     `json:"periodStart"`
+	PeriodEnd        time.Time     `json:"periodEnd"`
+	MerchantFees     AmountDecimal `json:"merchantFees"`
+	PartnerCost      AmountDecimal `json:"partnerCost"`
+	NetIncome        AmountDecimal `json:"netIncome"`
+	RevenueShare     string        `json:"revenueShare"`
+	ResidualAmount   AmountDecimal `json:"residualAmount"`
+	CreatedOn        time.Time     `json:"createdOn"`
+	UpdatedOn        time.Time     `json:"updatedOn"`
+}
+
+// PartnerPricing represents a partner pricing plan
+type PartnerPricing struct {
+	PlanID             string             `json:"planID"`
+	Name               string             `json:"name"`
+	Description        *string            `json:"description,omitempty"`
+	RevenueShare       string             `json:"revenueShare"`
+	CardAcquiringModel CardAcquiringModel `json:"cardAcquiringModel"`
+	BillableFees       []BillableFee      `json:"billableFees"`
+	MinimumCommitment  AmountDecimal      `json:"minimumCommitment"`
+	MonthlyPlatformFee AmountDecimal      `json:"monthlyPlatformFee"`
+	CreatedAt          time.Time          `json:"createdAt"`
+}
+
+// PartnerPricingAgreement represents a partner pricing agreement
+type PartnerPricingAgreement struct {
+	AgreementID        string                 `json:"agreementID"`
+	PlanID             string                 `json:"planID"`
+	AccountID          string                 `json:"accountID,omitempty"`
+	Name               string                 `json:"name"`
+	Description        *string                `json:"description,omitempty"`
+	AcceptedOn         time.Time              `json:"acceptedOn"`
+	Status             FeePlanAgreementStatus `json:"status"`
+	RevenueShare       string                 `json:"revenueShare"`
+	CardAcquiringModel CardAcquiringModel     `json:"cardAcquiringModel"`
+	BillableFees       []BillableFee          `json:"billableFees"`
+	MinimumCommitment  AmountDecimal          `json:"minimumCommitment"`
+	MonthlyPlatformFee AmountDecimal          `json:"monthlyPlatformFee"`
+}
+
 type FeePlanAgreementListFilter callArg
 
 type FeePlanListFilter callArg
+
+type ResidualListFilter callArg
+
+type ResidualFeeListFilter callArg
+
+type PartnerPricingAgreementListFilter callArg
 
 func WithFeePlanAgreementCount(c int) FeePlanAgreementListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
@@ -154,6 +204,94 @@ func WithFeePlanAgreementIds(agreementIds []string) FeePlanAgreementListFilter {
 func WithFeePlanIds(planIds []string) FeePlanListFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["planIds"] = strings.Join(planIds, ",")
+		return nil
+	})
+}
+
+func WithResidualCount(c int) ResidualListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["count"] = fmt.Sprintf("%d", c)
+		return nil
+	})
+}
+
+func WithResidualSkip(c int) ResidualListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["skip"] = fmt.Sprintf("%d", c)
+		return nil
+	})
+}
+
+func WithResidualStartDateTime(start string) ResidualListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["startDateTime"] = start
+		return nil
+	})
+}
+
+func WithResidualEndDateTime(end string) ResidualListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["endDateTime"] = end
+		return nil
+	})
+}
+
+func WithResidualFeeCount(c int) ResidualFeeListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["count"] = fmt.Sprintf("%d", c)
+		return nil
+	})
+}
+
+func WithResidualFeeSkip(c int) ResidualFeeListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["skip"] = fmt.Sprintf("%d", c)
+		return nil
+	})
+}
+
+func WithResidualFeeStartDateTime(start string) ResidualFeeListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["startDateTime"] = start
+		return nil
+	})
+}
+
+func WithResidualFeeEndDateTime(end string) ResidualFeeListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["endDateTime"] = end
+		return nil
+	})
+}
+
+func WithPartnerPricingAgreementCount(c int) PartnerPricingAgreementListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["count"] = fmt.Sprintf("%d", c)
+		return nil
+	})
+}
+
+func WithPartnerPricingAgreementSkip(c int) PartnerPricingAgreementListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["skip"] = fmt.Sprintf("%d", c)
+		return nil
+	})
+}
+
+func WithPartnerPricingAgreementStatuses(statuses []FeePlanAgreementStatus) PartnerPricingAgreementListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		statusStrings := make([]string, len(statuses))
+		for i, status := range statuses {
+			statusStrings[i] = string(status)
+		}
+		call.params["status"] = strings.Join(statusStrings, ",")
+		return nil
+	})
+}
+
+func WithPartnerPricingAgreementIds(agreementIds []string) PartnerPricingAgreementListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["agreementID"] = strings.Join(agreementIds, ",")
 		return nil
 	})
 }
@@ -199,4 +337,54 @@ func (c Client) CreateFeePlanAgreement(ctx context.Context, accountID string, re
 	default:
 		return nil, resp
 	}
+}
+
+// ListResiduals lists all residuals associated with an account
+// TODO: Add docs.moov.io link when published
+func (c Client) ListResiduals(ctx context.Context, accountID string, filters ...ResidualListFilter) ([]Residual, error) {
+	args := prependArgs(filters, AcceptJson())
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathResiduals, accountID), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[Residual](resp)
+}
+
+// GetResidual retrieves a specific residual by ID
+// TODO: Add docs.moov.io link when published
+func (c Client) GetResidual(ctx context.Context, accountID, residualID string) (*Residual, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathResidual, accountID, residualID),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[Residual](resp)
+}
+
+// ListResidualFees lists all fees associated with a residual
+// TODO: Add docs.moov.io link when published
+func (c Client) ListResidualFees(ctx context.Context, accountID, residualID string, filters ...ResidualFeeListFilter) ([]IncurredFee, error) {
+	args := prependArgs(filters, AcceptJson())
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathResidualFees, accountID, residualID), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[IncurredFee](resp)
+}
+
+// ListPartnerPricingAgreements lists all partner pricing agreements associated with an account
+// TODO: Add docs.moov.io link when published
+func (c Client) ListPartnerPricingAgreements(ctx context.Context, accountID string, filters ...PartnerPricingAgreementListFilter) ([]PartnerPricingAgreement, error) {
+	args := prependArgs(filters, AcceptJson())
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathPartnerPricingAgreements, accountID), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[PartnerPricingAgreement](resp)
 }
