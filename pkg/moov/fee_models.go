@@ -114,3 +114,54 @@ func WithFeeEndDateTime(end string) FeeGetFilter {
 type FeeListRequest struct {
 	FeeIDs []string `json:"feeIDs"`
 }
+
+type FeeRevenueFilter callArg
+
+func WithFeeRevenueCount(c int) FeeRevenueFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["count"] = fmt.Sprintf("%d", c)
+		return nil
+	})
+}
+
+func WithFeeRevenueSkip(c int) FeeRevenueFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["skip"] = fmt.Sprintf("%d", c)
+		return nil
+	})
+}
+
+func WithFeeRevenueTransferID(transferID string) FeeRevenueFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["transferID"] = transferID
+		return nil
+	})
+}
+
+func WithFeeRevenueDisputeID(disputeID string) FeeRevenueFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["disputeID"] = disputeID
+		return nil
+	})
+}
+
+func WithFeeRevenueResidualID(residualID string) FeeRevenueFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["residualID"] = residualID
+		return nil
+	})
+}
+
+func WithFeeRevenueStartDateTime(start string) FeeRevenueFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["startDateTime"] = start
+		return nil
+	})
+}
+
+func WithFeeRevenueEndDateTime(end string) FeeRevenueFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["endDateTime"] = end
+		return nil
+	})
+}
