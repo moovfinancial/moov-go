@@ -196,7 +196,7 @@ func Test_CreateFeePlanAgreement(t *testing.T) {
 func Test_ListResiduals(t *testing.T) {
 	mc := NewTestClient(t)
 
-	residuals, err := mc.ListResiduals(context.Background(), FACILITATOR_ID)
+	residuals, err := mc.ListResiduals(t.Context(), FACILITATOR_ID)
 	require.NoError(t, err)
 	require.NotNil(t, residuals)
 }
@@ -205,7 +205,7 @@ func Test_ListResiduals_WithCount(t *testing.T) {
 	mc := NewTestClient(t)
 
 	residuals, err := mc.ListResiduals(
-		context.Background(),
+		t.Context(),
 		FACILITATOR_ID,
 		moov.WithResidualCount(5),
 	)
@@ -220,7 +220,7 @@ func Test_ListResiduals_WithSkip(t *testing.T) {
 	mc := NewTestClient(t)
 
 	residuals, err := mc.ListResiduals(
-		context.Background(),
+		t.Context(),
 		FACILITATOR_ID,
 		moov.WithResidualSkip(2),
 	)
@@ -232,7 +232,7 @@ func Test_ListResiduals_WithDateTimeRange(t *testing.T) {
 	mc := NewTestClient(t)
 
 	residuals, err := mc.ListResiduals(
-		context.Background(),
+		t.Context(),
 		FACILITATOR_ID,
 		moov.WithResidualStartDateTime("2024-01-01T00:00:00Z"),
 		moov.WithResidualEndDateTime("2099-12-31T23:59:59Z"),
@@ -245,11 +245,11 @@ func Test_GetResidual(t *testing.T) {
 	mc := NewTestClient(t)
 
 	// First, list residuals to find a valid ID
-	residuals, err := mc.ListResiduals(context.Background(), FACILITATOR_ID)
+	residuals, err := mc.ListResiduals(t.Context(), FACILITATOR_ID)
 	require.NoError(t, err)
 
 	if len(residuals) > 0 {
-		residual, err := mc.GetResidual(context.Background(), FACILITATOR_ID, residuals[0].ResidualID)
+		residual, err := mc.GetResidual(t.Context(), FACILITATOR_ID, residuals[0].ResidualID)
 		require.NoError(t, err)
 		require.NotNil(t, residual)
 		assert.Equal(t, residuals[0].ResidualID, residual.ResidualID)
@@ -260,11 +260,11 @@ func Test_ListResidualFees(t *testing.T) {
 	mc := NewTestClient(t)
 
 	// First, list residuals to find a valid ID
-	residuals, err := mc.ListResiduals(context.Background(), FACILITATOR_ID)
+	residuals, err := mc.ListResiduals(t.Context(), FACILITATOR_ID)
 	require.NoError(t, err)
 
 	if len(residuals) > 0 {
-		fees, err := mc.ListResidualFees(context.Background(), FACILITATOR_ID, residuals[0].ResidualID)
+		fees, err := mc.ListResidualFees(t.Context(), FACILITATOR_ID, residuals[0].ResidualID)
 		require.NoError(t, err)
 		require.NotNil(t, fees)
 	}
@@ -274,12 +274,12 @@ func Test_ListResidualFees_WithFilters(t *testing.T) {
 	mc := NewTestClient(t)
 
 	// First, list residuals to find a valid ID
-	residuals, err := mc.ListResiduals(context.Background(), FACILITATOR_ID)
+	residuals, err := mc.ListResiduals(t.Context(), FACILITATOR_ID)
 	require.NoError(t, err)
 
 	if len(residuals) > 0 {
 		fees, err := mc.ListResidualFees(
-			context.Background(),
+			t.Context(),
 			FACILITATOR_ID,
 			residuals[0].ResidualID,
 			moov.WithResidualFeeCount(10),
@@ -293,7 +293,7 @@ func Test_ListResidualFees_WithFilters(t *testing.T) {
 func Test_ListPartnerPricingAgreements(t *testing.T) {
 	mc := NewTestClient(t)
 
-	agreements, err := mc.ListPartnerPricingAgreements(context.Background(), FACILITATOR_ID)
+	agreements, err := mc.ListPartnerPricingAgreements(t.Context(), FACILITATOR_ID)
 	require.NoError(t, err)
 	require.NotNil(t, agreements)
 }
@@ -302,7 +302,7 @@ func Test_ListPartnerPricingAgreements_WithCount(t *testing.T) {
 	mc := NewTestClient(t)
 
 	agreements, err := mc.ListPartnerPricingAgreements(
-		context.Background(),
+		t.Context(),
 		FACILITATOR_ID,
 		moov.WithPartnerPricingAgreementCount(5),
 	)
@@ -317,7 +317,7 @@ func Test_ListPartnerPricingAgreements_WithSkip(t *testing.T) {
 	mc := NewTestClient(t)
 
 	agreements, err := mc.ListPartnerPricingAgreements(
-		context.Background(),
+		t.Context(),
 		FACILITATOR_ID,
 		moov.WithPartnerPricingAgreementSkip(2),
 	)
@@ -329,7 +329,7 @@ func Test_ListPartnerPricingAgreements_WithStatuses(t *testing.T) {
 	mc := NewTestClient(t)
 
 	agreements, err := mc.ListPartnerPricingAgreements(
-		context.Background(),
+		t.Context(),
 		FACILITATOR_ID,
 		moov.WithPartnerPricingAgreementStatuses([]moov.FeePlanAgreementStatus{moov.FeePlanAgreementStatus_Active}),
 	)
@@ -341,7 +341,7 @@ func Test_ListPartnerPricingAgreements_WithAgreementIds(t *testing.T) {
 	mc := NewTestClient(t)
 
 	// First, get all agreements to find valid IDs
-	allAgreements, err := mc.ListPartnerPricingAgreements(context.Background(), FACILITATOR_ID)
+	allAgreements, err := mc.ListPartnerPricingAgreements(t.Context(), FACILITATOR_ID)
 	require.NoError(t, err)
 
 	if len(allAgreements) > 0 {
@@ -349,7 +349,7 @@ func Test_ListPartnerPricingAgreements_WithAgreementIds(t *testing.T) {
 		agreementIDs := []string{allAgreements[0].AgreementID}
 
 		agreements, err := mc.ListPartnerPricingAgreements(
-			context.Background(),
+			t.Context(),
 			FACILITATOR_ID,
 			moov.WithPartnerPricingAgreementIds(agreementIDs),
 		)
