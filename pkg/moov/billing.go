@@ -130,19 +130,6 @@ type Residual struct {
 	UpdatedOn        time.Time     `json:"updatedOn"`
 }
 
-// PartnerPricing represents a partner pricing plan
-type PartnerPricing struct {
-	PlanID             string             `json:"planID"`
-	Name               string             `json:"name"`
-	Description        *string            `json:"description,omitempty"`
-	RevenueShare       string             `json:"revenueShare"`
-	CardAcquiringModel CardAcquiringModel `json:"cardAcquiringModel"`
-	BillableFees       []BillableFee      `json:"billableFees"`
-	MinimumCommitment  AmountDecimal      `json:"minimumCommitment"`
-	MonthlyPlatformFee AmountDecimal      `json:"monthlyPlatformFee"`
-	CreatedAt          time.Time          `json:"createdAt"`
-}
-
 // PartnerPricingAgreement represents a partner pricing agreement
 type PartnerPricingAgreement struct {
 	AgreementID        string                 `json:"agreementID"`

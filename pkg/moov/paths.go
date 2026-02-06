@@ -115,7 +115,6 @@ const (
 	pathFeePlans          = "/accounts/%s/fee-plans"
 
 	pathFeeRevenue               = "/accounts/%s/fee-revenue"
-	pathPartnerPricing           = "/accounts/%s/partner-pricing"
 	pathPartnerPricingAgreements = "/accounts/%s/partner-pricing-agreements"
 	pathResiduals                = "/accounts/%s/residuals"
 	pathResidual                 = "/accounts/%s/residuals/%s"
