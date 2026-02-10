@@ -88,3 +88,128 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 	latestPayment := payments[0]
 	require.Equal(t, *createdPayment, latestPayment)
 }
+
+func Test_Invoice_CreateWithLineItems(t *testing.T) {
+	var (
+		mc                = NewTestClient(t)
+		ctx               = t.Context()
+		merchantAccountID = "e5a43c02-559a-49e4-a0f8-5b180ec30202"
+		customerAccountID = "5e1cc1a2-bbc8-46f9-94fb-fbbfab12ed80"
+		yeezysImageID     = "b2cd2b80-93df-4c64-afae-a0578c9180e6"
+		newBalanceImageID = "7c862f3e-ef31-4345-82a1-d4b33ccf8f48"
+		blueShirtImageID  = "f7d8487e-a24d-475c-9136-3bd49353a5e9"
+		today             = time.Now().UTC().Truncate(24 * time.Hour)
+		tomorrow          = today.Add(24 * time.Hour)
+	)
+
+	lineItems := moov.CreateInvoiceLineItems{
+		Items: []moov.CreateInvoiceLineItem{
+			{
+				Name: "Yeezys",
+				BasePrice: moov.AmountDecimal{
+					ValueDecimal: "529.99",
+					Currency:     "USD",
+				},
+				Quantity: 1,
+				ImageIDs: []string{yeezysImageID},
+				Options: []moov.CreateInvoiceLineItemOption{
+					{
+						Name:          "Size: 10.5",
+						Quantity:      1,
+						PriceModifier: &moov.AmountDecimal{ValueDecimal: "0", Currency: "USD"},
+					},
+					{
+						Name:          "Premium Gel Insoles",
+						Quantity:      1,
+						PriceModifier: &moov.AmountDecimal{ValueDecimal: "15.00", Currency: "USD"},
+					},
+					{
+						Name:          "Extra Laces (Black)",
+						Quantity:      2,
+						PriceModifier: &moov.AmountDecimal{ValueDecimal: "4.99", Currency: "USD"},
+					},
+				},
+			},
+			{
+				Name: "New Balance",
+				BasePrice: moov.AmountDecimal{
+					ValueDecimal: "189.99",
+					Currency:     "USD",
+				},
+				Quantity: 2,
+				ImageIDs: []string{newBalanceImageID},
+				Options: []moov.CreateInvoiceLineItemOption{
+					{
+						Name:          "Size: 9",
+						Quantity:      1,
+						PriceModifier: &moov.AmountDecimal{ValueDecimal: "0", Currency: "USD"},
+					},
+					{
+						Name:          "Waterproof Coating",
+						Quantity:      1,
+						PriceModifier: &moov.AmountDecimal{ValueDecimal: "12.00", Currency: "USD"},
+					},
+				},
+			},
+			{
+				Name: "Blue shirt",
+				BasePrice: moov.AmountDecimal{
+					ValueDecimal: "45.00",
+					Currency:     "USD",
+				},
+				Quantity: 3,
+				ImageIDs: []string{blueShirtImageID},
+				Options: []moov.CreateInvoiceLineItemOption{
+					{
+						Name:          "Size: Medium",
+						Quantity:      1,
+						PriceModifier: &moov.AmountDecimal{ValueDecimal: "0", Currency: "USD"},
+					},
+					{
+						Name:          "Custom Name Print",
+						Quantity:      1,
+						PriceModifier: &moov.AmountDecimal{ValueDecimal: "8.50", Currency: "USD"},
+					},
+				},
+			},
+			{
+				Name: "Sport Socks (6-Pack)",
+				BasePrice: moov.AmountDecimal{
+					ValueDecimal: "24.99",
+					Currency:     "USD",
+				},
+				Quantity: 2,
+				Options: []moov.CreateInvoiceLineItemOption{
+					{
+						Name:          "Size: Large",
+						Quantity:      1,
+						PriceModifier: &moov.AmountDecimal{ValueDecimal: "0", Currency: "USD"},
+					},
+				},
+			},
+		},
+	}
+
+	create := moov.CreateInvoice{
+		CustomerAccountID: customerAccountID,
+		Description:       "Shoes n stuff",
+		LineItems:         lineItems,
+		InvoiceDate:       &today,
+		DueDate:           &tomorrow,
+	}
+
+	// create the invoice
+	createdInvoice, err := mc.CreateInvoice(ctx, merchantAccountID, create)
+	require.NoError(t, err)
+	require.NotEmpty(t, createdInvoice.InvoiceID)
+	t.Logf("Created invoice ID: %s", createdInvoice.InvoiceID)
+	require.Equal(t, moov.InvoiceStatusDraft, createdInvoice.Status)
+	require.Len(t, createdInvoice.LineItems.Items, 4)
+
+	// Update invoice status to 'unpaid' to send the invoice to the customer.
+	updatedInvoice, err := mc.UpdateInvoice(ctx, merchantAccountID, createdInvoice.InvoiceID, moov.UpdateInvoice{
+		Status: moov.PtrOf(moov.InvoiceStatusUnpaid),
+	})
+	require.NoError(t, err)
+	require.Equal(t, moov.InvoiceStatusUnpaid, updatedInvoice.Status)
+}
