@@ -327,7 +327,7 @@ func (c Client) CreateFeePlanAgreement(ctx context.Context, accountID string, re
 }
 
 // ListResiduals lists all residuals associated with an account
-// TODO: Add docs.moov.io link when published
+// https://docs.moov.io/api/moov-accounts/partner-billing/list-residuals/
 func (c Client) ListResiduals(ctx context.Context, accountID string, filters ...ResidualListFilter) ([]Residual, error) {
 	args := prependArgs(filters, AcceptJson())
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathResiduals, accountID), args...)
@@ -339,7 +339,7 @@ func (c Client) ListResiduals(ctx context.Context, accountID string, filters ...
 }
 
 // GetResidual retrieves a specific residual by ID
-// TODO: Add docs.moov.io link when published
+// https://docs.moov.io/api/moov-accounts/partner-billing/get-residuals/
 func (c Client) GetResidual(ctx context.Context, accountID, residualID string) (*Residual, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathResidual, accountID, residualID),
@@ -353,7 +353,7 @@ func (c Client) GetResidual(ctx context.Context, accountID, residualID string) (
 }
 
 // ListResidualFees lists all fees associated with a residual
-// TODO: Add docs.moov.io link when published
+// https://docs.moov.io/api/moov-accounts/partner-billing/list-residual-fees/
 func (c Client) ListResidualFees(ctx context.Context, accountID, residualID string, filters ...ResidualFeeListFilter) ([]IncurredFee, error) {
 	args := prependArgs(filters, AcceptJson())
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathResidualFees, accountID, residualID), args...)
@@ -365,7 +365,7 @@ func (c Client) ListResidualFees(ctx context.Context, accountID, residualID stri
 }
 
 // ListPartnerPricingAgreements lists all partner pricing agreements associated with an account
-// TODO: Add docs.moov.io link when published
+// https://docs.moov.io/api/moov-accounts/partner-billing/list-partner-agreements/
 func (c Client) ListPartnerPricingAgreements(ctx context.Context, accountID string, filters ...PartnerPricingAgreementListFilter) ([]PartnerPricingAgreement, error) {
 	args := prependArgs(filters, AcceptJson())
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathPartnerPricingAgreements, accountID), args...)
