@@ -152,5 +152,5 @@ type CreateInvoiceLineItemOption struct {
 
 // CreateInvoiceLineItemImage represents an image to associate with a line item
 type CreateInvoiceLineItemImage struct {
-	ImageID string `json:"imageID,omitempty"`
+	ImageID string `json:"imageID"`
 }
