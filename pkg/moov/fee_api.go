@@ -30,3 +30,15 @@ func (c Client) ListFees(ctx context.Context, accountID string, request FeeListR
 
 	return CompletedListOrError[IncurredFee](resp)
 }
+
+// ListFeeRevenue retrieves revenue generated from merchant fees (for partners)
+// https://docs.moov.io/api/moov-accounts/partner-billing/list-fee-revenue/
+func (c Client) ListFeeRevenue(ctx context.Context, accountID string, filters ...FeeRevenueFilter) ([]IncurredFee, error) {
+	args := prependArgs(filters, AcceptJson())
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathFeeRevenue, accountID), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[IncurredFee](resp)
+}

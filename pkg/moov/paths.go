@@ -114,6 +114,12 @@ const (
 	pathFeePlanAgreements = "/accounts/%s/fee-plan-agreements"
 	pathFeePlans          = "/accounts/%s/fee-plans"
 
+	pathFeeRevenue               = "/accounts/%s/fee-revenue"
+	pathPartnerPricingAgreements = "/accounts/%s/partner-pricing-agreements"
+	pathResiduals                = "/accounts/%s/residuals"
+	pathResidual                 = "/accounts/%s/residuals/%s"
+	pathResidualFees             = "/accounts/%s/residuals/%s/fees"
+
 	pathFees      = "/accounts/%s/fees"
 	pathFeesFetch = "/accounts/%s/fees/.fetch"
 
