@@ -3,6 +3,7 @@ package moov_test
 import (
 	"testing"
 
+	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
 
@@ -14,7 +15,17 @@ func Test_ResolutionLinks(t *testing.T) {
 	var resolutionLinkCode string
 
 	t.Run("create resolution link", func(t *testing.T) {
-		created, err := mc.CreateResolutionLink(BgCtx(), account.AccountID)
+		createReq := moov.CreateResolutionLink{
+			AccountID: account.AccountID,
+			Recipient: moov.Recipient{
+				Email: "noreply@moov.io",
+			},
+			Options: moov.ResolutionLinkOptions{
+				MerchantName: "Test Merchant",
+				AccountName:  "Test Account",
+			},
+		}
+		created, err := mc.CreateResolutionLink(BgCtx(), account.AccountID, createReq)
 		NoResponseError(t, err)
 		require.NotNil(t, created)
 		require.NotEmpty(t, created.ResolutionLinkCode)

@@ -3,33 +3,33 @@ package moov
 import "time"
 
 type ResolutionLinkRecord struct {
-	ResolutionLinkCode string     `json:"resolution_link_code"`
-	PartnerAccountID   string     `json:"partner_account_id"`
-	Mode               string     `json:"account_mode"`
-	AccountID          string     `json:"account_id"`
-	CreatedOn          time.Time  `json:"created_on"`
-	UpdatedOn          time.Time  `json:"updated_on,omitempty"`
-	DisabledOn         *time.Time `json:"disabled_on,omitempty"`
-	ExpiresOn          time.Time  `json:"expires_on"`
-	Recipient          string
+	ResolutionLinkCode string                `json:"resolution_link_code"`
+	PartnerAccountID   string                `json:"partner_account_id"`
+	Mode               string                `json:"account_mode"`
+	AccountID          string                `json:"account_id"`
+	CreatedOn          time.Time             `json:"created_on"`
+	UpdatedOn          time.Time             `json:"updated_on,omitempty"`
+	DisabledOn         *time.Time            `json:"disabled_on,omitempty"`
+	ExpiresOn          time.Time             `json:"expires_on"`
+	Recipient          Recipient             `json:"recipient"`
 	Options            ResolutionLinkOptions `json:"options"`
 }
 
 type CreateResolutionLink struct {
-	PartnerAccountID string
+	PartnerAccountID string                `json:"partner_account_id,omitempty"`
+	Recipient        Recipient             `json:"recipient"`
+	Options          ResolutionLinkOptions `json:"options,omitempty"`
 	AccountID        string
-	Recipient        Recipient
-	Options          ResolutionLinkOptions
 }
 
 type Recipient struct {
-	Email string
+	Email string `json:"email"`
 	Phone *Phone `json:"phone,omitempty"`
 }
 
 type ResolutionLinkOptions struct {
-	MerchantName string `json:"merchantName,omitempty" otel:"merchant_name"`
-	AccountName  string `json:"accountName,omitempty" otel:"account_name,omitempty"`
+	MerchantName string `json:"merchant_name,omitempty"`
+	AccountName  string `json:"account_name,omitempty"`
 }
 
 type FileUploadRequest struct {
