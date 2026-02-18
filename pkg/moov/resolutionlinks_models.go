@@ -31,11 +31,3 @@ type ResolutionLinkOptions struct {
 	MerchantName string `json:"merchant_name,omitempty"`
 	AccountName  string `json:"account_name,omitempty"`
 }
-
-type FileUploadRequest struct {
-	FileContents []byte
-	FileName     string `json:"file_name,omitempty"`
-	Purpose      string `json:"purpose,omitempty"`
-	Size         int    `json:"file_size,omitempty"`
-	Metadata     string `json:"metadata,omitempty"`
-}
