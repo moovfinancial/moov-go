@@ -145,4 +145,7 @@ const (
 
 	pathProducts = "/accounts/%s/products"
 	pathProduct  = "/accounts/%s/products/%s"
+
+	pathResolutionLinks = "/accounts/%s/resolution-links"
+	pathResolutionLink  = "/accounts/%s/resolution-links/%s"
 )
