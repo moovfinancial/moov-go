@@ -10,24 +10,28 @@ func Test_ResolutionLinks(t *testing.T) {
 	mc := NewTestClient(t)
 
 	account := getLincolnBank(t, mc)
-	resolutionLinkCode := "abc123"
 
-	t.Run("list Resolution Links", func(t *testing.T) {
-		filtered, err := mc.ListResolutionLinks(BgCtx(), account.AccountID)
+	var resolutionLinkCode string
+
+	t.Run("create resolution link", func(t *testing.T) {
+		created, err := mc.CreateResolutionLink(BgCtx(), account.AccountID)
 		NoResponseError(t, err)
-		require.NotEmpty(t, filtered)
+		require.NotNil(t, created)
+		require.NotEmpty(t, created.ResolutionLinkCode)
+		resolutionLinkCode = created.ResolutionLinkCode
+	})
+
+	t.Run("list resolution links", func(t *testing.T) {
+		links, err := mc.ListResolutionLinks(BgCtx(), account.AccountID)
+		NoResponseError(t, err)
+		require.NotEmpty(t, links)
 	})
 
 	t.Run("get resolution link", func(t *testing.T) {
-		cap, err := mc.GetResolutionLink(BgCtx(), account.AccountID, resolutionLinkCode)
+		link, err := mc.GetResolutionLink(BgCtx(), account.AccountID, resolutionLinkCode)
 		NoResponseError(t, err)
-		require.NotNil(t, cap)
-	})
-
-	t.Run("create resolution link", func(t *testing.T) {
-		cap, err := mc.CreateResolutionLink(BgCtx(), account.AccountID)
-		NoResponseError(t, err)
-		require.NotNil(t, cap)
+		require.NotNil(t, link)
+		require.Equal(t, resolutionLinkCode, link.ResolutionLinkCode)
 	})
 
 	t.Run("delete resolution link", func(t *testing.T) {
