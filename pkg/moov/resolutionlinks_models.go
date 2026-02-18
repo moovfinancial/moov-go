@@ -34,8 +34,8 @@ type ResolutionLinkOptions struct {
 
 type FileUploadRequest struct {
 	FileContents []byte
-	FileName     string `otel:"file_name, omitempty"`
-	Purpose      string `otel:"purpose, omitempty"`
-	Size         int    `otel:"file_size, omitempty"`
-	Metadata     string `otel:"metadata, omitempty"`
+	FileName     string `json:"file_name,omitempty"`
+	Purpose      string `json:"purpose,omitempty"`
+	Size         int    `json:"file_size,omitempty"`
+	Metadata     string `json:"metadata,omitempty"`
 }
