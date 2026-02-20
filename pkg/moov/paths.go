@@ -97,7 +97,7 @@ const (
 	pathDisputeEvidenceFile   = "/accounts/%s/disputes/%s/evidence-file"
 
 	pathEndToEndPublicKey = "/end-to-end-keys"
-	pathEndToEndTokenTest = "/debug/end-to-end-token" //nolint:gosec
+	pathEndToEndTokenTest = "/debug/end-to-end-token"
 
 	pathTerminalApplications        = "/terminal-applications"
 	pathTerminalApplication         = "/terminal-applications/%s"
