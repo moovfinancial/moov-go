@@ -138,19 +138,12 @@ type CreateInvoiceLineItem struct {
 	Quantity  int32                         `json:"quantity"`
 	ProductID *string                       `json:"productID,omitempty"`
 	Options   []CreateInvoiceLineItemOption `json:"options,omitempty"`
-	Images    []CreateInvoiceLineItemImage  `json:"images,omitempty"`
 }
 
 // CreateInvoiceLineItemOption represents a modifier or option in an invoice creation/update request
 type CreateInvoiceLineItemOption struct {
-	Name          string                       `json:"name"`
-	Quantity      int32                        `json:"quantity"`
-	PriceModifier *AmountDecimal               `json:"priceModifier,omitempty"`
-	Group         *string                      `json:"group,omitempty"`
-	Images        []CreateInvoiceLineItemImage `json:"images,omitempty"`
-}
-
-// CreateInvoiceLineItemImage represents an image to associate with a line item
-type CreateInvoiceLineItemImage struct {
-	ImageID string `json:"imageID"`
+	Name          string         `json:"name"`
+	Quantity      int32          `json:"quantity"`
+	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
+	Group         *string        `json:"group,omitempty"`
 }
