@@ -334,7 +334,9 @@ type TransferDestination struct {
 	ApplePay          *ApplePayPaymentMethod    `json:"applePay,omitempty"`
 	AchDetails        *AchDetails               `json:"achDetails,omitempty"`
 	CardDetails       *CardDetails              `json:"cardDetails,omitempty"`
-	RtpDetails        *RtpDetails               `json:"rtpDetails,omitempty"`
+	// RtpDetails is deprecated; use InstantBankDetails instead
+	RtpDetails         *RtpDetails         `json:"rtpDetails,omitempty"`
+	InstantBankDetails *InstantBankDetails `json:"instantBankDetails,omitempty"`
 }
 
 // AchDetails ACH specific details about the transaction.
@@ -367,6 +369,25 @@ type RtpDetails struct {
 	CompletedOn              *time.Time      `json:"completedOn,omitempty"`
 	FailedOn                 *time.Time      `json:"failedOn,omitempty"`
 	AcceptedWithoutPostingOn *time.Time      `json:"acceptedWithoutPostingOn,omitempty"`
+}
+
+type InstantBankDetails struct {
+	// Network instant bank transfer was processed on
+	Network InstantBankNetwork `json:"network,omitempty"`
+
+	// Status of the instant bank details.
+	Status *InstantBankStatus `json:"status,omitempty"`
+
+	// Code returned by rail network on failure.
+	NetworkResponseCode *string `json:"networkResponseCode,omitempty"`
+
+	// Reason for failure.
+	FailureCode *InstantBankFailureCode `json:"failureCode,omitempty"`
+
+	InitiatedOn              *time.Time `json:"initiatedOn,omitempty"`
+	CompletedOn              *time.Time `json:"completedOn,omitempty"`
+	FailedOn                 *time.Time `json:"failedOn,omitempty"`
+	AcceptedWithoutPostingOn *time.Time `json:"acceptedWithoutPostingOn,omitempty"`
 }
 
 type patchTransfer struct {
@@ -604,6 +625,44 @@ const (
 	RtpFailureCode_InvalidAmount           RtpFailureCode = "invalid-amount"
 	RtpFailureCode_CustomerDeceased        RtpFailureCode = "customer-deceased"
 	RtpFailureCode_Other                   RtpFailureCode = "other"
+)
+
+// InstantBankNetwork is the network that the instant bank transfer was processed on
+type InstantBankNetwork string
+
+// List of InstantBankNetwork
+const (
+	InstantBankNetwork_FedNow InstantBankNetwork = "fednow"
+	InstantBankNetwork_RTP    InstantBankNetwork = "rtp"
+)
+
+// InstantBankStatus Status of the instant bank details.
+type InstantBankStatus string
+
+// List of InstantBankStatus
+const (
+	InstantBankStatus_Initiated              InstantBankStatus = "initiated"
+	InstantBankStatus_Completed              InstantBankStatus = "completed"
+	InstantBankStatus_Failed                 InstantBankStatus = "failed"
+	InstantBankStatus_AcceptedWithoutPosting InstantBankStatus = "accepted-without-posting"
+)
+
+// InstantBankFailureCode is the failure code of an instant bank transfer
+type InstantBankFailureCode string
+
+// List of InstantBankFailureCode
+const (
+	InstantBankFailureCode_ProcessingError         InstantBankFailureCode = "processing-error"
+	InstantBankFailureCode_InvalidAccount          InstantBankFailureCode = "invalid-account"
+	InstantBankFailureCode_AccountClosed           InstantBankFailureCode = "account-closed"
+	InstantBankFailureCode_AccountBlocked          InstantBankFailureCode = "account-blocked"
+	InstantBankFailureCode_InvalidField            InstantBankFailureCode = "invalid-field"
+	InstantBankFailureCode_TransactionNotSupported InstantBankFailureCode = "transaction-not-supported"
+	InstantBankFailureCode_LimitExceeded           InstantBankFailureCode = "limit-exceeded"
+	InstantBankFailureCode_InvalidAmount           InstantBankFailureCode = "invalid-amount"
+	InstantBankFailureCode_CustomerDeceased        InstantBankFailureCode = "customer-deceased"
+	InstantBankFailureCode_ParticipantNotAvailable InstantBankFailureCode = "participant-not-available"
+	InstantBankFailureCode_Other                   InstantBankFailureCode = "other"
 )
 
 // CancellationStatus Cancellation status.
