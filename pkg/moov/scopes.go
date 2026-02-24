@@ -118,6 +118,14 @@ func (sl *scopeList) ProfileEnrichment() ScopeBuilder {
 	return appendScope("/profile-enrichment.read")
 }
 
+func (sl *scopeList) ResolutionLinksRead(accountID string) ScopeBuilder {
+	return appendScope("/accounts/%s/resolution-links.read", accountID)
+}
+
+func (sl *scopeList) ResolutionLinksWrite(accountID string) ScopeBuilder {
+	return appendScope("/accounts/%s/resolution-links.write", accountID)
+}
+
 // Boilerplate for setting the above.
 
 type scopeList struct{}
