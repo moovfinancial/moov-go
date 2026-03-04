@@ -198,9 +198,8 @@ type CreateScheduledTransferLineItem struct {
 	// Optional list of modifiers applied to this item (e.g., toppings, upgrades, customizations).
 	Options []CreateScheduledTransferLineItemOption `json:"options,omitempty"`
 	// Optional unique identifier associating the line item with a product.
+	// Images for the line item will be set from the product's images.
 	ProductID *string `json:"productID,omitempty"`
-	// Optional list of images associated with this line item.
-	ImageIDs []string `json:"imageIDs,omitempty"`
 }
 
 // CreateScheduledTransferLineItemOption Represents a modifier or option applied to a scheduled transfer line item.
@@ -213,8 +212,6 @@ type CreateScheduledTransferLineItemOption struct {
 	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
 	// Optional group identifier to categorize related options (e.g., 'toppings').
 	Group *string `json:"group,omitempty"`
-	// Optional list of images associated with this line item.
-	ImageIDs []string `json:"imageIDs,omitempty"`
 }
 
 type UpdateSchedule struct {
@@ -277,14 +274,6 @@ func (r RunTransfer) ToCreateRunTransfer() CreateRunTransfer {
 				ProductID: item.ProductID,
 			}
 
-			// Convert Images to ImageIDs
-			if len(item.Images) > 0 {
-				createItem.ImageIDs = make([]string, len(item.Images))
-				for j, img := range item.Images {
-					createItem.ImageIDs[j] = img.ImageID
-				}
-			}
-
 			// Convert Options
 			if len(item.Options) > 0 {
 				createItem.Options = make([]CreateScheduledTransferLineItemOption, len(item.Options))
@@ -294,14 +283,6 @@ func (r RunTransfer) ToCreateRunTransfer() CreateRunTransfer {
 						Quantity:      opt.Quantity,
 						PriceModifier: opt.PriceModifier,
 						Group:         opt.Group,
-					}
-
-					// Convert option Images to ImageIDs
-					if len(opt.Images) > 0 {
-						createOpt.ImageIDs = make([]string, len(opt.Images))
-						for k, img := range opt.Images {
-							createOpt.ImageIDs[k] = img.ImageID
-						}
 					}
 
 					createItem.Options[j] = createOpt
