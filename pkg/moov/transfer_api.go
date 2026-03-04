@@ -168,6 +168,13 @@ func WithTransferCount(count int) ListTransferFilter {
 	return Count(count)
 }
 
+func WithTransferCustomerId(customerId string) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["customerId"] = customerId
+		return nil
+	})
+}
+
 // ListTransfers lists all transfers
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/listTransfers
 func (c Client) ListTransfers(ctx context.Context, accountID string, filters ...ListTransferFilter) ([]Transfer, error) {
