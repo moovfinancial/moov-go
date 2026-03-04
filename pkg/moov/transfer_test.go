@@ -1,7 +1,11 @@
 package moov_test
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -258,5 +262,120 @@ func Test_Cancellations(t *testing.T) {
 		fetchedCancellation, err := mc.GetCancellation(BgCtx(), FACILITATOR_ID, transferID, createdCancellation.CancellationID)
 		NoResponseError(t, err)
 		require.Equal(t, createdCancellation.CancellationID, fetchedCancellation.CancellationID)
+	})
+}
+
+// newTransferFilterClient creates a local test server that returns an empty
+// transfer list and a moov.Client pointed at it.  The returned function
+// retrieves the URL query values captured from the most recent request.
+func newTransferFilterClient(t *testing.T) (*moov.Client, func() url.Values) {
+	t.Helper()
+	var lastQuery url.Values
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		lastQuery = r.URL.Query()
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("[]"))
+	}))
+	t.Cleanup(srv.Close)
+
+	u, err := url.Parse(srv.URL)
+	require.NoError(t, err)
+
+	client, err := moov.NewClient(
+		moov.WithCredentials(moov.Credentials{
+			PublicKey: "test-public",
+			SecretKey: "test-secret",
+			Host:      u.Host,
+		}),
+		moov.WithMoovURLScheme("http"),
+	)
+	require.NoError(t, err)
+
+	return client, func() url.Values { return lastQuery }
+}
+
+func Test_ListTransferFilters(t *testing.T) {
+	const accountID = "test-account-id"
+
+	t.Run("WithTransferCustomerID", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferCustomerID("cust-123"))
+		require.Equal(t, "cust-123", query().Get("customerId"))
+	})
+
+	t.Run("WithTransferAccountIDs single", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferAccountIDs([]string{"acc-1"}))
+		require.Equal(t, "acc-1", query().Get("accountIDs"))
+	})
+
+	t.Run("WithTransferAccountIDs multiple", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferAccountIDs([]string{"acc-1", "acc-2", "acc-3"}))
+		require.Equal(t, "acc-1,acc-2,acc-3", query().Get("accountIDs"))
+	})
+
+	t.Run("WithTransferStatus", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferStatus("completed"))
+		require.Equal(t, "completed", query().Get("status"))
+	})
+
+	t.Run("WithTransferStartDate", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		ts := time.Date(2025, 1, 15, 10, 30, 0, 0, time.UTC)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferStartDate(ts))
+		require.Equal(t, ts.Format(time.RFC3339), query().Get("startDateTime"))
+	})
+
+	t.Run("WithTransferEndDate", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		ts := time.Date(2025, 12, 31, 23, 59, 59, 0, time.UTC)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferEndDate(ts))
+		require.Equal(t, ts.Format(time.RFC3339), query().Get("endDateTime"))
+	})
+
+	t.Run("WithTransferGroup", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferGroup("group-abc"))
+		require.Equal(t, "group-abc", query().Get("groupID"))
+	})
+
+	t.Run("WithTransferSchedule", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferSchedule("sched-xyz"))
+		require.Equal(t, "sched-xyz", query().Get("scheduleID"))
+	})
+
+	t.Run("WithTransferPaymentLinkCode", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferPaymentLinkCode("LINK42"))
+		require.Equal(t, "LINK42", query().Get("paymentLinkCode"))
+	})
+
+	t.Run("WithTransferRefunded", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferRefunded())
+		require.Equal(t, "true", query().Get("refunded"))
+	})
+
+	t.Run("WithTransferDisputed", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferDisputed())
+		require.Equal(t, "true", query().Get("disputed"))
+	})
+
+	t.Run("WithTransferSkip", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferSkip(25))
+		require.Equal(t, "25", query().Get("skip"))
+	})
+
+	t.Run("WithTransferCount", func(t *testing.T) {
+		client, query := newTransferFilterClient(t)
+		_, _ = client.ListTransfers(BgCtx(), accountID, moov.WithTransferCount(100))
+		require.Equal(t, "100", query().Get("count"))
 	})
 }

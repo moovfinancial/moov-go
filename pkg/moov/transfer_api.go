@@ -168,9 +168,9 @@ func WithTransferCount(count int) ListTransferFilter {
 	return Count(count)
 }
 
-func WithTransferCustomerId(customerId string) ListTransferFilter {
+func WithTransferCustomerID(customerID string) ListTransferFilter {
 	return callBuilderFn(func(call *callBuilder) error {
-		call.params["customerId"] = customerId
+		call.params["customerId"] = customerID
 		return nil
 	})
 }
