@@ -123,15 +123,7 @@ func Test_Products(t *testing.T) {
 	ctx := context.Background()
 	accountID := MERCHANT_ID
 
-	// upload image for use with product test
-	_, imgReader := randomImage(t, 100, 100, encodePNG)
-	metadata := &moov.ImageMetadataRequest{
-		AltText: moov.PtrOf("Test product image"),
-	}
-	image, err := mc.UploadImage(ctx, accountID, imgReader, metadata)
-	require.NoError(t, err)
-	require.NotNil(t, image)
-	t.Cleanup(func() { _ = mc.DeleteImage(ctx, accountID, image.ImageID) })
+	image := createTemporaryImage(t, mc, accountID)
 	// there is some async delay for the image to be available for products
 	// we will remove this in the near future
 	time.Sleep(1 * time.Second)
