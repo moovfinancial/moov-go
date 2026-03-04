@@ -191,29 +191,7 @@ func Test_Schedules_LineItems(t *testing.T) {
 	customerCard := createTemporaryCard(t, mc, customer.AccountID)
 	customerPmId := customerCard.PaymentMethods[0].PaymentMethodID
 
-	// Upload test images
-	_, imgReader1 := randomImage(t, 100, 100, encodePNG)
-	image1, err := mc.UploadImage(ctx, merchantAccountId, imgReader1, &moov.ImageMetadataRequest{
-		AltText: moov.PtrOf("Latte image"),
-	})
-	require.NoError(t, err)
-	require.NotNil(t, image1)
-	t.Cleanup(func() { _ = mc.DeleteImage(ctx, merchantAccountId, image1.ImageID) })
-
-	// Upload test product with image
-	product, err := mc.CreateProduct(ctx, merchantAccountId, moov.ProductRequest{
-		Title: "test product",
-		BasePrice: moov.AmountDecimal{
-			Currency:     "USD",
-			ValueDecimal: "5.50",
-		},
-		Images: []moov.AssignProductImage{
-			{ImageID: image1.ImageID},
-		},
-	})
-	require.NoError(t, err)
-	require.NotNil(t, product)
-	t.Cleanup(func() { _ = mc.DisableProduct(ctx, merchantAccountId, product.ProductID) })
+	product := createTemporaryProduct(t, mc, merchantAccountId)
 
 	runTransfer := moov.CreateRunTransfer{
 		Description: "recurring transfer",
@@ -275,6 +253,16 @@ func Test_Schedules_LineItems(t *testing.T) {
 		}
 	})
 
+	var wantImages []moov.ScheduledTransferImageMetadata
+	for _, img := range product.Images {
+		wantImages = append(wantImages, moov.ScheduledTransferImageMetadata{
+			ImageID:  img.ImageID,
+			AltText:  img.AltText,
+			Link:     img.Link,
+			PublicID: img.PublicID,
+		})
+	}
+
 	wantLineItems := &moov.ScheduledTransferLineItems{
 		Items: []moov.ScheduledTransferLineItem{
 			{
@@ -285,14 +273,7 @@ func Test_Schedules_LineItems(t *testing.T) {
 				},
 				Quantity:  1,
 				ProductID: &product.ProductID,
-				Images: []moov.ScheduledTransferImageMetadata{
-					{
-						ImageID:  image1.ImageID,
-						AltText:  image1.AltText,
-						Link:     image1.Link,
-						PublicID: image1.PublicID,
-					},
-				},
+				Images:    wantImages,
 				Options: []moov.ScheduledTransferLineItemOption{
 					{
 						Name:     "Oat Milk",
@@ -338,8 +319,7 @@ func Test_Schedules_LineItems(t *testing.T) {
 					Currency:     "USD",
 					ValueDecimal: "0.75",
 				},
-				Group:    moov.PtrOf("Flavors"),
-				ImageIDs: []string{image1.ImageID},
+				Group: moov.PtrOf("Flavors"),
 			},
 		)
 		upsert.Occurrences[0].RunTransfer.Amount.Value = 625

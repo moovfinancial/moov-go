@@ -101,8 +101,10 @@ type CreateTransferLineItem struct {
 	BasePrice AmountDecimal                  `json:"basePrice"`
 	Quantity  int                            `json:"quantity"`
 	Options   []CreateTransferLineItemOption `json:"options,omitempty"`
-	ImageIDs  []string                       `json:"imageIDs,omitempty"`
-	ProductID *string                        `json:"productID,omitempty"`
+
+	// Optional unique identifier associating the line item with a product.
+	// Images for the line item will be set from the product's images.
+	ProductID *string `json:"productID,omitempty"`
 }
 
 // CreateTransferLineItemOption represents an option for a line item.
@@ -110,7 +112,6 @@ type CreateTransferLineItemOption struct {
 	Name          string         `json:"name"`
 	Quantity      int            `json:"quantity"`
 	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
-	ImageIDs      []string       `json:"imageIDs,omitempty"`
 	Group         *string        `json:"group,omitempty"`
 }
 
