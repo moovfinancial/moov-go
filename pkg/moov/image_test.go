@@ -66,12 +66,17 @@ func Test_Images(t *testing.T) {
 		uploaded, err := mc.UploadImage(ctx, accountID, imgReader, metadata)
 		require.NoError(t, err)
 		require.NotNil(t, uploaded)
+		uploadedImageID = uploaded.ImageID
 		require.NotEmpty(t, uploaded.ImageID)
 		require.NotEmpty(t, uploaded.PublicID)
 		require.NotEmpty(t, uploaded.Link)
 		require.Equal(t, metadata.AltText, uploaded.AltText)
-
-		uploadedImageID = uploaded.ImageID
+	})
+	// cleanup image even if a below test fails
+	t.Cleanup(func() {
+		if uploadedImageID != "" {
+			_ = mc.DeleteImage(ctx, accountID, uploadedImageID)
+		}
 	})
 
 	t.Run("list images", func(t *testing.T) {

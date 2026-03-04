@@ -198,10 +198,22 @@ func Test_Schedules_LineItems(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotNil(t, image1)
+	t.Cleanup(func() { _ = mc.DeleteImage(ctx, merchantAccountId, image1.ImageID) })
 
-	t.Cleanup(func() {
-		mc.DeleteImage(ctx, merchantAccountId, image1.ImageID)
+	// Upload test product with image
+	product, err := mc.CreateProduct(ctx, merchantAccountId, moov.ProductRequest{
+		Title: "test product",
+		BasePrice: moov.AmountDecimal{
+			Currency:     "USD",
+			ValueDecimal: "5.50",
+		},
+		Images: []moov.AssignProductImage{
+			{ImageID: image1.ImageID},
+		},
 	})
+	require.NoError(t, err)
+	require.NotNil(t, product)
+	t.Cleanup(func() { _ = mc.DisableProduct(ctx, merchantAccountId, product.ProductID) })
 
 	runTransfer := moov.CreateRunTransfer{
 		Description: "recurring transfer",
@@ -225,8 +237,7 @@ func Test_Schedules_LineItems(t *testing.T) {
 						ValueDecimal: "4.00",
 					},
 					Quantity:  1,
-					ProductID: moov.PtrOf("11d58aa0-fb14-4aaf-ac04-8b7cfc282ca4"),
-					ImageIDs:  []string{image1.ImageID},
+					ProductID: &product.ProductID,
 					Options: []moov.CreateScheduledTransferLineItemOption{
 						{
 							Name:     "Oat Milk",
@@ -235,8 +246,7 @@ func Test_Schedules_LineItems(t *testing.T) {
 								Currency:     "USD",
 								ValueDecimal: "1.50",
 							},
-							Group:    moov.PtrOf("Milk"),
-							ImageIDs: []string{image1.ImageID},
+							Group: moov.PtrOf("Milk"),
 						},
 					},
 				},
@@ -274,7 +284,7 @@ func Test_Schedules_LineItems(t *testing.T) {
 					ValueDecimal: "4.00",
 				},
 				Quantity:  1,
-				ProductID: moov.PtrOf("11d58aa0-fb14-4aaf-ac04-8b7cfc282ca4"),
+				ProductID: &product.ProductID,
 				Images: []moov.ScheduledTransferImageMetadata{
 					{
 						ImageID:  image1.ImageID,
@@ -292,14 +302,6 @@ func Test_Schedules_LineItems(t *testing.T) {
 							ValueDecimal: "1.50",
 						},
 						Group: moov.PtrOf("Milk"),
-						Images: []moov.ScheduledTransferImageMetadata{
-							{
-								ImageID:  image1.ImageID,
-								AltText:  image1.AltText,
-								Link:     image1.Link,
-								PublicID: image1.PublicID,
-							},
-						},
 					},
 				},
 			},

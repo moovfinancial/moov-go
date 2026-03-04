@@ -131,6 +131,10 @@ func Test_Products(t *testing.T) {
 	image, err := mc.UploadImage(ctx, accountID, imgReader, metadata)
 	require.NoError(t, err)
 	require.NotNil(t, image)
+	t.Cleanup(func() { _ = mc.DeleteImage(ctx, accountID, image.ImageID) })
+	// there is some async delay for the image to be available for products
+	// we will remove this in the near future
+	time.Sleep(1 * time.Second)
 
 	var createdProduct moov.Product
 
