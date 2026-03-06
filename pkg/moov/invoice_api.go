@@ -141,6 +141,16 @@ func (c Client) ListInvoices(ctx context.Context, accountID string, filters ...L
 	return CompletedListOrError[Invoice](resp)
 }
 
+// DeleteInvoice deletes a draft invoice. Only invoices in draft status can be deleted.
+func (c Client) DeleteInvoice(ctx context.Context, accountID, invoiceID string) error {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathInvoice, accountID, invoiceID))
+	if err != nil {
+		return err
+	}
+
+	return CompletedNilOrError(resp)
+}
+
 // ListInvoicePayments lists all payments for an invoice for a Moov account
 func (c Client) ListInvoicePayments(ctx context.Context, accountID, invoiceID string) ([]InvoicePayment, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathInvoicePayments, accountID, invoiceID))
