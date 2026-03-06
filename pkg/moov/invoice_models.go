@@ -3,28 +3,31 @@ package moov
 import "time"
 
 type Invoice struct {
-	InvoiceID         string           `json:"invoiceID"`
-	InvoiceNumber     string           `json:"invoiceNumber"`
-	Description       string           `json:"description"`
-	CustomerAccountID string           `json:"customerAccountID"`
-	PartnerAccountID  string           `json:"partnerAccountID,omitempty"`
-	Status            InvoiceStatus    `json:"status"`
-	LineItems         InvoiceLineItems `json:"lineItems"`
-	SubtotalAmount    AmountDecimal    `json:"subtotalAmount"`
-	TaxAmount         AmountDecimal    `json:"taxAmount"`
-	TotalAmount       AmountDecimal    `json:"totalAmount"`
-	PendingAmount     AmountDecimal    `json:"pendingAmount"`
-	PaidAmount        AmountDecimal    `json:"paidAmount"`
-	RefundedAmount    AmountDecimal    `json:"refundedAmount"`
-	DisputedAmount    AmountDecimal    `json:"disputedAmount"`
-	PaymentLinkCode   string           `json:"paymentLinkCode"`
-	Payments          []InvoicePayment `json:"payments"`
-	CreatedOn         time.Time        `json:"createdOn"`
-	InvoiceDate       *time.Time       `json:"invoiceDate"`
-	DueDate           *time.Time       `json:"dueDate"`
-	SentOn            *time.Time       `json:"sentOn"`
-	PaidOn            *time.Time       `json:"paidOn"`
-	CanceledOn        *time.Time       `json:"canceledOn"`
+	InvoiceID           string           `json:"invoiceID"`
+	InvoiceNumber       string           `json:"invoiceNumber"`
+	Description         string           `json:"description"`
+	CustomerAccountID   string           `json:"customerAccountID"`
+	PartnerAccountID    string           `json:"partnerAccountID,omitempty"`
+	CustomerDisplayName string           `json:"customerDisplayName"`
+	CustomerEmail       string           `json:"customerEmail"`
+	Status              InvoiceStatus    `json:"status"`
+	LineItems           InvoiceLineItems `json:"lineItems"`
+	SubtotalAmount      AmountDecimal    `json:"subtotalAmount"`
+	TaxAmount           AmountDecimal    `json:"taxAmount"`
+	TotalAmount         AmountDecimal    `json:"totalAmount"`
+	PendingAmount       AmountDecimal    `json:"pendingAmount"`
+	PaidAmount          AmountDecimal    `json:"paidAmount"`
+	RefundedAmount      AmountDecimal    `json:"refundedAmount"`
+	DisputedAmount      AmountDecimal    `json:"disputedAmount"`
+	PaymentLinkCode     string           `json:"paymentLinkCode"`
+	Payments            []InvoicePayment `json:"payments"`
+	CreatedOn           time.Time        `json:"createdOn"`
+	InvoiceDate         *time.Time       `json:"invoiceDate"`
+	DueDate             *time.Time       `json:"dueDate"`
+	SentOn              *time.Time       `json:"sentOn"`
+	PaidOn              *time.Time       `json:"paidOn"`
+	CanceledOn          *time.Time       `json:"canceledOn"`
+	DisabledOn          *time.Time       `json:"disabledOn"`
 }
 
 type InvoiceStatus string

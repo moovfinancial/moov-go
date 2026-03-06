@@ -88,3 +88,43 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 	latestPayment := payments[0]
 	require.Equal(t, *createdPayment, latestPayment)
 }
+
+func Test_Invoice_Delete(t *testing.T) {
+	var (
+		mc                = NewTestClient(t)
+		ctx               = t.Context()
+		accountID         = testtools.MERCHANT_ID
+		customerAccountID = testtools.PARTNER_ID
+	)
+
+	create := moov.CreateInvoice{
+		CustomerAccountID: customerAccountID,
+		Description:       "Invoice to delete",
+		LineItems: moov.CreateInvoiceLineItems{
+			Items: []moov.CreateInvoiceLineItem{
+				{
+					Name: "Disposable item",
+					BasePrice: moov.AmountDecimal{
+						Currency:     "USD",
+						ValueDecimal: "10.00",
+					},
+					Quantity: 1,
+				},
+			},
+		},
+	}
+
+	// create a draft invoice
+	createdInvoice, err := mc.CreateInvoice(ctx, accountID, create)
+	require.NoError(t, err)
+	require.Equal(t, moov.InvoiceStatusDraft, createdInvoice.Status)
+
+	// delete the draft invoice
+	err = mc.DeleteInvoice(ctx, accountID, createdInvoice.InvoiceID)
+	require.NoError(t, err)
+
+	// deleted invoice can still be fetched but has DisabledOn set
+	fetchedInvoice, err := mc.GetInvoice(ctx, accountID, createdInvoice.InvoiceID)
+	require.NoError(t, err)
+	require.NotNil(t, fetchedInvoice.DisabledOn)
+}
