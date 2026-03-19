@@ -104,4 +104,7 @@ const (
 
 	pathFeePlanAgreements = "/accounts/%s/fee-plan-agreements"
 	pathFeePlans          = "/accounts/%s/fee-plans"
+
+	pathIndustries        = "/industries"
+	pathEnrichmentProfile = "/enrichment/profile"
 )
