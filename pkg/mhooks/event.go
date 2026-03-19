@@ -99,6 +99,10 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 		eventData = &event.walletTransactionUpdated
 	case EventTypeBillingStatementCreated:
 		eventData = &event.billingStatementCreated
+	case EventTypeInvoiceCreated:
+		eventData = &event.invoiceCreated
+	case EventTypeInvoiceUpdated:
+		eventData = &event.invoiceUpdated
 	default:
 		return nil, fmt.Errorf("invalid event type: %v", event.EventType)
 	}
@@ -124,6 +128,7 @@ type Event struct {
 	bankAccountCreated       *BankAccountCreated
 	bankAccountDeleted       *BankAccountDeleted
 	bankAccountUpdated       *BankAccountUpdated
+	billingStatementCreated  *BillingStatementCreated
 	cancellationCreated      *CancellationCreated
 	cancellationUpdated      *CancellationUpdated
 	cardAutoUpdated          *CardAutoUpdated
@@ -131,6 +136,8 @@ type Event struct {
 	capabilityUpdated        *CapabilityUpdated
 	disputeCreated           *DisputeCreated
 	disputeUpdated           *DisputeUpdated
+	invoiceCreated           *InvoiceCreated
+	invoiceUpdated           *InvoiceUpdated
 	networkIDUpdated         *NetworkIDUpdated
 	paymentMethodDisabled    *PaymentMethodDisabled
 	paymentMethodEnabled     *PaymentMethodEnabled
@@ -150,7 +157,6 @@ type Event struct {
 	walletCreated            *WalletCreated
 	walletUpdated            *WalletUpdated
 	walletTransactionUpdated *WalletTransactionUpdated
-	billingStatementCreated  *BillingStatementCreated
 }
 
 func (e Event) AccountCreated() (*AccountCreated, error) {
@@ -423,6 +429,22 @@ func (e Event) BillingStatementCreated() (*BillingStatementCreated, error) {
 	}
 
 	return e.billingStatementCreated, nil
+}
+
+func (e Event) InvoiceCreated() (*InvoiceCreated, error) {
+	if e.EventType != EventTypeInvoiceCreated {
+		return nil, newInvalidEventTypeError(EventTypeInvoiceCreated, e.EventType)
+	}
+
+	return e.invoiceCreated, nil
+}
+
+func (e Event) InvoiceUpdated() (*InvoiceUpdated, error) {
+	if e.EventType != EventTypeInvoiceUpdated {
+		return nil, newInvalidEventTypeError(EventTypeInvoiceUpdated, e.EventType)
+	}
+
+	return e.invoiceUpdated, nil
 }
 
 func newInvalidEventTypeError(expected, got EventType) error {

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/moovfinancial/moov-go/pkg/mv2507"
 	"github.com/stretchr/testify/assert"
@@ -378,6 +379,14 @@ func TestListAccounts_V2507(t *testing.T) {
 	mc := NewTestClient(t)
 
 	accounts, err := mv2507.Accounts.List(context.Background(), *mc)
+	NoResponseError(t, err)
+	require.NotNil(t, accounts)
+}
+
+func Test_ListConnectedAccounts(t *testing.T) {
+	mc := NewTestClient(t)
+
+	accounts, err := mv2507.Accounts.ListConnected(context.Background(), *mc, testtools.PARTNER_ID)
 	NoResponseError(t, err)
 	require.NotNil(t, accounts)
 }

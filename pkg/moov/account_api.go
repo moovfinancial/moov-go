@@ -80,6 +80,19 @@ func (ac AccountClient[T, V]) List(ctx context.Context, client Client, opts ...L
 	return CompletedListOrError[V](resp)
 }
 
+// ListConnected returns a list of connected accounts on the specified accountID.
+// This is equivalent `List` if the given accountID is your own account.
+func (ac AccountClient[T, V]) ListConnected(ctx context.Context, client Client, accountID string, opts ...ListAccountFilter) ([]V, error) {
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathAccountsConnected, accountID),
+		prependArgs(opts, MoovVersion(ac.Version), AcceptJson())...)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[V](resp)
+}
+
 // Disconnect severs the connection between you and the account specified.
 // It will no longer be listed as active in the list of accounts.
 // This also means you'll only have read-only access to the account going forward for reporting purposes.
