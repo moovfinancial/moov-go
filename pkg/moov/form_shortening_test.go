@@ -19,7 +19,7 @@ func Test_ListIndustries(t *testing.T) {
 	result, err := mc.ListIndustries(context.Background())
 	require.NoError(t, err)
 	require.NotNil(t, result)
-	assert.NotEmpty(t, result.Industries)
+	require.NotEmpty(t, result.Industries)
 
 	// Spot-check that industry entries are populated
 	first := result.Industries[0]

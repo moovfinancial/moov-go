@@ -2,6 +2,7 @@ package moov
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 )
 
@@ -26,7 +27,7 @@ func (c Client) EnrichBusinessProfile(ctx context.Context, email string) (*Enric
 		Endpoint(http.MethodGet, pathEnrichmentProfile),
 		AcceptJson(),
 		callBuilderFn(func(call *callBuilder) error {
-			call.params["email"] = email
+			call.params["email"] = fmt.Sprintf("%s", email)
 			return nil
 		}))
 	if err != nil {
