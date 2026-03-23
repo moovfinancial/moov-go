@@ -191,17 +191,7 @@ func Test_Schedules_LineItems(t *testing.T) {
 	customerCard := createTemporaryCard(t, mc, customer.AccountID)
 	customerPmId := customerCard.PaymentMethods[0].PaymentMethodID
 
-	// Upload test images
-	_, imgReader1 := randomImage(t, 100, 100, encodePNG)
-	image1, err := mc.UploadImage(ctx, merchantAccountId, imgReader1, &moov.ImageMetadataRequest{
-		AltText: moov.PtrOf("Latte image"),
-	})
-	require.NoError(t, err)
-	require.NotNil(t, image1)
-
-	t.Cleanup(func() {
-		mc.DeleteImage(ctx, merchantAccountId, image1.ImageID)
-	})
+	product := createTemporaryProduct(t, mc, merchantAccountId)
 
 	runTransfer := moov.CreateRunTransfer{
 		Description: "recurring transfer",
@@ -225,8 +215,7 @@ func Test_Schedules_LineItems(t *testing.T) {
 						ValueDecimal: "4.00",
 					},
 					Quantity:  1,
-					ProductID: moov.PtrOf("11d58aa0-fb14-4aaf-ac04-8b7cfc282ca4"),
-					ImageIDs:  []string{image1.ImageID},
+					ProductID: &product.ProductID,
 					Options: []moov.CreateScheduledTransferLineItemOption{
 						{
 							Name:     "Oat Milk",
@@ -235,8 +224,7 @@ func Test_Schedules_LineItems(t *testing.T) {
 								Currency:     "USD",
 								ValueDecimal: "1.50",
 							},
-							Group:    moov.PtrOf("Milk"),
-							ImageIDs: []string{image1.ImageID},
+							Group: moov.PtrOf("Milk"),
 						},
 					},
 				},
@@ -265,6 +253,16 @@ func Test_Schedules_LineItems(t *testing.T) {
 		}
 	})
 
+	var wantImages []moov.ScheduledTransferImageMetadata
+	for _, img := range product.Images {
+		wantImages = append(wantImages, moov.ScheduledTransferImageMetadata{
+			ImageID:  img.ImageID,
+			AltText:  img.AltText,
+			Link:     img.Link,
+			PublicID: img.PublicID,
+		})
+	}
+
 	wantLineItems := &moov.ScheduledTransferLineItems{
 		Items: []moov.ScheduledTransferLineItem{
 			{
@@ -274,15 +272,8 @@ func Test_Schedules_LineItems(t *testing.T) {
 					ValueDecimal: "4.00",
 				},
 				Quantity:  1,
-				ProductID: moov.PtrOf("11d58aa0-fb14-4aaf-ac04-8b7cfc282ca4"),
-				Images: []moov.ScheduledTransferImageMetadata{
-					{
-						ImageID:  image1.ImageID,
-						AltText:  image1.AltText,
-						Link:     image1.Link,
-						PublicID: image1.PublicID,
-					},
-				},
+				ProductID: &product.ProductID,
+				Images:    wantImages,
 				Options: []moov.ScheduledTransferLineItemOption{
 					{
 						Name:     "Oat Milk",
@@ -292,14 +283,6 @@ func Test_Schedules_LineItems(t *testing.T) {
 							ValueDecimal: "1.50",
 						},
 						Group: moov.PtrOf("Milk"),
-						Images: []moov.ScheduledTransferImageMetadata{
-							{
-								ImageID:  image1.ImageID,
-								AltText:  image1.AltText,
-								Link:     image1.Link,
-								PublicID: image1.PublicID,
-							},
-						},
 					},
 				},
 			},
@@ -336,8 +319,7 @@ func Test_Schedules_LineItems(t *testing.T) {
 					Currency:     "USD",
 					ValueDecimal: "0.75",
 				},
-				Group:    moov.PtrOf("Flavors"),
-				ImageIDs: []string{image1.ImageID},
+				Group: moov.PtrOf("Flavors"),
 			},
 		)
 		upsert.Occurrences[0].RunTransfer.Amount.Value = 625
