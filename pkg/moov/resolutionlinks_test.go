@@ -10,8 +10,6 @@ import (
 func Test_ResolutionLinks(t *testing.T) {
 	mc := NewTestClient(t)
 
-	account := getLincolnBank(t, mc)
-
 	var resolutionLinkCode string
 
 	t.Run("create resolution link", func(t *testing.T) {
@@ -20,7 +18,7 @@ func Test_ResolutionLinks(t *testing.T) {
 				Email: "noreply@moov.io",
 			},
 		}
-		created, err := mc.CreateResolutionLink(BgCtx(), account.AccountID, createReq)
+		created, err := mc.CreateResolutionLink(BgCtx(), MERCHANT_ID, createReq)
 		NoResponseError(t, err)
 		require.NotNil(t, created)
 		require.NotEmpty(t, created.ResolutionLinkCode)
@@ -28,20 +26,20 @@ func Test_ResolutionLinks(t *testing.T) {
 	})
 
 	t.Run("list resolution links", func(t *testing.T) {
-		links, err := mc.ListResolutionLinks(BgCtx(), account.AccountID)
+		links, err := mc.ListResolutionLinks(BgCtx(), MERCHANT_ID)
 		NoResponseError(t, err)
 		require.NotEmpty(t, links)
 	})
 
 	t.Run("get resolution link", func(t *testing.T) {
-		link, err := mc.GetResolutionLink(BgCtx(), account.AccountID, resolutionLinkCode)
+		link, err := mc.GetResolutionLink(BgCtx(), MERCHANT_ID, resolutionLinkCode)
 		NoResponseError(t, err)
 		require.NotNil(t, link)
 		require.Equal(t, resolutionLinkCode, link.ResolutionLinkCode)
 	})
 
 	t.Run("delete resolution link", func(t *testing.T) {
-		err := mc.DeleteResolutionLink(BgCtx(), account.AccountID, resolutionLinkCode)
+		err := mc.DeleteResolutionLink(BgCtx(), MERCHANT_ID, resolutionLinkCode)
 		NoResponseError(t, err)
 	})
 }
