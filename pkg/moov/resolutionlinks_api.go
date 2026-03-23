@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (c Client) CreateResolutionLink(ctx context.Context, accountID string, resolutionLink CreateResolutionLink) (*ResolutionLinkRecord, error) {
+func (c Client) CreateResolutionLink(ctx context.Context, accountID string, resolutionLink CreateResolutionLinkRequest) (*ResolutionLinkResponse, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathResolutionLinks, accountID),
 		AcceptJson(),
@@ -14,27 +14,27 @@ func (c Client) CreateResolutionLink(ctx context.Context, accountID string, reso
 		return nil, err
 	}
 
-	return CompletedObjectOrError[ResolutionLinkRecord](resp)
+	return CompletedObjectOrError[ResolutionLinkResponse](resp)
 }
 
-func (c Client) GetResolutionLink(ctx context.Context, accountID string, resolutionLinkCode string) (*ResolutionLinkRecord, error) {
+func (c Client) GetResolutionLink(ctx context.Context, accountID string, resolutionLinkCode string) (*ResolutionLinkResponse, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathResolutionLink, accountID, resolutionLinkCode))
 	if err != nil {
 		return nil, err
 	}
 
-	return CompletedObjectOrError[ResolutionLinkRecord](resp)
+	return CompletedObjectOrError[ResolutionLinkResponse](resp)
 }
 
-func (c Client) ListResolutionLinks(ctx context.Context, accountID string) ([]ResolutionLinkRecord, error) {
+func (c Client) ListResolutionLinks(ctx context.Context, accountID string) ([]ResolutionLinkResponse, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathResolutionLinks, accountID))
 	if err != nil {
 		return nil, err
 	}
 
-	return CompletedListOrError[ResolutionLinkRecord](resp)
+	return CompletedListOrError[ResolutionLinkResponse](resp)
 }
 
 func (c Client) DeleteResolutionLink(ctx context.Context, accountID string, resolutionLinkCode string) error {

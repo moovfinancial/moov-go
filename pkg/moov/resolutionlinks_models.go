@@ -2,32 +2,23 @@ package moov
 
 import "time"
 
-type ResolutionLinkRecord struct {
-	ResolutionLinkCode string                `json:"resolution_link_code"`
-	PartnerAccountID   string                `json:"partner_account_id"`
-	Mode               string                `json:"account_mode"`
-	AccountID          string                `json:"account_id"`
-	CreatedOn          time.Time             `json:"created_on"`
-	UpdatedOn          time.Time             `json:"updated_on,omitempty"`
-	DisabledOn         *time.Time            `json:"disabled_on,omitempty"`
-	ExpiresOn          time.Time             `json:"expires_on"`
-	Recipient          Recipient             `json:"recipient"`
-	Options            ResolutionLinkOptions `json:"options"`
+type ResolutionLinkResponse struct {
+	ResolutionLinkCode string     `json:"code"`
+	PartnerAccountID   string     `json:"partnerAccountID"`
+	AccountID          string     `json:"accountID"`
+	CreatedOn          time.Time  `json:"createdOn"`
+	UpdatedOn          time.Time  `json:"updatedOn"`
+	ExpiresOn          time.Time  `json:"expiresOn"`
+	DisabledOn         *time.Time `json:"disabledOn,omitempty"`
+	Recipient          string     `json:"recipient"`
+	URL                string     `json:"url"`
 }
 
-type CreateResolutionLink struct {
-	PartnerAccountID string                `json:"partner_account_id,omitempty"`
-	Recipient        Recipient             `json:"recipient"`
-	Options          ResolutionLinkOptions `json:"options,omitempty"`
-	AccountID        string
+type CreateResolutionLinkRequest struct {
+	Recipient Recipient `json:"recipient"`
 }
 
 type Recipient struct {
 	Email string `json:"email"`
 	Phone *Phone `json:"phone,omitempty"`
-}
-
-type ResolutionLinkOptions struct {
-	MerchantName string `json:"merchant_name,omitempty"`
-	AccountName  string `json:"account_name,omitempty"`
 }

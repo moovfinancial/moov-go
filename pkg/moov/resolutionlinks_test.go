@@ -15,14 +15,9 @@ func Test_ResolutionLinks(t *testing.T) {
 	var resolutionLinkCode string
 
 	t.Run("create resolution link", func(t *testing.T) {
-		createReq := moov.CreateResolutionLink{
-			AccountID: account.AccountID,
+		createReq := moov.CreateResolutionLinkRequest{
 			Recipient: moov.Recipient{
 				Email: "noreply@moov.io",
-			},
-			Options: moov.ResolutionLinkOptions{
-				MerchantName: "Test Merchant",
-				AccountName:  "Test Account",
 			},
 		}
 		created, err := mc.CreateResolutionLink(BgCtx(), account.AccountID, createReq)
