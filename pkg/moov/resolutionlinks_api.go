@@ -9,6 +9,7 @@ func (c Client) CreateResolutionLink(ctx context.Context, accountID string, reso
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathResolutionLinks, accountID),
 		AcceptJson(),
+		MoovVersion(Version2026_04),
 		JsonBody(resolutionLink))
 	if err != nil {
 		return nil, err
@@ -19,7 +20,9 @@ func (c Client) CreateResolutionLink(ctx context.Context, accountID string, reso
 
 func (c Client) GetResolutionLink(ctx context.Context, accountID string, resolutionLinkCode string) (*ResolutionLinkResponse, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, pathResolutionLink, accountID, resolutionLinkCode))
+		Endpoint(http.MethodGet, pathResolutionLink, accountID, resolutionLinkCode),
+		MoovVersion(Version2026_04),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +32,9 @@ func (c Client) GetResolutionLink(ctx context.Context, accountID string, resolut
 
 func (c Client) ListResolutionLinks(ctx context.Context, accountID string) ([]ResolutionLinkResponse, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, pathResolutionLinks, accountID))
+		Endpoint(http.MethodGet, pathResolutionLinks, accountID),
+		MoovVersion(Version2026_04),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +44,9 @@ func (c Client) ListResolutionLinks(ctx context.Context, accountID string) ([]Re
 
 func (c Client) DeleteResolutionLink(ctx context.Context, accountID string, resolutionLinkCode string) error {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodDelete, pathResolutionLink, accountID, resolutionLinkCode))
+		Endpoint(http.MethodDelete, pathResolutionLink, accountID, resolutionLinkCode),
+		MoovVersion(Version2026_04),
+	)
 	if err != nil {
 		return err
 	}
