@@ -66,6 +66,8 @@ type CreateTransfer_Destination struct {
 type CreateTransfer_CardDetailsDestination struct {
 	// An optional override of the default card statement descriptor for a transfer.
 	DynamicDescriptor string `json:"dynamicDescriptor,omitempty"`
+	// Specifies the payout type for push-to-card disbursements. Use "loyalty" for loyalty payment disbursements.
+	PayoutType string `json:"payoutType,omitempty"`
 }
 
 // CreateTransfer_AchDetailsBase If transfer involves ACH, override default card acceptance properties.
