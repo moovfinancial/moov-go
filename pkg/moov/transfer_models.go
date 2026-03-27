@@ -491,9 +491,9 @@ type TransferLineItemImageMetadata struct {
 }
 
 type TransferAmountDetails struct {
-	TipAmount       *AmountDecimal `json:"tip"`
-	TaxAmount       *AmountDecimal `json:"tax"`
-	SurchargeAmount *AmountDecimal `json:"surcharge"`
+	TipAmount       *AmountDecimal `json:"tip,omitempty"`
+	TaxAmount       *AmountDecimal `json:"tax,omitempty"`
+	SurchargeAmount *AmountDecimal `json:"surcharge,omitempty"`
 }
 
 /* ======== enumerations ======== */
