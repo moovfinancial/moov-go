@@ -1,6 +1,6 @@
 module github.com/moovfinancial/moov-go
 
-go 1.24.0
+go 1.25.0
 
 toolchain go1.26.1
 
@@ -10,7 +10,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/time v0.14.0
+	golang.org/x/time v0.15.0
 )
 
 require (
