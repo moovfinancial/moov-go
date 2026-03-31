@@ -144,4 +144,7 @@ const (
 
 	pathProducts = "/accounts/%s/products"
 	pathProduct  = "/accounts/%s/products/%s"
+
+	pathIndustries        = "/industries"
+	pathEnrichmentProfile = "/enrichment/profile"
 )
