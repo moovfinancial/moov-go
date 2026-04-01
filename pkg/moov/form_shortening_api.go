@@ -11,6 +11,7 @@ import (
 func (c Client) ListIndustries(ctx context.Context) (*Industries, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathIndustries),
+		MoovVersion(Version2025_07),
 		AcceptJson())
 	if err != nil {
 		return nil, err
