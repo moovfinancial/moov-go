@@ -147,4 +147,7 @@ const (
 
 	pathIndustries        = "/industries"
 	pathEnrichmentProfile = "/enrichment/profile"
+  
+	pathResolutionLinks = "/accounts/%s/resolution-links"
+	pathResolutionLink  = "/accounts/%s/resolution-links/%s"
 )
