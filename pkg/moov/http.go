@@ -135,9 +135,6 @@ func standardDecoder(r io.Reader, contentType string, item any) error {
 func (r *httpCallResponse) Unmarshal(item any) error {
 	ct := strings.ToLower(r.resp.Header.Get("content-type"))
 
-	// TODO: remove debug logging
-	fmt.Printf("DEBUG raw response body: %s\n", r.body)
-
 	if sb, ok := item.(*strings.Builder); ok {
 		_, err := sb.Write(r.body)
 		return err
