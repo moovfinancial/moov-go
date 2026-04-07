@@ -31,6 +31,8 @@ const (
 	PaymentMethodType_ApplePay           PaymentMethodType = "apple-pay"
 	PaymentMethodType_PushToCard         PaymentMethodType = "push-to-card"
 	PaymentMethodType_PullFromCard       PaymentMethodType = "pull-from-card"
+	PaymentMethodType_PushToApplePay     PaymentMethodType = "push-to-apple-pay"
+	PaymentMethodType_PullFromApplePay   PaymentMethodType = "pull-from-apple-pay"
 	PaymentMethodType_CardPresentPayment PaymentMethodType = "card-present-payment"
 	PaymentMethodType_InstantBankCredit  PaymentMethodType = "instant-bank-credit" // #nosec G101
 )
