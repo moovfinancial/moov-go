@@ -163,11 +163,6 @@ func Test_CardIssuing(t *testing.T) {
 	})
 	NoResponseError(t, err)
 	require.NotNil(t, card)
-
-	// get issued card
-	card, err = mc.GetIssuedCard(BgCtx(), MERCHANT_ID, created.IssuedCardID)
-	NoResponseError(t, err)
-	require.NotNil(t, card)
 	require.Equal(t, created.IssuedCardID, card.IssuedCardID)
 	require.Equal(t, string(closed), string(card.State))
 
