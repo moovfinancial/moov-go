@@ -71,5 +71,6 @@ func closeIssuedCard(ctx context.Context, mc *moov.Client, accountID, cardID str
 	update := moov.UpdateIssuedCard{
 		State: &closed,
 	}
-	return mc.UpdateIssuedCard(ctx, accountID, cardID, update)
+	_, err := mc.UpdateIssuedCard(ctx, accountID, cardID, update)
+	return err
 }
