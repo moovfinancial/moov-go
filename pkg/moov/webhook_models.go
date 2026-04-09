@@ -52,11 +52,28 @@ const (
 
 type WebhookStatus string
 
-type UpsertWebhook struct {
-	URL         string        `json:"url"`
-	Description string        `json:"description"`
-	Status      WebhookStatus `json:"status"`
-	EventTypes  []EventType   `json:"eventTypes"`
+// CreateWebhook is the payload for creating a new webhook.
+type CreateWebhook struct {
+	// URL is the destination for webhook events. Must be a valid URL.
+	URL string `json:"url"`
+	// Description is an optional description for the webhook.
+	Description string `json:"description"`
+	// Status is the webhook status (enabled or disabled).
+	Status WebhookStatus `json:"status"`
+	// EventTypes is the list of event types to subscribe to.
+	EventTypes []EventType `json:"eventTypes"`
+}
+
+// UpdateWebhook is the payload for updating an existing webhook.
+type UpdateWebhook struct {
+	// URL is the destination for webhook events. Must be a valid URL.
+	URL string `json:"url"`
+	// Description is an optional description for the webhook.
+	Description string `json:"description"`
+	// Status is the webhook status (enabled or disabled).
+	Status WebhookStatus `json:"status"`
+	// EventTypes is the list of event types to subscribe to.
+	EventTypes []EventType `json:"eventTypes"`
 }
 
 type Webhook struct {
@@ -68,4 +85,26 @@ type Webhook struct {
 	EventTypes  []EventType   `json:"eventTypes"`
 	CreatedOn   time.Time     `json:"createdOn"`
 	UpdatedOn   time.Time     `json:"updatedOn"`
+}
+
+// WebhookSecret contains the signing secret for verifying webhook payloads.
+type WebhookSecret struct {
+	Secret string `json:"secret"`
+}
+
+// WebhookPing is returned when pinging a webhook endpoint.
+type WebhookPing struct {
+	// The webhook that was pinged.
+	Webhook Webhook `json:"webhook"`
+	// The request body sent to the target URL. It will contain an event type of `event.test` and an empty (null) data payload.
+	RequestBodySent map[string]any `json:"requestBodySent"`
+	// The response status code after sending a ping event to the URL.
+	ResponseStatusCode int32 `json:"responseStatusCode"`
+}
+
+// WebhookEventType describes a webhook event type that can be subscribed to.
+type WebhookEventType struct {
+	EventTypeID string    `json:"eventTypeID"`
+	Type        EventType `json:"type"`
+	Description string    `json:"description"`
 }

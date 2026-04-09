@@ -47,16 +47,16 @@ func (c Client) GetIssuedCard(ctx context.Context, accountID string, cardID stri
 
 // UpdateIssuedCard updates a specified issued card for the given account
 // https://docs.moov.io/api/money-movement/issuing/update/
-func (c Client) UpdateIssuedCard(ctx context.Context, accountID string, cardID string, update UpdateIssuedCard) error {
+func (c Client) UpdateIssuedCard(ctx context.Context, accountID string, cardID string, update UpdateIssuedCard) (*IssuedCard, error) {
 	httpResp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPatch, pathIssuedCard, accountID, cardID),
 		AcceptJson(),
 		JsonBody(update))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return CompletedNilOrError(httpResp)
+	return CompletedObjectOrError[IssuedCard](httpResp)
 }
 
 // ListIssuedCardAuthorizations retrieves all issued card authorizations for the given account

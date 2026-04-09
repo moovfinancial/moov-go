@@ -183,3 +183,46 @@ func createTemporaryCard(t *testing.T, mc *moov.Client, accountID string) *moov.
 	require.NotEmpty(t, card.PaymentMethods)
 	return card
 }
+
+func createTemporaryImage(t *testing.T, mc *moov.Client, accountID string) *moov.ImageMetadata {
+	_, imgReader := randomImage(t, 100, 100, encodePNG)
+	metadata := &moov.ImageMetadataRequest{
+		AltText: moov.PtrOf("SDK Test Image"),
+	}
+	image, err := mc.UploadImage(context.Background(), accountID, imgReader, metadata)
+	require.NoError(t, err)
+	require.NotNil(t, image)
+
+	t.Cleanup(func() { _ = mc.DeleteImage(context.Background(), accountID, image.ImageID) })
+
+	return image
+}
+
+func createTemporaryProduct(t *testing.T, mc *moov.Client, accountID string) *moov.Product {
+	// upload image for use with product
+	image := createTemporaryImage(t, mc, accountID)
+	// there is some async delay for the image to be available for products
+	// this will be removed in the near future
+	time.Sleep(1 * time.Second)
+
+	productRequest := moov.ProductRequest{
+		Title: "SDK Test Product",
+		BasePrice: moov.AmountDecimal{
+			Currency:     "USD",
+			ValueDecimal: "19.99",
+		},
+		Images: []moov.AssignProductImage{
+			{ImageID: image.ImageID},
+		},
+	}
+	product, err := mc.CreateProduct(context.Background(), accountID, productRequest)
+	require.NoError(t, err)
+	require.NotNil(t, product)
+
+	t.Cleanup(func() {
+		if product != nil {
+			_ = mc.DisableProduct(context.Background(), accountID, product.ProductID)
+		}
+	})
+	return product
+}

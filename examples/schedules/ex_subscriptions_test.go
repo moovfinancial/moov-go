@@ -18,15 +18,16 @@ func Test_Subscription(t *testing.T) {
 		Description: "Streaming Services",
 
 		// Add in a recurring schedule that goes on indefinitely that bills every month at this time.
-		Recur: &moov.Recur{
+		Recur: &moov.CreateRecur{
 			Start:          &env.Now,
 			RecurrenceRule: "FREQ=MONTHLY",
-			RunTransfer: moov.RunTransfer{
+			RunTransfer: moov.CreateRunTransfer{
 				Description: "Monthly payment",
 				Amount: moov.ScheduleAmount{
 					Value:    1,
 					Currency: "USD",
 				},
+				PartnerAccountID: env.PartnerID,
 				Source: moov.SchedulePaymentMethod{
 					PaymentMethodID: env.CustomerPmId,
 				},

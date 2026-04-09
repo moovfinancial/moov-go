@@ -100,18 +100,21 @@ type CreateTransferLineItems struct {
 // CreateTransferLineItem represents a single item in a transfer.
 type CreateTransferLineItem struct {
 	Name      string                         `json:"name"`
-	ProductID *string                        `json:"productID,omitempty"`
 	BasePrice AmountDecimal                  `json:"basePrice"`
 	Quantity  int                            `json:"quantity"`
 	Options   []CreateTransferLineItemOption `json:"options,omitempty"`
+
+	// Optional unique identifier associating the line item with a product.
+	// Images for the line item will be set from the product's images.
+	ProductID *string `json:"productID,omitempty"`
 }
 
 // CreateTransferLineItemOption represents an option for a line item.
 type CreateTransferLineItemOption struct {
-	Group         *string        `json:"group,omitempty"`
 	Name          string         `json:"name"`
-	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
 	Quantity      int            `json:"quantity"`
+	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
+	Group         *string        `json:"group,omitempty"`
 }
 
 // TransferStarted is where the request to create a transfer was recorded and kicked off but hasn't completed yet
@@ -334,20 +337,22 @@ type TransferDestination struct {
 	ApplePay          *ApplePayPaymentMethod    `json:"applePay,omitempty"`
 	AchDetails        *AchDetails               `json:"achDetails,omitempty"`
 	CardDetails       *CardDetails              `json:"cardDetails,omitempty"`
-	RtpDetails        *RtpDetails               `json:"rtpDetails,omitempty"`
+	// RtpDetails is deprecated; use InstantBankDetails instead
+	RtpDetails         *RtpDetails         `json:"rtpDetails,omitempty"`
+	InstantBankDetails *InstantBankDetails `json:"instantBankDetails,omitempty"`
 }
 
 // AchDetails ACH specific details about the transaction.
 type AchDetails struct {
-	Status      AchStatus     `json:"status"`
-	TraceNumber string        `json:"traceNumber"`
+	Status      *AchStatus    `json:"status,omitempty"`
+	TraceNumber *string       `json:"traceNumber,omitempty"`
 	Return      *AchException `json:"return,omitempty"`
 	Correction  *AchException `json:"correction,omitempty"`
 	// An optional override of the default NACHA company entry description for a transfer.
-	CompanyEntryDescription string `json:"companyEntryDescription,omitempty"`
+	CompanyEntryDescription *string `json:"companyEntryDescription,omitempty"`
 	// An optional override of the default NACHA company name for a transfer.
-	OriginatingCompanyName string             `json:"originatingCompanyName,omitempty"`
-	SecCode                SecCode            `json:"secCode,omitempty"`
+	OriginatingCompanyName *string            `json:"originatingCompanyName,omitempty"`
+	SecCode                *SecCode           `json:"secCode,omitempty"`
 	InitiatedOn            *time.Time         `json:"initiatedOn,omitempty"`
 	OriginatedOn           *time.Time         `json:"originatedOn,omitempty"`
 	CorrectedOn            *time.Time         `json:"correctedOn,omitempty"`
@@ -359,7 +364,7 @@ type AchDetails struct {
 
 // RtpDetails RTP specific details about the transaction.
 type RtpDetails struct {
-	Status RtpStatus `json:"status"`
+	Status *RtpStatus `json:"status,omitempty"`
 	// Code returned by rail network on failure.
 	NetworkResponseCode      *string         `json:"networkResponseCode,omitempty"`
 	FailureCode              *RtpFailureCode `json:"failureCode,omitempty"`
@@ -367,6 +372,25 @@ type RtpDetails struct {
 	CompletedOn              *time.Time      `json:"completedOn,omitempty"`
 	FailedOn                 *time.Time      `json:"failedOn,omitempty"`
 	AcceptedWithoutPostingOn *time.Time      `json:"acceptedWithoutPostingOn,omitempty"`
+}
+
+type InstantBankDetails struct {
+	// Network instant bank transfer was processed on
+	Network InstantBankNetwork `json:"network,omitempty"`
+
+	// Status of the instant bank details.
+	Status *InstantBankStatus `json:"status,omitempty"`
+
+	// Code returned by rail network on failure.
+	NetworkResponseCode *string `json:"networkResponseCode,omitempty"`
+
+	// Reason for failure.
+	FailureCode *InstantBankFailureCode `json:"failureCode,omitempty"`
+
+	InitiatedOn              *time.Time `json:"initiatedOn,omitempty"`
+	CompletedOn              *time.Time `json:"completedOn,omitempty"`
+	FailedOn                 *time.Time `json:"failedOn,omitempty"`
+	AcceptedWithoutPostingOn *time.Time `json:"acceptedWithoutPostingOn,omitempty"`
 }
 
 type patchTransfer struct {
@@ -428,19 +452,28 @@ type TransferLineItems struct {
 
 // TransferLineItem represents a single item on a created transfer.
 type TransferLineItem struct {
-	Name      string                   `json:"name"`
-	ProductID *string                  `json:"productID,omitempty"`
-	BasePrice AmountDecimal            `json:"basePrice"`
-	Quantity  int                      `json:"quantity"`
-	Options   []TransferLineItemOption `json:"options,omitempty"`
+	Name      string                          `json:"name"`
+	BasePrice AmountDecimal                   `json:"basePrice"`
+	Quantity  int                             `json:"quantity"`
+	Options   []TransferLineItemOption        `json:"options,omitempty"`
+	Images    []TransferLineItemImageMetadata `json:"images,omitempty"`
+	ProductID *string                         `json:"productID,omitempty"`
 }
 
 // TransferLineItemOption represents an option for a line item on a created transfer.
 type TransferLineItemOption struct {
-	Group         *string        `json:"group,omitempty"`
-	Name          string         `json:"name"`
-	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
-	Quantity      int            `json:"quantity"`
+	Name          string                          `json:"name"`
+	Quantity      int                             `json:"quantity"`
+	PriceModifier *AmountDecimal                  `json:"priceModifier,omitempty"`
+	Images        []TransferLineItemImageMetadata `json:"images,omitempty"`
+	Group         *string                         `json:"group,omitempty"`
+}
+
+type TransferLineItemImageMetadata struct {
+	ImageID  string  `json:"imageID"`
+	AltText  *string `json:"altText,omitempty"`
+	Link     string  `json:"link"`
+	PublicID string  `json:"publicID"`
 }
 
 /* ======== enumerations ======== */
@@ -562,7 +595,7 @@ type AchStatus string
 
 // List of ACHStatus
 const (
-	AchStatus_Initied    AchStatus = "initiated"
+	AchStatus_Initiated  AchStatus = "initiated"
 	AchStatus_Originated AchStatus = "originated"
 	AchStatus_Corrected  AchStatus = "corrected"
 	AchStatus_Returned   AchStatus = "returned"
@@ -595,6 +628,44 @@ const (
 	RtpFailureCode_InvalidAmount           RtpFailureCode = "invalid-amount"
 	RtpFailureCode_CustomerDeceased        RtpFailureCode = "customer-deceased"
 	RtpFailureCode_Other                   RtpFailureCode = "other"
+)
+
+// InstantBankNetwork is the network that the instant bank transfer was processed on
+type InstantBankNetwork string
+
+// List of InstantBankNetwork
+const (
+	InstantBankNetwork_FedNow InstantBankNetwork = "fednow"
+	InstantBankNetwork_RTP    InstantBankNetwork = "rtp"
+)
+
+// InstantBankStatus Status of the instant bank details.
+type InstantBankStatus string
+
+// List of InstantBankStatus
+const (
+	InstantBankStatus_Initiated              InstantBankStatus = "initiated"
+	InstantBankStatus_Completed              InstantBankStatus = "completed"
+	InstantBankStatus_Failed                 InstantBankStatus = "failed"
+	InstantBankStatus_AcceptedWithoutPosting InstantBankStatus = "accepted-without-posting"
+)
+
+// InstantBankFailureCode is the failure code of an instant bank transfer
+type InstantBankFailureCode string
+
+// List of InstantBankFailureCode
+const (
+	InstantBankFailureCode_ProcessingError         InstantBankFailureCode = "processing-error"
+	InstantBankFailureCode_InvalidAccount          InstantBankFailureCode = "invalid-account"
+	InstantBankFailureCode_AccountClosed           InstantBankFailureCode = "account-closed"
+	InstantBankFailureCode_AccountBlocked          InstantBankFailureCode = "account-blocked"
+	InstantBankFailureCode_InvalidField            InstantBankFailureCode = "invalid-field"
+	InstantBankFailureCode_TransactionNotSupported InstantBankFailureCode = "transaction-not-supported"
+	InstantBankFailureCode_LimitExceeded           InstantBankFailureCode = "limit-exceeded"
+	InstantBankFailureCode_InvalidAmount           InstantBankFailureCode = "invalid-amount"
+	InstantBankFailureCode_CustomerDeceased        InstantBankFailureCode = "customer-deceased"
+	InstantBankFailureCode_ParticipantNotAvailable InstantBankFailureCode = "participant-not-available"
+	InstantBankFailureCode_Other                   InstantBankFailureCode = "other"
 )
 
 // CancellationStatus Cancellation status.

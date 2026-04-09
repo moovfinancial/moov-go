@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 // CreateInvoice creates a new invoice for a Moov account
@@ -47,10 +48,10 @@ func (c Client) UpdateInvoice(ctx context.Context, accountID, invoiceID string, 
 	return CompletedObjectOrError[Invoice](resp)
 }
 
-// MarkInvoicePaid marks an invoice as paid outside of the Moov platform
-func (c Client) MarkInvoicePaid(ctx context.Context, accountID, invoiceID string, payment MarkInvoicePaid) (*Invoice, error) {
+// CreateInvoicePayment marks an invoice as paid outside of the Moov platform
+func (c Client) CreateInvoicePayment(ctx context.Context, accountID, invoiceID string, payment CreateInvoicePayment) (*InvoicePayment, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPut, pathInvoiceMarkPaid, accountID, invoiceID),
+		Endpoint(http.MethodPost, pathInvoicePayments, accountID, invoiceID),
 		AcceptJson(),
 		JsonBody(payment),
 	)
@@ -58,22 +59,8 @@ func (c Client) MarkInvoicePaid(ctx context.Context, accountID, invoiceID string
 		return nil, fmt.Errorf("calling http: %w", err)
 	}
 
-	return CompletedObjectOrError[Invoice](resp)
+	return StartedObjectOrError[InvoicePayment](resp)
 }
-
-// TODO(vince,12/15/2025): Uncomment once this is fully supported in production.
-// SendInvoice finalizes an invoice, creates and sends a payment link
-// func (c Client) SendInvoice(ctx context.Context, accountID, invoiceID string) (*Invoice, error) {
-// 	resp, err := c.CallHttp(ctx,
-// 		Endpoint(http.MethodPost, pathInvoiceSend, accountID, invoiceID),
-// 		AcceptJson(),
-// 	)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("calling http: %w), err
-// 	}
-
-// 	return CompletedObjectOrError[Invoice](resp)
-// }
 
 // ListInvoiceFilter represents a filter option for listing invoices
 type ListInvoiceFilter callArg
@@ -110,6 +97,38 @@ func WithInvoiceSkip(skip int) ListInvoiceFilter {
 	})
 }
 
+// WithInvoiceCreatedStartDateTime filters invoices created on or after the specified date/time
+func WithInvoiceCreatedStartDateTime(t time.Time) ListInvoiceFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["createdStartDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}
+
+// WithInvoiceCreatedEndDateTime filters invoices created on or before the specified date/time
+func WithInvoiceCreatedEndDateTime(t time.Time) ListInvoiceFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["createdEndDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}
+
+// WithInvoiceDueStartDateTime filters invoices with a due date on or after the specified date/time
+func WithInvoiceDueStartDateTime(t time.Time) ListInvoiceFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["dueStartDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}
+
+// WithInvoiceDueEndDateTime filters invoices with a due date on or before the specified date/time
+func WithInvoiceDueEndDateTime(t time.Time) ListInvoiceFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["dueEndDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}
+
 // ListInvoices lists all invoices for a Moov account
 // https://docs.moov.io/api/
 func (c Client) ListInvoices(ctx context.Context, accountID string, filters ...ListInvoiceFilter) ([]Invoice, error) {
@@ -120,4 +139,24 @@ func (c Client) ListInvoices(ctx context.Context, accountID string, filters ...L
 	}
 
 	return CompletedListOrError[Invoice](resp)
+}
+
+// DeleteInvoice deletes a draft invoice. Only invoices in draft status can be deleted.
+func (c Client) DeleteInvoice(ctx context.Context, accountID, invoiceID string) error {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathInvoice, accountID, invoiceID))
+	if err != nil {
+		return err
+	}
+
+	return CompletedNilOrError(resp)
+}
+
+// ListInvoicePayments lists all payments for an invoice for a Moov account
+func (c Client) ListInvoicePayments(ctx context.Context, accountID, invoiceID string) ([]InvoicePayment, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathInvoicePayments, accountID, invoiceID))
+	if err != nil {
+		return nil, fmt.Errorf("calling http: %w", err)
+	}
+
+	return CompletedListOrError[InvoicePayment](resp)
 }

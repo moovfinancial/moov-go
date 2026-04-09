@@ -86,6 +86,8 @@ func Test_Transfers(t *testing.T) {
 	})
 
 	t.Run("with line items", func(t *testing.T) {
+		product := createTemporaryProduct(t, mc, account.AccountID)
+
 		completed, _, err := mc.CreateTransfer(BgCtx(),
 			FACILITATOR_ID,
 			moov.CreateTransfer{
@@ -103,7 +105,7 @@ func Test_Transfers(t *testing.T) {
 					Items: []moov.CreateTransferLineItem{
 						{
 							Name:      "Bagel",
-							ProductID: moov.PtrOf("1e262367-de3e-4acb-ae02-7f56e83632ee"),
+							ProductID: &product.ProductID,
 							BasePrice: moov.AmountDecimal{
 								Currency:     "USD",
 								ValueDecimal: "0.03",
@@ -137,17 +139,28 @@ func Test_Transfers(t *testing.T) {
 				},
 			}).WaitForRailResponse()
 		NoResponseError(t, err)
-
 		require.NotNil(t, completed)
+
+		var wantImages []moov.TransferLineItemImageMetadata
+		for _, img := range product.Images {
+			wantImages = append(wantImages, moov.TransferLineItemImageMetadata{
+				ImageID:  img.ImageID,
+				AltText:  img.AltText,
+				Link:     img.Link,
+				PublicID: img.PublicID,
+			})
+		}
+
 		wantLineItems := &moov.TransferLineItems{
 			Items: []moov.TransferLineItem{
 				{
 					Name:      "Bagel",
-					ProductID: moov.PtrOf("1e262367-de3e-4acb-ae02-7f56e83632ee"),
+					ProductID: &product.ProductID,
 					BasePrice: moov.AmountDecimal{
 						Currency:     "USD",
 						ValueDecimal: "0.03",
 					},
+					Images: wantImages,
 					Options: []moov.TransferLineItemOption{
 						{
 							Name:     "Everything Bagel",
@@ -177,7 +190,6 @@ func Test_Transfers(t *testing.T) {
 		}
 		require.Equal(t, wantLineItems, completed.LineItems)
 	})
-
 }
 
 func Test_Cancellations(t *testing.T) {

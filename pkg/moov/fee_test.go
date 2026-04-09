@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/google/uuid"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
@@ -112,6 +113,20 @@ func Test_ListFees_WithDisputeID(t *testing.T) {
 	}
 }
 
+func Test_ListFees_WithResidualID(t *testing.T) {
+	mc := NewTestClient(t)
+
+	// there are no fees in production with a residualID yet
+	fees, err := mc.GetFees(
+		t.Context(),
+		FACILITATOR_ID,
+		moov.WithFeeResidualID(uuid.NewString()),
+	)
+	require.NoError(t, err)
+	require.NotNil(t, fees)
+	require.Len(t, fees, 0)
+}
+
 func Test_ListFees_WithDateTimeRange(t *testing.T) {
 	mc := NewTestClient(t)
 
@@ -151,6 +166,76 @@ func Test_FetchFees(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, fetchedFees)
 			assert.Equal(t, len(feeIDs), len(fetchedFees))
+		}
+	}
+}
+
+func Test_ListFeeRevenue(t *testing.T) {
+	mc := NewTestClient(t)
+
+	fees, err := mc.ListFeeRevenue(t.Context(), FACILITATOR_ID)
+	require.NoError(t, err)
+	require.NotNil(t, fees)
+}
+
+func Test_ListFeeRevenue_WithCount(t *testing.T) {
+	mc := NewTestClient(t)
+
+	fees, err := mc.ListFeeRevenue(
+		t.Context(),
+		FACILITATOR_ID,
+		moov.WithFeeRevenueCount(5),
+	)
+	require.NoError(t, err)
+	require.NotNil(t, fees)
+	if len(fees) > 0 {
+		assert.LessOrEqual(t, len(fees), 5)
+	}
+}
+
+func Test_ListFeeRevenue_WithDateTimeRange(t *testing.T) {
+	mc := NewTestClient(t)
+
+	fees, err := mc.ListFeeRevenue(
+		t.Context(),
+		FACILITATOR_ID,
+		moov.WithFeeRevenueStartDateTime("2024-01-01T00:00:00Z"),
+		moov.WithFeeRevenueEndDateTime("2099-12-31T23:59:59Z"),
+	)
+	require.NoError(t, err)
+	require.NotNil(t, fees)
+}
+
+func Test_ListFeeRevenue_WithTransferID(t *testing.T) {
+	mc := NewTestClient(t)
+
+	// First get some fee revenue to find a transferID
+	allFees, err := mc.ListFeeRevenue(t.Context(), FACILITATOR_ID, moov.WithFeeRevenueCount(100))
+	require.NoError(t, err)
+
+	// Find a fee with a transferID
+	var transferID string
+	for _, fee := range allFees {
+		if fee.GeneratedBy != nil && fee.GeneratedBy.TransferID != nil {
+			transferID = *fee.GeneratedBy.TransferID
+			break
+		}
+	}
+
+	if transferID != "" {
+		fees, err := mc.ListFeeRevenue(
+			t.Context(),
+			FACILITATOR_ID,
+			moov.WithFeeRevenueTransferID(transferID),
+		)
+		require.NoError(t, err)
+		require.NotNil(t, fees)
+
+		// Verify all returned fees are for the specified transfer
+		for _, fee := range fees {
+			require.NotNil(t, fee.GeneratedBy)
+			require.NotNil(t, fee.GeneratedBy.TransferID)
+			assert.Equal(t, transferID, *fee.GeneratedBy.TransferID)
 		}
 	}
 }

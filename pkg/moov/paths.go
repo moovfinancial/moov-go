@@ -47,8 +47,11 @@ const (
 	pathWalletTransactions = "/accounts/%s/wallets/%s/transactions"
 	pathWalletTransaction  = "/accounts/%s/wallets/%s/transactions/%s"
 
-	pathWebhooks = "/webhooks"
-	pathWebhook  = "/webhooks/%s"
+	pathWebhooks      = "/webhooks"
+	pathWebhook       = "/webhooks/%s"
+	pathWebhookPing   = "/webhooks/%s/ping"
+	pathWebhookSecret = "/webhooks/%s/secret" // #nosec G101 - false positive, this is a URL path not a credential
+	pathEventTypes    = "/event-types"
 
 	pathSweepConfigs = "/accounts/%s/sweep-configs"
 	pathSweepConfig  = "/accounts/%s/sweep-configs/%s"
@@ -93,9 +96,8 @@ const (
 	pathDisputeEvidence       = "/accounts/%s/disputes/%s/evidence/%s"
 	pathDisputeEvidenceFile   = "/accounts/%s/disputes/%s/evidence-file"
 
-	pathEndToEndPublicKey = "/end-to-end-keys"
-	pathEndToEndTokenTest = "/debug/end-to-end-token" //nolint:gosec
-
+	pathEndToEndPublicKey           = "/end-to-end-keys"
+	pathEndToEndTokenTest           = "/debug/end-to-end-token"
 	pathTerminalApplications        = "/terminal-applications"
 	pathTerminalApplication         = "/terminal-applications/%s"
 	pathTerminalApplicationVersions = "/terminal-applications/%s/versions"
@@ -111,6 +113,12 @@ const (
 	pathFeePlanAgreements = "/accounts/%s/fee-plan-agreements"
 	pathFeePlans          = "/accounts/%s/fee-plans"
 
+	pathFeeRevenue               = "/accounts/%s/fee-revenue"
+	pathPartnerPricingAgreements = "/accounts/%s/partner-pricing-agreements"
+	pathResiduals                = "/accounts/%s/residuals"
+	pathResidual                 = "/accounts/%s/residuals/%s"
+	pathResidualFees             = "/accounts/%s/residuals/%s/fees"
+
 	pathFees      = "/accounts/%s/fees"
 	pathFeesFetch = "/accounts/%s/fees/.fetch"
 
@@ -119,8 +127,7 @@ const (
 
 	pathInvoices        = "/accounts/%s/invoices"
 	pathInvoice         = "/accounts/%s/invoices/%s"
-	pathInvoiceMarkPaid = "/accounts/%s/invoices/%s/mark-paid"
-	pathInvoiceSend     = "/accounts/%s/invoices/%s/send"
+	pathInvoicePayments = "/accounts/%s/invoices/%s/payments"
 
 	pathIssuedCards                = "/issuing/%s/issued-cards"
 	pathIssuedCard                 = "/issuing/%s/issued-cards/%s"
@@ -129,4 +136,18 @@ const (
 	pathIssuingAuthorizationEvents = "/issuing/%s/authorizations/%s/events"
 	pathIssuingTransactions        = "/issuing/%s/card-transactions"
 	pathIssuingTransaction         = "/issuing/%s/card-transactions/%s"
+
+	pathImages        = "/accounts/%s/images"
+	pathImage         = "/accounts/%s/images/%s"
+	pathImageMetadata = "/accounts/%s/images/%s/metadata"
+	pathPublicImage   = "/images/%s"
+
+	pathProducts = "/accounts/%s/products"
+	pathProduct  = "/accounts/%s/products/%s"
+
+	pathIndustries        = "/industries"
+	pathEnrichmentProfile = "/enrichment/profile"
+
+	pathResolutionLinks = "/accounts/%s/resolution-links"
+	pathResolutionLink  = "/accounts/%s/resolution-links/%s"
 )

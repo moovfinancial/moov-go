@@ -158,13 +158,9 @@ func Test_CardIssuing(t *testing.T) {
 
 	// update issued card
 	closed := moov.UpdateIssuedCardState_Closed
-	err = mc.UpdateIssuedCard(BgCtx(), MERCHANT_ID, created.IssuedCardID, moov.UpdateIssuedCard{
+	card, err := mc.UpdateIssuedCard(BgCtx(), MERCHANT_ID, created.IssuedCardID, moov.UpdateIssuedCard{
 		State: &closed,
 	})
-	NoResponseError(t, err)
-
-	// get issued card
-	card, err := mc.GetIssuedCard(BgCtx(), MERCHANT_ID, created.IssuedCardID)
 	NoResponseError(t, err)
 	require.NotNil(t, card)
 	require.Equal(t, created.IssuedCardID, card.IssuedCardID)
@@ -194,7 +190,8 @@ func closeIssuedCard(ctx context.Context, mc *moov.Client, accountID, cardID str
 		update := moov.UpdateIssuedCard{
 			State: &closed,
 		}
-		return mc.UpdateIssuedCard(ctx, accountID, cardID, update)
+		_, err := mc.UpdateIssuedCard(ctx, accountID, cardID, update)
+		return err
 	}
 	return nil
 }

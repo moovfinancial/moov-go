@@ -3,28 +3,31 @@ package moov
 import "time"
 
 type Invoice struct {
-	InvoiceID         string           `json:"invoiceID"`
-	InvoiceNumber     string           `json:"invoiceNumber"`
-	Description       string           `json:"description"`
-	CustomerAccountID string           `json:"customerAccountID"`
-	PartnerAccountID  string           `json:"partnerAccountID,omitempty"`
-	Status            InvoiceStatus    `json:"status"`
-	LineItems         InvoiceLineItems `json:"lineItems"`
-	SubtotalAmount    AmountDecimal    `json:"subtotalAmount"`
-	TaxAmount         AmountDecimal    `json:"taxAmount"`
-	TotalAmount       AmountDecimal    `json:"totalAmount"`
-	PendingAmount     AmountDecimal    `json:"pendingAmount"`
-	PaidAmount        AmountDecimal    `json:"paidAmount"`
-	RefundedAmount    AmountDecimal    `json:"refundedAmount"`
-	DisputedAmount    AmountDecimal    `json:"disputedAmount"`
-	PaymentLinkCode   string           `json:"paymentLinkCode"`
-	Payments          []InvoicePayment `json:"payments"`
-	CreatedOn         time.Time        `json:"createdOn"`
-	InvoiceDate       *time.Time       `json:"invoiceDate"`
-	DueDate           *time.Time       `json:"dueDate"`
-	SentOn            *time.Time       `json:"sentOn"`
-	PaidOn            *time.Time       `json:"paidOn"`
-	CanceledOn        *time.Time       `json:"canceledOn"`
+	InvoiceID           string           `json:"invoiceID"`
+	InvoiceNumber       string           `json:"invoiceNumber"`
+	Description         string           `json:"description"`
+	CustomerAccountID   string           `json:"customerAccountID"`
+	PartnerAccountID    string           `json:"partnerAccountID,omitempty"`
+	CustomerDisplayName string           `json:"customerDisplayName"`
+	CustomerEmail       string           `json:"customerEmail"`
+	Status              InvoiceStatus    `json:"status"`
+	LineItems           InvoiceLineItems `json:"lineItems"`
+	SubtotalAmount      AmountDecimal    `json:"subtotalAmount"`
+	TaxAmount           AmountDecimal    `json:"taxAmount"`
+	TotalAmount         AmountDecimal    `json:"totalAmount"`
+	PendingAmount       AmountDecimal    `json:"pendingAmount"`
+	PaidAmount          AmountDecimal    `json:"paidAmount"`
+	RefundedAmount      AmountDecimal    `json:"refundedAmount"`
+	DisputedAmount      AmountDecimal    `json:"disputedAmount"`
+	PaymentLinkCode     string           `json:"paymentLinkCode"`
+	Payments            []InvoicePayment `json:"payments"`
+	CreatedOn           time.Time        `json:"createdOn"`
+	InvoiceDate         *time.Time       `json:"invoiceDate"`
+	DueDate             *time.Time       `json:"dueDate"`
+	SentOn              *time.Time       `json:"sentOn"`
+	PaidOn              *time.Time       `json:"paidOn"`
+	CanceledOn          *time.Time       `json:"canceledOn"`
+	DisabledOn          *time.Time       `json:"disabledOn"`
 }
 
 type InvoiceStatus string
@@ -39,9 +42,11 @@ const (
 )
 
 type InvoicePayment struct {
-	PaymentType InvoicePaymentType      `json:"paymentType"`
-	Transfer    *InvoiceTransferPayment `json:"transfer"`
-	External    *InvoiceExternalPayment `json:"external"`
+	Amount             AmountDecimal           `json:"amount"`
+	InvoicePaymentID   string                  `json:"invoicePaymentID"`
+	InvoicePaymentType InvoicePaymentType      `json:"invoicePaymentType"`
+	Transfer           *InvoiceTransferPayment `json:"transfer"`
+	External           *InvoiceExternalPayment `json:"external"`
 }
 
 // InvoicePaymentType represents the type of payment
@@ -59,10 +64,9 @@ type InvoiceTransferPayment struct {
 
 // InvoiceExternalPayment represents a payment made outside Moov
 type InvoiceExternalPayment struct {
-	Description string        `json:"description"`
-	ForeignID   string        `json:"foreignID,omitempty"`
-	PaymentDate *time.Time    `json:"paymentDate,omitempty"`
-	Amount      AmountDecimal `json:"amount"`
+	Description string     `json:"description"`
+	ForeignID   string     `json:"foreignID,omitempty"`
+	PaymentDate *time.Time `json:"paymentDate,omitempty"`
 }
 
 // CreateInvoice represents the request to create an invoice
@@ -85,11 +89,12 @@ type UpdateInvoice struct {
 	TaxAmount   *AmountDecimal          `json:"taxAmount,omitempty"`
 }
 
-// MarkInvoicePaid represents the request to mark an invoice as paid externally
-type MarkInvoicePaid struct {
-	ForeignID   *string    `json:"foreignID,omitempty"`
-	Description *string    `json:"description,omitempty"`
-	PaymentDate *time.Time `json:"paymentDate,omitempty"`
+// CreateInvoicePayment represents the request to create an external payment for an invoice
+type CreateInvoicePayment struct {
+	Amount      AmountDecimal `json:"amount"`
+	ForeignID   *string       `json:"foreignID,omitempty"`
+	Description *string       `json:"description,omitempty"`
+	PaymentDate *time.Time    `json:"paymentDate,omitempty"`
 }
 
 // InvoiceLineItems represents a collection of line items for an invoice
@@ -136,7 +141,6 @@ type CreateInvoiceLineItem struct {
 	Quantity  int32                         `json:"quantity"`
 	ProductID *string                       `json:"productID,omitempty"`
 	Options   []CreateInvoiceLineItemOption `json:"options,omitempty"`
-	ImageIDs  []string                      `json:"imageIDs,omitempty"`
 }
 
 // CreateInvoiceLineItemOption represents a modifier or option in an invoice creation/update request
@@ -145,5 +149,4 @@ type CreateInvoiceLineItemOption struct {
 	Quantity      int32          `json:"quantity"`
 	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
 	Group         *string        `json:"group,omitempty"`
-	ImageIDs      []string       `json:"imageIDs,omitempty"`
 }
