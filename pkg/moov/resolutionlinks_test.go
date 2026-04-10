@@ -13,9 +13,7 @@ func Test_ResolutionLinks(t *testing.T) {
 	cleanupExisting, err := mc.ListResolutionLinks(BgCtx(), MERCHANT_ID)
 	if err == nil {
 		for _, link := range cleanupExisting {
-			if link.Recipient == "noreply@moov.io" {
-				require.NoError(t, mc.DeleteResolutionLink(BgCtx(), MERCHANT_ID, link.ResolutionLinkCode))
-			}
+			require.NoError(t, mc.DeleteResolutionLink(BgCtx(), MERCHANT_ID, link.ResolutionLinkCode))
 		}
 	}
 
