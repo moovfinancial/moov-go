@@ -12,6 +12,7 @@ type ResolutionLinkResponse struct {
 	DisabledOn         *time.Time `json:"disabledOn,omitempty"`
 	Recipient          string     `json:"recipient"`
 	URL                string     `json:"url"`
+	Status             string     `json:"status"`
 }
 
 type CreateResolutionLinkRequest struct {
