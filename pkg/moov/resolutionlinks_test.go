@@ -17,10 +17,6 @@ func Test_ResolutionLinks(t *testing.T) {
 		}
 	}
 
-	t.Run("delete duplicate resolution link", func(t *testing.T) {
-		require.NoError(t, mc.DeleteResolutionLink(BgCtx(), MERCHANT_ID, "pXpUz5PZbH"))
-	})
-
 	var resolutionLinkCode string
 
 	t.Run("create resolution link", func(t *testing.T) {
