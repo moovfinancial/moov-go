@@ -58,6 +58,23 @@ func TestOptional_Value(t *testing.T) {
 	})
 }
 
+func TestOptional_IsNull(t *testing.T) {
+	t.Run("nil pointer", func(t *testing.T) {
+		var opt *Optional[int]
+		require.False(t, opt.IsNull())
+	})
+
+	t.Run("Set value", func(t *testing.T) {
+		opt := Set(42)
+		require.False(t, opt.IsNull())
+	})
+
+	t.Run("SetNull", func(t *testing.T) {
+		opt := SetNull[int]()
+		require.True(t, opt.IsNull())
+	})
+}
+
 func TestUpdateInvoice_MarshalJSON(t *testing.T) {
 	t.Run("empty update produces empty object", func(t *testing.T) {
 		u := UpdateInvoice{}

@@ -35,6 +35,11 @@ func (o *Optional[T]) Value() *T {
 	return o.value
 }
 
+// IsNull returns true if the field is explicitly set to null.
+func (o *Optional[T]) IsNull() bool {
+	return o != nil && o.value == nil
+}
+
 // MarshalJSON implements json.Marshaler.
 // If set with a value, marshals the value. If set to null, marshals as null.
 func (o Optional[T]) MarshalJSON() ([]byte, error) {
