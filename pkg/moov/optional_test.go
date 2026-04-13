@@ -84,8 +84,9 @@ func TestUpdateInvoice_MarshalJSON(t *testing.T) {
 	})
 
 	t.Run("set value is included", func(t *testing.T) {
+		desc := "new description"
 		u := UpdateInvoice{
-			Description: Set("new description"),
+			Description: &desc,
 		}
 		data, err := json.Marshal(u)
 		require.NoError(t, err)
@@ -107,8 +108,9 @@ func TestUpdateInvoice_MarshalJSON(t *testing.T) {
 	})
 
 	t.Run("mix of set, null, and unset", func(t *testing.T) {
+		desc := "updated"
 		u := UpdateInvoice{
-			Description: Set("updated"),
+			Description: &desc,
 			DueDate:     SetNull[time.Time](),
 			// Status, LineItems, InvoiceDate, TaxAmount left unset
 		}

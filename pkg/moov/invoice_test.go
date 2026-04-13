@@ -74,7 +74,7 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 	require.Nil(t, updatedInvoice.DueDate)
 
 	// Update invoice status to 'unpaid' to send the invoice to the customer.
-	updatedInvoice, err = mc.UpdateInvoice(ctx, accountID, createdInvoice.InvoiceID, moov.UpdateInvoice{Status: moov.Set(moov.InvoiceStatusUnpaid)})
+	updatedInvoice, err = mc.UpdateInvoice(ctx, accountID, createdInvoice.InvoiceID, moov.UpdateInvoice{Status: moov.PtrOf(moov.InvoiceStatusUnpaid)})
 	require.NoError(t, err)
 	require.Equal(t, moov.InvoiceStatusUnpaid, updatedInvoice.Status)
 
