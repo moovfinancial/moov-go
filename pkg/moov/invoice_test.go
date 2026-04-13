@@ -63,10 +63,15 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 
 	// Update the dueDate
 	now := time.Now().UTC()
-	update := moov.UpdateInvoice{DueDate: moov.PtrOf(now)}
+	update := moov.UpdateInvoice{DueDate: moov.Set(now)}
 	updatedInvoice, err := mc.UpdateInvoice(ctx, accountID, createdInvoice.InvoiceID, update)
 	require.NoError(t, err)
 	require.Equal(t, now, *updatedInvoice.DueDate)
+
+	// Unset the dueDate
+	updatedInvoice, err = mc.UpdateInvoice(ctx, accountID, createdInvoice.InvoiceID, moov.UpdateInvoice{DueDate: moov.SetNull[time.Time]()})
+	require.NoError(t, err)
+	require.Nil(t, updatedInvoice.DueDate)
 
 	// Update invoice status to 'unpaid' to send the invoice to the customer.
 	updatedInvoice, err = mc.UpdateInvoice(ctx, accountID, createdInvoice.InvoiceID, moov.UpdateInvoice{Status: moov.PtrOf(moov.InvoiceStatusUnpaid)})
