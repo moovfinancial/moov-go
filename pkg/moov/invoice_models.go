@@ -80,16 +80,16 @@ type CreateInvoice struct {
 }
 
 // UpdateInvoice represents the request to update an invoice.
-// Nullable fields (InvoiceDate, DueDate, TaxAmount) use *Optional to
+// Nullable fields (InvoiceDate, DueDate, TaxAmount) use *Nullable to
 // distinguish between "not updating" (nil), "unsetting" (SetNull),
 // and "setting to a value" (Set).
 type UpdateInvoice struct {
 	Description *string                  `json:"description,omitempty"`
 	LineItems   *CreateInvoiceLineItems  `json:"lineItems,omitempty"`
 	Status      *InvoiceStatus           `json:"status,omitempty"`
-	InvoiceDate *Optional[time.Time]     `json:"invoiceDate,omitempty"`
-	DueDate     *Optional[time.Time]     `json:"dueDate,omitempty"`
-	TaxAmount   *Optional[AmountDecimal] `json:"taxAmount,omitempty"`
+	InvoiceDate *Nullable[time.Time]     `json:"invoiceDate,omitempty"`
+	DueDate     *Nullable[time.Time]     `json:"dueDate,omitempty"`
+	TaxAmount   *Nullable[AmountDecimal] `json:"taxAmount,omitempty"`
 }
 
 // CreateInvoicePayment represents the request to create an external payment for an invoice

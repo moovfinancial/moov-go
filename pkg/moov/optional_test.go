@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestOptional_MarshalJSON(t *testing.T) {
+func TestNullable_MarshalJSON(t *testing.T) {
 	t.Run("set with value", func(t *testing.T) {
 		opt := Set("hello")
 		data, err := json.Marshal(opt)
@@ -24,9 +24,9 @@ func TestOptional_MarshalJSON(t *testing.T) {
 	})
 }
 
-func TestOptional_UnmarshalJSON(t *testing.T) {
+func TestNullable_UnmarshalJSON(t *testing.T) {
 	t.Run("value present", func(t *testing.T) {
-		var opt Optional[string]
+		var opt Nullable[string]
 		err := json.Unmarshal([]byte(`"world"`), &opt)
 		require.NoError(t, err)
 		require.NotNil(t, opt.Value())
@@ -34,16 +34,16 @@ func TestOptional_UnmarshalJSON(t *testing.T) {
 	})
 
 	t.Run("null present", func(t *testing.T) {
-		var opt Optional[string]
+		var opt Nullable[string]
 		err := json.Unmarshal([]byte(`null`), &opt)
 		require.NoError(t, err)
 		require.Nil(t, opt.Value())
 	})
 }
 
-func TestOptional_Value(t *testing.T) {
+func TestNullable_Value(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
-		var opt *Optional[int]
+		var opt *Nullable[int]
 		require.Nil(t, opt.Value())
 	})
 
@@ -58,9 +58,9 @@ func TestOptional_Value(t *testing.T) {
 	})
 }
 
-func TestOptional_IsNull(t *testing.T) {
+func TestNullable_IsNull(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
-		var opt *Optional[int]
+		var opt *Nullable[int]
 		require.False(t, opt.IsNull())
 	})
 
