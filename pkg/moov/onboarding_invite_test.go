@@ -9,6 +9,56 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestOnboardingInvite_CRUD(t *testing.T) {
+	mc := NewTestClient(t)
+
+	// Create an onboarding invite
+	invite, err := mc.CreateOnboardingInvite(BgCtx(), moov.OnboardingInviteRequest{
+		Scopes:       []string{"accounts.read"},
+		Capabilities: []string{"transfers"},
+	})
+	NoResponseError(t, err)
+	require.NotNil(t, invite)
+	require.NotEmpty(t, invite.Code)
+	require.NotEmpty(t, invite.Link)
+
+	// List onboarding invites
+	invites, err := mc.ListOnboardingInvites(BgCtx())
+	NoResponseError(t, err)
+	require.NotEmpty(t, invites)
+
+	// Get the specific onboarding invite by code
+	fetched, err := mc.GetOnboardingInvite(BgCtx(), invite.Code)
+	NoResponseError(t, err)
+	require.NotNil(t, fetched)
+	require.Equal(t, invite.Code, fetched.Code)
+
+	// Revoke the onboarding invite
+	err = mc.RevokeOnboardingInvite(BgCtx(), invite.Code)
+	NoResponseError(t, err)
+}
+
+func TestOnboardingInvite_GetNotFound(t *testing.T) {
+	mc := NewTestClient(t)
+
+	invite, err := mc.GetOnboardingInvite(BgCtx(), "non-existent-code")
+	require.Nil(t, invite)
+
+	var httpErr moov.HttpCallResponse
+	require.ErrorAs(t, err, &httpErr)
+	require.Equal(t, moov.StatusNotFound, httpErr.Status())
+}
+
+func TestOnboardingInvite_RevokeNotFound(t *testing.T) {
+	mc := NewTestClient(t)
+
+	err := mc.RevokeOnboardingInvite(BgCtx(), "non-existent-code")
+
+	var httpErr moov.HttpCallResponse
+	require.ErrorAs(t, err, &httpErr)
+	require.Equal(t, moov.StatusNotFound, httpErr.Status())
+}
+
 func TestOnboardingInviteRequest_Serialization(t *testing.T) {
 	t.Run("full request serializes correctly", func(t *testing.T) {
 		req := moov.OnboardingInviteRequest{

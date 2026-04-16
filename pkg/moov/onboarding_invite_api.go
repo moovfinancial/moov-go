@@ -45,8 +45,7 @@ func (c Client) GetOnboardingInvite(ctx context.Context, code string) (*Onboardi
 // RevokeOnboardingInvite revokes an onboarding invite by its code.
 func (c Client) RevokeOnboardingInvite(ctx context.Context, code string) error {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodDelete, pathOnboardingInvite, code),
-		AcceptJson())
+		Endpoint(http.MethodDelete, pathOnboardingInvite, code))
 	if err != nil {
 		return err
 	}
