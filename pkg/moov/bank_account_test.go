@@ -67,3 +67,41 @@ func Test_CreateBankAccount_WithBankAccount(t *testing.T) {
 		require.NoError(t, err)
 	})
 }
+
+func Test_RecreateBankAccount(t *testing.T) {
+	mc := NewTestClient(t)
+
+	account := getLincolnBank(t, mc)
+
+	req := moov.BankAccountRequest{
+		HolderName:    "Sir recreate and delete",
+		HolderType:    moov.HolderType_Individual,
+		AccountType:   moov.BankAccountType_Checking,
+		AccountNumber: randomBankAccountNumber(),
+		RoutingNumber: "273976369",
+	}
+
+	resp, err := mc.CreateBankAccount(BgCtx(), account.AccountID, moov.WithBankAccount(req)) // no x-wait-for
+
+	t.Cleanup(func() {
+		if resp != nil {
+			_ = mc.DeleteBankAccount(BgCtx(), account.AccountID, resp.BankAccountID)
+		}
+	})
+
+	t.Run("add bank account and wait for payment methods", func(t *testing.T) {
+		moov.DebugPrintResponse(err, fmt.Printf)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		require.Empty(t, resp.PaymentMethods) // didn't wait for payment methods
+	})
+
+	t.Run("re-create bank account with the same details", func(t *testing.T) {
+		second, err := mc.CreateBankAccount(BgCtx(), account.AccountID, moov.WithBankAccount(req), moov.WaitForPaymentMethod())
+		require.NoError(t, err)
+
+		require.Equal(t, resp.BankAccountID, second.BankAccountID)
+		require.Empty(t, resp.PaymentMethods) // TODO(adam): bug, needs fixed
+	})
+}
