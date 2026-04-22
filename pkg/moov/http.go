@@ -45,9 +45,12 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 	}
 	req.Header.Add("User-Agent", fmt.Sprintf("moov-go/%s", moovgo.Version()))
 
-	if call.token != nil {
+	switch {
+	case call.token != nil:
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", *call.token))
-	} else {
+	case c.Credentials.Token != "":
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.Credentials.Token))
+	default:
 		req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 	}
 

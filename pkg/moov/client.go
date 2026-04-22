@@ -61,6 +61,17 @@ func WithHttpClient(client *http.Client) ClientConfigurable {
 	}
 }
 
+// WithToken configures the client to authenticate outbound calls using the
+// given bearer token instead of Basic auth. Sets Credentials.Token and
+// revalidates. Intended for pass-through scenarios where a caller-supplied
+// access token should authenticate every call made by this client.
+func WithToken(token string) ClientConfigurable {
+	return func(c *Client) error {
+		c.Credentials.Token = token
+		return c.Credentials.Validate()
+	}
+}
+
 type Decoder func(r io.Reader, contentType string, item any) error
 
 func WithDecoder(dec Decoder) ClientConfigurable {
