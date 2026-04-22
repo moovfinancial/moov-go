@@ -92,6 +92,12 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 	require.Len(t, payments, 1)
 	latestPayment := payments[0]
 	require.Equal(t, *createdPayment, latestPayment)
+
+	// Re-fetch the invoice and verify InvoicePayments
+	paidInvoice, err := mc.GetInvoice(ctx, accountID, createdInvoice.InvoiceID)
+	require.NoError(t, err)
+	require.Len(t, paidInvoice.InvoicePayments, 1)
+	require.Equal(t, createdPayment.InvoicePaymentID, paidInvoice.InvoicePayments[0].InvoicePaymentID)
 }
 
 func Test_Invoice_Delete(t *testing.T) {
