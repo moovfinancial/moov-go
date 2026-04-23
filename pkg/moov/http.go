@@ -48,8 +48,8 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 	switch {
 	case call.token != nil:
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", *call.token))
-	case c.Credentials.Token != "":
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.Credentials.Token))
+	case c.bearerToken != "":
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.bearerToken))
 	default:
 		req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 	}
