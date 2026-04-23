@@ -16,6 +16,8 @@ type Client struct {
 
 	decoder Decoder
 
+	bearerToken string
+
 	moovURLScheme string
 }
 
@@ -43,6 +45,21 @@ func NewClient(configurables ...ClientConfigurable) (*Client, error) {
 	}
 
 	return client, nil
+}
+
+// WithToken configures the client to authenticate outbound calls using the
+// given bearer token instead of Basic auth. Sets Credentials.Token and
+// revalidates. Intended for pass-through scenarios where a caller-supplied
+// access token should authenticate every call made by this client.
+func (c *Client) WithBearerToken(t string) *Client {
+	return &Client{
+		rateLimiter:   c.rateLimiter,
+		decoder:       c.decoder,
+		moovURLScheme: c.moovURLScheme,
+		Credentials:   c.Credentials,
+		HttpClient:    c.HttpClient,
+		bearerToken:   t,
+	}
 }
 
 type ClientConfigurable func(c *Client) error
