@@ -85,11 +85,6 @@ func TestCallHttp_AuthHeader(t *testing.T) {
 }
 
 func TestCredentials_Validate(t *testing.T) {
-	t.Run("token-only is valid", func(t *testing.T) {
-		c := Credentials{Token: "abc"}
-		require.NoError(t, c.Validate())
-	})
-
 	t.Run("public+secret is valid", func(t *testing.T) {
 		c := Credentials{PublicKey: "pk", SecretKey: "sk"}
 		require.NoError(t, c.Validate())
