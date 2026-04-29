@@ -113,3 +113,20 @@ func TestParseEvent(t *testing.T) {
 		})
 	}
 }
+
+func TestBankAccountCreated(t *testing.T) {
+	ba := BankAccountCreated{
+		BankAccountID: uuid.NewString(),
+		AccountID:     uuid.NewString(),
+		Status:        moov.BankAccountStatus_New,
+	}
+
+	event := Event{
+		EventType:          EventTypeBankAccountCreated,
+		bankAccountCreated: &ba,
+	}
+
+	got, err := event.BankAccountCreated()
+	require.NoError(t, err)
+	require.Equal(t, ba, *got)
+}
