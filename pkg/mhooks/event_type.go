@@ -77,6 +77,8 @@ type BankAccountCreated struct {
 	BankAccountID string `json:"bankAccountID"`
 	// ID of the account where the bank account was created
 	AccountID string `json:"accountID"`
+	// Status of the bank account
+	Status moov.BankAccountStatus `json:"status"`
 }
 
 type BankAccountDeleted struct {
