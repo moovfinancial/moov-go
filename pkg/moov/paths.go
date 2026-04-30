@@ -29,8 +29,9 @@ const (
 	pathRepresentatives = "/accounts/%s/representatives"
 	pathRepresentative  = "/accounts/%s/representatives/%s"
 
-	pathCards = "/accounts/%s/cards"
-	pathCard  = "/accounts/%s/cards/%s"
+	pathCards        = "/accounts/%s/cards"
+	pathCard         = "/accounts/%s/cards/%s"
+	pathCardMetadata = "/accounts/%s/cards/metadata"
 
 	pathBankAccounts = "/accounts/%s/bank-accounts"
 	pathBankAccount  = "/accounts/%s/bank-accounts/%s"
