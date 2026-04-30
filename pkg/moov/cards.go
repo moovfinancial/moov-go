@@ -104,6 +104,31 @@ type CreateCard struct {
 	EndToEndToken *EndToEndToken `json:"e2ee,omitempty"`
 }
 
+// CardMetadata describes card BIN attributes and push/pull capabilities returned
+// by the card metadata lookup endpoint without linking the card.
+type CardMetadata struct {
+	Bin                  string `json:"bin,omitempty"`
+	Brand                string `json:"brand,omitempty"`
+	CardCategory         string `json:"cardCategory,omitempty"`
+	CardType             string `json:"cardType,omitempty"`
+	Commercial           *bool  `json:"commercial,omitempty"`
+	Regulated            *bool  `json:"regulated,omitempty"`
+	Issuer               string `json:"issuer,omitempty"`
+	IssuerCountry        string `json:"issuerCountry,omitempty"`
+	IssuerPhone          string `json:"issuerPhone,omitempty"`
+	IssuerURL            string `json:"issuerURL,omitempty"`
+	DomesticPullFromCard string `json:"domesticPullFromCard,omitempty"`
+	DomesticPushToCard   string `json:"domesticPushToCard,omitempty"`
+}
+
+// CardMetadataRequest is the request body for LookupCard. Provide either CardNumber
+// or EndToEndToken — exactly one must be populated.
+type CardMetadataRequest struct {
+	CardNumber string `json:"cardNumber,omitempty"`
+
+	EndToEndToken *EndToEndToken `json:"e2ee,omitempty"`
+}
+
 // CreateCard creates a new card for the given customer linked to their account
 // https://docs.moov.io/api/#tag/Cards/operation/card
 func (c Client) CreateCard(ctx context.Context, accountID string, card CreateCard) (*Card, error) {
@@ -122,6 +147,19 @@ func (c Client) CreateCard(ctx context.Context, accountID string, card CreateCar
 	default:
 		return nil, resp
 	}
+}
+
+// LookupCard returns BIN attributes and push/pull capabilities for a card identified
+// by its full PAN, without linking the card. Provide the PAN via CardNumber or via
+// EndToEndToken (encrypted) — exactly one must be populated.
+// https://docs.moov.io/api/#tag/Cards/operation/lookupCard
+func (c Client) LookupCard(ctx context.Context, accountID string, request CardMetadataRequest) (*CardMetadata, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathCardMetadata, accountID), AcceptJson(), JsonBody(request))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[CardMetadata](resp)
 }
 
 // ListCards lists all cards for the given customer Moov account
