@@ -4,10 +4,13 @@ import "time"
 
 // CreateTransfer struct for CreateTransfer
 type CreateTransfer struct {
-	Source         CreateTransfer_Source         `json:"source"`
-	Destination    CreateTransfer_Destination    `json:"destination"`
-	Amount         Amount                        `json:"amount"`
-	SalesTaxAmount *Amount                       `json:"salesTaxAmount,omitempty"`
+	Source      CreateTransfer_Source      `json:"source"`
+	Destination CreateTransfer_Destination `json:"destination"`
+
+	Amount         Amount                       `json:"amount"`
+	SalesTaxAmount *Amount                      `json:"salesTaxAmount,omitempty"`
+	AmountDetails  *CreateTransferAmountDetails `json:"amountDetails,omitempty"`
+
 	FacilitatorFee CreateTransfer_FacilitatorFee `json:"facilitatorFee,omitempty"`
 	// An optional description of the transfer for your own internal use.
 	Description string `json:"description,omitempty"`
@@ -117,6 +120,11 @@ type CreateTransferLineItemOption struct {
 	Group         *string        `json:"group,omitempty"`
 }
 
+type CreateTransferAmountDetails struct {
+	// Optional tip amount
+	TipAmount *AmountDecimal `json:"tip,omitempty"`
+}
+
 // TransferStarted is where the request to create a transfer was recorded and kicked off but hasn't completed yet
 type TransferStarted struct {
 	// Identifier for the transfer.
@@ -173,6 +181,8 @@ type Transfer struct {
 
 	// Optional sales tax amount. Transfer.Amount.Value should be inclusive of any sales tax and represents the total amount charged.
 	SalesTaxAmount *Amount `json:"salesTaxAmount,omitempty"`
+
+	AmountDetails *TransferAmountDetails `json:"amountDetails,omitempty"`
 
 	PaymentLinkCode *string `json:"paymentLinkCode,omitempty"`
 
@@ -474,6 +484,10 @@ type TransferLineItemImageMetadata struct {
 	AltText  *string `json:"altText,omitempty"`
 	Link     string  `json:"link"`
 	PublicID string  `json:"publicID"`
+}
+
+type TransferAmountDetails struct {
+	TipAmount *AmountDecimal `json:"tip,omitempty"`
 }
 
 /* ======== enumerations ======== */
