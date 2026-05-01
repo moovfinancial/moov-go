@@ -172,8 +172,7 @@ type CreateOccurrence struct {
 type CreateRunTransfer struct {
 	Description string `json:"description"`
 
-	Amount ScheduleAmount `json:"amount"`
-	// Deprecated: use AmountDetails.TaxAmount
+	Amount         ScheduleAmount                `json:"amount"`
 	SalesTaxAmount *ScheduleAmount               `json:"salesTaxAmount,omitempty"`
 	AmountDetails  *CreateScheduledAmountDetails `json:"amountDetails,omitempty"`
 
@@ -217,9 +216,7 @@ type CreateScheduledTransferLineItemOption struct {
 }
 
 type CreateScheduledAmountDetails struct {
-	TipAmount       *AmountDecimal `json:"tip,omitempty"`
-	TaxAmount       *AmountDecimal `json:"tax,omitempty"`
-	SurchargeAmount *AmountDecimal `json:"surcharge,omitempty"`
+	TipAmount *AmountDecimal `json:"tip,omitempty"`
 }
 
 type UpdateSchedule struct {
@@ -250,8 +247,7 @@ type UpdateOccurrence struct {
 type RunTransfer struct {
 	Description string `json:"description,omitempty"`
 
-	Amount ScheduleAmount `json:"amount,omitempty"`
-	// Deprecated: use AmountDetails.TaxAmount
+	Amount         ScheduleAmount          `json:"amount,omitempty"`
 	SalesTaxAmount *ScheduleAmount         `json:"salesTaxAmount,omitempty"`
 	AmountDetails  *ScheduledAmountDetails `json:"amountDetails,omitempty"`
 
@@ -274,9 +270,7 @@ func (r RunTransfer) ToCreateRunTransfer() CreateRunTransfer {
 
 	if r.AmountDetails != nil {
 		crt.AmountDetails = &CreateScheduledAmountDetails{
-			TipAmount:       r.AmountDetails.TipAmount,
-			TaxAmount:       r.AmountDetails.TaxAmount,
-			SurchargeAmount: r.AmountDetails.SurchargeAmount,
+			TipAmount: r.AmountDetails.TipAmount,
 		}
 	}
 
@@ -384,7 +378,5 @@ type ScheduledTransferImageMetadata struct {
 }
 
 type ScheduledAmountDetails struct {
-	TipAmount       *AmountDecimal `json:"tip,omitempty"`
-	TaxAmount       *AmountDecimal `json:"tax,omitempty"`
-	SurchargeAmount *AmountDecimal `json:"surcharge,omitempty"`
+	TipAmount *AmountDecimal `json:"tip,omitempty"`
 }

@@ -7,8 +7,7 @@ type CreateTransfer struct {
 	Source      CreateTransfer_Source      `json:"source"`
 	Destination CreateTransfer_Destination `json:"destination"`
 
-	Amount Amount `json:"amount"`
-	// Deprecated: use AmountDetails.TaxAmount
+	Amount         Amount                       `json:"amount"`
 	SalesTaxAmount *Amount                      `json:"salesTaxAmount,omitempty"`
 	AmountDetails  *CreateTransferAmountDetails `json:"amountDetails,omitempty"`
 
@@ -122,10 +121,6 @@ type CreateTransferLineItemOption struct {
 type CreateTransferAmountDetails struct {
 	// Optional tip amount
 	TipAmount *AmountDecimal `json:"tip,omitempty"`
-	// Optional tax amount
-	TaxAmount *AmountDecimal `json:"tax,omitempty"`
-	// Optional surcharge amount
-	SurchargeAmount *AmountDecimal `json:"surcharge,omitempty"`
 }
 
 // TransferStarted is where the request to create a transfer was recorded and kicked off but hasn't completed yet
@@ -182,7 +177,6 @@ type Transfer struct {
 	// A list of cancellations for a transfer.
 	Cancellations []Cancellation `json:"cancellations,omitempty"`
 
-	// Deprecated: use AmountDetails.TaxAmount
 	// Optional sales tax amount. Transfer.Amount.Value should be inclusive of any sales tax and represents the total amount charged.
 	SalesTaxAmount *Amount `json:"salesTaxAmount,omitempty"`
 
@@ -491,9 +485,7 @@ type TransferLineItemImageMetadata struct {
 }
 
 type TransferAmountDetails struct {
-	TipAmount       *AmountDecimal `json:"tip,omitempty"`
-	TaxAmount       *AmountDecimal `json:"tax,omitempty"`
-	SurchargeAmount *AmountDecimal `json:"surcharge,omitempty"`
+	TipAmount *AmountDecimal `json:"tip,omitempty"`
 }
 
 /* ======== enumerations ======== */
