@@ -150,4 +150,7 @@ const (
 
 	pathResolutionLinks = "/accounts/%s/resolution-links"
 	pathResolutionLink  = "/accounts/%s/resolution-links/%s"
+
+	pathOnboardingInvites = "/onboarding-invites"
+	pathOnboardingInvite  = "/onboarding-invites/%s"
 )
