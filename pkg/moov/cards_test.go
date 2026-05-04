@@ -234,7 +234,6 @@ func TestCardMetadataMarshal(t *testing.T) {
 }
 
 func TestLookupCard(t *testing.T) {
-	const accountID = "abc123"
 	const responseBody = `{
 		"bin": "411111",
 		"brand": "Visa",
@@ -290,14 +289,14 @@ func TestLookupCard(t *testing.T) {
 	t.Run("success with raw cardNumber", func(t *testing.T) {
 		c, cap := newClientWithServer(t, http.StatusOK, responseBody)
 
-		metadata, err := c.LookupCard(context.Background(), accountID, moov.CardMetadataRequest{
+		metadata, err := c.LookupCard(context.Background(), moov.CardMetadataRequest{
 			CardNumber: "4111111111111111",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, metadata)
 
 		assert.Equal(t, http.MethodPost, cap.method)
-		assert.Equal(t, "/accounts/"+accountID+"/cards/metadata", cap.path)
+		assert.Equal(t, "/cards/metadata", cap.path)
 		assert.Equal(t, "application/json", cap.accept)
 		assert.Equal(t, "application/json", cap.contentType)
 
@@ -322,7 +321,7 @@ func TestLookupCard(t *testing.T) {
 	t.Run("success with e2ee token", func(t *testing.T) {
 		c, cap := newClientWithServer(t, http.StatusOK, responseBody)
 
-		_, err := c.LookupCard(context.Background(), accountID, moov.CardMetadataRequest{
+		_, err := c.LookupCard(context.Background(), moov.CardMetadataRequest{
 			EndToEndToken: &moov.EndToEndToken{Token: "jwe-token"},
 		})
 		require.NoError(t, err)
@@ -339,7 +338,7 @@ func TestLookupCard(t *testing.T) {
 	t.Run("error response is surfaced", func(t *testing.T) {
 		c, _ := newClientWithServer(t, http.StatusUnprocessableEntity, `{"error":"cardNumber or e2ee is required"}`)
 
-		metadata, err := c.LookupCard(context.Background(), accountID, moov.CardMetadataRequest{})
+		metadata, err := c.LookupCard(context.Background(), moov.CardMetadataRequest{})
 		require.Error(t, err)
 		assert.Nil(t, metadata)
 	})

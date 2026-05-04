@@ -153,8 +153,8 @@ func (c Client) CreateCard(ctx context.Context, accountID string, card CreateCar
 // by its full PAN, without linking the card. Provide the PAN via CardNumber or via
 // EndToEndToken (encrypted) — exactly one must be populated.
 // https://docs.moov.io/api/#tag/Cards/operation/lookupCard
-func (c Client) LookupCard(ctx context.Context, accountID string, request CardMetadataRequest) (*CardMetadata, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathCardMetadata, accountID), AcceptJson(), JsonBody(request))
+func (c Client) LookupCard(ctx context.Context, request CardMetadataRequest) (*CardMetadata, error) {
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathCardMetadata), AcceptJson(), JsonBody(request))
 	if err != nil {
 		return nil, err
 	}
