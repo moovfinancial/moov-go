@@ -172,9 +172,8 @@ type CreateOccurrence struct {
 type CreateRunTransfer struct {
 	Description string `json:"description"`
 
-	Amount         ScheduleAmount                `json:"amount"`
-	SalesTaxAmount *ScheduleAmount               `json:"salesTaxAmount,omitempty"`
-	AmountDetails  *CreateScheduledAmountDetails `json:"amountDetails,omitempty"`
+	Amount         ScheduleAmount  `json:"amount"`
+	SalesTaxAmount *ScheduleAmount `json:"salesTaxAmount,omitempty"`
 
 	PartnerAccountID string                            `json:"partnerAccountID"`
 	Source           SchedulePaymentMethod             `json:"source"`
@@ -215,10 +214,6 @@ type CreateScheduledTransferLineItemOption struct {
 	Group *string `json:"group,omitempty"`
 }
 
-type CreateScheduledAmountDetails struct {
-	TipAmount *AmountDecimal `json:"tip,omitempty"`
-}
-
 type UpdateSchedule struct {
 	// Description of what this schedule is
 	Description string `json:"description,omitempty"`
@@ -247,9 +242,8 @@ type UpdateOccurrence struct {
 type RunTransfer struct {
 	Description string `json:"description,omitempty"`
 
-	Amount         ScheduleAmount          `json:"amount,omitempty"`
-	SalesTaxAmount *ScheduleAmount         `json:"salesTaxAmount,omitempty"`
-	AmountDetails  *ScheduledAmountDetails `json:"amountDetails,omitempty"`
+	Amount         ScheduleAmount  `json:"amount,omitempty"`
+	SalesTaxAmount *ScheduleAmount `json:"salesTaxAmount,omitempty"`
 
 	PartnerAccountID string                `json:"partnerAccountID,omitempty"`
 	Source           SchedulePaymentMethod `json:"source,omitempty"`
@@ -266,12 +260,6 @@ func (r RunTransfer) ToCreateRunTransfer() CreateRunTransfer {
 		PartnerAccountID: r.PartnerAccountID,
 		Source:           r.Source,
 		Destination:      r.Destination,
-	}
-
-	if r.AmountDetails != nil {
-		crt.AmountDetails = &CreateScheduledAmountDetails{
-			TipAmount: r.AmountDetails.TipAmount,
-		}
 	}
 
 	if r.LineItems != nil {
@@ -375,8 +363,4 @@ type ScheduledTransferImageMetadata struct {
 	Link string `json:"link"`
 	// A unique identifier for an image, used in public image links.
 	PublicID string `json:"publicID" validate:"regexp=[A-Za-z0-9_-]{21}"`
-}
-
-type ScheduledAmountDetails struct {
-	TipAmount *AmountDecimal `json:"tip,omitempty"`
 }
