@@ -17,7 +17,7 @@ func (c Client) CreateTransferConfig(ctx context.Context, accountID string, crea
 		return nil, err
 	}
 
-	return StartedObjectOrError[TransferConfig](resp)
+	return CompletedObjectOrError[TransferConfig](resp)
 }
 
 // GetTransferConfig retrieves the transfer config for the specified account.
