@@ -6,12 +6,12 @@ import (
 )
 
 // CreateTransferConfig creates a transfer config for the specified account.
-func (c Client) CreateTransferConfig(ctx context.Context, accountID string, create CreateTransferConfig) (*TransferConfig, error) {
+func (c Client) CreateTransferConfig(ctx context.Context, accountID string, config UpsertTransferConfig) (*TransferConfig, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathTransferConfig, accountID),
 		MoovVersion(Version2026_04),
 		AcceptJson(),
-		JsonBody(create),
+		JsonBody(config),
 	)
 	if err != nil {
 		return nil, err
@@ -35,12 +35,12 @@ func (c Client) GetTransferConfig(ctx context.Context, accountID string) (*Trans
 }
 
 // UpdateTransferConfig replaces the transfer config for the specified account.
-func (c Client) UpdateTransferConfig(ctx context.Context, accountID string, update PutTransferConfig) (*TransferConfig, error) {
+func (c Client) UpdateTransferConfig(ctx context.Context, accountID string, config UpsertTransferConfig) (*TransferConfig, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPut, pathTransferConfig, accountID),
 		MoovVersion(Version2026_04),
 		AcceptJson(),
-		JsonBody(update),
+		JsonBody(config),
 	)
 	if err != nil {
 		return nil, err

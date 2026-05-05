@@ -16,8 +16,8 @@ func ExampleClient_CreateTransferConfig() {
 
 	config, err := mc.CreateTransferConfig(context.Background(),
 		"00000000-00000000-00000000-00000000",
-		moov.CreateTransferConfig{
-			TipPresets: &moov.CreateTipPresets{
+		moov.UpsertTransferConfig{
+			TipPresets: &moov.UpsertTipPresets{
 				CalculationBasis:  moov.PtrOf(moov.TipCalculationBasis_PreTax),
 				PercentageOptions: []int{10, 15, 20},
 			},
@@ -56,8 +56,8 @@ func ExampleClient_UpdateTransferConfig() {
 
 	config, err := mc.UpdateTransferConfig(context.Background(),
 		"00000000-00000000-00000000-00000000",
-		moov.PutTransferConfig{
-			TipPresets: moov.PutTipPresets{
+		moov.UpsertTransferConfig{
+			TipPresets: &moov.UpsertTipPresets{
 				FixedAmountOptions: []moov.AmountDecimal{
 					{Currency: "USD", ValueDecimal: "1.00"},
 					{Currency: "USD", ValueDecimal: "2.00"},

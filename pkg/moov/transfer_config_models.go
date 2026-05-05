@@ -12,25 +12,13 @@ type TipPresets struct {
 	FixedAmountOptions []AmountDecimal      `json:"fixedAmountOptions,omitempty"`
 }
 
-// CreateTransferConfig request payload for creating a transfer config.
-type CreateTransferConfig struct {
-	TipPresets *CreateTipPresets `json:"tipPresets,omitempty"`
+// UpsertTransferConfig request payload for creating or replacing a transfer config.
+type UpsertTransferConfig struct {
+	TipPresets *UpsertTipPresets `json:"tipPresets,omitempty"`
 }
 
-// CreateTipPresets suggested customer tip values for transfer config creation.
-type CreateTipPresets struct {
-	CalculationBasis   *TipCalculationBasis `json:"calculationBasis,omitempty"`
-	PercentageOptions  []int                `json:"percentageOptions,omitempty"`
-	FixedAmountOptions []AmountDecimal      `json:"fixedAmountOptions,omitempty"`
-}
-
-// PutTransferConfig request payload for replacing a transfer config.
-type PutTransferConfig struct {
-	TipPresets PutTipPresets `json:"tipPresets"`
-}
-
-// PutTipPresets suggested customer tip values for transfer config replacement.
-type PutTipPresets struct {
+// UpsertTipPresets suggested customer tip values for transfer config creation or replacement.
+type UpsertTipPresets struct {
 	CalculationBasis   *TipCalculationBasis `json:"calculationBasis,omitempty"`
 	PercentageOptions  []int                `json:"percentageOptions,omitempty"`
 	FixedAmountOptions []AmountDecimal      `json:"fixedAmountOptions,omitempty"`

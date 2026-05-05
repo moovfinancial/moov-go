@@ -13,8 +13,8 @@ func Test_TransferConfig(t *testing.T) {
 		mc := NewTestClient(t)
 		account := CreateTemporaryTestAccount(t, mc, createTestIndividualAccount())
 
-		create := moov.CreateTransferConfig{
-			TipPresets: &moov.CreateTipPresets{
+		create := moov.UpsertTransferConfig{
+			TipPresets: &moov.UpsertTipPresets{
 				CalculationBasis:  moov.PtrOf(moov.TipCalculationBasis_PreTax),
 				PercentageOptions: []int{10, 15, 20},
 			},
@@ -32,8 +32,8 @@ func Test_TransferConfig(t *testing.T) {
 		require.NotNil(t, got)
 		require.Equal(t, created, got)
 
-		updateFixed := moov.PutTransferConfig{
-			TipPresets: moov.PutTipPresets{
+		updateFixed := moov.UpsertTransferConfig{
+			TipPresets: &moov.UpsertTipPresets{
 				FixedAmountOptions: []moov.AmountDecimal{
 					{Currency: "USD", ValueDecimal: "1.00"},
 					{Currency: "USD", ValueDecimal: "2.00"},
@@ -46,10 +46,11 @@ func Test_TransferConfig(t *testing.T) {
 		NoResponseError(t, err)
 		require.NotNil(t, updatedFixed)
 		require.NotNil(t, updatedFixed.TipPresets)
+		require.NotNil(t, updateFixed.TipPresets)
 		require.Equal(t, updateFixed.TipPresets.FixedAmountOptions, updatedFixed.TipPresets.FixedAmountOptions)
 
-		updatePercentages := moov.PutTransferConfig{
-			TipPresets: moov.PutTipPresets{
+		updatePercentages := moov.UpsertTransferConfig{
+			TipPresets: &moov.UpsertTipPresets{
 				CalculationBasis:  moov.PtrOf(moov.TipCalculationBasis_PostTax),
 				PercentageOptions: []int{12, 18, 25},
 			},
