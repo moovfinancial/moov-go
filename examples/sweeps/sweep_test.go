@@ -13,7 +13,7 @@ import (
 func TestSweepConfigsEndpoints(t *testing.T) {
 	mc, err := moov.NewClient()
 	require.NoError(t, err)
-	sweepServiceV2604 := mv2604.NewSweepService(mc)
+	sweepClientV2604 := mv2604.NewSweepClient(mc)
 
 	var (
 		ctx = context.Background()
@@ -64,7 +64,7 @@ func TestSweepConfigsEndpoints(t *testing.T) {
 	t.Logf("Got sweep config by ID: %+v", sweepConfig)
 
 	t.Run("v2604.UpdateSweepConfig unsets the statement descriptor", func(t *testing.T) {
-		sweepConfig, err = sweepServiceV2604.UpdateSweepConfig(ctx, accountID, sweepConfig.SweepConfigID, mv2604.UpdateSweepConfig{
+		sweepConfig, err = sweepClientV2604.UpdateSweepConfig(ctx, accountID, sweepConfig.SweepConfigID, mv2604.UpdateSweepConfig{
 			StatementDescriptor: moov.SetNull[string](),
 		})
 		require.NoError(t, err)

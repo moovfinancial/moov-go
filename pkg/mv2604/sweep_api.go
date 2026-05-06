@@ -6,15 +6,15 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
-type SweepService struct {
+type SweepClient struct {
 	client *moov.Client
 }
 
-func NewSweepService(client *moov.Client) SweepService {
-	return SweepService{client: client}
+func NewSweepClient(client *moov.Client) SweepClient {
+	return SweepClient{client: client}
 }
 
-func (s SweepService) UpdateSweepConfig(ctx context.Context, accountID, sweepConfigID string, update UpdateSweepConfig) (*moov.SweepConfig, error) {
+func (s SweepClient) UpdateSweepConfig(ctx context.Context, accountID, sweepConfigID string, update UpdateSweepConfig) (*moov.SweepConfig, error) {
 	return moov.UpdateSweepConfigGeneric(ctx, s.client, moov.Version2026_04, accountID, sweepConfigID, update)
 }
 
