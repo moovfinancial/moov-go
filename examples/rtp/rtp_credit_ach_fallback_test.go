@@ -32,9 +32,9 @@ func TestRTPCreditACHFallbackExample(t *testing.T) {
 	// Step 2: Get the source wallet for our RTP transfer
 	sourcePaymentMethods, err := mc.ListPaymentMethods(ctx, sourceAccountID, moov.WithPaymentMethodType("moov-wallet"))
 	require.NoError(t, err)
-	require.Len(t, sourcePaymentMethods, 1)
 
-	sourcePaymentMethod := sourcePaymentMethods[0]
+	sourcePaymentMethod, ok := testtools.FindMerchantWalletPaymentMethod(sourcePaymentMethods)
+	require.True(t, ok, "expected moov-wallet payment method for MERCHANT_WALLET_ID %s", testtools.MERCHANT_WALLET_ID)
 
 	// Step 3: Create account for the destination
 	account, _, err := mc.CreateAccount(ctx, moov.CreateAccount{
