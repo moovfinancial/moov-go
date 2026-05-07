@@ -3,8 +3,12 @@ package wallets
 import (
 	"context"
 	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/pkg/mv2604"
 )
 
 func ExampleClient_wallet() {
@@ -57,4 +61,42 @@ func ExampleClient_wallet() {
 		return
 	}
 	fmt.Printf("listed active wallets: %+v\n", listedWallets)
+}
+
+func TestWalletEndpoints(t *testing.T) {
+	mc, err := moov.NewClient()
+	require.NoError(t, err)
+	walletClientV2604 := mv2604.NewWalletClient(mc)
+
+	var (
+		ctx       = context.Background()
+		accountID = "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
+	)
+
+	createdWallet, err := mc.CreateWallet(ctx, accountID, moov.CreateWallet{
+		Name:        "general wallet for v2604 test",
+		Description: "initial description",
+		Metadata:    map[string]string{"foo": "bar"},
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, createdWallet.Description)
+	require.NotEmpty(t, createdWallet.Metadata)
+	t.Logf("Created wallet: %+v", createdWallet)
+
+	t.Run("v2604.UpdateWallet unsets the description and metadata", func(t *testing.T) {
+		updatedWallet, err := walletClientV2604.UpdateWallet(ctx, accountID, createdWallet.WalletID, mv2604.UpdateWallet{
+			Description: moov.SetNull[string](),
+			Metadata:    moov.SetNull[map[string]string](),
+		})
+		require.NoError(t, err)
+		require.Empty(t, updatedWallet.Description)
+		require.Empty(t, updatedWallet.Metadata)
+		t.Logf("unset description and metadata in wallet: %+v", updatedWallet)
+
+		fetchedWallet, err := mc.GetWallet(ctx, accountID, createdWallet.WalletID)
+		require.NoError(t, err)
+		require.Empty(t, fetchedWallet.Description)
+		require.Empty(t, fetchedWallet.Metadata)
+		t.Logf("got wallet with unset description and metadata: %+v", fetchedWallet)
+	})
 }
