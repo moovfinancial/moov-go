@@ -3,6 +3,7 @@ package moov
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -217,6 +218,27 @@ func (c Client) PatchTransfer(ctx context.Context, accountID, transferID string,
 		JsonBody(patch))
 	if err != nil {
 		return nil, err
+	}
+
+	return CompletedObjectOrError[Transfer](resp)
+}
+
+/* Exported functions used only for making client calls in the versioned packages (e.g. mv2604) */
+
+func PatchTransferGeneric[T any](ctx context.Context, client *Client, version Version, accountID, transferID string, update T) (*Transfer, error) {
+	if client == nil {
+		return nil, fmt.Errorf("client is nil")
+	}
+
+	resp, err := client.CallHttp(
+		ctx,
+		Endpoint(http.MethodPatch, pathTransfer, accountID, transferID),
+		MoovVersion(version),
+		AcceptJson(),
+		JsonBody(update),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("patching transfer: %w", err)
 	}
 
 	return CompletedObjectOrError[Transfer](resp)
