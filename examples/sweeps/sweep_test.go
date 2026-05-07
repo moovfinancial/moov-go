@@ -7,11 +7,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/pkg/mv2604"
 )
 
 func TestSweepConfigsEndpoints(t *testing.T) {
 	mc, err := moov.NewClient()
 	require.NoError(t, err)
+	sweepClientV2604 := mv2604.NewSweepClient(mc)
 
 	var (
 		ctx = context.Background()
@@ -60,6 +62,20 @@ func TestSweepConfigsEndpoints(t *testing.T) {
 	sweepConfig, err = mc.GetSweepConfig(ctx, accountID, sweepConfig.SweepConfigID)
 	require.NoError(t, err)
 	t.Logf("Got sweep config by ID: %+v", sweepConfig)
+
+	t.Run("v2604.UpdateSweepConfig unsets the statement descriptor", func(t *testing.T) {
+		sweepConfig, err = sweepClientV2604.UpdateSweepConfig(ctx, accountID, sweepConfig.SweepConfigID, mv2604.UpdateSweepConfig{
+			StatementDescriptor: moov.SetNull[string](),
+		})
+		require.NoError(t, err)
+		require.Nil(t, sweepConfig.StatementDescriptor)
+		t.Logf("unset statement descriptor in sweep config: %+v", sweepConfig)
+
+		sweepConfig, err = mc.GetSweepConfig(ctx, accountID, sweepConfig.SweepConfigID)
+		require.NoError(t, err)
+		require.Nil(t, sweepConfig.StatementDescriptor)
+		t.Logf("got sweep config with unset statement descriptor: %+v", sweepConfig)
+	})
 }
 
 func TestSweepEndpoints(t *testing.T) {
