@@ -17,8 +17,8 @@ func TestCreateAndPatchTransfer(t *testing.T) {
 	var (
 		ctx                   = context.Background()
 		partnerAccountID      = "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
-		sourcePaymentMethodID = "00000000-0000-0000-0000-000000000001"
-		destPaymentMethodID   = "00000000-0000-0000-0000-000000000002"
+		sourcePaymentMethodID = "b9a7153a-ad9b-4ada-b31b-f230fb8d1e8b" // ach-debit-fund
+		destPaymentMethodID   = "67ebda6c-de48-474c-b49d-2cd3aa7d3f92" // moov-wallet
 		initialForeignID      = "external-ref-123"
 	)
 
