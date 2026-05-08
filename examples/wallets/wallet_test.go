@@ -96,6 +96,23 @@ func TestWalletEndpoints(t *testing.T) {
 		t.Logf("Created wallet: %+v", created)
 	}
 
+	t.Run("v2604.UpdateWallet sets the description and metadata", func(t *testing.T) {
+		updatedWallet, err := walletClientV2604.UpdateWallet(ctx, accountID, walletID, mv2604.UpdateWallet{
+			Description: moov.Set("new description"),
+			Metadata:    moov.Set(map[string]string{"foo": "baz"}),
+		})
+		require.NoError(t, err)
+		require.Equal(t, "new description", updatedWallet.Description)
+		require.Equal(t, map[string]string{"foo": "baz"}, updatedWallet.Metadata)
+		t.Logf("set description and metadata in wallet: %+v", updatedWallet)
+
+		fetchedWallet, err := walletClientV2604.GetWallet(ctx, accountID, walletID)
+		require.NoError(t, err)
+		require.Equal(t, "new description", fetchedWallet.Description)
+		require.Equal(t, map[string]string{"foo": "baz"}, fetchedWallet.Metadata)
+		t.Logf("got wallet with set description and metadata: %+v", fetchedWallet)
+	})
+
 	t.Run("v2604.UpdateWallet unsets the description and metadata", func(t *testing.T) {
 		updatedWallet, err := walletClientV2604.UpdateWallet(ctx, accountID, walletID, mv2604.UpdateWallet{
 			Description: moov.SetNull[string](),
