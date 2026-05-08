@@ -7,19 +7,20 @@ import (
 )
 
 type WalletClient struct {
-	client *moov.Client
+	*moov.Client
 }
 
 func NewWalletClient(client *moov.Client) WalletClient {
-	return WalletClient{client: client}
+	return WalletClient{Client: client}
 }
 
 func (w WalletClient) UpdateWallet(ctx context.Context, accountID, walletID string, update UpdateWallet) (*moov.Wallet, error) {
-	return moov.UpdateWalletGeneric(ctx, w.client, moov.Version2026_04, accountID, walletID, update)
+	return moov.UpdateWalletGeneric(ctx, w.Client, moov.Version2026_04, accountID, walletID, update)
 }
 
 type UpdateWallet struct {
-	moov.UpdateWallet
+	Name   *string            `json:"name,omitempty"`
+	Status *moov.WalletStatus `json:"status,omitempty"`
 
 	// A free-form description of the wallet.
 	Description *moov.Nullable[string] `json:"description,omitempty"`

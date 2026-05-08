@@ -74,7 +74,7 @@ func TestWalletEndpoints(t *testing.T) {
 		accountID = testtools.MERCHANT_ID
 	)
 
-	wallets, err := mc.ListWallets(ctx, accountID, moov.WithWalletStatus(moov.WalletStatus_Active))
+	wallets, err := walletClientV2604.ListWallets(ctx, accountID, moov.WithWalletStatus(moov.WalletStatus_Active))
 	require.NoError(t, err)
 
 	var walletID string
@@ -86,7 +86,7 @@ func TestWalletEndpoints(t *testing.T) {
 		}
 	}
 	if walletID == "" {
-		created, err := mc.CreateWallet(ctx, accountID, moov.CreateWallet{
+		created, err := walletClientV2604.CreateWallet(ctx, accountID, moov.CreateWallet{
 			Name:        "general wallet for v2604 test",
 			Description: "initial description",
 			Metadata:    map[string]string{"foo": "bar"},
@@ -106,7 +106,7 @@ func TestWalletEndpoints(t *testing.T) {
 		require.Empty(t, updatedWallet.Metadata)
 		t.Logf("unset description and metadata in wallet: %+v", updatedWallet)
 
-		fetchedWallet, err := mc.GetWallet(ctx, accountID, walletID)
+		fetchedWallet, err := walletClientV2604.GetWallet(ctx, accountID, walletID)
 		require.NoError(t, err)
 		require.Empty(t, fetchedWallet.Description)
 		require.Empty(t, fetchedWallet.Metadata)
