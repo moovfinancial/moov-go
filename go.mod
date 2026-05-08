@@ -2,7 +2,7 @@ module github.com/moovfinancial/moov-go
 
 go 1.25.0
 
-toolchain go1.26.2
+toolchain go1.26.3
 
 require (
 	github.com/go-faker/faker/v4 v4.7.0
