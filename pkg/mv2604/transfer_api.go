@@ -7,15 +7,15 @@ import (
 )
 
 type TransferClient struct {
-	client *moov.Client
+	*moov.Client
 }
 
 func NewTransferClient(client *moov.Client) TransferClient {
-	return TransferClient{client: client}
+	return TransferClient{Client: client}
 }
 
 func (t TransferClient) PatchTransfer(ctx context.Context, accountID, transferID string, update PatchTransfer) (*moov.Transfer, error) {
-	return moov.PatchTransferGeneric(ctx, t.client, moov.Version2026_04, accountID, transferID, update)
+	return moov.PatchTransferGeneric(ctx, t.Client, moov.Version2026_04, accountID, transferID, update)
 }
 
 type PatchTransfer struct {
