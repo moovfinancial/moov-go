@@ -130,3 +130,24 @@ func (c Client) GetSweep(ctx context.Context, accountID string, walletID string,
 
 	return CompletedObjectOrError[Sweep](resp)
 }
+
+/* Exported functions used only for making client calls in the versioned packages (e.g. mv2604) */
+
+func UpdateSweepConfigGeneric[T any](ctx context.Context, client *Client, version Version, accountID string, sweepConfigID string, update T) (*SweepConfig, error) {
+	if client == nil {
+		return nil, fmt.Errorf("client is nil")
+	}
+
+	resp, err := client.CallHttp(
+		ctx,
+		Endpoint(http.MethodPatch, pathSweepConfig, accountID, sweepConfigID),
+		MoovVersion(version),
+		AcceptJson(),
+		JsonBody(update),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("updating sweep config: %w", err)
+	}
+
+	return CompletedObjectOrError[SweepConfig](resp)
+}
