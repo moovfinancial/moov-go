@@ -23,14 +23,14 @@ func TestSweepConfigsEndpoints(t *testing.T) {
 		minBalance = "1000.00"
 	)
 
-	sweepConfigs, err := mc.ListSweepConfigs(ctx, accountID)
+	sweepConfigs, err := sweepClientV2604.ListSweepConfigs(ctx, accountID)
 	require.NoError(t, err)
 
 	var sweepConfig *moov.SweepConfig
 	// If no sweep configs found, create one
 	if len(sweepConfigs) == 0 {
 		// Create a sweep config
-		sweepConfig, err := mc.CreateSweepConfig(ctx, moov.CreateSweepConfig{
+		sweepConfig, err := sweepClientV2604.CreateSweepConfig(ctx, moov.CreateSweepConfig{
 			AccountID:           accountID,
 			WalletID:            walletID,
 			Status:              moov.SweepConfigStatus_Enabled,
@@ -49,17 +49,15 @@ func TestSweepConfigsEndpoints(t *testing.T) {
 	minBalance = "2000.00"
 	statementDescriptor := "my-sweeps"
 
-	sweepConfig, err = mc.UpdateSweepConfig(ctx, moov.UpdateSweepConfig{
-		AccountID:           accountID,
-		SweepConfigID:       sweepConfig.SweepConfigID,
+	sweepConfig, err = sweepClientV2604.UpdateSweepConfig(ctx, accountID, sweepConfig.SweepConfigID, mv2604.UpdateSweepConfig{
 		MinimumBalance:      &minBalance,
-		StatementDescriptor: &statementDescriptor,
+		StatementDescriptor: moov.Set(statementDescriptor),
 	})
 	require.NoError(t, err)
 	t.Logf("updated sweep config: %+v", sweepConfig)
 
 	// Get the sweep config by ID
-	sweepConfig, err = mc.GetSweepConfig(ctx, accountID, sweepConfig.SweepConfigID)
+	sweepConfig, err = sweepClientV2604.GetSweepConfig(ctx, accountID, sweepConfig.SweepConfigID)
 	require.NoError(t, err)
 	t.Logf("Got sweep config by ID: %+v", sweepConfig)
 
@@ -71,7 +69,7 @@ func TestSweepConfigsEndpoints(t *testing.T) {
 		require.Nil(t, sweepConfig.StatementDescriptor)
 		t.Logf("unset statement descriptor in sweep config: %+v", sweepConfig)
 
-		sweepConfig, err = mc.GetSweepConfig(ctx, accountID, sweepConfig.SweepConfigID)
+		sweepConfig, err = sweepClientV2604.GetSweepConfig(ctx, accountID, sweepConfig.SweepConfigID)
 		require.NoError(t, err)
 		require.Nil(t, sweepConfig.StatementDescriptor)
 		t.Logf("got sweep config with unset statement descriptor: %+v", sweepConfig)
