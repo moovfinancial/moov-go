@@ -94,10 +94,9 @@ func TestVisaSandboxPush(t *testing.T) {
 	paymentMethods, err = mc.ListPaymentMethods(ctx, sourceAccountID, moov.WithPaymentMethodType("moov-wallet"))
 	require.NoError(t, err)
 
-	require.Len(t, paymentMethods, 1)
-
 	// This is the source payment method (Moov wallet)
-	sourcePaymentMethod := paymentMethods[0]
+	sourcePaymentMethod, ok := testtools.FindMerchantWalletPaymentMethod(paymentMethods)
+	require.True(t, ok, "expected moov-wallet payment method for MERCHANT_WALLET_ID %s", testtools.MERCHANT_WALLET_ID)
 
 	// Step 6: create transfer
 	completedTransfer, _, err := mc.CreateTransfer(

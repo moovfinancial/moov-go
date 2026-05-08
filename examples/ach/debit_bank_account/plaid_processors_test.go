@@ -94,10 +94,10 @@ func TestPlaidProcessorExample(t *testing.T) {
 	// destination Moov wallet ("moov-wallet" payment method).
 	paymentMethods, err = mc.ListPaymentMethods(ctx, destinationAccountID, moov.WithPaymentMethodType("moov-wallet"))
 	require.NoError(t, err)
-	require.Len(t, paymentMethods, 1)
 
 	// This is the destination payment method (Moov wallet)
-	destinationPaymentMethod := paymentMethods[0]
+	destinationPaymentMethod, ok := testtools.FindMerchantWalletPaymentMethod(paymentMethods)
+	require.True(t, ok, "expected moov-wallet payment method for MERCHANT_WALLET_ID %s", testtools.MERCHANT_WALLET_ID)
 
 	// Step 6: create transfer
 	completedTransfer, _, err := mc.CreateTransfer(

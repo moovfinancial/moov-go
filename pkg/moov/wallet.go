@@ -2,6 +2,7 @@ package moov
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -194,6 +195,27 @@ func (c Client) UpdateWallet(ctx context.Context, accountID string, walletID str
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPatch, pathWallet, accountID, walletID), AcceptJson(), JsonBody(update))
 	if err != nil {
 		return nil, err
+	}
+
+	return CompletedObjectOrError[Wallet](resp)
+}
+
+/* Exported functions used only for making client calls in the versioned packages (e.g. mv2604) */
+
+func UpdateWalletGeneric[T any](ctx context.Context, client *Client, version Version, accountID string, walletID string, update T) (*Wallet, error) {
+	if client == nil {
+		return nil, fmt.Errorf("client is nil")
+	}
+
+	resp, err := client.CallHttp(
+		ctx,
+		Endpoint(http.MethodPatch, pathWallet, accountID, walletID),
+		MoovVersion(version),
+		AcceptJson(),
+		JsonBody(update),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("updating wallet: %w", err)
 	}
 
 	return CompletedObjectOrError[Wallet](resp)

@@ -83,8 +83,6 @@ func TestMicroDepositExample(t *testing.T) {
 
 	// Step 4: find moov-wallet payment method for the linked bank account
 
-	// When we have only one bank account linked, we can avoid checking that the
-	// payment method is for user's bank account and just use the first one.
 	var paymentMethods []moov.PaymentMethod
 	require.Eventually(t, func() bool {
 		paymentMethods, err = mc.ListPaymentMethods(ctx, sourceAccountID, moov.WithPaymentMethodType("moov-wallet"))
@@ -93,10 +91,8 @@ func TestMicroDepositExample(t *testing.T) {
 		return len(paymentMethods) > 0
 	}, 10*time.Second, time.Second)
 
-	// We expect to have only one `moov-wallet` payment method on the connected account
-	require.Len(t, paymentMethods, 1)
-
-	sourcePaymentMethod := paymentMethods[0]
+	sourcePaymentMethod, ok := testtools.FindMerchantWalletPaymentMethod(paymentMethods)
+	require.True(t, ok, "expected moov-wallet payment method for MERCHANT_WALLET_ID %s", testtools.MERCHANT_WALLET_ID)
 
 	// Step 5: configure destination payment method
 
