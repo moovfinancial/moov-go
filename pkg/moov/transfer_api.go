@@ -238,7 +238,7 @@ func PatchTransferGeneric[T any](ctx context.Context, client *Client, version Ve
 		JsonBody(update),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("patching transfer: %w", err)
+		return nil, err
 	}
 
 	return CompletedObjectOrError[Transfer](resp)
