@@ -227,7 +227,7 @@ func (c Client) PatchTransfer(ctx context.Context, accountID, transferID string,
 
 func PatchTransferGeneric[T any](ctx context.Context, client *Client, version Version, accountID, transferID string, update T) (*Transfer, error) {
 	if client == nil {
-		return nil, fmt.Errorf("client is nil")
+		return nil, errors.New("client is nil")
 	}
 
 	resp, err := client.CallHttp(
