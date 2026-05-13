@@ -110,12 +110,16 @@ func TestDebitPullWithRefund(t *testing.T) {
 	t.Log("")
 
 	// Step 7: refund transfer
+	surcharge := moov.AmountDecimal{Currency: "USD", ValueDecimal: "0.03"}
 	refund, _, err := mc.RefundTransfer(
 		ctx,
 		partnerAccountID,
 		completedTransfer.TransferID,
 		moov.CreateRefund{
 			Amount: 97,
+			AmountDetails: &moov.RefundAmountDetails{
+				Surcharge: &surcharge,
+			},
 		},
 		moov.WithRefundWaitForRailResponse(),
 	)

@@ -21,14 +21,18 @@ func TestCreateAndPatchTransfer(t *testing.T) {
 		sourcePaymentMethodID = "aea716b2-3e25-42e7-9802-c75dd2dfabb1" // customer bank ach-debit-fund
 		destPaymentMethodID   = testtools.MERCHANT_WALLET_PM_ID        // moov-wallet
 		initialForeignID      = "external-ref-123"
+		surcharge             = moov.AmountDecimal{Currency: "USD", ValueDecimal: "0.03"}
 	)
 
 	started, err := mc.CreateTransfer(ctx, partnerAccountID, moov.CreateTransfer{
 		Source:      moov.CreateTransfer_Source{PaymentMethodID: sourcePaymentMethodID},
 		Destination: moov.CreateTransfer_Destination{PaymentMethodID: destPaymentMethodID},
 		Amount:      moov.Amount{Currency: "USD", Value: 100},
-		Metadata:    map[string]string{"foo": "bar"},
-		ForeignID:   &initialForeignID,
+		AmountDetails: &moov.CreateTransferAmountDetails{
+			Surcharge: &surcharge,
+		},
+		Metadata:  map[string]string{"foo": "bar"},
+		ForeignID: &initialForeignID,
 	}).Started()
 	require.NoError(t, err)
 	require.NotEmpty(t, started.TransferID)
