@@ -105,7 +105,7 @@ type CreateCard struct {
 }
 
 // CreateCard creates a new card for the given customer linked to their account
-// https://docs.moov.io/api/#tag/Cards/operation/card
+// https://docs.moov.io/api/sources/cards/create/
 func (c Client) CreateCard(ctx context.Context, accountID string, card CreateCard) (*Card, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathCards, accountID), AcceptJson(), JsonBody(card), WaitFor("payment-method"))
 	if err != nil {
@@ -125,7 +125,7 @@ func (c Client) CreateCard(ctx context.Context, accountID string, card CreateCar
 }
 
 // ListCards lists all cards for the given customer Moov account
-// https://docs.moov.io/api/#tag/Cards/operation/listCards
+// https://docs.moov.io/api/sources/cards/list/
 func (c Client) ListCards(ctx context.Context, accountID string) ([]Card, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathCards, accountID))
 	if err != nil {
@@ -136,7 +136,7 @@ func (c Client) ListCards(ctx context.Context, accountID string) ([]Card, error)
 }
 
 // GetCard retrieves a card for the given customer Moov account
-// https://docs.moov.io/api/#tag/Cards/operation/getCard
+// https://docs.moov.io/api/sources/cards/get/
 func (c Client) GetCard(ctx context.Context, accountID string, cardID string) (*Card, error) {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathCard, accountID, cardID), AcceptJson())
 	if err != nil {
@@ -230,7 +230,7 @@ func WithEndToEndToken(token EndToEndToken) CardUpdateFilter {
 // are populated (non-nil) in the request will be updated. If a value is provided for CVV, a new
 // verification ($0 authorization) will be submitted for the card. Updating the expiration date or
 // address will update the information stored on file for the card but will not be verified
-// https://docs.moov.io/api/#tag/Cards/operation/updateCard
+// https://docs.moov.io/api/sources/cards/update/
 func (c Client) UpdateCard(ctx context.Context, accountID string, cardID string, opt1 CardUpdateFilter, opts ...CardUpdateFilter) (*Card, error) {
 	// Create a new CardPatch payload and apply any filters
 	opts = append([]CardUpdateFilter{opt1}, opts...)
@@ -253,7 +253,7 @@ func (c Client) UpdateCard(ctx context.Context, accountID string, cardID string,
 }
 
 // DisableCard disables a card associated with a Moov account
-// https://docs.moov.io/api/#tag/Cards/operation/deleteCard
+// https://docs.moov.io/api/sources/cards/delete/
 func (c Client) DisableCard(ctx context.Context, accountID string, cardID string) error {
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodDelete, pathCard, accountID, cardID))
 	if err != nil {
