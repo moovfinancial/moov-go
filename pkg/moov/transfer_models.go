@@ -123,6 +123,8 @@ type CreateTransferLineItemOption struct {
 type CreateTransferAmountDetails struct {
 	// Optional tip amount
 	TipAmount *AmountDecimal `json:"tip,omitempty"`
+
+	// Surcharge is an optional fee added to the transfer amount, typically used to cover additional costs such as card scheme fees. Transfer.Amount should be inclusive of any surcharge and represents the total amount charged to the customer. Note that Surcharges must be enabled for the merchant account and are only valid on credit card payments.
 	Surcharge *AmountDecimal `json:"surcharge,omitempty"`
 }
 
@@ -256,6 +258,7 @@ type Refund struct {
 }
 
 type RefundAmountDetails struct {
+	// Surcharge is the amount of the original transfer's surcharge that was refunded.
 	Surcharge *AmountDecimal `json:"surcharge,omitempty"`
 }
 
