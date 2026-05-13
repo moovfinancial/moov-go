@@ -419,7 +419,8 @@ type patchTransfer struct {
 // CreateRefund Specifies a partial amount to refund. This request body is optional, an empty body will issue a refund for the full amount of the original transfer.
 type CreateRefund struct {
 	// Amount to refund in cents. If null, the original transfer's full amount will be refunded.
-	Amount        int64                `json:"amount,omitempty"`
+	Amount int64 `json:"amount,omitempty"`
+	// Optional amount details for the refund
 	AmountDetails *RefundAmountDetails `json:"amountDetails,omitempty"`
 }
 
