@@ -29,7 +29,12 @@ type CardMetadataRequest struct {
 // GetCardMetadata returns BIN attributes and push/pull capabilities for a card identified by its full PAN, without linking the card.
 // https://docs.moov.io/api/sources/cards/get-metadata/
 func (c Client) GetCardMetadata(ctx context.Context, request CardMetadataRequest) (*CardMetadata, error) {
-	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathCardMetadata), AcceptJson(), JsonBody(request))
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathCardMetadata),
+		AcceptJson(),
+		JsonBody(request),
+		MoovVersion(Version2026_07),
+	)
 	if err != nil {
 		return nil, err
 	}
