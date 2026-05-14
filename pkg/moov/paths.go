@@ -32,6 +32,8 @@ const (
 	pathCards = "/accounts/%s/cards"
 	pathCard  = "/accounts/%s/cards/%s"
 
+	pathCardMetadata = "/card-metadata"
+
 	pathBankAccounts = "/accounts/%s/bank-accounts"
 	pathBankAccount  = "/accounts/%s/bank-accounts/%s"
 
