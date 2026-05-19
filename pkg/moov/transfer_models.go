@@ -123,9 +123,6 @@ type CreateTransferLineItemOption struct {
 type CreateTransferAmountDetails struct {
 	// Optional tip amount
 	TipAmount *AmountDecimal `json:"tip,omitempty"`
-
-	// Surcharge is an optional fee added to the transfer amount, typically used to cover additional costs such as card scheme fees. Transfer.Amount should be inclusive of any surcharge and represents the total amount charged to the customer. Note that Surcharges must be enabled for the merchant account and are only valid on credit card payments.
-	Surcharge *AmountDecimal `json:"surcharge,omitempty"`
 }
 
 // TransferStarted is where the request to create a transfer was recorded and kicked off but hasn't completed yet
@@ -251,15 +248,9 @@ type Refund struct {
 	UpdatedOn time.Time    `json:"updatedOn,omitempty"`
 	Status    RefundStatus `json:"status,omitempty"`
 	// This field is deprecated and will be removed in December 2023.
-	FailureCode   *CardFailureCode     `json:"failureCode,omitempty"`
-	Amount        Amount               `json:"amount,omitempty"`
-	AmountDetails *RefundAmountDetails `json:"amountDetails,omitempty"`
-	CardDetails   *RefundCardDetails   `json:"cardDetails,omitempty"`
-}
-
-type RefundAmountDetails struct {
-	// Surcharge is the amount of the original transfer's surcharge that was refunded.
-	Surcharge *AmountDecimal `json:"surcharge,omitempty"`
+	FailureCode *CardFailureCode   `json:"failureCode,omitempty"`
+	Amount      Amount             `json:"amount,omitempty"`
+	CardDetails *RefundCardDetails `json:"cardDetails,omitempty"`
 }
 
 // RefundCardDetails struct for RefundCardDetails
@@ -420,8 +411,6 @@ type patchTransfer struct {
 type CreateRefund struct {
 	// Amount to refund in cents. If null, the original transfer's full amount will be refunded.
 	Amount int64 `json:"amount,omitempty"`
-	// Optional amount details for the refund
-	AmountDetails *RefundAmountDetails `json:"amountDetails,omitempty"`
 }
 
 type RefundStarted struct {
@@ -432,8 +421,7 @@ type RefundStarted struct {
 // CreateReversal struct for CreateReversal
 type CreateReversal struct {
 	// Amount to reverse in cents. If null, the original transfer's full amount will be reversed. Partial amounts will automatically trigger a refund instead of a cancellation.
-	Amount        int64                `json:"amount,omitempty"`
-	AmountDetails *RefundAmountDetails `json:"amountDetails,omitempty"`
+	Amount int64 `json:"amount,omitempty"`
 }
 
 // CreatedReversal struct for CreatedReversal
@@ -500,7 +488,6 @@ type TransferLineItemImageMetadata struct {
 
 type TransferAmountDetails struct {
 	TipAmount *AmountDecimal `json:"tip,omitempty"`
-	Surcharge *AmountDecimal `json:"surcharge,omitempty"`
 }
 
 /* ======== enumerations ======== */

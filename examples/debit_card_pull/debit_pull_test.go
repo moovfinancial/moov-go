@@ -6,6 +6,7 @@ import (
 
 	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/pkg/mv2607"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,6 +24,7 @@ func TestDebitPullWithRefund(t *testing.T) {
 
 	mc, err := moov.NewClient(moov.WithCredentials(moov.CredentialsFromEnv()))
 	require.NoError(t, err)
+	transferClientV2607 := mv2607.NewTransferClient(mc)
 
 	// Create a new context or use an existing one
 	ctx := context.Background()
@@ -111,13 +113,13 @@ func TestDebitPullWithRefund(t *testing.T) {
 
 	// Step 7: refund transfer
 	surcharge := moov.AmountDecimal{Currency: "USD", ValueDecimal: "0.03"}
-	refund, _, err := mc.RefundTransfer(
+	refund, _, err := transferClientV2607.RefundTransfer(
 		ctx,
 		partnerAccountID,
 		completedTransfer.TransferID,
-		moov.CreateRefund{
+		mv2607.CreateRefund{
 			Amount: 97,
-			AmountDetails: &moov.RefundAmountDetails{
+			AmountDetails: &mv2607.RefundAmountDetails{
 				Surcharge: &surcharge,
 			},
 		},
