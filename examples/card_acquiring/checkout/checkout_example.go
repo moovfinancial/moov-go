@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/pkg/mv2607"
 )
 
 func main() {
@@ -146,6 +147,10 @@ func main() {
 		Currency: "USD",
 		Value:    9900, // $99.00
 	}
+	surcharge := moov.AmountDecimal{
+		Currency:     "USD",
+		ValueDecimal: "1.98", // $1.98
+	}
 
 	source := moov.CreateTransfer_Source{
 		PaymentMethodID: cardPaymentMethodID,
@@ -163,14 +168,18 @@ func main() {
 	description := "Pay Instructor for May 15 Class"
 
 	// Create a transfer from the card to the wallet
-	completedTransfer, _, err := mc.CreateTransfer(context.Background(),
+	transferClientV2607 := mv2607.NewTransferClient(mc)
+	completedTransfer, _, err := transferClientV2607.CreateTransfer(context.Background(),
 		lincolnAccount.AccountID,
-		moov.CreateTransfer{
+		mv2607.CreateTransfer{
 			Source:         source,
 			Destination:    destination,
 			Amount:         amount,
 			FacilitatorFee: facilitatorFee,
 			Description:    description,
+			AmountDetails: &mv2607.CreateTransferAmountDetails{
+				Surcharge: &surcharge,
+			},
 		}).WaitForRailResponse()
 	if err != nil {
 		fmt.Println(err)
