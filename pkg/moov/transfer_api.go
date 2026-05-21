@@ -224,6 +224,81 @@ func (c Client) PatchTransfer(ctx context.Context, accountID, transferID string,
 
 /* Exported functions used only for making client calls in the versioned packages (e.g. mv2604) */
 
+func CreateTransferGeneric[TRequest any, TTransfer any](ctx context.Context, client *Client, version Version, partnerAccountID string, transfer TRequest, options ...CreateTransferArgs) CreateTransferGenericBuilder[TTransfer] {
+	builder := &createTransferBuilder{}
+	callArgs := []callArg{
+		MoovVersion(version),
+		AcceptJson(),
+		JsonBody(transfer),
+		WithTransferIdempotencyKey(uuid.New())(builder),
+	}
+
+	for _, opt := range options {
+		callArgs = append(callArgs, opt(builder))
+	}
+
+	return CreateTransferGenericBuilder[TTransfer]{
+		client:   client,
+		ctx:      ctx,
+		endpoint: Endpoint(http.MethodPost, pathTransfers, partnerAccountID),
+		callArgs: callArgs,
+	}
+}
+
+type CreateTransferGenericBuilder[TTransfer any] struct {
+	client   *Client
+	ctx      context.Context
+	endpoint EndpointArg
+	callArgs []callArg
+}
+
+// Started initiates the transfers request and doesn't wait beyond creating the transfer.
+func (r CreateTransferGenericBuilder[TTransfer]) Started() (*TransferStarted, error) {
+	if r.client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := r.client.CallHttp(r.ctx, r.endpoint, r.callArgs...)
+	if err != nil {
+		return nil, err
+	}
+
+	switch resp.Status() {
+	case StatusCompleted:
+		st, err := UnmarshalObjectResponse[TransferStarted](resp)
+		return st, err
+	case StatusStateConflict:
+		return nil, errors.Join(ErrXIdempotencyKey, resp)
+	default:
+		return nil, resp
+	}
+}
+
+// WaitForRailResponse starts a transfer request and waits for a response from the rail before returning the result.
+func (r CreateTransferGenericBuilder[TTransfer]) WaitForRailResponse() (*TTransfer, *TransferStarted, error) {
+	if r.client == nil {
+		return nil, nil, errors.New("client is nil")
+	}
+
+	resp, err := r.client.CallHttp(r.ctx, r.endpoint, append(r.callArgs, WaitFor("rail-response"))...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	switch resp.Status() {
+	case StatusCompleted:
+		transfer, err := UnmarshalObjectResponse[TTransfer](resp)
+		return transfer, nil, err
+	case StatusStarted:
+		transferStarted, err := UnmarshalObjectResponse[TransferStarted](resp)
+		return nil, transferStarted, err
+	case StatusStateConflict:
+		return nil, nil, errors.Join(ErrXIdempotencyKey, resp)
+	default:
+		return nil, nil, resp
+	}
+}
+
 func PatchTransferGeneric[T any](ctx context.Context, client *Client, version Version, accountID, transferID string, update T) (*Transfer, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -241,6 +316,38 @@ func PatchTransferGeneric[T any](ctx context.Context, client *Client, version Ve
 	}
 
 	return CompletedObjectOrError[Transfer](resp)
+}
+
+func ListTransfersGeneric[TTransfer any](ctx context.Context, client *Client, version Version, accountID string, filters ...ListTransferFilter) ([]TTransfer, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathTransfers, accountID),
+		prependArgs(filters, MoovVersion(version), AcceptJson())...)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[TTransfer](resp)
+}
+
+func GetTransferGeneric[TTransfer any](ctx context.Context, client *Client, version Version, accountID, transferID string) (*TTransfer, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathTransfer, accountID, transferID),
+		MoovVersion(version),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[TTransfer](resp)
 }
 
 type CreateRefundArgs callArg
@@ -282,6 +389,37 @@ func (c Client) RefundTransfer(ctx context.Context, partnerAccountID, transferID
 	}
 }
 
+func RefundTransferGeneric[TRequest any, TRefund any](ctx context.Context, client *Client, version Version, partnerAccountID, transferID string, refund TRequest, options ...CreateRefundArgs) (*TRefund, *RefundStarted, error) {
+	if client == nil {
+		return nil, nil, errors.New("client is nil")
+	}
+
+	args := prependArgs(options,
+		MoovVersion(version),
+		AcceptJson(),
+		WithRefundIdempotencyKey(uuid.New()),
+		JsonBody(refund),
+	)
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathRefunds, partnerAccountID, transferID),
+		args...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	switch resp.Status() {
+	case StatusCompleted:
+		r, err := CompletedObjectOrError[TRefund](resp)
+		return r, nil, err
+	case StatusStarted:
+		r, err := CompletedObjectOrError[RefundStarted](resp)
+		return nil, r, err
+	default:
+		return nil, nil, resp
+	}
+}
+
 // ListRefunds lists all refunds for a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/getRefunds
 func (c Client) ListRefunds(ctx context.Context, accountID, transferID string) ([]Refund, error) {
@@ -296,6 +434,23 @@ func (c Client) ListRefunds(ctx context.Context, accountID, transferID string) (
 	return CompletedListOrError[Refund](resp)
 }
 
+func ListRefundsGeneric[TRefund any](ctx context.Context, client *Client, version Version, accountID, transferID string) ([]TRefund, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathRefunds, accountID, transferID),
+		MoovVersion(version),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[TRefund](resp)
+}
+
 // GetRefund retrieves a refund for a transfer
 // https://docs.moov.io/api/index.html#tag/Transfers/operation/getRefund
 func (c Client) GetRefund(ctx context.Context, accountID, transferID, refundID string) (*Refund, error) {
@@ -308,6 +463,23 @@ func (c Client) GetRefund(ctx context.Context, accountID, transferID, refundID s
 	}
 
 	return CompletedObjectOrError[Refund](resp)
+}
+
+func GetRefundGeneric[TRefund any](ctx context.Context, client *Client, version Version, accountID, transferID, refundID string) (*TRefund, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathRefund, accountID, transferID, refundID),
+		MoovVersion(version),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[TRefund](resp)
 }
 
 type CreateReversalArgs callArg
@@ -332,6 +504,26 @@ func (c Client) ReverseTransfer(ctx context.Context, partnerAccountID, transferI
 	}
 
 	return CompletedObjectOrError[CreatedReversal](resp)
+}
+
+func ReverseTransferGeneric[TRequest any, TCreatedReversal any](ctx context.Context, client *Client, version Version, partnerAccountID, transferID string, reversal TRequest, options ...CreateReversalArgs) (*TCreatedReversal, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	args := prependArgs(options,
+		MoovVersion(version),
+		AcceptJson(),
+		WithReversalsIdempotencyKey(uuid.New()),
+		JsonBody(reversal),
+	)
+
+	resp, err := client.CallHttp(ctx, Endpoint(http.MethodPost, pathReversals, partnerAccountID, transferID), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[TCreatedReversal](resp)
 }
 
 // CancelTransfer cancels a transfer
