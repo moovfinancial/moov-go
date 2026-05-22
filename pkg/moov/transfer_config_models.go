@@ -2,7 +2,17 @@ package moov
 
 // TransferConfig configurable options for a transfer.
 type TransferConfig struct {
-	TipPresets *TipPresets `json:"tipPresets,omitempty"`
+	TipPresets       *TipPresets       `json:"tipPresets,omitempty"`
+	TransferControls []TransferControl `json:"transferControls,omitempty"`
+}
+
+// TransferControl holds per-account transfer capability flags.
+type TransferControl struct {
+	AccountID              string `json:"accountID,omitempty"`
+	PartnerAccountID       string `json:"partnerAccountID,omitempty"`
+	AllowDynamicDescriptor bool   `json:"allowDynamicDescriptor,omitempty"`
+	AllowSurcharge         bool   `json:"allowSurcharge,omitempty"`
+	DebtRepayment          bool   `json:"debtRepayment,omitempty"`
 }
 
 // TipPresets suggested customer tip values for a transfer.

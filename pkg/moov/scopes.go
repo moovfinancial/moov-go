@@ -126,6 +126,10 @@ func (sl *scopeList) ResolutionLinksWrite(accountID string) ScopeBuilder {
 	return appendScope("/accounts/%s/resolution-links.write", accountID)
 }
 
+func (sl *scopeList) TransfersWrite(accountID string) ScopeBuilder {
+	return appendScope("/accounts/%s/transfers.write", accountID)
+}
+
 // Boilerplate for setting the above.
 
 type scopeList struct{}

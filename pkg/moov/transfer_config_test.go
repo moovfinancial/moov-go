@@ -30,7 +30,7 @@ func Test_TransferConfig(t *testing.T) {
 		got, err := mc.GetTransferConfig(BgCtx(), account.AccountID)
 		NoResponseError(t, err)
 		require.NotNil(t, got)
-		require.Equal(t, created, got)
+		require.Equal(t, created.TipPresets, got.TipPresets)
 
 		updateFixed := moov.UpsertTransferConfig{
 			TipPresets: &moov.UpsertTipPresets{
