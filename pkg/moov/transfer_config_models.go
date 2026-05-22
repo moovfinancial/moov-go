@@ -1,8 +1,11 @@
 package moov
 
+import "encoding/json"
+
 // TransferConfig configurable options for a transfer.
 type TransferConfig struct {
-	TipPresets *TipPresets `json:"tipPresets,omitempty"`
+	TipPresets       *TipPresets      `json:"tipPresets,omitempty"`
+	TransferControls *json.RawMessage `json:"transferControls,omitempty"`
 }
 
 // TipPresets suggested customer tip values for a transfer.
