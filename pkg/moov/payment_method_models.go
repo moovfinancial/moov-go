@@ -76,17 +76,26 @@ type CardPaymentMethod struct {
 	PaymentMethods []BasicPaymentMethod `json:"paymentMethods,omitempty"`
 }
 
+// GooglePayAuthMethod The authentication method used for a Google Pay token.
+type GooglePayAuthMethod string
+
+// List of GooglePayAuthMethod
+const (
+	GooglePayAuthMethod_PanOnly       GooglePayAuthMethod = "PAN_ONLY"
+	GooglePayAuthMethod_Cryptogram3DS GooglePayAuthMethod = "CRYPTOGRAM_3DS"
+)
+
 // GooglePayPaymentMethod Describes a Google Pay token on a Moov account.
 type GooglePayPaymentMethod struct {
-	TokenID         string         `json:"tokenID,omitempty"`
-	Brand           CardBrand      `json:"brand,omitempty"`
-	CardType        CardType       `json:"cardType,omitempty"`
-	CardDisplayName string         `json:"cardDisplayName,omitempty"`
-	Fingerprint     string         `json:"fingerprint,omitempty"`
-	Expiration      CardExpiration `json:"expiration,omitempty"`
-	DynamicLastFour string         `json:"dynamicLastFour,omitempty"`
-	IssuerCountry   string         `json:"issuerCountry,omitempty"`
-	AuthMethod      string         `json:"authMethod,omitempty"` // "PAN_ONLY" | "CRYPTOGRAM_3DS"
+	TokenID         string              `json:"tokenID,omitempty"`
+	Brand           CardBrand           `json:"brand,omitempty"`
+	CardType        CardType            `json:"cardType,omitempty"`
+	CardDisplayName string              `json:"cardDisplayName,omitempty"`
+	Fingerprint     string              `json:"fingerprint,omitempty"`
+	Expiration      CardExpiration      `json:"expiration,omitempty"`
+	DynamicLastFour string              `json:"dynamicLastFour,omitempty"`
+	IssuerCountry   string              `json:"issuerCountry,omitempty"`
+	AuthMethod      GooglePayAuthMethod `json:"authMethod,omitempty"`
 }
 
 // ApplePayResponse Describes an Apple Pay token on a Moov account.

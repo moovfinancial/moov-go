@@ -48,5 +48,5 @@ func TestGooglePayPaymentMethodMarshal(t *testing.T) {
 	assert.Equal(t, "29", pm.GooglePay.Expiration.Year)
 	assert.Equal(t, "1234", pm.GooglePay.DynamicLastFour)
 	assert.Equal(t, "US", pm.GooglePay.IssuerCountry)
-	assert.Equal(t, "CRYPTOGRAM_3DS", pm.GooglePay.AuthMethod)
+	assert.Equal(t, moov.GooglePayAuthMethod_Cryptogram3DS, pm.GooglePay.AuthMethod)
 }
