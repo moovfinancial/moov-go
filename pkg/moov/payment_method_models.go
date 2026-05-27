@@ -8,6 +8,7 @@ type PaymentMethod struct {
 	BankAccount       *BankAccountPaymentMethod `json:"bankAccount,omitempty"`
 	Card              *CardPaymentMethod        `json:"card,omitempty"`
 	ApplePay          *ApplePayPaymentMethod    `json:"applePay,omitempty"`
+	GooglePay         *GooglePayPaymentMethod   `json:"googlePay,omitempty"`
 }
 
 // BasicPaymentMethod struct for BasicPaymentMethod
@@ -33,6 +34,9 @@ const (
 	PaymentMethodType_PullFromCard       PaymentMethodType = "pull-from-card"
 	PaymentMethodType_PushToApplePay     PaymentMethodType = "push-to-apple-pay"
 	PaymentMethodType_PullFromApplePay   PaymentMethodType = "pull-from-apple-pay"
+	PaymentMethodType_GooglePay          PaymentMethodType = "google-pay"
+	PaymentMethodType_PushToGooglePay    PaymentMethodType = "push-to-google-pay"
+	PaymentMethodType_PullFromGooglePay  PaymentMethodType = "pull-from-google-pay"
 	PaymentMethodType_CardPresentPayment PaymentMethodType = "card-present-payment"
 	PaymentMethodType_InstantBankCredit  PaymentMethodType = "instant-bank-credit" // #nosec G101
 )
@@ -70,6 +74,28 @@ type CardPaymentMethod struct {
 	DomesticPullFromCard DomesticPullFromCard `json:"domesticPullFromCard,omitempty"`
 	// Includes any payment methods generated for a newly linked card, removing the need to  call the List Payment Methods endpoint following a successful Link Card request.  **NOTE: This field is only populated for Link Card requests made with the `X-Wait-For` header.**
 	PaymentMethods []BasicPaymentMethod `json:"paymentMethods,omitempty"`
+}
+
+// GooglePayAuthMethod The authentication method used for a Google Pay token.
+type GooglePayAuthMethod string
+
+// List of GooglePayAuthMethod
+const (
+	GooglePayAuthMethod_PanOnly       GooglePayAuthMethod = "PAN_ONLY"
+	GooglePayAuthMethod_Cryptogram3DS GooglePayAuthMethod = "CRYPTOGRAM_3DS"
+)
+
+// GooglePayPaymentMethod Describes a Google Pay token on a Moov account.
+type GooglePayPaymentMethod struct {
+	TokenID         string              `json:"tokenID,omitempty"`
+	Brand           CardBrand           `json:"brand,omitempty"`
+	CardType        CardType            `json:"cardType,omitempty"`
+	CardDisplayName string              `json:"cardDisplayName,omitempty"`
+	Fingerprint     string              `json:"fingerprint,omitempty"`
+	Expiration      CardExpiration      `json:"expiration,omitempty"`
+	DynamicLastFour string              `json:"dynamicLastFour,omitempty"`
+	IssuerCountry   string              `json:"issuerCountry,omitempty"`
+	AuthMethod      GooglePayAuthMethod `json:"authMethod,omitempty"`
 }
 
 // ApplePayResponse Describes an Apple Pay token on a Moov account.
