@@ -286,6 +286,7 @@ type TransferSource struct {
 	Wallet            *WalletPaymentMethod       `json:"wallet,omitempty"`
 	Card              *CardPaymentMethod         `json:"card,omitempty"`
 	ApplePay          *ApplePayPaymentMethod     `json:"applePay,omitempty"`
+	GooglePay         *GooglePayPaymentMethod    `json:"googlePay,omitempty"`
 	AchDetails        *AchDetailsSource          `json:"achDetails,omitempty"`
 	CardDetails       *CardDetails               `json:"cardDetails,omitempty"`
 	TerminalCard      *TerminalCardPaymentMethod `json:"terminalCard,omitempty"`
@@ -345,6 +346,7 @@ type TransferDestination struct {
 	Wallet            *WalletPaymentMethod      `json:"wallet,omitempty"`
 	Card              *CardPaymentMethod        `json:"card,omitempty"`
 	ApplePay          *ApplePayPaymentMethod    `json:"applePay,omitempty"`
+	GooglePay         *GooglePayPaymentMethod   `json:"googlePay,omitempty"`
 	AchDetails        *AchDetails               `json:"achDetails,omitempty"`
 	CardDetails       *CardDetails              `json:"cardDetails,omitempty"`
 	// RtpDetails is deprecated; use InstantBankDetails instead
