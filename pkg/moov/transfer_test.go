@@ -241,5 +241,12 @@ func Test_Cancellations(t *testing.T) {
 		fetchedCancellation, err := mc.GetCancellation(BgCtx(), FACILITATOR_ID, transferID, createdCancellation.CancellationID)
 		NoResponseError(t, err)
 		require.Equal(t, createdCancellation.CancellationID, fetchedCancellation.CancellationID)
+
+		t.Run("list cancellations", func(t *testing.T) {
+			cancellations, err := mc.ListCancellations(BgCtx(), FACILITATOR_ID, transferID)
+			NoResponseError(t, err)
+			require.Len(t, cancellations, 1)
+			require.Equal(t, createdCancellation.CancellationID, cancellations[0].CancellationID)
+		})
 	})
 }

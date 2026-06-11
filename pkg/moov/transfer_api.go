@@ -548,6 +548,18 @@ func (c Client) GetCancellation(ctx context.Context, accountID string, transferI
 	return CompletedObjectOrError[Cancellation](resp)
 }
 
+func (c Client) ListCancellations(ctx context.Context, accountID string, transferID string) ([]Cancellation, error) {
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathCancellations, accountID, transferID),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[Cancellation](resp)
+}
+
 // TransferOptions lists all transfer options between a source and destination
 // https://docs.moov.io/api/#tag/Transfers/operation/createTransferOptions
 func (c Client) TransferOptions(ctx context.Context, partnerAccountID string, payload CreateTransferOptions) (*TransferOptions, error) {
