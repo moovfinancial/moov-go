@@ -132,8 +132,8 @@ const (
 	pathInvoice         = "/accounts/%s/invoices/%s"
 	pathInvoicePayments = "/accounts/%s/invoices/%s/payments"
 
-	pathIssuedCards                = "/issuing/%s/issued-cards"
-	pathIssuedCard                 = "/issuing/%s/issued-cards/%s"
+	pathIssuedCards                = "/issuing/%s/cards"
+	pathIssuedCard                 = "/issuing/%s/cards/%s"
 	pathIssuingAuthorizations      = "/issuing/%s/authorizations"
 	pathIssuingAuthorization       = "/issuing/%s/authorizations/%s"
 	pathIssuingAuthorizationEvents = "/issuing/%s/authorizations/%s/events"
