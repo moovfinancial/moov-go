@@ -17,6 +17,7 @@ type IssuedCard struct {
 	FormFactor         IssuedCardFormFactor `json:"formFactor"`
 	Controls           *IssuingControls     `json:"controls,omitempty"`
 	CreatedOn          time.Time            `json:"createdOn"`
+	UpdatedOn          time.Time            `json:"updatedOn"`
 }
 
 type IssuedCardBrand string
