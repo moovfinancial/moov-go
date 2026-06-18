@@ -3,6 +3,7 @@ package mv2607_test
 import (
 	"context"
 	"encoding/json"
+	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
@@ -94,6 +95,11 @@ func TestCreateDepositView_Integration(t *testing.T) {
 	depositView := mv2607.NewDepositViewClient(client)
 
 	resp, err := depositView.CreateDepositView(ctx, account.AccountID, mv2607.SourceSystemJHSilverlake, document)
+	// The deposit view endpoint is access-gated; partners without it (e.g. the
+	// generic CI credentials) receive 403. Skip rather than fail in that case.
+	if httpResp, ok := err.(moov.HttpCallResponse); ok && httpResp.StatusCode() == http.StatusForbidden {
+		t.Skipf("credentials not authorized for the deposit view endpoint, skipping: %v", err)
+	}
 	require.NoError(t, err)
 
 	require.NotNil(t, resp)
