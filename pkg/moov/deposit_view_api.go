@@ -2,6 +2,7 @@ package moov
 
 import (
 	"context"
+	"errors"
 	"net/http"
 )
 
@@ -14,6 +15,10 @@ const sourceSystemHeader = "X-Source-System"
 // is sent as the X-Source-System header. The document is sent as the raw request
 // body. On success the API responds with the ingest result, returned as V.
 func CreateDepositView[V any](ctx context.Context, client *Client, version Version, accountID, sourceSystem string, document []byte) (*V, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
 	resp, err := client.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathDepositView, accountID),
 		MoovVersion(version),
