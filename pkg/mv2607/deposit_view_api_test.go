@@ -129,15 +129,20 @@ func TestCreateDepositView_JHSilverlakeRecord(t *testing.T) {
 }
 
 func TestParseSourceSystem(t *testing.T) {
-	cases := map[string]mv2607.SourceSystem{
-		"jh_silverlake":   mv2607.SourceSystemJHSilverlake,
-		"jh_cif2020":      mv2607.SourceSystemJHCIF2020,
-		"jh_coredirector": mv2607.SourceSystemJHCoreDirector,
+	cases := []struct {
+		input string
+		want  mv2607.SourceSystem
+	}{
+		{"jh_silverlake", mv2607.SourceSystemJHSilverlake},
+		{"jh_cif2020", mv2607.SourceSystemJHCIF2020},
+		{"jh_coredirector", mv2607.SourceSystemJHCoreDirector},
 	}
-	for raw, want := range cases {
-		got, ok := mv2607.ParseSourceSystem(raw)
-		require.True(t, ok)
-		require.Equal(t, want, got)
+	for _, tc := range cases {
+		t.Run(tc.input, func(t *testing.T) {
+			got, ok := mv2607.ParseSourceSystem(tc.input)
+			require.True(t, ok)
+			require.Equal(t, tc.want, got)
+		})
 	}
 
 	_, ok := mv2607.ParseSourceSystem("unknown")
@@ -147,6 +152,11 @@ func TestParseSourceSystem(t *testing.T) {
 // jhSilverlakeRecord models the deposit account payload Jack Henry SilverLake
 // sends as the deposit view document. It is a test fixture only; CreateDepositView
 // forwards the raw bytes, so callers may marshal whatever the source system emits.
+//
+// Field types deliberately mirror SilverLake's wire format rather than Moov's
+// internal representations. Monetary amounts (CurBal, AvlBal, etc.) are json.Number
+// because SilverLake emits them as decimal-string floats; this is NOT Moov's
+// money model (integer cents) and must not be reused as a production type.
 type jhSilverlakeRecord struct {
 	Dlt          *string      `json:"Dlt"`          // Delete Record Flag
 	SrcKey       *string      `json:"SrcKey"`       // Unique Record Key

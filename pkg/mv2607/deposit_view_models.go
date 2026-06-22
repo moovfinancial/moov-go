@@ -24,11 +24,11 @@ const (
 // value is false if the string does not match a known source system.
 func ParseSourceSystem(s string) (SourceSystem, bool) {
 	switch s {
-	case "jh_silverlake":
+	case string(SourceSystemJHSilverlake):
 		return SourceSystemJHSilverlake, true
-	case "jh_cif2020":
+	case string(SourceSystemJHCIF2020):
 		return SourceSystemJHCIF2020, true
-	case "jh_coredirector":
+	case string(SourceSystemJHCoreDirector):
 		return SourceSystemJHCoreDirector, true
 	default:
 		return "", false
