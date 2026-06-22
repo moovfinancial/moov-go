@@ -127,6 +127,23 @@ func MoovVersion(version Version) callArg {
 	})
 }
 
+// Header sets an arbitrary request header.
+func Header(key, value string) callArg {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.headers[key] = value
+		return nil
+	})
+}
+
+// BytesBody sends the given bytes as the raw request body with the provided Content-Type.
+func BytesBody(contentType string, body []byte) callArg {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.headers["Content-Type"] = contentType
+		call.body = bytes.NewReader(body)
+		return nil
+	})
+}
+
 type multipartFn func(w *multipart.Writer) error
 
 func MultipartField(key, value string) multipartFn {

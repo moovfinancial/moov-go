@@ -12,11 +12,14 @@ type IssuedCard struct {
 	Expiration         IssuedCardExpiration `json:"expiration"`
 	AuthorizedUser     AuthorizedUser       `json:"authorizedUser"`
 	Memo               *string              `json:"memo,omitempty"`
+	Nickname           *string              `json:"nickname,omitempty"`
 	FundingWalletID    string               `json:"fundingWalletID"`
 	State              IssuedCardState      `json:"state"`
 	FormFactor         IssuedCardFormFactor `json:"formFactor"`
 	Controls           *IssuingControls     `json:"controls,omitempty"`
+	Metadata           map[string]string    `json:"metadata,omitempty"`
 	CreatedOn          time.Time            `json:"createdOn"`
+	UpdatedOn          time.Time            `json:"updatedOn"`
 }
 
 type IssuedCardBrand string

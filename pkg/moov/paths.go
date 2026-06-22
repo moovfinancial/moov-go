@@ -19,6 +19,7 @@ const (
 	pathConnections = "/accounts/%s/connections"
 
 	pathUnderwriting = "/accounts/%s/underwriting"
+	pathDepositView  = "/underwriting/%s/deposit-accounts"
 
 	pathFiles = "/accounts/%s/files"
 	pathFile  = "/accounts/%s/files/%s"
