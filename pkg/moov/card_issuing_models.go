@@ -43,12 +43,6 @@ const (
 	// operational and can approve incoming authorizations
 	IssuedCardState_Active IssuedCardState = "active"
 
-	// still in the activation process and cannot yet approve incoming authorizations
-	IssuedCardState_Inactive IssuedCardState = "inactive"
-
-	// awaiting additional AuthorizedUser verification before the card can become active
-	IssuedCardState_PendingVerification IssuedCardState = "pending-verification"
-
 	// permanently deactivated, either by request or because it expired, and cannot approve incoming authorizations
 	IssuedCardState_Closed IssuedCardState = "closed"
 )
