@@ -5,7 +5,7 @@ go 1.25.0
 toolchain go1.26.4
 
 require (
-	github.com/go-faker/faker/v4 v4.8.0
+	github.com/go-faker/faker/v4 v4.9.0
 	github.com/go-jose/go-jose/v4 v4.1.4
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
