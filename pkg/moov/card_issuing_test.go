@@ -20,13 +20,21 @@ func TestIssuedCardMarshal(t *testing.T) {
 				"month": "01",
 				"year": "21"
 			},
-			"authorizedUser": {
-				"firstName": "Jules",
-				"lastName": "Jackson"
-			},
+			"authorizedUserAccountID": "a06f9j41-5e3e-4f4a-9b1e-2c3d4e5f6a7b",
+			"nickname": "Travel card",
 			"fundingWalletID": "50469144-f859-46dc-bdbd-9587c2fa7b42",
 			"state": "active",
 			"formFactor": "virtual",
+			"billingAddress": {
+				"addressLine1": "123 Main St",
+				"city": "Longmont",
+				"stateOrProvince": "CO",
+				"postalCode": "80525",
+				"country": "US"
+			},
+			"metadata": {
+				"program": "rewards"
+			},
 			"createdOn": "2023-11-08T22:06:16Z"
 		}`)
 
@@ -129,17 +137,14 @@ func TestIssuedCardTransactionMarshal(t *testing.T) {
 
 func Test_CardIssuing(t *testing.T) {
 	mc := NewTestClient(t)
-	memo := "testing"
+	nickname := "testing"
 
 	// create issued card
+	// The card is issued to (and funded by the default wallet of) the MERCHANT_ID business
+	// account. AuthorizedUserAccountID (an optional second cardholder) is omitted.
 	created, err := mc.CreateIssuedCard(BgCtx(), MERCHANT_ID, moov.CreateIssuedCard{
-		FundingWalletID: MERCHANT_WALLET_ID,
-		AuthorizedUser: moov.CreateAuthorizedUser{
-			FirstName: "John",
-			LastName:  "Doe",
-		},
-		FormFactor: moov.IssuedCardFormFactor_Virtual,
-		Memo:       &memo,
+		Nickname: &nickname,
+		Metadata: map[string]string{"program": "testing"},
 	})
 	NoResponseError(t, err)
 	require.NotNil(t, created)
@@ -151,7 +156,6 @@ func Test_CardIssuing(t *testing.T) {
 	cards, err := mc.ListIssuedCards(BgCtx(), MERCHANT_ID,
 		moov.WithIssuedCardStates([]moov.IssuedCardState{
 			moov.IssuedCardState_Active,
-			moov.IssuedCardState_PendingVerification,
 		}))
 	NoResponseError(t, err)
 	require.NotEmpty(t, cards)
