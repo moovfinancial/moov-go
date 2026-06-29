@@ -42,22 +42,16 @@ func TestCardIssuing(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	// Step 4: get the source wallet for funding the issued card
+	// Step 4: create an issued card
 
-	// For now just using a known existing wallet for the account
-	walletID := "4dbac313-d505-4d51-a0fe-c11787916fcf"
-
-	// Step 5: create an issued card
-
-	memo := "example"
+	// The card is issued to the business account identified by accountID above, and is funded
+	// from that business account's default wallet (resolved server-side).
+	//
+	// AuthorizedUserAccountID is optional: it names a second cardholder on the card. Omit it to
+	// issue the card without one.
+	nickname := "example"
 	create := moov.CreateIssuedCard{
-		FundingWalletID: walletID,
-		AuthorizedUser: moov.CreateAuthorizedUser{
-			FirstName: "John",
-			LastName:  "Doe",
-		},
-		FormFactor: moov.IssuedCardFormFactor_Virtual,
-		Memo:       &memo,
+		Nickname: &nickname,
 	}
 	created, err := mc.CreateIssuedCard(ctx, accountID, create)
 	require.NoError(t, err)

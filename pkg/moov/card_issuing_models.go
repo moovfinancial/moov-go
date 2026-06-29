@@ -6,20 +6,20 @@ import (
 )
 
 type IssuedCard struct {
-	IssuedCardID       string               `json:"issuedCardID"`
-	Brand              IssuedCardBrand      `json:"brand"`
-	LastFourCardNumber string               `json:"lastFourCardNumber"`
-	Expiration         IssuedCardExpiration `json:"expiration"`
-	AuthorizedUser     AuthorizedUser       `json:"authorizedUser"`
-	Memo               *string              `json:"memo,omitempty"`
-	Nickname           *string              `json:"nickname,omitempty"`
-	FundingWalletID    string               `json:"fundingWalletID"`
-	State              IssuedCardState      `json:"state"`
-	FormFactor         IssuedCardFormFactor `json:"formFactor"`
-	Controls           *IssuingControls     `json:"controls,omitempty"`
-	Metadata           map[string]string    `json:"metadata,omitempty"`
-	CreatedOn          time.Time            `json:"createdOn"`
-	UpdatedOn          time.Time            `json:"updatedOn"`
+	IssuedCardID            string               `json:"issuedCardID"`
+	Brand                   IssuedCardBrand      `json:"brand"`
+	LastFourCardNumber      string               `json:"lastFourCardNumber"`
+	Expiration              IssuedCardExpiration `json:"expiration"`
+	AuthorizedUserAccountID *string              `json:"authorizedUserAccountID,omitempty"`
+	Nickname                *string              `json:"nickname,omitempty"`
+	FundingWalletID         string               `json:"fundingWalletID"`
+	State                   IssuedCardState      `json:"state"`
+	FormFactor              IssuedCardFormFactor `json:"formFactor"`
+	BillingAddress          *Address             `json:"billingAddress,omitempty"`
+	Controls                *IssuingControls     `json:"controls,omitempty"`
+	Metadata                map[string]string    `json:"metadata,omitempty"`
+	CreatedOn               time.Time            `json:"createdOn"`
+	UpdatedOn               time.Time            `json:"updatedOn"`
 }
 
 type IssuedCardBrand string
@@ -36,23 +36,12 @@ type IssuedCardExpiration struct {
 	Year  string `json:"year,omitempty"`
 }
 
-type AuthorizedUser struct {
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-}
-
 // IssuedCardState represents the operational status of an IssuedCard
 type IssuedCardState string
 
 const (
 	// operational and can approve incoming authorizations
 	IssuedCardState_Active IssuedCardState = "active"
-
-	// still in the activation process and cannot yet approve incoming authorizations
-	IssuedCardState_Inactive IssuedCardState = "inactive"
-
-	// awaiting additional AuthorizedUser verification before the card can become active
-	IssuedCardState_PendingVerification IssuedCardState = "pending-verification"
 
 	// permanently deactivated, either by request or because it expired, and cannot approve incoming authorizations
 	IssuedCardState_Closed IssuedCardState = "closed"
@@ -111,30 +100,19 @@ func WithIssuedCardCount(count int) ListIssuedCardsFilter {
 }
 
 type CreateIssuedCard struct {
-	FundingWalletID string                `json:"fundingWalletID"`
-	AuthorizedUser  CreateAuthorizedUser  `json:"authorizedUser"`
-	FormFactor      IssuedCardFormFactor  `json:"formFactor"`
-	Memo            *string               `json:"memo,omitempty"`
-	Expiration      *IssuedCardExpiration `json:"expiration,omitempty"`
-	Controls        *IssuingControls      `json:"controls,omitempty"`
-}
-
-type CreateAuthorizedUser struct {
-	FirstName string     `json:"firstName"`
-	LastName  string     `json:"lastName"`
-	BirthDate *BirthDate `json:"birthDate,omitempty"`
-}
-
-type BirthDate struct {
-	Day   int32 `json:"day"`
-	Month int32 `json:"month"`
-	Year  int32 `json:"year"`
+	AuthorizedUserAccountID *string               `json:"authorizedUserAccountID,omitempty"`
+	Nickname                *string               `json:"nickname,omitempty"`
+	Metadata                map[string]string     `json:"metadata,omitempty"`
+	BillingAddress          *Address              `json:"billingAddress,omitempty"`
+	Expiration              *IssuedCardExpiration `json:"expiration,omitempty"`
+	Controls                *IssuingControls      `json:"controls,omitempty"`
 }
 
 type UpdateIssuedCard struct {
 	State          *UpdateIssuedCardState `json:"state,omitempty"`
-	Memo           *string                `json:"memo,omitempty"`
-	AuthorizedUser *CreateAuthorizedUser  `json:"authorizedUser,omitempty"`
+	Nickname       *string                `json:"nickname,omitempty"`
+	Metadata       map[string]string      `json:"metadata,omitempty"`
+	BillingAddress *AddressPatch          `json:"billingAddress,omitempty"`
 }
 
 type UpdateIssuedCardState string
