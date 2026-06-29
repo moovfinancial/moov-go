@@ -9,14 +9,15 @@ type requestCapabilities struct {
 type CapabilityName string
 
 const (
-	CapabilityName_1099             CapabilityName = "1099"
-	CapabilityName_CardIssuing      CapabilityName = "card-issuing"
-	CapabilityName_CollectFunds     CapabilityName = "collect-funds"
-	CapabilityName_DeveloperAccount CapabilityName = "developer-account"
-	CapabilityName_ProductionApp    CapabilityName = "production-app"
-	CapabilityName_SendFunds        CapabilityName = "send-funds"
-	CapabilityName_Transfers        CapabilityName = "transfers"
-	CapabilityName_Wallet           CapabilityName = "wallet"
+	CapabilityName_1099              CapabilityName = "1099"
+	CapabilityName_CardIssuing       CapabilityName = "card-issuing"
+	CapabilityName_CollectFunds      CapabilityName = "collect-funds"
+	CapabilityName_DeveloperAccount  CapabilityName = "developer-account"
+	CapabilityName_IssuingCardholder CapabilityName = "issuing.cardholder"
+	CapabilityName_ProductionApp     CapabilityName = "production-app"
+	CapabilityName_SendFunds         CapabilityName = "send-funds"
+	CapabilityName_Transfers         CapabilityName = "transfers"
+	CapabilityName_Wallet            CapabilityName = "wallet"
 
 	// Granular Capability Names Platform
 	CapabilityName_PlatformProductionApp   CapabilityName = "platform.production-app"
