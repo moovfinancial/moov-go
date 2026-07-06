@@ -54,8 +54,10 @@ type BankAccountPaymentMethod BankAccount
 type CardPaymentMethod struct {
 	CardID string `json:"cardID,omitempty"`
 	// Uniquely identifies a linked payment card or token. For Apple Pay, the fingerprint is based on the tokenized card number and may vary based on the user's device. This field can be used to identify specific payment methods across multiple accounts on your platform.
-	Fingerprint        string            `json:"fingerprint,omitempty"`
-	Brand              CardBrand         `json:"brand,omitempty"`
+	Fingerprint string    `json:"fingerprint,omitempty"`
+	Brand       CardBrand `json:"brand,omitempty"`
+	// The category or level of the card defined by the issuer. Examples include, but not limited to, "REWARDS", "TRADITIONAL REWARDS", "CLASSIC", and "CORPORATE PURCHASING".
+	CardCategory       string            `json:"cardCategory,omitempty"`
 	CardType           CardType          `json:"cardType,omitempty"`
 	LastFourCardNumber string            `json:"lastFourCardNumber,omitempty"`
 	Bin                string            `json:"bin,omitempty"`
