@@ -20,6 +20,7 @@ type Invoice struct {
 	RefundedAmount      AmountDecimal    `json:"refundedAmount"`
 	DisputedAmount      AmountDecimal    `json:"disputedAmount"`
 	PaymentLinkCode     string           `json:"paymentLinkCode"`
+	PaymentLinkURL      string           `json:"paymentLinkURL,omitempty"`
 	Payments            []InvoicePayment `json:"invoicePayments,omitempty"`
 	CreatedOn           time.Time        `json:"createdOn"`
 	InvoiceDate         *time.Time       `json:"invoiceDate"`
