@@ -711,3 +711,15 @@ const (
 	TransferParty_Destination TransferParty = "destination"
 	TransferParty_Partner     TransferParty = "partner"
 )
+
+// TransferRiskOutcomes lists the risk rules that contributed to a transfer's
+// risk decision. Availability is limited to enrolled partners.
+type TransferRiskOutcomes struct {
+	TransferID        string             `json:"transferID"`
+	ContributingRules []ContributingRule `json:"contributingRules"`
+}
+
+// ContributingRule is a risk rule that contributed to a transfer's risk decision.
+type ContributingRule struct {
+	Name string `json:"name"`
+}
