@@ -69,13 +69,16 @@ type CreateTransfer_Destination struct {
 // CreateTransfer_CardDetailsDestination struct for CreateTransfer_CardDetailsDestination
 type CreateTransfer_CardDetailsDestination struct {
 	// An optional override of the default card statement descriptor for a transfer.
-	DynamicDescriptor   string     `json:"dynamicDescriptor,omitempty"`
+	DynamicDescriptor string `json:"dynamicDescriptor,omitempty"`
+	// The scheduled date for the funds to be delivered.
 	ScheduledDeliveryOn *time.Time `json:"scheduledDeliveryOn,omitempty"`
 	// Specifies the payout type for push-to-card disbursements.
 	PayoutType PayoutType `json:"payoutType,omitempty"`
 }
 
+// TransferFeePaidBy specifies which party pays for the fees of a transfer.
 type TransferFeePaidBy struct {
+	// Payout specifies which party pays for the payout fees.
 	Payout *FeePaidBy `json:"payout,omitempty"`
 }
 
