@@ -10,6 +10,7 @@ const (
 	EventTypeAccountCreated           EventType = "account.created"
 	EventTypeAccountDisconnected      EventType = "account.disconnected"
 	EventTypeAccountUpdated           EventType = "account.updated"
+	EventTypeAuthorizationExpiring    EventType = "authorization.expiring"
 	EventTypeBalanceUpdated           EventType = "balance.updated"
 	EventTypeBankAccountCreated       EventType = "bankAccount.created"
 	EventTypeBankAccountDeleted       EventType = "bankAccount.deleted"

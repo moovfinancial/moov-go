@@ -70,6 +70,19 @@ type LinkedApplePayPaymentMethod struct {
 	ApplePay          ApplePay `json:"applePay"`
 }
 
+// LinkApplePayTokenResponse contains linked payment methods and any partial-success errors.
+type LinkApplePayTokenResponse struct {
+	PaymentMethods      []LinkedApplePayPaymentMethod `json:"paymentMethods"`
+	PaymentMethodErrors []PaymentMethodError          `json:"paymentMethodErrors,omitempty"`
+}
+
+// PaymentMethodError describes why a payment method type could not be linked.
+type PaymentMethodError struct {
+	PaymentMethodType PaymentMethodType `json:"paymentMethodType"`
+	Error             string            `json:"error"`
+	Code              string            `json:"code"`
+}
+
 type ApplePay struct {
 	Brand           string     `json:"brand,omitempty"`
 	CardType        string     `json:"cardType,omitempty"`
@@ -154,6 +167,18 @@ func (c Client) StartApplePaySession(ctx context.Context, accountID string, req 
 // ApplePayToken creates a new Apple Pay token for the given customer account
 // https://docs.moov.io/api/#tag/Cards/operation/getApplePayMerchantDomains
 func (c Client) LinkApplePayToken(ctx context.Context, accountID string, req LinkApplePay) (*LinkedApplePayPaymentMethod, error) {
+	response, err := c.LinkApplePayTokenWithDetails(ctx, accountID, req)
+	if err != nil {
+		return nil, err
+	}
+	if len(response.PaymentMethods) == 0 {
+		return nil, errors.New("link apple pay token returned no payment methods")
+	}
+	return &response.PaymentMethods[0], nil
+}
+
+// LinkApplePayTokenWithDetails links an Apple Pay token and returns all linked payment methods and partial-success errors.
+func (c Client) LinkApplePayTokenWithDetails(ctx context.Context, accountID string, req LinkApplePay) (*LinkApplePayTokenResponse, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathApplePayTokens, accountID),
 		AcceptJson(),
@@ -164,7 +189,7 @@ func (c Client) LinkApplePayToken(ctx context.Context, accountID string, req Lin
 
 	switch resp.Status() {
 	case StatusCompleted:
-		return UnmarshalObjectResponse[LinkedApplePayPaymentMethod](resp)
+		return UnmarshalObjectResponse[LinkApplePayTokenResponse](resp)
 	default:
 		return nil, resp
 	}

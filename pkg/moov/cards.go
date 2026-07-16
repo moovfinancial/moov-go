@@ -51,18 +51,20 @@ type CardAccountUpdater struct {
 }
 
 type CardDetails struct {
-	Status            *CardTransactionStatus `json:"status,omitempty"`
-	FailureCode       *string                `json:"failureCode,omitempty"`
-	DynamicDescriptor *string                `json:"dynamicDescriptor,omitempty"`
-	TransactionSource *TransactionSource     `json:"transactionSource,omitempty"`
-	FeeProgram        *string                `json:"feeProgram,omitempty"`
-	AuthorizationCode *string                `json:"authorizationCode,omitempty"`
-	InitiatedOn       *time.Time             `json:"initiatedOn,omitempty"`
-	ConfirmedOn       *time.Time             `json:"confirmedOn,omitempty"`
-	SettledOn         *time.Time             `json:"settledOn,omitempty"`
-	FailedOn          *time.Time             `json:"failedOn,omitempty"`
-	CanceledOn        *time.Time             `json:"canceledOn,omitempty"`
-	CompletedOn       *time.Time             `json:"completedOn,omitempty"`
+	Status              *CardTransactionStatus `json:"status,omitempty"`
+	FailureCode         *string                `json:"failureCode,omitempty"`
+	DynamicDescriptor   *string                `json:"dynamicDescriptor,omitempty"`
+	TransactionSource   *TransactionSource     `json:"transactionSource,omitempty"`
+	FeeProgram          *string                `json:"feeProgram,omitempty"`
+	AuthorizationCode   *string                `json:"authorizationCode,omitempty"`
+	ScheduledDeliveryOn *time.Time             `json:"scheduledDeliveryOn,omitempty"`
+	InitiatedOn         *time.Time             `json:"initiatedOn,omitempty"`
+	ConfirmedOn         *time.Time             `json:"confirmedOn,omitempty"`
+	SettledOn           *time.Time             `json:"settledOn,omitempty"`
+	FailedOn            *time.Time             `json:"failedOn,omitempty"`
+	CanceledOn          *time.Time             `json:"canceledOn,omitempty"`
+	CompletedOn         *time.Time             `json:"completedOn,omitempty"`
+	DeferredOn          *time.Time             `json:"deferredOn,omitempty"`
 
 	// Deprecated: This field has been deprecated, use `FeeProgram` instead.
 	InterchangeQualification string `json:"interchangeQualification,omitempty"`
