@@ -166,7 +166,19 @@ func (c Client) StartApplePaySession(ctx context.Context, accountID string, req 
 
 // ApplePayToken creates a new Apple Pay token for the given customer account
 // https://docs.moov.io/api/#tag/Cards/operation/getApplePayMerchantDomains
-func (c Client) LinkApplePayToken(ctx context.Context, accountID string, req LinkApplePay) (*LinkApplePayTokenResponse, error) {
+func (c Client) LinkApplePayToken(ctx context.Context, accountID string, req LinkApplePay) (*LinkedApplePayPaymentMethod, error) {
+	response, err := c.LinkApplePayTokenWithDetails(ctx, accountID, req)
+	if err != nil {
+		return nil, err
+	}
+	if len(response.PaymentMethods) == 0 {
+		return nil, errors.New("link apple pay token returned no payment methods")
+	}
+	return &response.PaymentMethods[0], nil
+}
+
+// LinkApplePayTokenWithDetails links an Apple Pay token and returns all linked payment methods and partial-success errors.
+func (c Client) LinkApplePayTokenWithDetails(ctx context.Context, accountID string, req LinkApplePay) (*LinkApplePayTokenResponse, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathApplePayTokens, accountID),
 		AcceptJson(),
