@@ -19,6 +19,7 @@ type CreateTransfer struct {
 	// ForeignID an optional alias from a foreign/external system which can be used to reference this resource
 	ForeignID *string                  `json:"foreignID,omitempty"`
 	LineItems *CreateTransferLineItems `json:"lineItems,omitempty"`
+	FeePaidBy *TransferFeePaidBy       `json:"feePaidBy,omitempty"`
 }
 
 // CreateTransfer_Source Where funds for a transfer originate. For the source,
@@ -68,9 +69,14 @@ type CreateTransfer_Destination struct {
 // CreateTransfer_CardDetailsDestination struct for CreateTransfer_CardDetailsDestination
 type CreateTransfer_CardDetailsDestination struct {
 	// An optional override of the default card statement descriptor for a transfer.
-	DynamicDescriptor string `json:"dynamicDescriptor,omitempty"`
+	DynamicDescriptor   string     `json:"dynamicDescriptor,omitempty"`
+	ScheduledDeliveryOn *time.Time `json:"scheduledDeliveryOn,omitempty"`
 	// Specifies the payout type for push-to-card disbursements.
 	PayoutType PayoutType `json:"payoutType,omitempty"`
+}
+
+type TransferFeePaidBy struct {
+	Payout *FeePaidBy `json:"payout,omitempty"`
 }
 
 // CreateTransfer_AchDetailsBase If transfer involves ACH, override default card acceptance properties.
