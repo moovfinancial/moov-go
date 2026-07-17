@@ -137,6 +137,9 @@ func ListSweepConfigsGeneric(ctx context.Context, client *Client, version Versio
 	if client == nil {
 		return nil, fmt.Errorf("client is nil")
 	}
+	if accountID == "" {
+		return nil, fmt.Errorf("accountID is required")
+	}
 
 	resp, err := client.CallHttp(
 		ctx,
@@ -154,6 +157,12 @@ func ListSweepConfigsGeneric(ctx context.Context, client *Client, version Versio
 func GetSweepConfigGeneric(ctx context.Context, client *Client, version Version, accountID string, sweepConfigID string) (*SweepConfig, error) {
 	if client == nil {
 		return nil, fmt.Errorf("client is nil")
+	}
+	if accountID == "" {
+		return nil, fmt.Errorf("accountID is required")
+	}
+	if sweepConfigID == "" {
+		return nil, fmt.Errorf("sweepConfigID is required")
 	}
 
 	resp, err := client.CallHttp(
@@ -173,6 +182,9 @@ func CreateSweepConfigGeneric(ctx context.Context, client *Client, version Versi
 	if client == nil {
 		return nil, fmt.Errorf("client is nil")
 	}
+	if create.AccountID == "" {
+		return nil, fmt.Errorf("accountID is required")
+	}
 
 	resp, err := client.CallHttp(
 		ctx,
@@ -191,6 +203,12 @@ func CreateSweepConfigGeneric(ctx context.Context, client *Client, version Versi
 func UpdateSweepConfigGeneric[T any](ctx context.Context, client *Client, version Version, accountID string, sweepConfigID string, update T) (*SweepConfig, error) {
 	if client == nil {
 		return nil, fmt.Errorf("client is nil")
+	}
+	if accountID == "" {
+		return nil, fmt.Errorf("accountID is required")
+	}
+	if sweepConfigID == "" {
+		return nil, fmt.Errorf("sweepConfigID is required")
 	}
 
 	resp, err := client.CallHttp(
