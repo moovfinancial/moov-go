@@ -14,6 +14,18 @@ func NewSweepClient(client *moov.Client) SweepClient {
 	return SweepClient{Client: client}
 }
 
+func (s SweepClient) ListSweepConfigs(ctx context.Context, accountID string) ([]moov.SweepConfig, error) {
+	return moov.ListSweepConfigsGeneric(ctx, s.Client, moov.Version2026_04, accountID)
+}
+
+func (s SweepClient) GetSweepConfig(ctx context.Context, accountID string, sweepConfigID string) (*moov.SweepConfig, error) {
+	return moov.GetSweepConfigGeneric(ctx, s.Client, moov.Version2026_04, accountID, sweepConfigID)
+}
+
+func (s SweepClient) CreateSweepConfig(ctx context.Context, create moov.CreateSweepConfig) (*moov.SweepConfig, error) {
+	return moov.CreateSweepConfigGeneric(ctx, s.Client, moov.Version2026_04, create)
+}
+
 func (s SweepClient) UpdateSweepConfig(ctx context.Context, accountID, sweepConfigID string, update UpdateSweepConfig) (*moov.SweepConfig, error) {
 	return moov.UpdateSweepConfigGeneric(ctx, s.Client, moov.Version2026_04, accountID, sweepConfigID, update)
 }
