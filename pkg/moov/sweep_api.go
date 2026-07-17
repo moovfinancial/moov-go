@@ -133,9 +133,82 @@ func (c Client) GetSweep(ctx context.Context, accountID string, walletID string,
 
 /* Exported functions used only for making client calls in the versioned packages (e.g. mv2604) */
 
+func ListSweepConfigsGeneric(ctx context.Context, client *Client, version Version, accountID string) ([]SweepConfig, error) {
+	if client == nil {
+		return nil, fmt.Errorf("client is nil")
+	}
+	if accountID == "" {
+		return nil, fmt.Errorf("accountID is required")
+	}
+
+	resp, err := client.CallHttp(
+		ctx,
+		Endpoint(http.MethodGet, pathSweepConfigs, accountID),
+		MoovVersion(version),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("listing sweep configs: %w", err)
+	}
+
+	return CompletedListOrError[SweepConfig](resp)
+}
+
+func GetSweepConfigGeneric(ctx context.Context, client *Client, version Version, accountID string, sweepConfigID string) (*SweepConfig, error) {
+	if client == nil {
+		return nil, fmt.Errorf("client is nil")
+	}
+	if accountID == "" {
+		return nil, fmt.Errorf("accountID is required")
+	}
+	if sweepConfigID == "" {
+		return nil, fmt.Errorf("sweepConfigID is required")
+	}
+
+	resp, err := client.CallHttp(
+		ctx,
+		Endpoint(http.MethodGet, pathSweepConfig, accountID, sweepConfigID),
+		MoovVersion(version),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("getting sweep config: %w", err)
+	}
+
+	return CompletedObjectOrError[SweepConfig](resp)
+}
+
+func CreateSweepConfigGeneric(ctx context.Context, client *Client, version Version, create CreateSweepConfig) (*SweepConfig, error) {
+	if client == nil {
+		return nil, fmt.Errorf("client is nil")
+	}
+	if create.AccountID == "" {
+		return nil, fmt.Errorf("accountID is required")
+	}
+
+	resp, err := client.CallHttp(
+		ctx,
+		Endpoint(http.MethodPost, pathSweepConfigs, create.AccountID),
+		MoovVersion(version),
+		AcceptJson(),
+		JsonBody(create),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("creating sweep config: %w", err)
+	}
+
+	return CompletedObjectOrError[SweepConfig](resp)
+}
+
 func UpdateSweepConfigGeneric[T any](ctx context.Context, client *Client, version Version, accountID string, sweepConfigID string, update T) (*SweepConfig, error) {
 	if client == nil {
 		return nil, fmt.Errorf("client is nil")
+	}
+	if accountID == "" {
+		return nil, fmt.Errorf("accountID is required")
+	}
+	if sweepConfigID == "" {
+		return nil, fmt.Errorf("sweepConfigID is required")
 	}
 
 	resp, err := client.CallHttp(
