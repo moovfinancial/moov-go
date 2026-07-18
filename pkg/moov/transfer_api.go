@@ -350,6 +350,40 @@ func GetTransferGeneric[TTransfer any](ctx context.Context, client *Client, vers
 	return CompletedObjectOrError[TTransfer](resp)
 }
 
+func ListCapturesGeneric[TCapture any](ctx context.Context, client *Client, version Version, accountID, transferID string) ([]TCapture, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathCaptures, accountID, transferID),
+		MoovVersion(version),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[TCapture](resp)
+}
+
+func GetCaptureGeneric[TCapture any](ctx context.Context, client *Client, version Version, accountID, transferID, captureID string) (*TCapture, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathCapture, accountID, transferID, captureID),
+		MoovVersion(version),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[TCapture](resp)
+}
+
 type CreateRefundArgs callArg
 
 func WithRefundWaitForRailResponse() CreateRefundArgs {
