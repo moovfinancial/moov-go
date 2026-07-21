@@ -15,7 +15,15 @@ type IncurredFee struct {
 	GeneratedBy *GeneratedBy  `json:"generatedBy,omitempty"`
 	FeeGroup    string        `json:"feeGroup,omitempty"`
 	ResidualID  *string       `json:"residualID,omitempty"`
+	FeePaidBy   *FeePaidBy    `json:"feePaidBy,omitempty"`
 }
+
+type FeePaidBy string
+
+const (
+	FeePaidBySource      FeePaidBy = "source"
+	FeePaidByDestination FeePaidBy = "destination"
+)
 
 type GeneratedBy struct {
 	TransferID    *string `json:"transferID,omitempty"`

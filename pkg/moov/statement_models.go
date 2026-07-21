@@ -78,6 +78,7 @@ type CardBrandFees struct {
 	InterchangePrograms            *[]InterchangeProgramFee `json:"interchangePrograms,omitempty"`
 	NetworkPassthrough             *CountAndAmount          `json:"networkPassthrough,omitempty"`
 	Refunds                        *CountAndAmount          `json:"refunds,omitempty"`
+	CardCancellations              *CountAndAmount          `json:"cardCancellations,omitempty"`
 	Total                          CountAndAmount           `json:"total,omitempty"`
 }
 
