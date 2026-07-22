@@ -76,6 +76,8 @@ const (
 	pathTransfers = "/accounts/%s/transfers"
 	pathTransfer  = "/accounts/%s/transfers/%s"
 
+	pathTransferRiskOutcomes = "/transfers/%s/risk-outcomes"
+
 	pathSchedules          = "/accounts/%s/schedules"
 	pathSchedule           = "/accounts/%s/schedules/%s"
 	pathScheduleOccurrence = "/accounts/%s/schedules/%s/occurrences/%s"
