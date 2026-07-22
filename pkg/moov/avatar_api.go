@@ -2,6 +2,7 @@ package moov
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 )
@@ -13,6 +14,13 @@ import (
 // read time.
 // https://docs.moov.io/api/enrichment/form-shortening/avatars/put/
 func (c Client) UploadAvatar(ctx context.Context, accountID string, file io.Reader) error {
+	if accountID == "" {
+		return errors.New("accountID cannot be empty")
+	}
+	if file == nil {
+		return errors.New("file cannot be nil")
+	}
+
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPut, pathAvatar, accountID),
 		MoovVersion(Version2026_07),
@@ -30,6 +38,10 @@ func (c Client) UploadAvatar(ctx context.Context, accountID string, file io.Read
 // or an account-type-aware fallback icon.
 // https://docs.moov.io/api/enrichment/form-shortening/avatars/delete/
 func (c Client) DeleteAvatar(ctx context.Context, accountID string) error {
+	if accountID == "" {
+		return errors.New("accountID cannot be empty")
+	}
+
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodDelete, pathAvatar, accountID),
 		MoovVersion(Version2026_07),

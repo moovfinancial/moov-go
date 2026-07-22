@@ -10,7 +10,12 @@ import (
 func Test_Avatars(t *testing.T) {
 	mc := NewTestClient(t)
 	ctx := context.Background()
-	accountID := MERCHANT_ID
+
+	// Avatar writes require the facilitator's /accounts.write scope against an
+	// account it owns, so create a temporary account rather than using the shared
+	// merchant account.
+	account := CreateTemporaryTestAccount(t, mc, createTestIndividualAccount())
+	accountID := account.AccountID
 
 	// ensure any uploaded avatar is removed even if a test below fails
 	t.Cleanup(func() {
