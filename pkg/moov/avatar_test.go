@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
 
@@ -30,6 +31,13 @@ func Test_Avatars(t *testing.T) {
 
 	t.Run("delete avatar", func(t *testing.T) {
 		err := mc.DeleteAvatar(ctx, accountID)
-		require.NoError(t, err)
+
+		// The avatar is a singleton on the shared facilitator account, so a
+		// concurrent test run may have already removed it. Tolerate not_found.
+		if err != nil {
+			var httpErr moov.HttpCallResponse
+			require.ErrorAs(t, err, &httpErr)
+			require.Equal(t, moov.StatusNotFound, httpErr.Status())
+		}
 	})
 }
