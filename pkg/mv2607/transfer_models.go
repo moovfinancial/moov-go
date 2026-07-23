@@ -14,6 +14,25 @@ type CreateTransfer struct {
 	Metadata       map[string]string                  `json:"metadata,omitempty"`
 	ForeignID      *string                            `json:"foreignID,omitempty"`
 	LineItems      *moov.CreateTransferLineItems      `json:"lineItems,omitempty"`
+	// FeePaidBy indicates which party bears fees for the transfer, keyed by fee type.
+	FeePaidBy *TransferFeePaidBy `json:"feePaidBy,omitempty"`
+}
+
+// FeePaidBy indicates which party to a money movement bears an incurred fee.
+type FeePaidBy string
+
+// List of FeePaidBy
+const (
+	// FeePaidBy_Source: the source of funds pays the fee.
+	FeePaidBy_Source FeePaidBy = "source"
+	// FeePaidBy_Destination: the destination of funds pays the fee.
+	FeePaidBy_Destination FeePaidBy = "destination"
+)
+
+// TransferFeePaidBy indicates which party bears fees for a transfer, keyed by fee type.
+type TransferFeePaidBy struct {
+	// Payout indicates which party bears the fee for payouts. Defaults to `source`.
+	Payout *FeePaidBy `json:"payout,omitempty"`
 }
 
 type CreateTransferAmountDetails struct {
