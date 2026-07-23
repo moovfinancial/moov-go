@@ -96,7 +96,8 @@ type IssuedControls struct {
 }
 
 // UpdateIssuingControls specifies the mutable controls on a PATCH. Each field replaces the entire
-// corresponding value.
+// corresponding value. SingleUse is intentionally absent: it is set at card creation and is not
+// patchable, matching the moov-api PATCH surface.
 type UpdateIssuingControls struct {
 	// replaces the entire set of velocity limits; nil leaves them unchanged, a non-nil empty slice clears them
 	VelocityLimits *[]IssuingVelocityLimit `json:"velocityLimits,omitempty"`
