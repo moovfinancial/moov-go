@@ -86,6 +86,7 @@ type HttpCallResponse interface {
 
 	RequestId() string
 	StatusCode() int
+	ContentType() string
 }
 
 type httpCallResponse struct {
@@ -156,6 +157,13 @@ func (r *httpCallResponse) StatusCode() int {
 		return r.resp.StatusCode
 	}
 	return 0
+}
+
+func (r *httpCallResponse) ContentType() string {
+	if r.resp != nil {
+		return r.resp.Header.Get("Content-Type")
+	}
+	return ""
 }
 
 func (r *httpCallResponse) RequestId() string {
