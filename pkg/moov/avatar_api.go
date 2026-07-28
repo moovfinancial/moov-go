@@ -34,7 +34,7 @@ func (c Client) GetAvatar(ctx context.Context, uniqueID string) ([]byte, string,
 	}
 
 	contentType := ""
-	if hcr, ok := resp.(HttpCallResponse); ok {
+	if hcr, ok := resp.(*httpCallResponse); ok {
 		contentType = hcr.ContentType()
 	}
 	return buf.Bytes(), contentType, nil
