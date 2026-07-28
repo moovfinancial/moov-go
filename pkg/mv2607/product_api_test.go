@@ -48,17 +48,20 @@ const productWithCategoryJSON = `{
 
 func TestCreateProduct(t *testing.T) {
 	var (
-		method  string
-		path    string
-		version string
-		body    map[string]any
+		method    string
+		path      string
+		version   string
+		body      map[string]any
+		decodeErr error
 	)
 
+	// The handler runs on its own goroutine, so it records what it saw rather than
+	// asserting: require.* calls t.FailNow, which is only valid on the test goroutine.
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		method = r.Method
 		path = r.URL.Path
 		version = r.Header.Get(moov.VersionHeader)
-		require.NoError(t, json.NewDecoder(r.Body).Decode(&body))
+		decodeErr = json.NewDecoder(r.Body).Decode(&body)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
@@ -77,6 +80,7 @@ func TestCreateProduct(t *testing.T) {
 		CategoryID: moov.PtrOf("413"),
 	})
 	require.NoError(t, err)
+	require.NoError(t, decodeErr)
 
 	require.Equal(t, http.MethodPost, method)
 	require.Equal(t, "/accounts/account-123/products", path)
@@ -104,17 +108,20 @@ func TestProductRequestOmitsCategoryID(t *testing.T) {
 
 func TestUpdateProduct(t *testing.T) {
 	var (
-		method  string
-		path    string
-		version string
-		body    map[string]any
+		method    string
+		path      string
+		version   string
+		body      map[string]any
+		decodeErr error
 	)
 
+	// The handler runs on its own goroutine, so it records what it saw rather than
+	// asserting: require.* calls t.FailNow, which is only valid on the test goroutine.
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		method = r.Method
 		path = r.URL.Path
 		version = r.Header.Get(moov.VersionHeader)
-		require.NoError(t, json.NewDecoder(r.Body).Decode(&body))
+		decodeErr = json.NewDecoder(r.Body).Decode(&body)
 
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(productWithCategoryJSON))
@@ -129,6 +136,7 @@ func TestUpdateProduct(t *testing.T) {
 		CategoryID: moov.PtrOf("413"),
 	})
 	require.NoError(t, err)
+	require.NoError(t, decodeErr)
 
 	require.Equal(t, http.MethodPut, method)
 	require.Equal(t, "/accounts/account-123/products/ec7e1848-dc80-4ab0-8827-dd7fc0737b43", path)
