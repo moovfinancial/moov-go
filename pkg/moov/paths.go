@@ -148,8 +148,9 @@ const (
 	pathImageMetadata = "/accounts/%s/images/%s/metadata"
 	pathPublicImage   = "/images/%s"
 
-	pathProducts = "/accounts/%s/products"
-	pathProduct  = "/accounts/%s/products/%s"
+	pathProducts          = "/accounts/%s/products"
+	pathProduct           = "/accounts/%s/products/%s"
+	pathProductCategories = "/product-categories"
 
 	pathAvatar = "/avatars/%s"
 

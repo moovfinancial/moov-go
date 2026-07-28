@@ -100,3 +100,14 @@ func WithProductTitle(title string) ProductListFilter {
 		return nil
 	})
 }
+
+// WithProductCategory filters products by category. It accepts a category ID at any level of the
+// taxonomy; a product matches when the given category is anywhere in its category's breadcrumb,
+// so filtering by a top-level category returns products in any of its descendants.
+// Requires Version2026_07 or later.
+func WithProductCategory(categoryID string) ProductListFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["category"] = categoryID
+		return nil
+	})
+}
