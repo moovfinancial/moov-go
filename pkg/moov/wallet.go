@@ -32,8 +32,9 @@ const (
 type WalletType string
 
 const (
-	WalletType_Default WalletType = "default"
-	WalletType_General WalletType = "general"
+	WalletType_Default     WalletType = "default"
+	WalletType_General     WalletType = "general"
+	WalletType_CardIssuing WalletType = "card-issuing"
 )
 
 type Metadata map[string]string
