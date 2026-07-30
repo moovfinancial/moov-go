@@ -1,11 +1,44 @@
 package moov
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"io"
 	"net/http"
 )
+
+// GetAvatar retrieves an avatar image for an account and returns the raw image
+// bytes along with the image's content type (e.g. "image/png"). Unlike the
+// write endpoints, uniqueID accepts any unique ID associated with an account
+// such as accountID, representativeID, routing number, or userID. The response
+// is a user-uploaded avatar if one exists, otherwise the enriched avatar or an
+// account-type-aware fallback icon.
+// https://docs.moov.io/api/enrichment/form-shortening/avatars/get/
+func (c Client) GetAvatar(ctx context.Context, uniqueID string) ([]byte, string, error) {
+	if uniqueID == "" {
+		return nil, "", errors.New("uniqueID cannot be empty")
+	}
+
+	resp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathAvatar, uniqueID),
+		MoovVersion(Version2026_07),
+		AcceptContentType("image/*"))
+	if err != nil {
+		return nil, "", err
+	}
+
+	buf, err := CompletedObjectOrError[bytes.Buffer](resp)
+	if err != nil {
+		return nil, "", err
+	}
+
+	contentType := ""
+	if hcr, ok := resp.(*httpCallResponse); ok {
+		contentType = hcr.ContentType()
+	}
+	return buf.Bytes(), contentType, nil
+}
 
 // UploadAvatar uploads a user avatar image for an account.
 // The accountID is used as the uniqueID; only accountID values are accepted for

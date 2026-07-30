@@ -158,6 +158,13 @@ func (r *httpCallResponse) StatusCode() int {
 	return 0
 }
 
+func (r *httpCallResponse) ContentType() string {
+	if r == nil || r.resp == nil {
+		return ""
+	}
+	return r.resp.Header.Get("Content-Type")
+}
+
 func (r *httpCallResponse) RequestId() string {
 	if r.resp != nil {
 		return r.resp.Header.Get("X-Request-ID")

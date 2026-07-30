@@ -29,6 +29,13 @@ func Test_Avatars(t *testing.T) {
 		require.NoError(t, err)
 	})
 
+	t.Run("get avatar", func(t *testing.T) {
+		img, contentType, err := mc.GetAvatar(ctx, accountID)
+		require.NoError(t, err)
+		require.NotEmpty(t, img)
+		require.Contains(t, contentType, "image/")
+	})
+
 	t.Run("delete avatar", func(t *testing.T) {
 		err := mc.DeleteAvatar(ctx, accountID)
 
