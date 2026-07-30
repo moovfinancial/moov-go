@@ -40,6 +40,7 @@ const (
 	CapabilityName_SendFundsRTP         CapabilityName = "send-funds.rtp"
 	CapabilityName_SendFundsPushToCard  CapabilityName = "send-funds.push-to-card"
 	CapabilityName_SendFundsInstantBank CapabilityName = "send-funds.instant-bank"
+	CapabilityName_SendFundsWire        CapabilityName = "send-funds.wire"
 )
 
 // Capability Describes an action or set of actions that an account is permitted to perform.
