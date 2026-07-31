@@ -45,6 +45,9 @@ func GetUnderwritingGeneric[TUnderwriting any](ctx context.Context, client *Clie
 	if client == nil {
 		return nil, errors.New("client is nil")
 	}
+	if accountID == "" {
+		return nil, errors.New("accountID is required")
+	}
 
 	resp, err := client.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathUnderwriting, accountID),
@@ -63,6 +66,9 @@ func GetUnderwritingGeneric[TUnderwriting any](ctx context.Context, client *Clie
 func UpsertUnderwritingGeneric[TRequest any, TUnderwriting any](ctx context.Context, client *Client, version Version, accountID string, underwriting TRequest) (*TUnderwriting, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
+	}
+	if accountID == "" {
+		return nil, errors.New("accountID is required")
 	}
 
 	resp, err := client.CallHttp(ctx,

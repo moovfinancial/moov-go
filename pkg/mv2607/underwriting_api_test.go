@@ -147,6 +147,27 @@ func TestGetUnderwriting(t *testing.T) {
 	require.Equal(t, moov.PtrOf(mv2607.MonthlyVolumeRange1M5M), actual.SendFunds.Wire.EstimatedActivity.MonthlyVolumeRange)
 }
 
+// An empty accountID would produce /accounts//underwriting, so both calls must fail
+// before reaching the network.
+func TestUnderwritingRequiresAccountID(t *testing.T) {
+	called := false
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+	}))
+	t.Cleanup(srv.Close)
+
+	underwriting := newUnderwritingTestClient(t, srv)
+
+	_, err := underwriting.GetUnderwriting(context.Background(), "")
+	require.EqualError(t, err, "accountID is required")
+
+	_, err = underwriting.UpsertUnderwriting(context.Background(), "", mv2607.UpsertUnderwriting{})
+	require.EqualError(t, err, "accountID is required")
+
+	require.False(t, called, "no request should reach the server")
+}
+
 // SendFunds must not emit a wire key when the rail isn't set, so pre-v2026.07 shapes
 // round-trip unchanged.
 func TestSendFundsOmitsWireWhenUnset(t *testing.T) {
