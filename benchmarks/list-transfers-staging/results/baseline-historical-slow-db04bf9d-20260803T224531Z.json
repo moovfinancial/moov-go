@@ -1,0 +1,247 @@
+{
+  "label": "baseline-historical-slow",
+  "account": {
+    "accountID": "db04bf9d-91f6-4206-ba38-6844636532ad",
+    "transferCount": 261129,
+    "firstTransferOn": "2021-08-13T21:40:54Z",
+    "latestTransferOn": "2026-08-03T21:51:58Z",
+    "sourceAccountID": "db04bf9d-91f6-4206-ba38-6844636532ad",
+    "destinationAccountID": "bcbfa114-2475-487e-bdd6-5f3d7efeff20",
+    "groupID": "bbd5020b-bf29-48f6-b52f-85fc8d78418c",
+    "scheduleID": "8574051f-06c8-4045-9cd3-b24cd5984e69",
+    "paymentLinkCode": "1rRyWuW8hS",
+    "foreignID": "123",
+    "hasRefunds": true,
+    "hasDisputes": false
+  },
+  "host": "api.moov-staging.io",
+  "startedAt": "2026-08-03T22:45:31.456566Z",
+  "finishedAt": "2026-08-03T22:46:06.798362Z",
+  "warmups": 1,
+  "iterations": 3,
+  "cases": [
+    {
+      "name": "page-default-20",
+      "category": "pagination",
+      "pathAccountID": "db04bf9d-91f6-4206-ba38-6844636532ad",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "20"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "page-offset-140-count-20",
+      "category": "pagination",
+      "pathAccountID": "db04bf9d-91f6-4206-ba38-6844636532ad",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "20"
+        ],
+        "skip": [
+          "140"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "page-offset-200-count-20",
+      "category": "pagination",
+      "pathAccountID": "db04bf9d-91f6-4206-ba38-6844636532ad",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "20"
+        ],
+        "skip": [
+          "200"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "page-tiny-5",
+      "category": "pagination",
+      "pathAccountID": "db04bf9d-91f6-4206-ba38-6844636532ad",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "5"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "status-failed-page-2",
+      "category": "indexed-combined",
+      "pathAccountID": "db04bf9d-91f6-4206-ba38-6844636532ad",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "20"
+        ],
+        "skip": [
+          "20"
+        ],
+        "status": [
+          "failed"
+        ]
+      },
+      "fixtureMatch": true
+    }
+  ],
+  "measurements": [
+    {
+      "caseName": "page-default-20",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:45:32.030884Z",
+      "durationMs": 192.366,
+      "statusCode": 200,
+      "requestID": "7a2e6ddd-a474-48e1-a35f-07cdd22978c8",
+      "responseCount": 20,
+      "responseBytes": 36877
+    },
+    {
+      "caseName": "page-default-20",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:45:32.2487Z",
+      "durationMs": 245.513,
+      "statusCode": 200,
+      "requestID": "0f5132c3-633e-4e50-9a2a-1a29ed0ae22d",
+      "responseCount": 20,
+      "responseBytes": 36877
+    },
+    {
+      "caseName": "page-default-20",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:45:32.51433Z",
+      "durationMs": 183.831,
+      "statusCode": 200,
+      "requestID": "64f4f60b-c69c-4c3c-88e8-cddef76eb664",
+      "responseCount": 20,
+      "responseBytes": 36877
+    },
+    {
+      "caseName": "page-offset-140-count-20",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:45:32.909944Z",
+      "durationMs": 267.294,
+      "statusCode": 200,
+      "requestID": "89c9c2d4-e655-402e-ab26-1bb3a3da4480",
+      "responseCount": 20,
+      "responseBytes": 46264
+    },
+    {
+      "caseName": "page-offset-140-count-20",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:45:33.198162Z",
+      "durationMs": 167.202,
+      "statusCode": 200,
+      "requestID": "dda68660-9736-4b39-87b4-d1956babba69",
+      "responseCount": 20,
+      "responseBytes": 46264
+    },
+    {
+      "caseName": "page-offset-140-count-20",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:45:33.385017Z",
+      "durationMs": 166.318,
+      "statusCode": 200,
+      "requestID": "0351ce2e-257f-4182-b6dc-7474b6125a99",
+      "responseCount": 20,
+      "responseBytes": 46264
+    },
+    {
+      "caseName": "page-offset-200-count-20",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:45:33.748775Z",
+      "durationMs": 170.513,
+      "statusCode": 200,
+      "requestID": "e8dccab4-54da-4e12-9823-37922c11c098",
+      "responseCount": 20,
+      "responseBytes": 45989
+    },
+    {
+      "caseName": "page-offset-200-count-20",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:45:33.935422Z",
+      "durationMs": 30000.495,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/db04bf9d-91f6-4206-ba38-6844636532ad/transfers?count=20\u0026skip=200\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "page-offset-200-count-20",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:46:03.936003Z",
+      "durationMs": 212.01,
+      "statusCode": 200,
+      "requestID": "73ff3255-6440-49d5-bb0a-f6d88fb38728",
+      "responseCount": 20,
+      "responseBytes": 45989
+    },
+    {
+      "caseName": "page-tiny-5",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:46:04.383977Z",
+      "durationMs": 172.279,
+      "statusCode": 200,
+      "requestID": "1a55172f-86e7-4e59-8a08-1a77ff34047b",
+      "responseCount": 5,
+      "responseBytes": 8192
+    },
+    {
+      "caseName": "page-tiny-5",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:46:04.557522Z",
+      "durationMs": 154.34,
+      "statusCode": 200,
+      "requestID": "9a6dc368-996d-4e4d-889b-a67ac35a0bfb",
+      "responseCount": 5,
+      "responseBytes": 8192
+    },
+    {
+      "caseName": "page-tiny-5",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:46:04.712235Z",
+      "durationMs": 151.605,
+      "statusCode": 200,
+      "requestID": "47b8b958-ed27-4457-b918-7e76be1be00e",
+      "responseCount": 5,
+      "responseBytes": 8192
+    },
+    {
+      "caseName": "status-failed-page-2",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:46:05.861363Z",
+      "durationMs": 283.914,
+      "statusCode": 200,
+      "requestID": "46a49bca-a654-4266-b664-dc427aefbe3f",
+      "responseCount": 20,
+      "responseBytes": 32395
+    },
+    {
+      "caseName": "status-failed-page-2",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:46:06.158065Z",
+      "durationMs": 304.078,
+      "statusCode": 200,
+      "requestID": "5d4b7d29-599f-49bf-a2db-55e8f7044960",
+      "responseCount": 20,
+      "responseBytes": 32395
+    },
+    {
+      "caseName": "status-failed-page-2",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:46:06.469957Z",
+      "durationMs": 317.419,
+      "statusCode": 200,
+      "requestID": "9d6c12ff-3fea-4a0b-8804-fe3b1ccb65bc",
+      "responseCount": 20,
+      "responseBytes": 32395
+    }
+  ]
+}
