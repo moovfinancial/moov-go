@@ -41,3 +41,29 @@ The 60-day Honeycomb review added five cases after the original baseline. Run `b
 Honeycomb observed all 20 attempts, including warmups. The [labeled latency query](https://ui.honeycomb.io/moov/environments/staging/datasets/transfersbff2/result/giATAVgvjSR) shows that successful server spans were normally 78–230 ms at P50 by URI; the timed-out skip-200 request became a 29.98-second `499`. The [projection-route verification](https://ui.honeycomb.io/moov/environments/staging/datasets/transfersbff2/result/kcc6xGNLSVH) confirms all 20 attempts used `projection_enabled=false` and `account-transfer.list`.
 
 After enabling projection reads, rerun these five cases with label `projection-historical-slow` as well as rerunning the complete 34-case suite. Keep the timeout in the baseline artifact: it is the behavior the historical scan was designed to preserve for comparison.
+
+## High-volume Gatling account baseline
+
+Run `baseline-public-gatling`, 2026-08-03 22:52:48–23:07:49 UTC, exercised the complete 34-case suite against staging partner account `6f36ae5e-d715-4b5f-9089-11dd8f21c120`. This fixture has 86,892,676 transfers. The complete result is [`results/baseline-public-gatling-6f36ae5e-20260803T225248Z.json`](results/baseline-public-gatling-6f36ae5e-20260803T225248Z.json).
+
+Of 102 measured requests, 82 succeeded and 20 hit the 30-second client timeout. Medians exclude timed-out requests.
+
+| Case | Successful median | Outcome |
+| --- | ---: | --- |
+| default account feed | 282 ms | 3 successes |
+| global `/transfers` feed | 263 ms | 3 successes |
+| source-account filter | 2,884 ms | 1 success, 2 timeouts |
+| destination-account filter | 977 ms | 3 successes; 659–6,577 ms |
+| source/destination union | 2,060 ms | 3 successes |
+| count 1,000 | 2,066 ms | 3 successes |
+| shallow skip 200 | 684 ms | 3 successes |
+| refunded-only | — | 3 timeouts |
+| deep skip 50,000 | — | 3 timeouts |
+| skip past end | — | 3 timeouts |
+| authorization no-match | — | 3 timeouts |
+| capture no-match | — | 3 timeouts |
+| payment-link no-match | — | 3 timeouts |
+
+Honeycomb observed all 136 attempts, including warmups. The [labeled latency query](https://ui.honeycomb.io/moov/environments/staging/datasets/transfersbff2/result/uSi3UzNzNui) shows 28 client-canceled `499` spans when warmups are included. The account-path [projection verification](https://ui.honeycomb.io/moov/environments/staging/datasets/transfersbff2/result/q9gaDrkZFip) confirms all 132 account requests used `projection_enabled=false` and `account-transfer.list`; the global-path [projection verification](https://ui.honeycomb.io/moov/environments/staging/datasets/transfersbff2/result/reGZKS8pkuH) confirms the remaining four used `projection_enabled=false` and `transfer.list`.
+
+Rerun this suite with a distinct `projection-*` label after enabling projection reads. Preserve the 30-second timeout so regressions and improvements remain directly comparable to this baseline.

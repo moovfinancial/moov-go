@@ -1,0 +1,1473 @@
+{
+  "label": "baseline-public-gatling",
+  "account": {
+    "accountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+    "transferCount": 86892676,
+    "firstTransferOn": "2022-03-04T22:02:56Z",
+    "latestTransferOn": "2026-08-03T21:23:15Z",
+    "sourceAccountID": "0e69d339-c00f-4ce2-b3c2-790d5ac379dc",
+    "destinationAccountID": "00d98253-6b4a-44de-aafc-47f88b30d34d",
+    "hasRefunds": false,
+    "hasDisputes": false
+  },
+  "host": "api.moov-staging.io",
+  "startedAt": "2026-08-03T22:52:48.239448Z",
+  "finishedAt": "2026-08-03T23:07:49.040544Z",
+  "warmups": 1,
+  "iterations": 3,
+  "cases": [
+    {
+      "name": "account-destination",
+      "category": "account-filter",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "accountIDs": [
+          "00d98253-6b4a-44de-aafc-47f88b30d34d"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "account-no-match",
+      "category": "account-filter",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "accountIDs": [
+          "11111111-1111-4111-8111-111111111111"
+        ]
+      },
+      "fixtureMatch": false
+    },
+    {
+      "name": "account-source",
+      "category": "account-filter",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "accountIDs": [
+          "0e69d339-c00f-4ce2-b3c2-790d5ac379dc"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "account-source-destination-union",
+      "category": "account-filter",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "accountIDs": [
+          "0e69d339-c00f-4ce2-b3c2-790d5ac379dc,00d98253-6b4a-44de-aafc-47f88b30d34d"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "base-default",
+      "category": "common",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {},
+      "fixtureMatch": true
+    },
+    {
+      "name": "base-global-endpoint",
+      "category": "common",
+      "pathAccountID": "",
+      "version": "v2026.07.00",
+      "params": {},
+      "fixtureMatch": true
+    },
+    {
+      "name": "boolean-disputed",
+      "category": "sparse-boolean",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "disputed": [
+          "true"
+        ]
+      },
+      "fixtureMatch": false
+    },
+    {
+      "name": "boolean-refunded",
+      "category": "sparse-boolean",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "refunded": [
+          "true"
+        ]
+      },
+      "fixtureMatch": false
+    },
+    {
+      "name": "boolean-refunded-disputed",
+      "category": "sparse-combined",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "disputed": [
+          "true"
+        ],
+        "refunded": [
+          "true"
+        ]
+      },
+      "fixtureMatch": false
+    },
+    {
+      "name": "date-broad-history",
+      "category": "indexed",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "endDateTime": [
+          "2026-08-04T00:00:00Z"
+        ],
+        "startDateTime": [
+          "2022-01-01T00:00:00Z"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "date-old-month",
+      "category": "indexed",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "endDateTime": [
+          "2023-02-01T00:00:00Z"
+        ],
+        "startDateTime": [
+          "2023-01-01T00:00:00Z"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "date-recent-week",
+      "category": "indexed",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "endDateTime": [
+          "2026-08-04T00:00:00Z"
+        ],
+        "startDateTime": [
+          "2026-07-27T00:00:00Z"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "empty-foreign-id",
+      "category": "empty-result",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "foreignID": [
+          "amp-list-benchmark-no-match"
+        ]
+      },
+      "fixtureMatch": false
+    },
+    {
+      "name": "guard-party-path-account",
+      "category": "authorization-guard",
+      "pathAccountID": "00d98253-6b4a-44de-aafc-47f88b30d34d",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "200"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "page-deep-skip-50000",
+      "category": "pagination",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "200"
+        ],
+        "skip": [
+          "50000"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "page-default-20",
+      "category": "pagination",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "20"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "page-large-1000",
+      "category": "pagination",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "1000"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "page-offset-140-count-20",
+      "category": "pagination",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "20"
+        ],
+        "skip": [
+          "140"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "page-offset-200-count-20",
+      "category": "pagination",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "20"
+        ],
+        "skip": [
+          "200"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "page-past-end",
+      "category": "empty-result",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "200"
+        ],
+        "skip": [
+          "86893676"
+        ]
+      },
+      "fixtureMatch": false
+    },
+    {
+      "name": "page-shallow-skip-200",
+      "category": "pagination",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "200"
+        ],
+        "skip": [
+          "200"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "page-small-10",
+      "category": "pagination",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "10"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "page-tiny-5",
+      "category": "pagination",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "5"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "sparse-authorization",
+      "category": "sparse-auth-capture",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "authorizationIDs": [
+          "11111111-1111-4111-8111-111111111111"
+        ]
+      },
+      "fixtureMatch": false
+    },
+    {
+      "name": "sparse-capture",
+      "category": "sparse-auth-capture",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "captureIDs": [
+          "11111111-1111-4111-8111-111111111111"
+        ]
+      },
+      "fixtureMatch": false
+    },
+    {
+      "name": "sparse-foreign-id",
+      "category": "sparse",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "foreignID": [
+          "amp-list-benchmark-no-match"
+        ]
+      },
+      "fixtureMatch": false
+    },
+    {
+      "name": "sparse-group",
+      "category": "sparse",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "groupID": [
+          "11111111-1111-4111-8111-111111111111"
+        ]
+      },
+      "fixtureMatch": false
+    },
+    {
+      "name": "sparse-payment-link",
+      "category": "sparse",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "paymentLinkCode": [
+          "amp-list-benchmark-no-match"
+        ]
+      },
+      "fixtureMatch": false
+    },
+    {
+      "name": "sparse-schedule",
+      "category": "sparse",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "scheduleID": [
+          "11111111-1111-4111-8111-111111111111"
+        ]
+      },
+      "fixtureMatch": false
+    },
+    {
+      "name": "status-account-date",
+      "category": "indexed-combined",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "accountIDs": [
+          "00d98253-6b4a-44de-aafc-47f88b30d34d"
+        ],
+        "endDateTime": [
+          "2026-08-04T00:00:00Z"
+        ],
+        "startDateTime": [
+          "2026-07-27T00:00:00Z"
+        ],
+        "status": [
+          "completed"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "status-completed",
+      "category": "indexed",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "status": [
+          "completed"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "status-completed-recent",
+      "category": "indexed-combined",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "endDateTime": [
+          "2026-08-04T00:00:00Z"
+        ],
+        "startDateTime": [
+          "2026-07-27T00:00:00Z"
+        ],
+        "status": [
+          "completed"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "status-failed-page-2",
+      "category": "indexed-combined",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "count": [
+          "20"
+        ],
+        "skip": [
+          "20"
+        ],
+        "status": [
+          "failed"
+        ]
+      },
+      "fixtureMatch": true
+    },
+    {
+      "name": "status-group",
+      "category": "sparse-combined",
+      "pathAccountID": "6f36ae5e-d715-4b5f-9089-11dd8f21c120",
+      "version": "v2026.07.00",
+      "params": {
+        "groupID": [
+          "11111111-1111-4111-8111-111111111111"
+        ],
+        "status": [
+          "completed"
+        ]
+      },
+      "fixtureMatch": false
+    }
+  ],
+  "measurements": [
+    {
+      "caseName": "account-destination",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:53:18.241517Z",
+      "durationMs": 6576.795,
+      "statusCode": 200,
+      "requestID": "28f64af7-42d0-4ac3-9156-d4b06179449c",
+      "responseCount": 200,
+      "responseBytes": 482052
+    },
+    {
+      "caseName": "account-destination",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:53:25.049192Z",
+      "durationMs": 977.248,
+      "statusCode": 200,
+      "requestID": "ba554d4b-e835-4dac-acca-ea14e9ed84f2",
+      "responseCount": 200,
+      "responseBytes": 482052
+    },
+    {
+      "caseName": "account-destination",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:53:26.074979Z",
+      "durationMs": 658.701,
+      "statusCode": 200,
+      "requestID": "180c669d-8200-449b-8b7f-ec89a53065af",
+      "responseCount": 200,
+      "responseBytes": 482052
+    },
+    {
+      "caseName": "account-no-match",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:53:26.851249Z",
+      "durationMs": 110.74,
+      "statusCode": 200,
+      "requestID": "615d4644-942a-4e85-b2b8-a26b5a3964fe",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "account-no-match",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:53:26.962045Z",
+      "durationMs": 104.063,
+      "statusCode": 200,
+      "requestID": "ab233567-f373-4fa5-b2c4-c0775fcb99cf",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "account-no-match",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:53:27.066161Z",
+      "durationMs": 90.904,
+      "statusCode": 200,
+      "requestID": "1b90018a-ee78-4410-a59f-e651d982c24b",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "account-source",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:53:57.158467Z",
+      "durationMs": 30001.091,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?accountIDs=0e69d339-c00f-4ce2-b3c2-790d5ac379dc\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "account-source",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:54:27.159613Z",
+      "durationMs": 30001.292,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?accountIDs=0e69d339-c00f-4ce2-b3c2-790d5ac379dc\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "account-source",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:54:57.160981Z",
+      "durationMs": 2884.5,
+      "statusCode": 200,
+      "requestID": "487da501-1360-4891-98c6-dd94049f7151",
+      "responseCount": 200,
+      "responseBytes": 428138
+    },
+    {
+      "caseName": "account-source-destination-union",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:55:02.285135Z",
+      "durationMs": 2152.752,
+      "statusCode": 200,
+      "requestID": "1ad7e693-ddd3-4892-be81-736c3282cc6c",
+      "responseCount": 200,
+      "responseBytes": 428138
+    },
+    {
+      "caseName": "account-source-destination-union",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:55:04.456101Z",
+      "durationMs": 2059.815,
+      "statusCode": 200,
+      "requestID": "89685f61-551c-47a0-ac2f-50d0936d542f",
+      "responseCount": 200,
+      "responseBytes": 428138
+    },
+    {
+      "caseName": "account-source-destination-union",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:55:06.532911Z",
+      "durationMs": 1977.596,
+      "statusCode": 200,
+      "requestID": "a747cb7a-cec9-4a9f-93ed-5e3d1f18b166",
+      "responseCount": 200,
+      "responseBytes": 428138
+    },
+    {
+      "caseName": "base-default",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:55:09.893568Z",
+      "durationMs": 362.112,
+      "statusCode": 200,
+      "requestID": "1bbaf4d8-ad33-401c-afaa-02e3170dfb14",
+      "responseCount": 200,
+      "responseBytes": 432493
+    },
+    {
+      "caseName": "base-default",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:55:10.272408Z",
+      "durationMs": 281.677,
+      "statusCode": 200,
+      "requestID": "3b0f8f70-2f1b-481a-9c73-e58be909ee2c",
+      "responseCount": 200,
+      "responseBytes": 432493
+    },
+    {
+      "caseName": "base-default",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:55:10.570322Z",
+      "durationMs": 263.918,
+      "statusCode": 200,
+      "requestID": "7538f14f-84c5-4d9e-b472-9c0799bc81d0",
+      "responseCount": 200,
+      "responseBytes": 432493
+    },
+    {
+      "caseName": "base-global-endpoint",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:55:11.139114Z",
+      "durationMs": 262.648,
+      "statusCode": 200,
+      "requestID": "7d534c8d-c632-457b-ba9a-12035397f701",
+      "responseCount": 200,
+      "responseBytes": 432493
+    },
+    {
+      "caseName": "base-global-endpoint",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:55:11.416834Z",
+      "durationMs": 254.054,
+      "statusCode": 200,
+      "requestID": "8171ec15-97a3-4cc9-acbe-36015d48f48a",
+      "responseCount": 200,
+      "responseBytes": 432493
+    },
+    {
+      "caseName": "base-global-endpoint",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:55:11.686186Z",
+      "durationMs": 264.971,
+      "statusCode": 200,
+      "requestID": "733d028b-a661-411a-ba47-f9397a3217e6",
+      "responseCount": 200,
+      "responseBytes": 432493
+    },
+    {
+      "caseName": "boolean-disputed",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:55:12.202433Z",
+      "durationMs": 217.859,
+      "statusCode": 200,
+      "requestID": "09eb23e2-2677-49aa-87c4-9a8602b10825",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "boolean-disputed",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:55:12.420375Z",
+      "durationMs": 227.739,
+      "statusCode": 200,
+      "requestID": "f62d5255-5447-4a9b-898b-00e9f8b41643",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "boolean-disputed",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:55:12.648164Z",
+      "durationMs": 208.854,
+      "statusCode": 200,
+      "requestID": "51251c92-8f1c-416e-a800-7324daa3dfb6",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "boolean-refunded",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:55:42.857842Z",
+      "durationMs": 30001.256,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?refunded=true\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "boolean-refunded",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:56:12.859164Z",
+      "durationMs": 30000.43,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?refunded=true\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "boolean-refunded",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:56:42.859683Z",
+      "durationMs": 30000.49,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?refunded=true\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "boolean-refunded-disputed",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:57:13.247112Z",
+      "durationMs": 411.828,
+      "statusCode": 200,
+      "requestID": "aba761c4-a05e-4ff2-942b-ca5725c59298",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "boolean-refunded-disputed",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:57:13.659Z",
+      "durationMs": 282.87,
+      "statusCode": 200,
+      "requestID": "60709671-b38b-47ce-b6c8-4ee4f22331b2",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "boolean-refunded-disputed",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:57:13.941931Z",
+      "durationMs": 235.546,
+      "statusCode": 200,
+      "requestID": "cf635396-ca3e-4a3a-8e11-20181495a085",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "date-broad-history",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:57:14.617108Z",
+      "durationMs": 356.938,
+      "statusCode": 200,
+      "requestID": "5f4dfa42-de09-4434-82c2-0d644c136645",
+      "responseCount": 200,
+      "responseBytes": 432493
+    },
+    {
+      "caseName": "date-broad-history",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:57:14.991834Z",
+      "durationMs": 289.963,
+      "statusCode": 200,
+      "requestID": "9194dbd2-b62f-432f-b052-1b8107fe9f1a",
+      "responseCount": 200,
+      "responseBytes": 432493
+    },
+    {
+      "caseName": "date-broad-history",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:57:15.29734Z",
+      "durationMs": 288.155,
+      "statusCode": 200,
+      "requestID": "201fcb36-166e-4d63-b8e1-df42b8c262f8",
+      "responseCount": 200,
+      "responseBytes": 432493
+    },
+    {
+      "caseName": "date-old-month",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:57:21.005115Z",
+      "durationMs": 254.046,
+      "statusCode": 200,
+      "requestID": "079fdc8d-b668-4d02-a052-052b63ee8ba2",
+      "responseCount": 200,
+      "responseBytes": 314553
+    },
+    {
+      "caseName": "date-old-month",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:57:21.270261Z",
+      "durationMs": 242.528,
+      "statusCode": 200,
+      "requestID": "a00d2251-f7bf-4424-be77-b8b5abb35a33",
+      "responseCount": 200,
+      "responseBytes": 314553
+    },
+    {
+      "caseName": "date-old-month",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:57:21.526Z",
+      "durationMs": 221.799,
+      "statusCode": 200,
+      "requestID": "990510c0-6bd1-41e4-81b4-cae34fd93bcc",
+      "responseCount": 200,
+      "responseBytes": 314553
+    },
+    {
+      "caseName": "date-recent-week",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:57:22.066728Z",
+      "durationMs": 266.389,
+      "statusCode": 200,
+      "requestID": "b1091846-c690-4d58-a514-1fe75e29d393",
+      "responseCount": 200,
+      "responseBytes": 432493
+    },
+    {
+      "caseName": "date-recent-week",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:57:22.349114Z",
+      "durationMs": 272.384,
+      "statusCode": 200,
+      "requestID": "ca0cf688-80a9-4f1b-b638-fa5450e66c51",
+      "responseCount": 200,
+      "responseBytes": 432493
+    },
+    {
+      "caseName": "date-recent-week",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:57:22.637891Z",
+      "durationMs": 270.981,
+      "statusCode": 200,
+      "requestID": "6bc16968-ee80-4ffc-a69e-1b6016a0627e",
+      "responseCount": 200,
+      "responseBytes": 432493
+    },
+    {
+      "caseName": "empty-foreign-id",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:57:23.015781Z",
+      "durationMs": 88.382,
+      "statusCode": 200,
+      "requestID": "2804bacf-08ef-41a8-940a-3f12896cde0c",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "empty-foreign-id",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:57:23.104236Z",
+      "durationMs": 86.524,
+      "statusCode": 200,
+      "requestID": "5da67d74-58c6-4a58-a556-c48d7ca83169",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "empty-foreign-id",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:57:23.190931Z",
+      "durationMs": 84.448,
+      "statusCode": 200,
+      "requestID": "5bb11ab6-bfe2-48db-8459-4058102bf128",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "guard-party-path-account",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:57:23.863467Z",
+      "durationMs": 587.758,
+      "statusCode": 200,
+      "requestID": "d4352572-b4cc-4c52-9733-1884eac8dada",
+      "responseCount": 200,
+      "responseBytes": 482052
+    },
+    {
+      "caseName": "guard-party-path-account",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:57:24.464872Z",
+      "durationMs": 567.823,
+      "statusCode": 200,
+      "requestID": "c91b13f0-64c1-4620-9480-0f592e8a6ae3",
+      "responseCount": 200,
+      "responseBytes": 482052
+    },
+    {
+      "caseName": "guard-party-path-account",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:57:25.049876Z",
+      "durationMs": 521.471,
+      "statusCode": 200,
+      "requestID": "dc554366-c9c0-4152-a489-ef073b5a478c",
+      "responseCount": 200,
+      "responseBytes": 482052
+    },
+    {
+      "caseName": "page-deep-skip-50000",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:57:55.591163Z",
+      "durationMs": 30001.26,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?count=200\u0026skip=50000\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "page-deep-skip-50000",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:58:25.592493Z",
+      "durationMs": 30001.251,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?count=200\u0026skip=50000\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "page-deep-skip-50000",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:58:55.593796Z",
+      "durationMs": 30001.277,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?count=200\u0026skip=50000\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "page-default-20",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:59:26.099798Z",
+      "durationMs": 330.468,
+      "statusCode": 200,
+      "requestID": "3b283d8b-515a-419c-9147-e8f3547ae8dd",
+      "responseCount": 20,
+      "responseBytes": 42623
+    },
+    {
+      "caseName": "page-default-20",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:59:26.432871Z",
+      "durationMs": 220.37,
+      "statusCode": 200,
+      "requestID": "d578d392-2907-4f11-a9e1-c6c711cfe5d3",
+      "responseCount": 20,
+      "responseBytes": 42623
+    },
+    {
+      "caseName": "page-default-20",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:59:26.660815Z",
+      "durationMs": 188.13,
+      "statusCode": 200,
+      "requestID": "545e4609-2d6a-4e2a-8f5a-dfffb6e0e0ac",
+      "responseCount": 20,
+      "responseBytes": 42623
+    },
+    {
+      "caseName": "page-large-1000",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:59:29.375818Z",
+      "durationMs": 2165.908,
+      "statusCode": 200,
+      "requestID": "d0bfcbee-0bc3-4891-a77b-eb56cadc6897",
+      "responseCount": 1000,
+      "responseBytes": 2424643
+    },
+    {
+      "caseName": "page-large-1000",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:59:31.637719Z",
+      "durationMs": 2066.493,
+      "statusCode": 200,
+      "requestID": "ff34b7dd-1d34-4dcb-89ad-9d29273ab737",
+      "responseCount": 1000,
+      "responseBytes": 2424643
+    },
+    {
+      "caseName": "page-large-1000",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:59:33.804033Z",
+      "durationMs": 2051.971,
+      "statusCode": 200,
+      "requestID": "2ebc502d-ade0-4b87-9922-f904b3ae191b",
+      "responseCount": 1000,
+      "responseBytes": 2424643
+    },
+    {
+      "caseName": "page-offset-140-count-20",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:59:36.109693Z",
+      "durationMs": 142.982,
+      "statusCode": 200,
+      "requestID": "e4cd634f-d2a0-4420-a2dc-4d73d62ba6e0",
+      "responseCount": 20,
+      "responseBytes": 42836
+    },
+    {
+      "caseName": "page-offset-140-count-20",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:59:36.253186Z",
+      "durationMs": 142.909,
+      "statusCode": 200,
+      "requestID": "340ab1ae-f596-47a4-8fbd-33868f34ad9b",
+      "responseCount": 20,
+      "responseBytes": 42836
+    },
+    {
+      "caseName": "page-offset-140-count-20",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:59:36.398469Z",
+      "durationMs": 147.791,
+      "statusCode": 200,
+      "requestID": "e5347360-9371-4807-b7a0-2e50f504684e",
+      "responseCount": 20,
+      "responseBytes": 42836
+    },
+    {
+      "caseName": "page-offset-200-count-20",
+      "iteration": 1,
+      "startedAt": "2026-08-03T22:59:36.773518Z",
+      "durationMs": 199.241,
+      "statusCode": 200,
+      "requestID": "b1f0ed41-bdd1-4fb3-8956-9fc633c3ec8c",
+      "responseCount": 20,
+      "responseBytes": 49406
+    },
+    {
+      "caseName": "page-offset-200-count-20",
+      "iteration": 2,
+      "startedAt": "2026-08-03T22:59:36.974977Z",
+      "durationMs": 222.181,
+      "statusCode": 200,
+      "requestID": "3cb7f4b7-5a77-444f-a2ea-bbde5d442335",
+      "responseCount": 20,
+      "responseBytes": 49406
+    },
+    {
+      "caseName": "page-offset-200-count-20",
+      "iteration": 3,
+      "startedAt": "2026-08-03T22:59:37.198908Z",
+      "durationMs": 196.412,
+      "statusCode": 200,
+      "requestID": "6e6ab946-ffb7-45ec-bef5-2017eefd1b81",
+      "responseCount": 20,
+      "responseBytes": 49406
+    },
+    {
+      "caseName": "page-past-end",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:00:07.397255Z",
+      "durationMs": 30001.254,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?count=200\u0026skip=86893676\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "page-past-end",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:00:37.398557Z",
+      "durationMs": 30001.249,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?count=200\u0026skip=86893676\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "page-past-end",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:01:07.399863Z",
+      "durationMs": 30001.252,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?count=200\u0026skip=86893676\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "page-shallow-skip-200",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:01:38.216719Z",
+      "durationMs": 726.979,
+      "statusCode": 200,
+      "requestID": "eddbef95-2f04-4f78-b290-05c6765c1265",
+      "responseCount": 200,
+      "responseBytes": 498945
+    },
+    {
+      "caseName": "page-shallow-skip-200",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:01:38.95033Z",
+      "durationMs": 678.817,
+      "statusCode": 200,
+      "requestID": "3061dff5-5879-4795-9b9a-f18a5fd103ea",
+      "responseCount": 200,
+      "responseBytes": 498945
+    },
+    {
+      "caseName": "page-shallow-skip-200",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:01:39.655098Z",
+      "durationMs": 683.896,
+      "statusCode": 200,
+      "requestID": "2d3c7aa5-fddc-4ace-b645-b69d8a8cb253",
+      "responseCount": 200,
+      "responseBytes": 498945
+    },
+    {
+      "caseName": "page-small-10",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:01:40.527174Z",
+      "durationMs": 134.904,
+      "statusCode": 200,
+      "requestID": "a2a2e73b-38a9-4ffc-80db-227bf4967c92",
+      "responseCount": 10,
+      "responseBytes": 21251
+    },
+    {
+      "caseName": "page-small-10",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:01:40.663496Z",
+      "durationMs": 136.736,
+      "statusCode": 200,
+      "requestID": "143da688-df0b-4787-89e7-d919d20fe4ca",
+      "responseCount": 10,
+      "responseBytes": 21251
+    },
+    {
+      "caseName": "page-small-10",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:01:40.800563Z",
+      "durationMs": 125.381,
+      "statusCode": 200,
+      "requestID": "313c6af4-b4c1-4060-9f1c-3b74b170e72c",
+      "responseCount": 10,
+      "responseBytes": 21251
+    },
+    {
+      "caseName": "page-tiny-5",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:01:41.063431Z",
+      "durationMs": 133.438,
+      "statusCode": 200,
+      "requestID": "d80538c4-ff25-467b-86ce-01cf0aa3b3aa",
+      "responseCount": 5,
+      "responseBytes": 10812
+    },
+    {
+      "caseName": "page-tiny-5",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:01:41.197036Z",
+      "durationMs": 138.195,
+      "statusCode": 200,
+      "requestID": "57af6173-1dc0-4a79-9d39-c1c0ec381ee4",
+      "responseCount": 5,
+      "responseBytes": 10812
+    },
+    {
+      "caseName": "page-tiny-5",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:01:41.335426Z",
+      "durationMs": 120.526,
+      "statusCode": 200,
+      "requestID": "088532cb-e73a-471c-9f4b-bc3ced5555a0",
+      "responseCount": 5,
+      "responseBytes": 10812
+    },
+    {
+      "caseName": "sparse-authorization",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:02:11.458269Z",
+      "durationMs": 30000.826,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?authorizationIDs=11111111-1111-4111-8111-111111111111\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "sparse-authorization",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:02:41.459137Z",
+      "durationMs": 30001.265,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?authorizationIDs=11111111-1111-4111-8111-111111111111\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "sparse-authorization",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:03:11.460477Z",
+      "durationMs": 30001.261,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?authorizationIDs=11111111-1111-4111-8111-111111111111\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "sparse-capture",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:04:11.46313Z",
+      "durationMs": 30001.258,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?captureIDs=11111111-1111-4111-8111-111111111111\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "sparse-capture",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:04:41.464439Z",
+      "durationMs": 30001.525,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?captureIDs=11111111-1111-4111-8111-111111111111\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "sparse-capture",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:05:11.466016Z",
+      "durationMs": 30001.265,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?captureIDs=11111111-1111-4111-8111-111111111111\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "sparse-foreign-id",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:05:41.675791Z",
+      "durationMs": 142.585,
+      "statusCode": 200,
+      "requestID": "b7d92056-a90b-42e2-8e94-f519cd64b7ae",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "sparse-foreign-id",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:05:41.818416Z",
+      "durationMs": 205.047,
+      "statusCode": 200,
+      "requestID": "ff072167-a1af-42f3-89a3-106e7ab72a3c",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "sparse-foreign-id",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:05:42.023509Z",
+      "durationMs": 143.188,
+      "statusCode": 200,
+      "requestID": "982c677b-5f86-4a22-b866-992863118705",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "sparse-group",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:05:42.272346Z",
+      "durationMs": 98.203,
+      "statusCode": 200,
+      "requestID": "412aedb6-1c69-47f1-baeb-7f3f142dc425",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "sparse-group",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:05:42.370584Z",
+      "durationMs": 91.241,
+      "statusCode": 200,
+      "requestID": "a9d6c050-d0fe-477b-9ca8-72799f891255",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "sparse-group",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:05:42.46186Z",
+      "durationMs": 150.4,
+      "statusCode": 200,
+      "requestID": "de863719-d01a-49bd-b66c-5cbb6d3dd9c2",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "sparse-payment-link",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:06:12.613741Z",
+      "durationMs": 30001.357,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?paymentLinkCode=amp-list-benchmark-no-match\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "sparse-payment-link",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:06:42.615254Z",
+      "durationMs": 30001.37,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?paymentLinkCode=amp-list-benchmark-no-match\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "sparse-payment-link",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:07:12.616836Z",
+      "durationMs": 30001.398,
+      "statusCode": 0,
+      "responseBytes": 0,
+      "error": "Get \"https://api.moov-staging.io/accounts/6f36ae5e-d715-4b5f-9089-11dd8f21c120/transfers?paymentLinkCode=amp-list-benchmark-no-match\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "caseName": "sparse-schedule",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:07:42.86434Z",
+      "durationMs": 200.998,
+      "statusCode": 200,
+      "requestID": "58483d52-6b30-4b27-8e33-2c1181cce0f1",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "sparse-schedule",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:07:43.065407Z",
+      "durationMs": 250.845,
+      "statusCode": 200,
+      "requestID": "08f34c1a-efe9-4571-99e0-65c506e878a6",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "sparse-schedule",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:07:43.316317Z",
+      "durationMs": 207.635,
+      "statusCode": 200,
+      "requestID": "a418d2c9-7e31-4326-a080-aae9802d936d",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "status-account-date",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:07:44.033762Z",
+      "durationMs": 285.056,
+      "statusCode": 200,
+      "requestID": "3e294592-543f-4d63-bf8b-aa5a588601cc",
+      "responseCount": 87,
+      "responseBytes": 209704
+    },
+    {
+      "caseName": "status-account-date",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:07:44.325941Z",
+      "durationMs": 252.001,
+      "statusCode": 200,
+      "requestID": "8e8b60fc-fb4c-4785-a265-2af8efab6f69",
+      "responseCount": 87,
+      "responseBytes": 209704
+    },
+    {
+      "caseName": "status-account-date",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:07:44.582184Z",
+      "durationMs": 198.698,
+      "statusCode": 200,
+      "requestID": "427a56e7-0407-49ca-bc8c-c4622775885f",
+      "responseCount": 87,
+      "responseBytes": 209704
+    },
+    {
+      "caseName": "status-completed",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:07:45.139248Z",
+      "durationMs": 304.108,
+      "statusCode": 200,
+      "requestID": "92c951ee-e730-483f-9c1c-54c67d4a05ab",
+      "responseCount": 200,
+      "responseBytes": 432884
+    },
+    {
+      "caseName": "status-completed",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:07:45.466474Z",
+      "durationMs": 270.708,
+      "statusCode": 200,
+      "requestID": "d787e747-159f-432b-a0a1-3f2ecca52d99",
+      "responseCount": 200,
+      "responseBytes": 432884
+    },
+    {
+      "caseName": "status-completed",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:07:45.756364Z",
+      "durationMs": 365.589,
+      "statusCode": 200,
+      "requestID": "07b5d4d0-c0d7-4ab7-99dd-c85d59129101",
+      "responseCount": 200,
+      "responseBytes": 432884
+    },
+    {
+      "caseName": "status-completed-recent",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:07:46.431989Z",
+      "durationMs": 275.532,
+      "statusCode": 200,
+      "requestID": "16b9bcfd-ef37-4e21-a02b-a1dde8186b07",
+      "responseCount": 200,
+      "responseBytes": 432884
+    },
+    {
+      "caseName": "status-completed-recent",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:07:46.7186Z",
+      "durationMs": 272.1,
+      "statusCode": 200,
+      "requestID": "7abef0ff-186c-4a66-8b0c-568fedaa4f1b",
+      "responseCount": 200,
+      "responseBytes": 432884
+    },
+    {
+      "caseName": "status-completed-recent",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:07:46.995266Z",
+      "durationMs": 277.69,
+      "statusCode": 200,
+      "requestID": "fc291e77-ff8a-4c76-83c6-5b62753c896b",
+      "responseCount": 200,
+      "responseBytes": 432884
+    },
+    {
+      "caseName": "status-failed-page-2",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:07:48.200141Z",
+      "durationMs": 174.924,
+      "statusCode": 200,
+      "requestID": "0672d301-441e-4648-9a75-f9255049a66e",
+      "responseCount": 20,
+      "responseBytes": 33864
+    },
+    {
+      "caseName": "status-failed-page-2",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:07:48.377048Z",
+      "durationMs": 153.123,
+      "statusCode": 200,
+      "requestID": "a93b307a-e06f-4170-968e-d5f3350351a2",
+      "responseCount": 20,
+      "responseBytes": 33864
+    },
+    {
+      "caseName": "status-failed-page-2",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:07:48.531811Z",
+      "durationMs": 155.329,
+      "statusCode": 200,
+      "requestID": "d5b1f414-49da-4934-85b0-8ca30d839d22",
+      "responseCount": 20,
+      "responseBytes": 33864
+    },
+    {
+      "caseName": "status-group",
+      "iteration": 1,
+      "startedAt": "2026-08-03T23:07:48.779211Z",
+      "durationMs": 84.664,
+      "statusCode": 200,
+      "requestID": "b3caed34-0f7d-47f5-bf8f-bdda2c193b84",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "status-group",
+      "iteration": 2,
+      "startedAt": "2026-08-03T23:07:48.86397Z",
+      "durationMs": 83.661,
+      "statusCode": 200,
+      "requestID": "41100d8f-4663-4119-b053-f492282f424d",
+      "responseCount": 0,
+      "responseBytes": 3
+    },
+    {
+      "caseName": "status-group",
+      "iteration": 3,
+      "startedAt": "2026-08-03T23:07:48.947781Z",
+      "durationMs": 92.739,
+      "statusCode": 200,
+      "requestID": "7891519b-0aed-455f-a930-c15d8fc48a8d",
+      "responseCount": 0,
+      "responseBytes": 3
+    }
+  ]
+}
