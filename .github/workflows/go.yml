@@ -113,7 +113,7 @@ jobs:
 
     - name: Report Failure
       uses: tokorom/action-slack-incoming-webhook@main
-      if: github.event_name == 'schedule' && failure() && matrix.os == 'ubuntu-latest'
+      if: github.event_name == 'schedule' && failure()
       env:
         INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       with:
