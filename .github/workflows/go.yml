@@ -54,18 +54,72 @@ jobs:
       run: choco install -y make mingw
 
     - name: Check
-      if: github.repository == 'moovfinancial/moov-go'
+      if: github.repository == 'moovfinancial/moov-go' && matrix.os == 'ubuntu-latest'
+      run: |
+        set -o pipefail
+        make check 2>&1 | tee test-output.log
+      env:
+        SKIP_LINTERS: yes
+
+    - name: Check (macOS/Windows)
+      if: github.repository == 'moovfinancial/moov-go' && matrix.os != 'ubuntu-latest'
       run: make check
       env:
         SKIP_LINTERS: yes
 
+    - name: Extract failure summary
+      id: failure_summary
+      if: failure() && matrix.os == 'ubuntu-latest'
+      run: |
+        if [ ! -f test-output.log ]; then
+          summary="Check step produced no test output -- failure likely occurred before tests ran (checkout, setup, etc)."
+        else
+          test_count="$(awk '/^--- FAIL:/ { c++ } END { print c+0 }' test-output.log)"
+          file_list="$(awk 'match($0, /[A-Za-z0-9_]+\.go:[0-9]+:/) { s = substr($0, RSTART, RLENGTH); sub(/:[0-9]+:$/, "", s); print s }' test-output.log | sort -u)"
+
+          if [ -n "$file_list" ]; then
+            count="$(printf '%s\n' "$file_list" | wc -l | tr -d ' ')"
+            bullets="$(printf '%s\n' "$file_list" | awk '{print "  - `" $0 "`"}')"
+            if [ "$test_count" -gt 0 ]; then
+              header="$test_count failing tests in $count file(s):"
+            else
+              header="$count file(s) failed:"
+            fi
+            summary="$(printf '%s\n%s' "$header" "$bullets")"
+          else
+            modpath="$(go list -m 2>/dev/null || true)"
+            pkg_list="$(awk -F'\t' '/^FAIL\t/ {print $2}' test-output.log | sed "s#^${modpath}/##")"
+            if [ -n "$pkg_list" ]; then
+              count="$(printf '%s\n' "$pkg_list" | wc -l | tr -d ' ')"
+              bullets="$(printf '%s\n' "$pkg_list" | awk '{print "  - `" $0 "`"}')"
+              if [ "$test_count" -gt 0 ]; then
+                header="$test_count failing tests in $count package(s):"
+              else
+                header="$count package(s) failed:"
+              fi
+              summary="$(printf '%s\n%s' "$header" "$bullets")"
+            else
+              summary="make check failed, but no failing package was found in test output -- likely a non-test failure (lint tooling, coverage threshold, dependency check)."
+            fi
+          fi
+        fi
+
+        delim="SUMMARY_${GITHUB_RUN_ID}_${RANDOM}"
+        {
+          echo "summary<<$delim"
+          echo "$summary"
+          echo "$delim"
+        } >> "$GITHUB_OUTPUT"
+
     - name: Report Failure
       uses: tokorom/action-slack-incoming-webhook@main
-      if: github.event_name == 'schedule' && failure()
+      if: github.event_name == 'schedule' && failure() && matrix.os == 'ubuntu-latest'
       env:
         INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       with:
         text: |+
           moov-go CI Failure
+
+          ${{ steps.failure_summary.outputs.summary }}
 
           Github Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
