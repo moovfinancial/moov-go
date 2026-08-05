@@ -66,15 +66,17 @@ func sampleComparison(transferID string, diffs map[string]struct{}, errorsByTran
 }
 
 type summary struct {
-	CachedThroughPK int64 `json:"cached_through_pk"`
-	PlannedSamples  int   `json:"planned_samples"`
-	ValidatedRanges int   `json:"validated_ranges"`
-	Attempted       int   `json:"attempted"`
-	Matched         int   `json:"matched"`
-	Mismatched      int   `json:"mismatched"`
-	Errored         int   `json:"errored"`
-	FailedRequests  int   `json:"failed_requests"`
-	SkippedRanges   int   `json:"skipped_ranges"`
+	ProducerCheckpoint int64  `json:"producer_checkpoint"`
+	ProducerVersion    string `json:"producer_version"`
+	CachedThroughPK    int64  `json:"cached_through_pk"`
+	PlannedSamples     int    `json:"planned_samples"`
+	ValidatedRanges    int    `json:"validated_ranges"`
+	Attempted          int    `json:"attempted"`
+	Matched            int    `json:"matched"`
+	Mismatched         int    `json:"mismatched"`
+	Errored            int    `json:"errored"`
+	FailedRequests     int    `json:"failed_requests"`
+	SkippedRanges      int    `json:"skipped_ranges"`
 }
 
 func printSummary(dbPath string) error {
@@ -83,6 +85,8 @@ func printSummary(dbPath string) error {
 	}
 	query := `
 SELECT
+  COALESCE((SELECT checkpoint FROM monitor_producer_state WHERE id = 1), 0) AS producer_checkpoint,
+  COALESCE((SELECT service_version FROM monitor_producer_state WHERE id = 1), '') AS producer_version,
   (SELECT cached_through_pk FROM sample_cache_state WHERE id = 1) AS cached_through_pk,
   (SELECT COUNT(*) FROM samples) AS planned_samples,
   (SELECT COUNT(*) FROM validation_runs WHERE status IN ('clean', 'mismatch', 'mismatch_error')) AS validated_ranges,
@@ -105,8 +109,9 @@ SELECT
 		return fmt.Errorf("expected one summary row, got %d", len(summaries))
 	}
 	current := summaries[0]
-	fmt.Printf("cachedThroughPK=%d planned=%d validatedRanges=%d skippedRanges=%d attempted=%d matched=%d mismatched=%d errored=%d failedRequests=%d\n",
-		current.CachedThroughPK, current.PlannedSamples, current.ValidatedRanges, current.SkippedRanges, current.Attempted,
+	fmt.Printf("producerCheckpoint=%d producerVersion=%s cachedThroughPK=%d planned=%d validatedRanges=%d skippedRanges=%d attempted=%d matched=%d mismatched=%d errored=%d failedRequests=%d\n",
+		current.ProducerCheckpoint, current.ProducerVersion, current.CachedThroughPK,
+		current.PlannedSamples, current.ValidatedRanges, current.SkippedRanges, current.Attempted,
 		current.Matched, current.Mismatched, current.Errored, current.FailedRequests)
 	return nil
 }

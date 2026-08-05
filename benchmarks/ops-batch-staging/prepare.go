@@ -142,6 +142,17 @@ func extendSampleCache(options sampleCacheOptions) (sampleCacheExtension, error)
 	if err != nil {
 		return sampleCacheExtension{}, fmt.Errorf("reading campaign range size: %w", err)
 	}
+	maxPKText, err := scalar(options.DBPath, "SELECT max_pk FROM campaign WHERE id = 1;")
+	if err != nil {
+		return sampleCacheExtension{}, fmt.Errorf("reading campaign maximum PK: %w", err)
+	}
+	maxPK, err := strconv.ParseInt(maxPKText, 10, 64)
+	if err != nil {
+		return sampleCacheExtension{}, fmt.Errorf("parsing campaign maximum PK %q: %w", maxPKText, err)
+	}
+	if maxPK != 0 {
+		return sampleCacheExtension{}, nil
+	}
 	cachedThroughText, err := scalar(options.DBPath, "SELECT cached_through_pk FROM sample_cache_state WHERE id = 1;")
 	if err != nil {
 		return sampleCacheExtension{}, fmt.Errorf("reading sample cache checkpoint: %w", err)
@@ -275,7 +286,7 @@ CREATE TEMP TABLE samples_import (
 .mode csv
 .import --skip 1 %s samples_import
 BEGIN;
-INSERT OR IGNORE INTO samples
+INSERT INTO samples
 SELECT pk_id, transfer_id, range_start, range_end, sample_rank, selection_reason, transfer_type, status, account_id
 FROM samples_import;
 UPDATE sample_cache_state

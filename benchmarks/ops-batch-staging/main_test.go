@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -98,6 +99,28 @@ func TestExtendSampleCacheSkipsBigQueryWhenCheckpointIsCovered(t *testing.T) {
 	assertScalar(t, dbPath, "SELECT cached_through_pk FROM sample_cache_state WHERE id = 1;", "263000")
 }
 
+func TestExtendSampleCacheDoesNotExtendFixedCampaign(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "campaign.sqlite")
+	if err := initializeDB(dbPath); err != nil {
+		t.Fatal(err)
+	}
+	if err := ensureCampaign(prepareOptions{DBPath: dbPath, StartPK: 3001, MaxPK: 13_000, RangeSize: 10_000}); err != nil {
+		t.Fatal(err)
+	}
+
+	extension, err := extendSampleCache(sampleCacheOptions{
+		DBPath:         dbPath,
+		SafeCheckpoint: 30_000,
+		ChunkPKs:       1_000_000,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if extension != (sampleCacheExtension{}) {
+		t.Fatalf("fixed campaign extension = %+v", extension)
+	}
+}
+
 func TestImportSampleCacheFailureDoesNotAdvanceCheckpoint(t *testing.T) {
 	dbPath := filepath.Join(t.TempDir(), "campaign.sqlite")
 	if err := initializeDB(dbPath); err != nil {
@@ -112,6 +135,62 @@ func TestImportSampleCacheFailureDoesNotAdvanceCheckpoint(t *testing.T) {
 		t.Fatal("expected missing sample export to fail")
 	}
 	assertScalar(t, dbPath, "SELECT cached_through_pk FROM sample_cache_state WHERE id = 1;", "3000")
+}
+
+func TestImportSampleCacheConstraintFailureDoesNotAdvanceCheckpoint(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "campaign.sqlite")
+	if err := initializeDB(dbPath); err != nil {
+		t.Fatal(err)
+	}
+	if err := ensureCampaign(prepareOptions{DBPath: dbPath, StartPK: 3001, RangeSize: 10_000}); err != nil {
+		t.Fatal(err)
+	}
+	csvPath := filepath.Join(t.TempDir(), "samples.csv")
+	csv := "pk_id,transfer_id,range_start,range_end,sample_rank,selection_reason,transfer_type,status,account_id\n" +
+		"3001,duplicate,3001,13000,1,range-first,wallet-to-wallet,completed,account-one\n" +
+		"3002,duplicate,3001,13000,2,uniform,wallet-to-bank,completed,account-two\n"
+	if err := os.WriteFile(csvPath, []byte(csv), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := importSamples(dbPath, csvPath, 13_000); err == nil {
+		t.Fatal("expected duplicate transfer ID to fail")
+	}
+	assertScalar(t, dbPath, "SELECT COUNT(*) FROM samples;", "0")
+	assertScalar(t, dbPath, "SELECT cached_through_pk FROM sample_cache_state WHERE id = 1;", "3000")
+}
+
+func TestMonitorProgressStateIsDurableAndVersionBound(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "campaign.sqlite")
+	if err := initializeDB(dbPath); err != nil {
+		t.Fatal(err)
+	}
+	if err := recordProducerCheckpoint(dbPath, "dev-one", 270_000); err != nil {
+		t.Fatal(err)
+	}
+	if err := recordProducerCheckpoint(dbPath, "dev-one", 260_000); err != nil {
+		t.Fatal(err)
+	}
+	checkpoint, ok, err := persistedProducerCheckpoint(dbPath, "dev-one")
+	if err != nil || !ok || checkpoint != 270_000 {
+		t.Fatalf("persisted checkpoint = %d, %t, %v", checkpoint, ok, err)
+	}
+	if _, ok, err := persistedProducerCheckpoint(dbPath, "dev-two"); err != nil || ok {
+		t.Fatalf("unexpected checkpoint for another version: %t, %v", ok, err)
+	}
+
+	selected := sampleRange{Start: 253_001, End: 263_000}
+	if err := recordConsumedRange(dbPath, "dev-bff", selected); err != nil {
+		t.Fatal(err)
+	}
+	ready, err := consumedRangeRecorded(dbPath, "dev-bff", selected)
+	if err != nil || !ready {
+		t.Fatalf("persisted consumed range = %t, %v", ready, err)
+	}
+	ready, err = consumedRangeRecorded(dbPath, "dev-other", selected)
+	if err != nil || ready {
+		t.Fatalf("consumed range leaked across versions = %t, %v", ready, err)
+	}
 }
 
 func TestPendingRangesResumeAfterCompletedRun(t *testing.T) {

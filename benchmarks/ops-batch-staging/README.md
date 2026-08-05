@@ -16,7 +16,7 @@ The manifest starts at the first PK after the checkpoint that precedes the autom
 - One candidate per partner-account stratum is preferred after transfer-type/status coverage.
 - The seed `projection-backfill-sample-v1` makes preparation repeatable.
 
-The monitor reads the safe producer checkpoint from Honeycomb and extends the local sample cache only when that checkpoint moves beyond the cached PK range. Cache extensions are bounded, aligned to the campaign's 10,000-PK ranges, and persisted in SQLite. Only selected `pk_id` and `transfer_id` mappings and their analysis dimensions are stored locally.
+The monitor reads the safe producer checkpoint from Honeycomb and extends the local sample cache only when that checkpoint moves beyond the cached PK range. The highest checkpoint is persisted with its Transfers image version so cache catch-up can continue after producer activity stops. Cache extensions are bounded, aligned to the campaign's 10,000-PK ranges, and persisted in SQLite. Only selected `pk_id` and `transfer_id` mappings and their analysis dimensions are stored locally.
 
 ## Prepare
 
@@ -81,7 +81,7 @@ Confirm the number of `projection_comparison` spans equals the attempted count. 
 go run ./benchmarks/ops-batch-staging summary
 ```
 
-The summary reports the durable sample-cache PK checkpoint, planned samples, completed and intentionally skipped ranges, total attempts, matches, mismatches, per-transfer errors, and request-level failures. Historical errors remain recorded after a successful retry.
+The summary reports the durable producer and sample-cache PK checkpoints, planned samples, completed and intentionally skipped ranges, total attempts, matches, mismatches, per-transfer errors, and request-level failures. Historical errors remain recorded after a successful retry.
 
 ## Monitor every 30 minutes
 
@@ -101,8 +101,9 @@ The monitor:
 - takes a non-blocking file lock so scheduled runs cannot overlap;
 - refuses to send traffic when the expected producer or consumer image is not healthy;
 - extends the SQLite sample cache in bounded BigQuery queries without requiring a final campaign PK;
+- resumes from the highest version-bound producer checkpoint after recent producer telemetry becomes quiet;
 - fails closed on errors in Transfers backfill stages, TransferUpdated consumption, or projection upserts;
-- requires every selected transfer to have a matching projection-upsert span before validation;
+- requires every selected transfer to have a matching projection-upsert span before validation and persists that readiness by range and transfersbff2 version;
 - retries prior failed ranges before sampling a newer range;
 - validates the newest safe range and records older elapsed ranges as intentionally skipped;
 - records clean API responses as pending until Honeycomb confirms one matching comparison span per attempted transfer; and

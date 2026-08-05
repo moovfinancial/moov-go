@@ -76,10 +76,6 @@ func monitorOnce(options monitorOptions) error {
 	if err != nil {
 		return err
 	}
-	if health.ProducerIterations == 0 || health.ProducerCheckpoint == 0 {
-		return fmt.Errorf("producer has no recent successful backfill iterations: iterations=%d checkpoint=%d query=%s",
-			health.ProducerIterations, health.ProducerCheckpoint, honeycombQueryURL("transfers", health.ProducerQueryPK))
-	}
 	if health.ProducerErrors > 0 {
 		return fmt.Errorf("producer reported %d recent errors", health.ProducerErrors)
 	}
@@ -87,15 +83,31 @@ func monitorOnce(options monitorOptions) error {
 		return fmt.Errorf("Transfers backfill traces reported %d recent errors: %s", health.ProducerWorkflowErrors,
 			honeycombQueryURL("transfers", health.ProducerErrorsQueryPK))
 	}
-	if health.ConsumerUpserts == 0 {
-		return errors.New("consumer has no recent projection upserts; catch-up is not proven")
-	}
 	if health.ConsumerErrors > 0 {
 		return fmt.Errorf("consumer reported %d recent errors", health.ConsumerErrors)
 	}
 	if health.ConsumerWorkflowErrors > 0 {
 		return fmt.Errorf("transfersbff2 TransferUpdated consumer traces reported %d recent errors: %s", health.ConsumerWorkflowErrors,
 			honeycombQueryURL("transfersbff2", health.ConsumerErrorsQueryPK))
+	}
+	if health.ProducerIterations > 0 {
+		if health.ProducerCheckpoint == 0 {
+			return fmt.Errorf("producer reported recent iterations without a checkpoint: query=%s",
+				honeycombQueryURL("transfers", health.ProducerQueryPK))
+		}
+		if err := recordProducerCheckpoint(options.DBPath, options.ProducerVersion, health.ProducerCheckpoint); err != nil {
+			return err
+		}
+	} else {
+		checkpoint, ok, err := persistedProducerCheckpoint(options.DBPath, options.ProducerVersion)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return fmt.Errorf("producer has no recent iterations or persisted checkpoint for %s: query=%s",
+				options.ProducerVersion, honeycombQueryURL("transfers", health.ProducerQueryPK))
+		}
+		health.ProducerCheckpoint = checkpoint
 	}
 
 	safeCheckpoint := health.ProducerCheckpoint - rangeSize*options.SafeLagRanges
@@ -130,7 +142,7 @@ func monitorOnce(options monitorOptions) error {
 		return nil
 	}
 	readinessCtx, cancelReadiness := context.WithTimeout(context.Background(), 60*time.Second)
-	consumerReady, err := projectionSampleConsumed(readinessCtx, honeycomb, options.ServiceVersion, selected)
+	consumerReady, err := projectionSampleConsumed(readinessCtx, honeycomb, options.DBPath, options.ServiceVersion, selected)
 	cancelReadiness()
 	if err != nil {
 		return err
@@ -197,9 +209,13 @@ func monitorOnce(options monitorOptions) error {
 	return nil
 }
 
-func projectionSampleConsumed(ctx context.Context, client *honeycombMCPClient, serviceVersion string, selected sampleRange) (bool, error) {
+func projectionSampleConsumed(ctx context.Context, client *honeycombMCPClient, dbPath, serviceVersion string, selected sampleRange) (bool, error) {
 	if len(selected.Samples) == 0 {
 		return false, errors.New("selected range has no samples")
+	}
+	ready, err := consumedRangeRecorded(dbPath, serviceVersion, selected)
+	if err != nil || ready {
+		return ready, err
 	}
 	transferIDs := make([]string, 0, len(selected.Samples))
 	for _, current := range selected.Samples {
@@ -215,7 +231,7 @@ func projectionSampleConsumed(ctx context.Context, client *honeycombMCPClient, s
 				{"column": "service.version", "op": "=", "value": serviceVersion},
 				{"column": "transfer_id", "op": "in", "value": transferIDs},
 			},
-			"time_range": "24h",
+			"time_range": "30d",
 		},
 	})
 	if err != nil {
@@ -228,7 +244,75 @@ func projectionSampleConsumed(ctx context.Context, client *honeycombMCPClient, s
 	if err != nil {
 		return false, err
 	}
-	return count == int64(len(transferIDs)), nil
+	if count != int64(len(transferIDs)) {
+		return false, nil
+	}
+	if err := recordConsumedRange(dbPath, serviceVersion, selected); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func recordProducerCheckpoint(dbPath, serviceVersion string, checkpoint int64) error {
+	_, err := runSQLite(dbPath, fmt.Sprintf(`
+INSERT INTO monitor_producer_state (id, service_version, checkpoint, observed_at)
+VALUES (1, %s, %d, %s)
+ON CONFLICT(id) DO UPDATE SET
+  service_version = excluded.service_version,
+  checkpoint = CASE
+    WHEN monitor_producer_state.service_version = excluded.service_version
+      AND monitor_producer_state.checkpoint > excluded.checkpoint
+    THEN monitor_producer_state.checkpoint
+    ELSE excluded.checkpoint
+  END,
+  observed_at = excluded.observed_at;
+`, sqlQuote(serviceVersion), checkpoint, sqlQuote(time.Now().UTC().Format(time.RFC3339Nano))))
+	if err != nil {
+		return fmt.Errorf("recording producer checkpoint: %w", err)
+	}
+	return nil
+}
+
+func persistedProducerCheckpoint(dbPath, serviceVersion string) (int64, bool, error) {
+	value, err := scalar(dbPath, fmt.Sprintf(
+		"SELECT checkpoint FROM monitor_producer_state WHERE id = 1 AND service_version = %s;",
+		sqlQuote(serviceVersion),
+	))
+	if err != nil {
+		return 0, false, fmt.Errorf("reading persisted producer checkpoint: %w", err)
+	}
+	if value == "" {
+		return 0, false, nil
+	}
+	checkpoint, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return 0, false, fmt.Errorf("parsing persisted producer checkpoint %q: %w", value, err)
+	}
+	return checkpoint, true, nil
+}
+
+func consumedRangeRecorded(dbPath, serviceVersion string, selected sampleRange) (bool, error) {
+	count, err := scalar(dbPath, fmt.Sprintf(`
+SELECT COUNT(*) FROM monitor_consumed_ranges
+WHERE range_start = %d AND range_end = %d AND service_version = %s;
+`, selected.Start, selected.End, sqlQuote(serviceVersion)))
+	if err != nil {
+		return false, fmt.Errorf("reading consumed range state: %w", err)
+	}
+	return count == "1", nil
+}
+
+func recordConsumedRange(dbPath, serviceVersion string, selected sampleRange) error {
+	_, err := runSQLite(dbPath, fmt.Sprintf(`
+INSERT INTO monitor_consumed_ranges (range_start, range_end, service_version, observed_at)
+VALUES (%d, %d, %s, %s)
+ON CONFLICT(range_start, range_end, service_version)
+DO UPDATE SET observed_at = excluded.observed_at;
+`, selected.Start, selected.End, sqlQuote(serviceVersion), sqlQuote(time.Now().UTC().Format(time.RFC3339Nano))))
+	if err != nil {
+		return fmt.Errorf("recording consumed range state: %w", err)
+	}
+	return nil
 }
 
 func waitForComparisonEvidence(ctx context.Context, client *honeycombMCPClient, serviceVersion, userAgent string, attempted int, interval time.Duration) (comparisonEvidence, error) {
@@ -316,11 +400,13 @@ func readRolloutHealth(ctx context.Context, client *honeycombMCPClient, options 
 		ProducerErrorsQueryPK: producerWorkflowErrors.RunPK,
 		ConsumerErrorsQueryPK: consumerWorkflowErrors.RunPK,
 	}
-	if health.ProducerCheckpoint, err = number(producer.Rows[0], "checkpoint"); err != nil {
-		return rolloutHealth{}, err
-	}
 	if health.ProducerIterations, err = number(producer.Rows[0], "iterations"); err != nil {
 		return rolloutHealth{}, err
+	}
+	if health.ProducerIterations > 0 {
+		if health.ProducerCheckpoint, err = number(producer.Rows[0], "checkpoint"); err != nil {
+			return rolloutHealth{}, err
+		}
 	}
 	if health.ProducerErrors, err = number(producer.Rows[0], "errors"); err != nil {
 		return rolloutHealth{}, err

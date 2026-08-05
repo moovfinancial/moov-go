@@ -70,6 +70,19 @@ CREATE TABLE IF NOT EXISTS sample_cache_state (
     cached_through_pk INTEGER NOT NULL,
     updated_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS monitor_producer_state (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    service_version TEXT NOT NULL,
+    checkpoint INTEGER NOT NULL,
+    observed_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS monitor_consumed_ranges (
+    range_start INTEGER NOT NULL,
+    range_end INTEGER NOT NULL,
+    service_version TEXT NOT NULL,
+    observed_at TEXT NOT NULL,
+    PRIMARY KEY (range_start, range_end, service_version)
+);
 `
 
 func initializeDB(dbPath string) error {
