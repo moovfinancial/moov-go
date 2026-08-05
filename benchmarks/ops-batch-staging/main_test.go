@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -13,7 +14,7 @@ import (
 )
 
 func TestSampleQueryUsesConfiguredBackfillRanges(t *testing.T) {
-	query := sampleQuery(3001, 89_821_930, 10_000)
+	query := sampleQuery(3001, 3001, 89_821_930, 10_000)
 	for _, expected := range []string{
 		"DIV(pk_id - 3001, 10000)",
 		"WHERE pk_id BETWEEN 3001 AND 89821930",
@@ -27,6 +28,90 @@ func TestSampleQueryUsesConfiguredBackfillRanges(t *testing.T) {
 			t.Fatalf("sample query missing %q", expected)
 		}
 	}
+}
+
+func TestSampleQueryKeepsCampaignRangeAlignmentAcrossCacheChunks(t *testing.T) {
+	query := sampleQuery(3001, 253001, 263000, 10_000)
+	for _, expected := range []string{
+		"DIV(pk_id - 3001, 10000)",
+		"WHERE pk_id BETWEEN 253001 AND 263000",
+		"3001 + range_index * 10000 AS range_start",
+	} {
+		if !strings.Contains(query, expected) {
+			t.Fatalf("sample cache query missing %q", expected)
+		}
+	}
+}
+
+func TestPlanSampleCacheExtensionUsesOnlyCompletedRanges(t *testing.T) {
+	extension, ok, err := planSampleCacheExtension(3001, 10_000, 253_000, 270_000, 1_000_000)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !ok || extension.Start != 253_001 || extension.End != 263_000 {
+		t.Fatalf("extension = %+v, %t", extension, ok)
+	}
+
+	_, ok, err = planSampleCacheExtension(3001, 10_000, 263_000, 270_000, 1_000_000)
+	if err != nil || ok {
+		t.Fatalf("unexpected extension for complete cache: ok=%t err=%v", ok, err)
+	}
+}
+
+func TestPlanSampleCacheExtensionBoundsLargeProducerLead(t *testing.T) {
+	extension, ok, err := planSampleCacheExtension(3001, 10_000, 3000, 2_500_000, 1_000_000)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !ok || extension.Start != 3001 || extension.End != 1_003_000 {
+		t.Fatalf("extension = %+v, %t", extension, ok)
+	}
+}
+
+func TestPlanSampleCacheExtensionRejectsUnalignedCacheCheckpoint(t *testing.T) {
+	_, _, err := planSampleCacheExtension(3001, 10_000, 12_500, 30_000, 1_000_000)
+	if err == nil || !strings.Contains(err.Error(), "not aligned") {
+		t.Fatalf("unaligned checkpoint error = %v", err)
+	}
+}
+
+func TestExtendSampleCacheSkipsBigQueryWhenCheckpointIsCovered(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "campaign.sqlite")
+	if err := initializeDB(dbPath); err != nil {
+		t.Fatal(err)
+	}
+	if err := ensureCampaign(prepareOptions{DBPath: dbPath, StartPK: 3001, RangeSize: 10_000}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := runSQLite(dbPath, "UPDATE sample_cache_state SET cached_through_pk = 263000 WHERE id = 1;"); err != nil {
+		t.Fatal(err)
+	}
+
+	options := sampleCacheOptions{
+		DBPath:         dbPath,
+		SafeCheckpoint: 270_000,
+		ChunkPKs:       1_000_000,
+	}
+	if _, err := extendSampleCache(options); err != nil {
+		t.Fatalf("covered checkpoint unexpectedly queried BigQuery: %v", err)
+	}
+	assertScalar(t, dbPath, "SELECT cached_through_pk FROM sample_cache_state WHERE id = 1;", "263000")
+}
+
+func TestImportSampleCacheFailureDoesNotAdvanceCheckpoint(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "campaign.sqlite")
+	if err := initializeDB(dbPath); err != nil {
+		t.Fatal(err)
+	}
+	if err := ensureCampaign(prepareOptions{DBPath: dbPath, StartPK: 3001, RangeSize: 10_000}); err != nil {
+		t.Fatal(err)
+	}
+
+	err := importSamples(dbPath, filepath.Join(t.TempDir(), "missing.csv"), 13_000)
+	if err == nil {
+		t.Fatal("expected missing sample export to fail")
+	}
+	assertScalar(t, dbPath, "SELECT cached_through_pk FROM sample_cache_state WHERE id = 1;", "3000")
 }
 
 func TestPendingRangesResumeAfterCompletedRun(t *testing.T) {
@@ -86,6 +171,147 @@ INSERT INTO validation_runs (
 	}
 }
 
+func TestLatestPendingRangeUsesNewestSafeRange(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "campaign.sqlite")
+	if err := initializeDB(dbPath); err != nil {
+		t.Fatal(err)
+	}
+	seedSamples(t, dbPath)
+
+	current, ok, err := latestPendingRange(dbPath, 23_000)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !ok || current.Start != 13_001 {
+		t.Fatalf("latest pending range = %+v, %t", current, ok)
+	}
+	if _, err := runSQLite(dbPath, `
+INSERT INTO monitor_skipped_ranges VALUES (13001, 23000, '2026-08-05T00:00:00Z', 23000, 'test');
+`); err != nil {
+		t.Fatal(err)
+	}
+	current, ok, err = latestPendingRange(dbPath, 23_000)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !ok || current.Start != 3001 {
+		t.Fatalf("latest pending range after skip = %+v, %t", current, ok)
+	}
+}
+
+func TestLatestPendingRangeRetriesErrorOnlyResponse(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "campaign.sqlite")
+	if err := initializeDB(dbPath); err != nil {
+		t.Fatal(err)
+	}
+	seedSamples(t, dbPath)
+	if _, err := runSQLite(dbPath, `
+INSERT INTO validation_runs (
+  range_start, range_end, started_at, api_version, user_agent, attempted_count, status
+) VALUES (13001, 23000, '2026-08-05T00:00:00Z', 'v2026.07.00', 'test', 1, 'error');
+`); err != nil {
+		t.Fatal(err)
+	}
+
+	current, ok, err := latestPendingRange(dbPath, 23_000)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !ok || current.Start != 13_001 {
+		t.Fatalf("error-only range was not retryable: %+v, %t", current, ok)
+	}
+}
+
+func TestMarkSkippedRangesOnlySkipsOlderPendingRanges(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "campaign.sqlite")
+	if err := initializeDB(dbPath); err != nil {
+		t.Fatal(err)
+	}
+	seedSamples(t, dbPath)
+	selected, ok, err := latestPendingRange(dbPath, 23_000)
+	if err != nil || !ok {
+		t.Fatalf("selecting latest range: %+v, %t, %v", selected, ok, err)
+	}
+	result := requestResult{StatusCode: http.StatusOK, RequestID: "monitor-request", Duration: time.Second}
+	options := validateOptions{Version: defaultAPIVersion, ServiceVersion: "dev-test"}
+	runID, err := recordValidation(dbPath, selected, options, "test-agent", result, "evidence_pending", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := finalizeMonitorSuccess(dbPath, runID, "trace-id", selected, 23_000); err != nil {
+		t.Fatal(err)
+	}
+	assertScalar(t, dbPath, "SELECT COUNT(*) FROM monitor_skipped_ranges;", "1")
+	assertScalar(t, dbPath, "SELECT range_start FROM monitor_skipped_ranges;", "3001")
+	assertScalar(t, dbPath, fmt.Sprintf("SELECT status FROM validation_runs WHERE id = %d;", runID), "clean")
+}
+
+func TestFinalizeMonitorSuccessPreservesPriorFailedRange(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "campaign.sqlite")
+	if err := initializeDB(dbPath); err != nil {
+		t.Fatal(err)
+	}
+	seedSamples(t, dbPath)
+	options := validateOptions{Version: defaultAPIVersion, ServiceVersion: "dev-test"}
+	older, err := samplesForRange(dbPath, 3001, 13_000)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := recordValidation(dbPath, older, options, "failed-agent", requestResult{}, "request_error", false); err != nil {
+		t.Fatal(err)
+	}
+	selected, err := samplesForRange(dbPath, 13_001, 23_000)
+	if err != nil {
+		t.Fatal(err)
+	}
+	runID, err := recordValidation(dbPath, selected, options, "monitor-agent", requestResult{StatusCode: http.StatusOK}, "evidence_pending", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := finalizeMonitorSuccess(dbPath, runID, "trace-id", selected, 23_000); err != nil {
+		t.Fatal(err)
+	}
+	assertScalar(t, dbPath, "SELECT COUNT(*) FROM monitor_skipped_ranges;", "0")
+
+	retry, ok, err := latestPendingRange(dbPath, 23_000)
+	if err != nil || !ok || retry.Start != 3001 {
+		t.Fatalf("prior failed range was not preserved: %+v, %t, %v", retry, ok, err)
+	}
+}
+
+func TestEvidenceTransitionsTargetValidationRunID(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "campaign.sqlite")
+	if err := initializeDB(dbPath); err != nil {
+		t.Fatal(err)
+	}
+	seedSamples(t, dbPath)
+	options := validateOptions{Version: defaultAPIVersion, ServiceVersion: "dev-test"}
+	first, err := samplesForRange(dbPath, 3001, 13_000)
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := samplesForRange(dbPath, 13_001, 23_000)
+	if err != nil {
+		t.Fatal(err)
+	}
+	firstID, err := recordValidation(dbPath, first, options, "first", requestResult{}, "evidence_pending", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	secondID, err := recordValidation(dbPath, second, options, "second", requestResult{}, "evidence_pending", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := recordValidationTrace(dbPath, firstID, "first-trace"); err != nil {
+		t.Fatal(err)
+	}
+	if err := markValidationEvidenceError(dbPath, secondID); err != nil {
+		t.Fatal(err)
+	}
+	assertScalar(t, dbPath, fmt.Sprintf("SELECT trace_id FROM validation_runs WHERE id = %d;", firstID), "first-trace")
+	assertScalar(t, dbPath, fmt.Sprintf("SELECT status FROM validation_runs WHERE id = %d;", secondID), "evidence_error")
+}
+
 func TestValidationStatusPreservesMixedMismatchAndError(t *testing.T) {
 	result := requestResult{Response: validationResponse{
 		TransferIDsWithDiff: []string{"mismatch"},
@@ -129,6 +355,20 @@ func TestCampaignDatabaseMustExistAndContainSamples(t *testing.T) {
 	if err := requireCampaignDB(dbPath); err != nil {
 		t.Fatalf("prepared database rejected: %v", err)
 	}
+}
+
+func TestDynamicCampaignCanStartWithoutSamples(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "campaign.sqlite")
+	if err := initializeDB(dbPath); err != nil {
+		t.Fatal(err)
+	}
+	if err := ensureCampaign(prepareOptions{DBPath: dbPath, StartPK: 3001, RangeSize: 10_000}); err != nil {
+		t.Fatal(err)
+	}
+	if err := requireCampaignDB(dbPath); err != nil {
+		t.Fatalf("dynamic campaign rejected: %v", err)
+	}
+	assertScalar(t, dbPath, "SELECT cached_through_pk FROM sample_cache_state WHERE id = 1;", "3000")
 }
 
 func TestCampaignOptionsAreImmutable(t *testing.T) {
@@ -187,6 +427,81 @@ func TestRequestValidation(t *testing.T) {
 	}
 }
 
+func TestHoneycombMCPRunQueryReadsResource(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "Bearer token" {
+			t.Error("missing MCP authorization")
+		}
+		var request struct {
+			Method string `json:"method"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+			t.Fatal(err)
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		switch request.Method {
+		case "tools/call":
+			w.Header().Set("Mcp-Session-Id", "session-id")
+			writeSSE(t, w, map[string]any{"jsonrpc": "2.0", "id": 1, "result": map[string]any{
+				"content": []map[string]any{{"type": "resource_link", "uri": "honeycomb://query-run/test-run/json"}},
+			}})
+		case "resources/read":
+			if r.Header.Get("Mcp-Session-Id") != "session-id" {
+				t.Error("missing MCP session ID")
+			}
+			writeSSE(t, w, map[string]any{"jsonrpc": "2.0", "id": 1, "result": map[string]any{
+				"contents": []map[string]any{{"text": `{"results":[{"data":{"checkpoint":123000}}]}`}},
+			}})
+		default:
+			t.Fatalf("unexpected method %q", request.Method)
+		}
+	}))
+	defer server.Close()
+
+	client := newHoneycombMCPClient(server.URL, "token")
+	client.HTTPClient = server.Client()
+	result, err := client.runQuery(context.Background(), map[string]any{"test": true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	checkpoint, err := number(result.Rows[0], "checkpoint")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.RunPK != "test-run" || checkpoint != 123_000 {
+		t.Fatalf("unexpected query result: %+v", result)
+	}
+}
+
+func TestReadMCPResponseDataSupportsJSONAndMultilineSSE(t *testing.T) {
+	jsonData, err := readMCPResponseData("application/json; charset=utf-8", strings.NewReader(`{"jsonrpc":"2.0"}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(jsonData) != `{"jsonrpc":"2.0"}` {
+		t.Fatalf("JSON response = %q", jsonData)
+	}
+
+	sseData, err := readMCPResponseData("text/event-stream", strings.NewReader("event: message\ndata: {\"jsonrpc\":\ndata:\"2.0\"}\n\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(sseData) != "{\"jsonrpc\":\n\"2.0\"}" {
+		t.Fatalf("SSE response = %q", sseData)
+	}
+}
+
+func TestComparisonEvidenceRequiresEveryAttemptToMatch(t *testing.T) {
+	evidence := comparisonEvidence{Count: 100, Matches: 99, Mismatches: 1, TraceID: "trace", QueryRunPK: "query"}
+	if err := evidence.requireClean(100, "dev-test"); err == nil {
+		t.Fatal("expected mismatch evidence to fail")
+	}
+	evidence = comparisonEvidence{Count: 100, Matches: 100, TraceID: "trace", QueryRunPK: "query"}
+	if err := evidence.requireClean(100, "dev-test"); err != nil {
+		t.Fatalf("clean evidence failed: %v", err)
+	}
+}
+
 func TestSQLQuote(t *testing.T) {
 	if got := sqlQuote("projection's value"); got != "'projection''s value'" {
 		t.Fatalf("sqlQuote = %q", got)
@@ -210,7 +525,7 @@ func recordCleanRun(t *testing.T, dbPath string, current sampleRange) {
 	t.Helper()
 	result := requestResult{StatusCode: http.StatusOK, RequestID: "request-id", Duration: time.Second}
 	options := validateOptions{Version: defaultAPIVersion, ServiceVersion: "dev-test"}
-	if err := recordValidation(dbPath, current, options, "test-agent", result, "clean", true); err != nil {
+	if _, err := recordValidation(dbPath, current, options, "test-agent", result, "clean", true); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -224,4 +539,13 @@ func assertScalar(t *testing.T, dbPath, query, expected string) {
 	if actual != expected {
 		t.Fatalf("scalar = %q, want %q", actual, expected)
 	}
+}
+
+func writeSSE(t *testing.T, writer io.Writer, value any) {
+	t.Helper()
+	encoded, err := json.Marshal(value)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _ = fmt.Fprintf(writer, "event: message\ndata: %s\n\n", encoded)
 }

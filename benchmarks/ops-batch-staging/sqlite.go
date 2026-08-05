@@ -57,6 +57,19 @@ CREATE TABLE IF NOT EXISTS validation_results (
     FOREIGN KEY (run_id) REFERENCES validation_runs(id),
     FOREIGN KEY (pk_id) REFERENCES samples(pk_id)
 );
+CREATE TABLE IF NOT EXISTS monitor_skipped_ranges (
+    range_start INTEGER NOT NULL,
+    range_end INTEGER NOT NULL,
+    skipped_at TEXT NOT NULL,
+    safe_checkpoint INTEGER NOT NULL,
+    reason TEXT NOT NULL,
+    PRIMARY KEY (range_start, range_end)
+);
+CREATE TABLE IF NOT EXISTS sample_cache_state (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    cached_through_pk INTEGER NOT NULL,
+    updated_at TEXT NOT NULL
+);
 `
 
 func initializeDB(dbPath string) error {
@@ -86,13 +99,35 @@ func requireCampaignDB(dbPath string) error {
 	if !info.Mode().IsRegular() {
 		return fmt.Errorf("campaign database %s is not a regular file", dbPath)
 	}
+	if _, err := runSQLite(dbPath, schema); err != nil {
+		return fmt.Errorf("updating campaign database schema: %w", err)
+	}
 	campaigns, err := scalar(dbPath, "SELECT COUNT(*) FROM campaign;")
 	if err != nil || campaigns != "1" {
 		return fmt.Errorf("campaign database %s is not initialized; run prepare first", dbPath)
 	}
+	if err := ensureSampleCacheState(dbPath); err != nil {
+		return err
+	}
 	samples, err := scalar(dbPath, "SELECT COUNT(*) FROM samples;")
-	if err != nil || samples == "0" {
+	dynamic, dynamicErr := scalar(dbPath, "SELECT COUNT(*) FROM campaign WHERE max_pk = 0;")
+	if err != nil || dynamicErr != nil || samples == "0" && dynamic != "1" {
 		return fmt.Errorf("campaign database %s has no samples; run prepare first", dbPath)
+	}
+	return nil
+}
+
+func ensureSampleCacheState(dbPath string) error {
+	_, err := runSQLite(dbPath, `
+INSERT INTO sample_cache_state (id, cached_through_pk, updated_at)
+SELECT 1, COALESCE(MAX(samples.range_end), campaign.start_pk - 1), strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+FROM campaign
+LEFT JOIN samples ON TRUE
+WHERE campaign.id = 1
+HAVING NOT EXISTS (SELECT 1 FROM sample_cache_state WHERE id = 1);
+`)
+	if err != nil {
+		return fmt.Errorf("initializing sample cache state: %w", err)
 	}
 	return nil
 }

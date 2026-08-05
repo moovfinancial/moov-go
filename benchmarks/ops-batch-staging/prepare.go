@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"strconv"
 )
 
 const (
@@ -23,18 +24,45 @@ type prepareOptions struct {
 	DryRunOnly         bool
 }
 
+type sampleCacheOptions struct {
+	DBPath             string
+	SafeCheckpoint     int64
+	ChunkPKs           int64
+	MaximumBytesBilled int64
+	DryRun             bool
+}
+
+type sampleCacheExtension struct {
+	Start int64
+	End   int64
+}
+
 func prepareSamples(options prepareOptions) error {
-	if options.StartPK < 1 || options.MaxPK < options.StartPK {
+	if options.StartPK < 1 || options.MaxPK != 0 && options.MaxPK < options.StartPK {
 		return errors.New("invalid PK range")
 	}
 	if options.RangeSize < 1 || options.MaximumBytesBilled < 1 {
 		return errors.New("range-size and maximum-bytes-billed must be positive")
 	}
+	if options.MaxPK == 0 {
+		if options.DryRunOnly {
+			fmt.Println("dynamic campaign options are valid; samples will be cached from Honeycomb checkpoints")
+			return nil
+		}
+		if err := initializeDB(options.DBPath); err != nil {
+			return err
+		}
+		if err := ensureCampaign(options); err != nil {
+			return err
+		}
+		fmt.Printf("initialized dynamic sample campaign in %s\n", options.DBPath)
+		return nil
+	}
 	if err := requireCommand("bq"); err != nil {
 		return err
 	}
 
-	query := sampleQuery(options.StartPK, options.MaxPK, options.RangeSize)
+	query := sampleQuery(options.StartPK, options.StartPK, options.MaxPK, options.RangeSize)
 	if err := runBigQueryDryRun(query, options.MaximumBytesBilled); err != nil {
 		return err
 	}
@@ -70,7 +98,7 @@ func prepareSamples(options prepareOptions) error {
 	if err := temp.Close(); err != nil {
 		return fmt.Errorf("closing sample export: %w", err)
 	}
-	if err := importSamples(options.DBPath, tempPath); err != nil {
+	if err := importSamples(options.DBPath, tempPath, options.MaxPK); err != nil {
 		return err
 	}
 
@@ -102,7 +130,100 @@ WHERE id = 1 AND start_pk = %d AND max_pk = %d AND range_size = %d
 	if matching != "1" {
 		return errors.New("campaign database was prepared with different sampling options; use a new -db path")
 	}
-	return nil
+	return ensureSampleCacheState(options.DBPath)
+}
+
+func extendSampleCache(options sampleCacheOptions) (sampleCacheExtension, error) {
+	startPKText, err := scalar(options.DBPath, "SELECT start_pk FROM campaign WHERE id = 1;")
+	if err != nil {
+		return sampleCacheExtension{}, fmt.Errorf("reading campaign start PK: %w", err)
+	}
+	rangeSizeText, err := scalar(options.DBPath, "SELECT range_size FROM campaign WHERE id = 1;")
+	if err != nil {
+		return sampleCacheExtension{}, fmt.Errorf("reading campaign range size: %w", err)
+	}
+	cachedThroughText, err := scalar(options.DBPath, "SELECT cached_through_pk FROM sample_cache_state WHERE id = 1;")
+	if err != nil {
+		return sampleCacheExtension{}, fmt.Errorf("reading sample cache checkpoint: %w", err)
+	}
+	startPK, err := parsePositiveInt("campaign start PK", startPKText)
+	if err != nil {
+		return sampleCacheExtension{}, err
+	}
+	rangeSize, err := parsePositiveInt("campaign range size", rangeSizeText)
+	if err != nil {
+		return sampleCacheExtension{}, err
+	}
+	cachedThrough, err := strconv.ParseInt(cachedThroughText, 10, 64)
+	if err != nil {
+		return sampleCacheExtension{}, fmt.Errorf("parsing sample cache checkpoint %q: %w", cachedThroughText, err)
+	}
+	extension, ok, err := planSampleCacheExtension(startPK, rangeSize, cachedThrough, options.SafeCheckpoint, options.ChunkPKs)
+	if err != nil || !ok {
+		return extension, err
+	}
+	query := sampleQuery(startPK, extension.Start, extension.End, rangeSize)
+	if err := requireCommand("bq"); err != nil {
+		return sampleCacheExtension{}, err
+	}
+	if err := runBigQueryDryRun(query, options.MaximumBytesBilled); err != nil {
+		return sampleCacheExtension{}, err
+	}
+	if options.DryRun {
+		return extension, nil
+	}
+
+	temp, err := os.CreateTemp("", "projection-backfill-samples-*.csv")
+	if err != nil {
+		return sampleCacheExtension{}, fmt.Errorf("creating sample cache export: %w", err)
+	}
+	tempPath := temp.Name()
+	defer os.Remove(tempPath)
+	defer temp.Close()
+	if err := exportSamples(query, options.MaximumBytesBilled, temp); err != nil {
+		return sampleCacheExtension{}, err
+	}
+	if err := temp.Close(); err != nil {
+		return sampleCacheExtension{}, fmt.Errorf("closing sample cache export: %w", err)
+	}
+	if err := importSamples(options.DBPath, tempPath, extension.End); err != nil {
+		return sampleCacheExtension{}, err
+	}
+	return extension, nil
+}
+
+func planSampleCacheExtension(startPK, rangeSize, cachedThrough, safeCheckpoint, chunkPKs int64) (sampleCacheExtension, bool, error) {
+	if startPK < 1 || rangeSize < 1 || chunkPKs < rangeSize {
+		return sampleCacheExtension{}, false, errors.New("sample cache start, range size, and chunk size are invalid")
+	}
+	completeRanges := (safeCheckpoint - startPK + 1) / rangeSize
+	if completeRanges < 1 {
+		return sampleCacheExtension{}, false, nil
+	}
+	latestCompleteEnd := startPK + completeRanges*rangeSize - 1
+	if cachedThrough >= latestCompleteEnd {
+		return sampleCacheExtension{}, false, nil
+	}
+	if (cachedThrough-startPK+1)%rangeSize != 0 {
+		return sampleCacheExtension{}, false, fmt.Errorf("sample cache checkpoint %d is not aligned to campaign ranges", cachedThrough)
+	}
+	chunkRanges := chunkPKs / rangeSize
+	end := cachedThrough + chunkRanges*rangeSize
+	if end > latestCompleteEnd {
+		end = latestCompleteEnd
+	}
+	return sampleCacheExtension{Start: cachedThrough + 1, End: end}, true, nil
+}
+
+func parsePositiveInt(name, value string) (int64, error) {
+	parsed, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("parsing %s %q: %w", name, value, err)
+	}
+	if parsed < 1 {
+		return 0, fmt.Errorf("%s must be positive, got %d", name, parsed)
+	}
+	return parsed, nil
 }
 
 func runBigQueryDryRun(query string, maximumBytesBilled int64) error {
@@ -138,7 +259,7 @@ func bigQueryArgs(query string, maximumBytesBilled int64) []string {
 	}
 }
 
-func importSamples(dbPath, csvPath string) error {
+func importSamples(dbPath, csvPath string, cachedThrough int64) error {
 	commands := fmt.Sprintf(`
 CREATE TEMP TABLE samples_import (
     pk_id INTEGER,
@@ -154,18 +275,21 @@ CREATE TEMP TABLE samples_import (
 .mode csv
 .import --skip 1 %s samples_import
 BEGIN;
-INSERT INTO samples
+INSERT OR IGNORE INTO samples
 SELECT pk_id, transfer_id, range_start, range_end, sample_rank, selection_reason, transfer_type, status, account_id
 FROM samples_import;
+UPDATE sample_cache_state
+SET cached_through_pk = %d, updated_at = strftime('%%Y-%%m-%%dT%%H:%%M:%%fZ', 'now')
+WHERE id = 1 AND cached_through_pk < %d;
 COMMIT;
-`, sqliteDotQuote(csvPath))
+`, sqliteDotQuote(csvPath), cachedThrough, cachedThrough)
 	if _, err := runSQLite(dbPath, commands); err != nil {
 		return fmt.Errorf("importing samples: %w", err)
 	}
 	return nil
 }
 
-func sampleQuery(startPK, maxPK, rangeSize int64) string {
+func sampleQuery(campaignStartPK, queryStartPK, queryEndPK, rangeSize int64) string {
 	return fmt.Sprintf(`
 WITH source AS (
   SELECT
@@ -245,6 +369,6 @@ SELECT
 FROM sampled
 WHERE sample_rank <= IF(MOD(range_index + 1, 10) = 0, 500, 100)
 ORDER BY range_start, sample_rank
-`, startPK, rangeSize, sampleSeed, "`"+sourceTransfersTable+"`", startPK, maxPK,
-		startPK, rangeSize, maxPK, startPK, rangeSize)
+`, campaignStartPK, rangeSize, sampleSeed, "`"+sourceTransfersTable+"`", queryStartPK, queryEndPK,
+		campaignStartPK, rangeSize, queryEndPK, campaignStartPK, rangeSize)
 }

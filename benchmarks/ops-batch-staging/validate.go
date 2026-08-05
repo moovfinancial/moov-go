@@ -15,11 +15,13 @@ import (
 const stagingAPIHost = "api.moov-staging.io"
 
 type validateOptions struct {
-	DBPath         string
-	Checkpoint     int64
-	Version        string
-	ServiceVersion string
-	MaxRanges      int
+	DBPath          string
+	Checkpoint      int64
+	Version         string
+	ServiceVersion  string
+	MaxRanges       int
+	UserAgentSuffix string
+	EvidencePending bool
 }
 
 type sample struct {
@@ -49,6 +51,14 @@ type requestResult struct {
 	Duration   time.Duration
 }
 
+type validationOutcome struct {
+	Status    string
+	UserAgent string
+	Result    requestResult
+	Attempted int
+	RunID     int64
+}
+
 func validatePending(options validateOptions) error {
 	if err := requireCampaignDB(options.DBPath); err != nil {
 		return err
@@ -68,7 +78,7 @@ func validatePending(options validateOptions) error {
 	}
 	client := &http.Client{Timeout: 120 * time.Second}
 	for _, current := range ranges {
-		if err := validateRange(context.Background(), client, credentials, options, current); err != nil {
+		if _, err := validateRange(context.Background(), client, credentials, options, current); err != nil {
 			return err
 		}
 	}
@@ -96,25 +106,34 @@ func stagingCredentials() (credentials, error) {
 	return values, nil
 }
 
-func validateRange(ctx context.Context, client *http.Client, auth credentials, options validateOptions, current sampleRange) error {
+func validateRange(ctx context.Context, client *http.Client, auth credentials, options validateOptions, current sampleRange) (validationOutcome, error) {
 	userAgent := fmt.Sprintf("moov-go-projection-backfill-validator/1 range-%d-%d", current.Start, current.End)
+	if options.UserAgentSuffix != "" {
+		userAgent += " " + options.UserAgentSuffix
+	}
 	result, requestErr := requestValidation(ctx, client, auth, options.Version, userAgent, current.Samples)
 	status := validationStatus(result, requestErr)
-	if err := recordValidation(options.DBPath, current, options, userAgent, result, status, requestErr == nil); err != nil {
-		return err
+	recordedStatus := status
+	if options.EvidencePending && status == "clean" {
+		recordedStatus = "evidence_pending"
 	}
+	runID, err := recordValidation(options.DBPath, current, options, userAgent, result, recordedStatus, requestErr == nil)
+	if err != nil {
+		return validationOutcome{}, err
+	}
+	outcome := validationOutcome{Status: status, UserAgent: userAgent, Result: result, Attempted: len(current.Samples), RunID: runID}
 
 	fmt.Printf("range=%d-%d attempted=%d status=%d duration=%s requestID=%s result=%s diffs=%d errors=%d\n",
 		current.Start, current.End, len(current.Samples), result.StatusCode,
 		result.Duration.Round(time.Millisecond), result.RequestID, status,
 		len(result.Response.TransferIDsWithDiff), len(result.Response.ErrorsByTransferID))
 	if requestErr != nil {
-		return requestErr
+		return outcome, requestErr
 	}
 	if status != "clean" {
-		return fmt.Errorf("range %d-%d requires investigation: %s", current.Start, current.End, status)
+		return outcome, fmt.Errorf("range %d-%d requires investigation: %s", current.Start, current.End, status)
 	}
-	return nil
+	return outcome, nil
 }
 
 func requestValidation(ctx context.Context, client *http.Client, auth credentials, version, userAgent string, samples []sample) (requestResult, error) {
@@ -214,6 +233,69 @@ ORDER BY s.range_start, s.sample_rank;
 		}
 	}
 	return groupSamples(samples), nil
+}
+
+func latestPendingRange(dbPath string, checkpoint int64) (sampleRange, bool, error) {
+	query := fmt.Sprintf(`
+WITH pending_range AS (
+  SELECT s.range_start, s.range_end
+  FROM samples s
+  WHERE s.range_end <= %d
+    AND NOT EXISTS (
+      SELECT 1 FROM validation_runs vr
+      WHERE vr.range_start = s.range_start
+        AND vr.range_end = s.range_end
+        AND vr.status IN ('clean', 'mismatch', 'mismatch_error')
+    )
+    AND NOT EXISTS (
+      SELECT 1 FROM monitor_skipped_ranges msr
+      WHERE msr.range_start = s.range_start AND msr.range_end = s.range_end
+    )
+  GROUP BY s.range_start, s.range_end
+  ORDER BY EXISTS (
+    SELECT 1 FROM validation_runs attempted
+    WHERE attempted.range_start = s.range_start AND attempted.range_end = s.range_end
+  ) DESC, s.range_start DESC
+  LIMIT 1
+)
+SELECT s.pk_id, s.transfer_id, s.range_start, s.range_end, s.selection_reason
+FROM samples s
+JOIN pending_range p USING (range_start, range_end)
+ORDER BY s.sample_rank;
+`, checkpoint)
+	output, err := runSQLite(dbPath, query, "-json")
+	if err != nil {
+		return sampleRange{}, false, fmt.Errorf("loading latest pending samples: %w", err)
+	}
+	var samples []sample
+	if len(bytes.TrimSpace(output)) > 0 {
+		if err := json.Unmarshal(output, &samples); err != nil {
+			return sampleRange{}, false, fmt.Errorf("decoding latest pending samples: %w", err)
+		}
+	}
+	ranges := groupSamples(samples)
+	if len(ranges) == 0 {
+		return sampleRange{}, false, nil
+	}
+	return ranges[0], true, nil
+}
+
+func samplesForRange(dbPath string, rangeStart, rangeEnd int64) (sampleRange, error) {
+	query := fmt.Sprintf(`
+SELECT pk_id, transfer_id, range_start, range_end, selection_reason
+FROM samples
+WHERE range_start = %d AND range_end = %d
+ORDER BY sample_rank;
+`, rangeStart, rangeEnd)
+	output, err := runSQLite(dbPath, query, "-json")
+	if err != nil {
+		return sampleRange{}, fmt.Errorf("loading range samples: %w", err)
+	}
+	var samples []sample
+	if err := json.Unmarshal(output, &samples); err != nil {
+		return sampleRange{}, fmt.Errorf("decoding range samples: %w", err)
+	}
+	return sampleRange{Start: rangeStart, End: rangeEnd, Samples: samples}, nil
 }
 
 func groupSamples(samples []sample) []sampleRange {

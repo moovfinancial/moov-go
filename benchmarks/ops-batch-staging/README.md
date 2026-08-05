@@ -16,17 +16,21 @@ The manifest starts at the first PK after the checkpoint that precedes the autom
 - One candidate per partner-account stratum is preferred after transfer-type/status coverage.
 - The seed `projection-backfill-sample-v1` makes preparation repeatable.
 
-BigQuery is queried once for the fixed rollout range. Only selected `pk_id` and `transfer_id` mappings and their analysis dimensions are stored locally.
+The monitor reads the safe producer checkpoint from Honeycomb and extends the local sample cache only when that checkpoint moves beyond the cached PK range. Cache extensions are bounded, aligned to the campaign's 10,000-PK ranges, and persisted in SQLite. Only selected `pk_id` and `transfer_id` mappings and their analysis dimensions are stored locally.
 
 ## Prepare
 
-First verify the query and billing bound without downloading rows:
+Initialize the campaign without choosing a final PK:
 
 ```sh
-go run ./benchmarks/ops-batch-staging prepare -dry-run-only
+go run ./benchmarks/ops-batch-staging prepare \
+  -start-pk 3001 \
+  -range-size 10000
 ```
 
-After confirming the active backfill start checkpoint and maximum in Infra, prepare the manifest once:
+The first monitor run reads the safe producer checkpoint from Honeycomb, queries BigQuery for at most one cache chunk, and records the cache checkpoint in SQLite. Later runs append samples only after the producer advances. The default chunk is 1,000,000 PKs and each query has a 50 GB billing cap; override these deliberately with `-sample-cache-chunk-pks` and `-maximum-bytes-billed` on `monitor`.
+
+For a fixed one-time manifest, pass an explicit maximum:
 
 ```sh
 go run ./benchmarks/ops-batch-staging prepare \
@@ -36,7 +40,7 @@ go run ./benchmarks/ops-batch-staging prepare \
   -maximum-bytes-billed 50000000000
 ```
 
-Change `start-pk` if another manual backfill advances the checkpoint before the automated schedule deploys. Preparation records the immutable start, maximum, range size, source table, and sample seed in SQLite. It refuses to reuse a database that already contains a manifest; use a separate `-db` path for another campaign.
+Change `start-pk` if another manual backfill advances the checkpoint before the automated schedule deploys. Preparation records the immutable start, range size, source table, and sample seed in SQLite. A zero maximum marks a dynamic campaign; `max-pk` remains available only for fixed exports. Use a separate `-db` path for another campaign.
 
 The command requires authenticated `bq` and `sqlite3` CLIs. It explicitly queries `moov-data-staging.transfers_public.transfers` and refuses to exceed the configured BigQuery billing cap.
 
@@ -77,6 +81,33 @@ Confirm the number of `projection_comparison` spans equals the attempted count. 
 go run ./benchmarks/ops-batch-staging summary
 ```
 
-The summary reports planned samples, completed ranges, total attempts, matches, mismatches, per-transfer errors, and request-level failures. Historical errors remain recorded after a successful retry.
+The summary reports the durable sample-cache PK checkpoint, planned samples, completed and intentionally skipped ranges, total attempts, matches, mismatches, per-transfer errors, and request-level failures. Historical errors remain recorded after a successful retry.
 
-The command does not monitor Honeycomb or invoke itself on a timer. Start operator-driven validation only after the automatic backfill deployment is confirmed.
+## Monitor every 30 minutes
+
+The one-shot monitor is designed for an external scheduler such as `launchd`; it does not create a conversational or internal timer. It uses the Honeycomb MCP API key to check the current producer checkpoint and consumer health, stays one completed range behind the producer, extends its local deterministic sample cache toward that checkpoint, and selects the newest safe unvalidated range rather than replaying every range that elapsed since its previous run.
+
+```fish
+moov_env staging --quiet
+go run ./benchmarks/ops-batch-staging monitor \
+  -once \
+  -producer-version dev-6ede7f1 \
+  -service-version dev-add229b \
+  -version v2026.07.00
+```
+
+The monitor:
+
+- takes a non-blocking file lock so scheduled runs cannot overlap;
+- refuses to send traffic when the expected producer or consumer image is not healthy;
+- extends the SQLite sample cache in bounded BigQuery queries without requiring a final campaign PK;
+- fails closed on errors in Transfers backfill stages, TransferUpdated consumption, or projection upserts;
+- requires every selected transfer to have a matching projection-upsert span before validation;
+- retries prior failed ranges before sampling a newer range;
+- validates the newest safe range and records older elapsed ranges as intentionally skipped;
+- records clean API responses as pending until Honeycomb confirms one matching comparison span per attempted transfer; and
+- exits nonzero on a request, telemetry, mismatch, or consumer-health anomaly.
+
+Use `-dry-run` to inspect health and range selection without loading Moov credentials or sending validation traffic. The local LaunchAgent wrapper reads the cached Honeycomb MCP and Moov staging tokens, so normal scheduled runs do not contact 1Password.
+
+The command never invokes itself on a timer. Update the expected image flags whenever the staging rollout changes.

@@ -10,8 +10,9 @@ import (
 
 const (
 	defaultBackfillStartPK = int64(3001)
-	defaultBackfillMaxPK   = int64(89_821_930)
 	defaultRangeSize       = int64(10_000)
+	defaultSampleCachePKs  = int64(1_000_000)
+	defaultMaximumBQBytes  = int64(50_000_000_000)
 	defaultAPIVersion      = "v2026.07.00"
 )
 
@@ -32,6 +33,8 @@ func run(args []string) error {
 		return runPrepare(args[1:])
 	case "validate":
 		return runValidate(args[1:])
+	case "monitor":
+		return runMonitor(args[1:])
 	case "summary":
 		return runSummary(args[1:])
 	default:
@@ -43,9 +46,9 @@ func runPrepare(args []string) error {
 	flags := flag.NewFlagSet("prepare", flag.ContinueOnError)
 	dbPath := flags.String("db", defaultDBPath(), "SQLite campaign database")
 	startPK := flags.Int64("start-pk", defaultBackfillStartPK, "first PK included in the automated backfill")
-	maxPK := flags.Int64("max-pk", defaultBackfillMaxPK, "last PK included in the backfill")
+	maxPK := flags.Int64("max-pk", 0, "optional fixed final PK; zero lets monitor extend samples from Honeycomb checkpoints")
 	rangeSize := flags.Int64("range-size", defaultRangeSize, "PKs advanced by each scheduled invocation")
-	maxBytes := flags.Int64("maximum-bytes-billed", 50_000_000_000, "BigQuery billing limit")
+	maxBytes := flags.Int64("maximum-bytes-billed", defaultMaximumBQBytes, "BigQuery billing limit")
 	dryRunOnly := flags.Bool("dry-run-only", false, "validate the BigQuery query without downloading samples")
 	if err := flags.Parse(args); err != nil {
 		return err
@@ -93,6 +96,49 @@ func runValidate(args []string) error {
 	})
 }
 
+func runMonitor(args []string) error {
+	flags := flag.NewFlagSet("monitor", flag.ContinueOnError)
+	dbPath := flags.String("db", defaultDBPath(), "SQLite campaign database")
+	version := flags.String("version", defaultAPIVersion, "X-Moov-Version value")
+	serviceVersion := flags.String("service-version", "", "deployed transfersbff2 image or version")
+	producerVersion := flags.String("producer-version", "", "deployed Transfers image or version")
+	safeLagRanges := flags.Int64("safe-lag-ranges", 1, "completed PK ranges to stay behind the producer")
+	cacheChunkPKs := flags.Int64("sample-cache-chunk-pks", defaultSampleCachePKs, "maximum PK span added to the local sample cache per run")
+	maxBytes := flags.Int64("maximum-bytes-billed", defaultMaximumBQBytes, "BigQuery billing limit for sample cache extensions")
+	once := flags.Bool("once", false, "run one checkpoint-aware monitor cycle")
+	dryRun := flags.Bool("dry-run", false, "inspect health and selection without validation traffic")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if flags.NArg() != 0 {
+		return errors.New("monitor accepts flags only")
+	}
+	if !*once {
+		return errors.New("monitor requires -once; use an external scheduler for cadence")
+	}
+	if *serviceVersion == "" || *producerVersion == "" {
+		return errors.New("service-version and producer-version are required")
+	}
+	if *safeLagRanges < 1 {
+		return errors.New("safe-lag-ranges must be positive")
+	}
+	if *cacheChunkPKs < defaultRangeSize || *maxBytes < 1 {
+		return errors.New("sample-cache-chunk-pks and maximum-bytes-billed must be positive")
+	}
+
+	return monitorOnce(monitorOptions{
+		DBPath:          *dbPath,
+		Version:         *version,
+		ServiceVersion:  *serviceVersion,
+		ProducerVersion: *producerVersion,
+		SafeLagRanges:   *safeLagRanges,
+		CacheChunkPKs:   *cacheChunkPKs,
+		MaximumBQBytes:  *maxBytes,
+		DryRun:          *dryRun,
+		MCPToken:        os.Getenv("HONEYCOMB_MCP_API_KEY"),
+	})
+}
+
 func runSummary(args []string) error {
 	flags := flag.NewFlagSet("summary", flag.ContinueOnError)
 	dbPath := flags.String("db", defaultDBPath(), "SQLite campaign database")
@@ -114,5 +160,5 @@ func defaultDBPath() string {
 }
 
 func usageError() error {
-	return errors.New("usage: go run ./benchmarks/ops-batch-staging <prepare|validate|summary> [flags]")
+	return errors.New("usage: go run ./benchmarks/ops-batch-staging <prepare|validate|monitor|summary> [flags]")
 }
