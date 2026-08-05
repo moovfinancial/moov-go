@@ -43,6 +43,10 @@ type Summary struct {
 }
 
 type SummaryDetails struct {
+	// Deprecated: this field will be removed in a future release.
+	VolumeAmount *AmountDecimal `json:"volumeAmount,omitempty"`
+	// Deprecated: this field will be removed in a future release.
+	VolumeCount           *int64         `json:"volumeCount,omitempty"`
 	FeeAmount             *AmountDecimal `json:"feeAmount,omitempty"`
 	MerchantFeesCollected *AmountDecimal `json:"merchantFeesCollected,omitempty"`
 	PartnerFeesAssessed   *AmountDecimal `json:"partnerFeesAssessed,omitempty"`
@@ -88,22 +92,41 @@ type CountAndAmount struct {
 }
 
 type InterchangeProgramFee struct {
-	Count          int64         `json:"count,omitempty"`
-	PerItemRate    AmountDecimal `json:"perItemRate,omitempty"`
-	PercentageRate string        `json:"percentageRate,omitempty"`
-	ProgramName    string        `json:"programName,omitempty"`
-	TransferVolume AmountDecimal `json:"transferVolume,omitempty"`
-	Total          AmountDecimal `json:"total,omitempty"`
+	Count          int64          `json:"count,omitempty"`
+	PerItemRate    AmountDecimal  `json:"perItemRate,omitempty"`
+	PercentageRate PercentageRate `json:"percentageRate,omitempty"`
+	ProgramName    string         `json:"programName,omitempty"`
+	TransferVolume AmountDecimal  `json:"transferVolume,omitempty"`
+	Total          AmountDecimal  `json:"total,omitempty"`
+}
+
+type PercentageRate string
+
+func (r *PercentageRate) UnmarshalJSON(data []byte) error {
+	str := string(data)
+	if str == "null" {
+		return nil
+	}
+	*r = PercentageRate(str)
+	return nil
+}
+
+func (r PercentageRate) MarshalJSON() ([]byte, error) {
+	if r == "" {
+		return []byte("null"), nil
+	}
+	return []byte(r), nil
 }
 
 type ACHFees struct {
-	Debits             CountAndAmount `json:"debits,omitempty"`
-	NoticeOfChange     CountAndAmount `json:"noticeOfChange,omitempty"`
-	Return             CountAndAmount `json:"return,omitempty"`
-	SameDayCredit      CountAndAmount `json:"sameDayCredit,omitempty"`
-	StandardCredit     CountAndAmount `json:"standardCredit,omitempty"`
-	UnauthorizedReturn CountAndAmount `json:"unauthorizedReturn,omitempty"`
-	Total              CountAndAmount `json:"total,omitempty"`
+	BankAccountVerification CountAndAmount `json:"bankAccountVerification,omitempty"`
+	Debits                  CountAndAmount `json:"debits,omitempty"`
+	NoticeOfChange          CountAndAmount `json:"noticeOfChange,omitempty"`
+	Return                  CountAndAmount `json:"return,omitempty"`
+	SameDayCredit           CountAndAmount `json:"sameDayCredit,omitempty"`
+	StandardCredit          CountAndAmount `json:"standardCredit,omitempty"`
+	UnauthorizedReturn      CountAndAmount `json:"unauthorizedReturn,omitempty"`
+	Total                   CountAndAmount `json:"total,omitempty"`
 }
 
 type InstantPaymentFees struct {
@@ -127,6 +150,7 @@ type PlatformFees struct {
 type AccountFees struct {
 	WalletFee                AmountDecimal  `json:"walletFee,omitempty"`
 	MerchantPCIFee           AmountDecimal  `json:"merchantPCIFee,omitempty"`
+	InvoicePaymentFee        AmountDecimal  `json:"invoicePaymentFee,omitempty"`
 	KYBFee                   *AmountDecimal `json:"kybFee,omitempty"`
 	KYCFee                   *AmountDecimal `json:"kycFee,omitempty"`
 	TransactionMonitoringFee *AmountDecimal `json:"transactionMonitoringFee,omitempty"`
