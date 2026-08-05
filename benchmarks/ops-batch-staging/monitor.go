@@ -95,8 +95,10 @@ func monitorOnce(options monitorOptions) error {
 			return fmt.Errorf("producer reported recent iterations without a checkpoint: query=%s",
 				honeycombQueryURL("transfers", health.ProducerQueryPK))
 		}
-		if err := recordProducerCheckpoint(options.DBPath, options.ProducerVersion, health.ProducerCheckpoint); err != nil {
-			return err
+		if !options.DryRun {
+			if err := recordProducerCheckpoint(options.DBPath, options.ProducerVersion, health.ProducerCheckpoint); err != nil {
+				return err
+			}
 		}
 	} else {
 		checkpoint, ok, err := persistedProducerCheckpoint(options.DBPath, options.ProducerVersion)
@@ -142,7 +144,7 @@ func monitorOnce(options monitorOptions) error {
 		return nil
 	}
 	readinessCtx, cancelReadiness := context.WithTimeout(context.Background(), 60*time.Second)
-	consumerReady, err := projectionSampleConsumed(readinessCtx, honeycomb, options.DBPath, options.ServiceVersion, selected)
+	consumerReady, err := projectionSampleConsumed(readinessCtx, honeycomb, options.DBPath, options.ServiceVersion, selected, !options.DryRun)
 	cancelReadiness()
 	if err != nil {
 		return err
@@ -209,7 +211,7 @@ func monitorOnce(options monitorOptions) error {
 	return nil
 }
 
-func projectionSampleConsumed(ctx context.Context, client *honeycombMCPClient, dbPath, serviceVersion string, selected sampleRange) (bool, error) {
+func projectionSampleConsumed(ctx context.Context, client *honeycombMCPClient, dbPath, serviceVersion string, selected sampleRange, persist bool) (bool, error) {
 	if len(selected.Samples) == 0 {
 		return false, errors.New("selected range has no samples")
 	}
@@ -247,8 +249,10 @@ func projectionSampleConsumed(ctx context.Context, client *honeycombMCPClient, d
 	if count != int64(len(transferIDs)) {
 		return false, nil
 	}
-	if err := recordConsumedRange(dbPath, serviceVersion, selected); err != nil {
-		return false, err
+	if persist {
+		if err := recordConsumedRange(dbPath, serviceVersion, selected); err != nil {
+			return false, err
+		}
 	}
 	return true, nil
 }
