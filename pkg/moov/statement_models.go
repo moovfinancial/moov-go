@@ -1,6 +1,7 @@
 package moov
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -100,22 +101,20 @@ type InterchangeProgramFee struct {
 	Total          AmountDecimal  `json:"total,omitempty"`
 }
 
+// PercentageRate is an interchange percentage rate, held as the decimal literal exactly as the API sent it.
 type PercentageRate string
 
 func (r *PercentageRate) UnmarshalJSON(data []byte) error {
-	str := string(data)
-	if str == "null" {
-		return nil
+	var n json.Number
+	if err := json.Unmarshal(data, &n); err != nil {
+		return err
 	}
-	*r = PercentageRate(str)
+	*r = PercentageRate(n)
 	return nil
 }
 
 func (r PercentageRate) MarshalJSON() ([]byte, error) {
-	if r == "" {
-		return []byte("null"), nil
-	}
-	return []byte(r), nil
+	return json.Marshal(json.Number(r))
 }
 
 type ACHFees struct {
