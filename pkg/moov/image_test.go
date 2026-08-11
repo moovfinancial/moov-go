@@ -67,23 +67,32 @@ func TestImageConflictError(t *testing.T) {
 
 	t.Run("implements error interface", func(t *testing.T) {
 		err := &moov.ImageConflictError{
-			ExistingImage: existingImage,
+			ExistingImage: &existingImage,
 		}
 
 		// Verify it implements error interface
 		var asError error = err
 		require.NotNil(t, asError)
-		require.Contains(t, err.Error(), "duplicate image detected")
+		require.Contains(t, err.Error(), "image already exists with ID:")
 		require.Contains(t, err.Error(), existingImage.ImageID)
+	})
+
+	t.Run("returns fallback message when ExistingImage is nil", func(t *testing.T) {
+		err := &moov.ImageConflictError{
+			ExistingImage: nil,
+		}
+
+		require.Equal(t, "image already exists", err.Error())
 	})
 
 	t.Run("can unwrap via errors.As", func(t *testing.T) {
 		conflictErr := &moov.ImageConflictError{
-			ExistingImage: existingImage,
+			ExistingImage: &existingImage,
 		}
 
 		var target *moov.ImageConflictError
 		require.True(t, errors.As(conflictErr, &target))
+		require.NotNil(t, target.ExistingImage)
 		require.Equal(t, existingImage.ImageID, target.ExistingImage.ImageID)
 		require.Equal(t, existingImage.PublicID, target.ExistingImage.PublicID)
 		require.Equal(t, existingImage.AltText, target.ExistingImage.AltText)
@@ -159,6 +168,7 @@ func TestUploadImageV2026_10(t *testing.T) {
 
 		var conflictErr *moov.ImageConflictError
 		require.True(t, errors.As(err, &conflictErr), "expected ImageConflictError, got %T: %v", err, err)
+		require.NotNil(t, conflictErr.ExistingImage)
 		assert.Equal(t, existingImage.ImageID, conflictErr.ExistingImage.ImageID)
 		assert.Equal(t, existingImage.PublicID, conflictErr.ExistingImage.PublicID)
 		assert.Equal(t, existingImage.AltText, conflictErr.ExistingImage.AltText)

@@ -53,11 +53,10 @@ func (c Client) UploadImageV2026_10(ctx context.Context, accountID string, file 
 		return nil, err
 	}
 
-	// Handle 409 Conflict with ImageMetadata in response body
 	if resp.Status() == StatusStateConflict {
 		var existingImage ImageMetadata
 		if err := resp.Unmarshal(&existingImage); err == nil && existingImage.ImageID != "" {
-			return nil, &ImageConflictError{ExistingImage: existingImage}
+			return nil, &ImageConflictError{ExistingImage: &existingImage}
 		}
 		// Fall back to generic error if we couldn't parse ImageMetadata
 		return nil, resp
