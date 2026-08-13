@@ -166,3 +166,47 @@ func TestTransferAmountDetailsSurchargeJSON(t *testing.T) {
 	require.NotNil(t, transfer.Refunds[0].AmountDetails)
 	require.Equal(t, surcharge, *transfer.Refunds[0].AmountDetails.Surcharge)
 }
+
+func TestCreateTransferFeePaidByJSON(t *testing.T) {
+	payout := mv2607.FeePaidBy_Destination
+	create := mv2607.CreateTransfer{
+		Source: moov.CreateTransfer_Source{
+			PaymentMethodID: "source-payment-method",
+		},
+		Destination: moov.CreateTransfer_Destination{
+			PaymentMethodID: "destination-payment-method",
+		},
+		Amount: moov.Amount{
+			Currency: "USD",
+			Value:    100,
+		},
+		FeePaidBy: &mv2607.TransferFeePaidBy{
+			Payout: &payout,
+		},
+	}
+
+	b, err := json.Marshal(create)
+	require.NoError(t, err)
+	require.JSONEq(t, `{
+		"source": {"paymentMethodID": "source-payment-method"},
+		"destination": {"paymentMethodID": "destination-payment-method"},
+		"amount": {"currency": "USD", "value": 100},
+		"facilitatorFee": {},
+		"feePaidBy": {"payout": "destination"}
+	}`, string(b))
+
+	var decoded mv2607.CreateTransfer
+	require.NoError(t, json.Unmarshal(b, &decoded))
+	require.NotNil(t, decoded.FeePaidBy)
+	require.NotNil(t, decoded.FeePaidBy.Payout)
+	require.Equal(t, mv2607.FeePaidBy_Destination, *decoded.FeePaidBy.Payout)
+
+	// feePaidBy is omitted when unset.
+	b, err = json.Marshal(mv2607.CreateTransfer{
+		Source:      moov.CreateTransfer_Source{PaymentMethodID: "s"},
+		Destination: moov.CreateTransfer_Destination{PaymentMethodID: "d"},
+		Amount:      moov.Amount{Currency: "USD", Value: 100},
+	})
+	require.NoError(t, err)
+	require.NotContains(t, string(b), "feePaidBy")
+}
