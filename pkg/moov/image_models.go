@@ -5,6 +5,20 @@ import (
 	"time"
 )
 
+// ImageConflictError is returned when uploading a duplicate image.
+// The ExistingImage field contains the metadata of the existing image that was detected as a duplicate.
+type ImageConflictError struct {
+	ExistingImage *ImageMetadata
+}
+
+// Error implements the error interface.
+func (e *ImageConflictError) Error() string {
+	if e.ExistingImage != nil {
+		return fmt.Sprintf("image already exists with ID: %s", e.ExistingImage.ImageID)
+	}
+	return "image already exists"
+}
+
 // ImageMetadataRequest represents the request body for creating or updating image metadata.
 type ImageMetadataRequest struct {
 	AltText *string `json:"altText,omitempty"`

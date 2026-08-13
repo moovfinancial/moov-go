@@ -30,6 +30,41 @@ func (c Client) UploadImage(ctx context.Context, accountID string, file io.Reade
 	return StartedObjectOrError[ImageMetadata](resp)
 }
 
+// UploadImageV2026_10 uploads a new PNG, JPEG, or WebP image with optional metadata.
+// This function uses API version v2026.10.00 which returns the existing image's metadata
+// in the 409 Conflict response body when a duplicate image is detected.
+// When a duplicate is detected, an ImageConflictError is returned with the ExistingImage field
+// populated with the metadata of the existing image.
+// https://docs.moov.io/api/tools/images/post/
+func (c Client) UploadImageV2026_10(ctx context.Context, accountID string, file io.Reader, metadata *ImageMetadataRequest) (*ImageMetadata, error) {
+	var multiParts []multipartFn
+	multiParts = append(multiParts, MultipartFile("image", "image", file, "application/octet-stream"))
+
+	if metadata != nil {
+		mdJson, err := json.Marshal(metadata)
+		if err != nil {
+			return nil, err
+		}
+		multiParts = append(multiParts, MultipartField("metadata", string(mdJson)))
+	}
+
+	resp, err := c.CallHttp(ctx, Endpoint(http.MethodPost, pathImages, accountID), MoovVersion(Version2026_10), MultipartBody(multiParts...))
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.Status() == StatusStateConflict {
+		var existingImage ImageMetadata
+		if err := resp.Unmarshal(&existingImage); err == nil && existingImage.ImageID != "" {
+			return nil, &ImageConflictError{ExistingImage: &existingImage}
+		}
+		// Fall back to generic error if we couldn't parse ImageMetadata
+		return nil, resp
+	}
+
+	return StartedObjectOrError[ImageMetadata](resp)
+}
+
 // ListImageMetadata lists metadata for all images in the specified account.
 // https://docs.moov.io/api/tools/images/list/
 func (c Client) ListImageMetadata(ctx context.Context, accountID string, filters ...ImageListFilter) ([]ImageMetadata, error) {

@@ -4,16 +4,21 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"image"
 	"image/color"
 	"image/jpeg"
 	"image/png"
 	"io"
 	"math/rand"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -48,6 +53,153 @@ func TestImageMetadataMarshal(t *testing.T) {
 		DisabledOn: &time,
 	}
 	require.Equal(t, want, *metadata)
+}
+
+func TestImageConflictError(t *testing.T) {
+	existingImage := moov.ImageMetadata{
+		ImageID:   "ec7e1848-dc80-4ab0-8827-dd7fc0737b43",
+		PublicID:  "qJRAaAwwF5hmfeAFdHjIb",
+		AltText:   moov.PtrOf("Test image"),
+		Link:      "https://api.moov.io/images/qJRAaAwwF5hmfeAFdHjIb",
+		CreatedOn: time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC),
+		UpdatedOn: time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC),
+	}
+
+	t.Run("implements error interface", func(t *testing.T) {
+		err := &moov.ImageConflictError{
+			ExistingImage: &existingImage,
+		}
+
+		// Verify it implements error interface
+		var asError error = err
+		require.NotNil(t, asError)
+		require.Contains(t, err.Error(), "image already exists with ID:")
+		require.Contains(t, err.Error(), existingImage.ImageID)
+	})
+
+	t.Run("returns fallback message when ExistingImage is nil", func(t *testing.T) {
+		err := &moov.ImageConflictError{
+			ExistingImage: nil,
+		}
+
+		require.Equal(t, "image already exists", err.Error())
+	})
+
+	t.Run("can unwrap via errors.As", func(t *testing.T) {
+		conflictErr := &moov.ImageConflictError{
+			ExistingImage: &existingImage,
+		}
+
+		var target *moov.ImageConflictError
+		require.True(t, errors.As(conflictErr, &target))
+		require.NotNil(t, target.ExistingImage)
+		require.Equal(t, existingImage.ImageID, target.ExistingImage.ImageID)
+		require.Equal(t, existingImage.PublicID, target.ExistingImage.PublicID)
+		require.Equal(t, existingImage.AltText, target.ExistingImage.AltText)
+		require.Equal(t, existingImage.Link, target.ExistingImage.Link)
+		require.Equal(t, existingImage.CreatedOn, target.ExistingImage.CreatedOn)
+		require.Equal(t, existingImage.UpdatedOn, target.ExistingImage.UpdatedOn)
+	})
+}
+
+func TestUploadImageV2026_10(t *testing.T) {
+	existingImage := moov.ImageMetadata{
+		ImageID:   "ec7e1848-dc80-4ab0-8827-dd7fc0737b43",
+		PublicID:  "qJRAaAwwF5hmfeAFdHjIb",
+		AltText:   moov.PtrOf("Test image"),
+		Link:      "https://api.moov.io/images/qJRAaAwwF5hmfeAFdHjIb",
+		CreatedOn: time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC),
+		UpdatedOn: time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC),
+	}
+
+	t.Run("sends v2026.10.00 version header", func(t *testing.T) {
+		var capturedVersion string
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			capturedVersion = r.Header.Get(moov.VersionHeader)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusCreated)
+			_, _ = w.Write([]byte(`{
+				"imageID": "new-image-id",
+				"publicID": "newPublicId",
+				"link": "https://api.moov.io/images/newPublicId",
+				"createdOn": "2024-01-15T10:30:00Z",
+				"updatedOn": "2024-01-15T10:30:00Z"
+			}`))
+		}))
+		t.Cleanup(srv.Close)
+
+		client, err := moov.NewClient(
+			moov.WithCredentials(moov.Credentials{PublicKey: "pk", SecretKey: "sk"}),
+			moov.WithMoovURLScheme("http"),
+		)
+		require.NoError(t, err)
+		client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
+
+		_, imgReader := randomImage(t, 100, 100, encodePNG)
+		uploaded, err := client.UploadImageV2026_10(context.Background(), "account-123", imgReader, nil)
+
+		require.NoError(t, err)
+		require.NotNil(t, uploaded)
+		assert.Equal(t, moov.Version2026_10.String(), capturedVersion)
+		assert.Equal(t, "new-image-id", uploaded.ImageID)
+	})
+
+	t.Run("returns ImageConflictError on 409 with ImageMetadata body", func(t *testing.T) {
+		imageJSON, _ := json.Marshal(existingImage)
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusConflict)
+			_, _ = w.Write(imageJSON)
+		}))
+		t.Cleanup(srv.Close)
+
+		client, err := moov.NewClient(
+			moov.WithCredentials(moov.Credentials{PublicKey: "pk", SecretKey: "sk"}),
+			moov.WithMoovURLScheme("http"),
+		)
+		require.NoError(t, err)
+		client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
+
+		_, imgReader := randomImage(t, 100, 100, encodePNG)
+		uploaded, err := client.UploadImageV2026_10(context.Background(), "account-123", imgReader, nil)
+
+		require.Nil(t, uploaded)
+		require.Error(t, err)
+
+		var conflictErr *moov.ImageConflictError
+		require.True(t, errors.As(err, &conflictErr), "expected ImageConflictError, got %T: %v", err, err)
+		require.NotNil(t, conflictErr.ExistingImage)
+		assert.Equal(t, existingImage.ImageID, conflictErr.ExistingImage.ImageID)
+		assert.Equal(t, existingImage.PublicID, conflictErr.ExistingImage.PublicID)
+		assert.Equal(t, existingImage.AltText, conflictErr.ExistingImage.AltText)
+		assert.Equal(t, existingImage.Link, conflictErr.ExistingImage.Link)
+	})
+
+	t.Run("returns generic error on 409 without ImageMetadata body", func(t *testing.T) {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusConflict)
+			_, _ = w.Write([]byte(`{"error": "some conflict"}`))
+		}))
+		t.Cleanup(srv.Close)
+
+		client, err := moov.NewClient(
+			moov.WithCredentials(moov.Credentials{PublicKey: "pk", SecretKey: "sk"}),
+			moov.WithMoovURLScheme("http"),
+		)
+		require.NoError(t, err)
+		client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
+
+		_, imgReader := randomImage(t, 100, 100, encodePNG)
+		uploaded, err := client.UploadImageV2026_10(context.Background(), "account-123", imgReader, nil)
+
+		require.Nil(t, uploaded)
+		require.Error(t, err)
+
+		// Should be a generic error, not ImageConflictError
+		var conflictErr *moov.ImageConflictError
+		require.False(t, errors.As(err, &conflictErr), "did not expect ImageConflictError, got one")
+	})
 }
 
 func Test_Images(t *testing.T) {
