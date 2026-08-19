@@ -53,17 +53,42 @@ func NewClient(configurables ...ClientConfigurable) (*Client, error) {
 // given bearer token instead of Basic auth. Sets Credentials.Token and
 // revalidates. Intended for pass-through scenarios where a caller-supplied
 // access token should authenticate every call made by this client.
-// At least one of `Origin` or `Referer` header(s) must be included to not 401.
-func (c *Client) WithBearerToken(t, o, r string) *Client {
-	return &Client{
+// Bearer tokens may 401 unless at least one of the `Origin` or `Referer`
+// headers is sent, so pass WithOrigin and/or WithReferer options for those.
+// Any origin/referer already set on c carries over unless an option overrides it.
+func (c *Client) WithBearerToken(t string, opts ...BearerTokenOption) *Client {
+	client := &Client{
 		rateLimiter:   c.rateLimiter,
 		decoder:       c.decoder,
 		moovURLScheme: c.moovURLScheme,
 		Credentials:   c.Credentials,
 		HttpClient:    c.HttpClient,
 		bearerToken:   t,
-		origin:        o,
-		referer:       r,
+		origin:        c.origin,
+		referer:       c.referer,
+	}
+
+	for _, opt := range opts {
+		opt(client)
+	}
+
+	return client
+}
+
+// BearerTokenOption configures the headers sent alongside a bearer token.
+type BearerTokenOption func(c *Client)
+
+// WithOrigin sets the Origin header sent on every call made by the client.
+func WithOrigin(origin string) BearerTokenOption {
+	return func(c *Client) {
+		c.origin = origin
+	}
+}
+
+// WithReferer sets the Referer header sent on every call made by the client.
+func WithReferer(referer string) BearerTokenOption {
+	return func(c *Client) {
+		c.referer = referer
 	}
 }
 
