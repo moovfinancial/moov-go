@@ -62,7 +62,7 @@ func TestCallHttp_AuthHeader(t *testing.T) {
 
 	t.Run("Credentials.Token sends Bearer and omits Basic", func(t *testing.T) {
 		c, cap := newClient(t)
-		c = c.WithBearerToken("abc")
+		c = c.WithBearerToken("abc", "", "")
 		_, err := c.CallHttp(context.Background(), Endpoint(http.MethodGet, "/ping"))
 		require.NoError(t, err)
 		require.Equal(t, "Bearer abc", cap.auth)
@@ -70,7 +70,7 @@ func TestCallHttp_AuthHeader(t *testing.T) {
 
 	t.Run("WithToken option sets the bearer", func(t *testing.T) {
 		c, cap := newClient(t)
-		c = c.WithBearerToken("xyz")
+		c = c.WithBearerToken("xyz", "", "")
 		_, err := c.CallHttp(context.Background(), Endpoint(http.MethodGet, "/ping"))
 		require.NoError(t, err)
 		require.Equal(t, "Bearer xyz", cap.auth)

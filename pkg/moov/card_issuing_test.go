@@ -318,7 +318,7 @@ func Test_CardIssuing(t *testing.T) {
 	nickname := "testing"
 
 	// create issued card
-	// The card is issued to (and funded by the default wallet of) the MERCHANT_ID business
+	// The card is issued to (and funded by the card-issuing wallet of) the MERCHANT_ID business
 	// account. AuthorizedUserAccountID (an optional second cardholder) is omitted.
 	created, err := mc.CreateIssuedCard(BgCtx(), MERCHANT_ID, moov.CreateIssuedCard{
 		Nickname: &nickname,

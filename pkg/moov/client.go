@@ -17,6 +17,8 @@ type Client struct {
 	decoder Decoder
 
 	bearerToken string
+	origin      string
+	referer     string
 
 	moovURLScheme string
 }
@@ -51,7 +53,8 @@ func NewClient(configurables ...ClientConfigurable) (*Client, error) {
 // given bearer token instead of Basic auth. Sets Credentials.Token and
 // revalidates. Intended for pass-through scenarios where a caller-supplied
 // access token should authenticate every call made by this client.
-func (c *Client) WithBearerToken(t string) *Client {
+// At least one of `Origin` or `Referer` header(s) must be included to not 401.
+func (c *Client) WithBearerToken(t, o, r string) *Client {
 	return &Client{
 		rateLimiter:   c.rateLimiter,
 		decoder:       c.decoder,
@@ -59,6 +62,8 @@ func (c *Client) WithBearerToken(t string) *Client {
 		Credentials:   c.Credentials,
 		HttpClient:    c.HttpClient,
 		bearerToken:   t,
+		origin:        o,
+		referer:       r,
 	}
 }
 
