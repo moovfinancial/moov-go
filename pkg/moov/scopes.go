@@ -46,14 +46,14 @@ func (sl *scopeList) IssuedCardsRead(accountID string) ScopeBuilder {
 	return appendScope("/accounts/%s/issued-cards.read", accountID)
 }
 
-// Allows for the creation of a new issued card
+// Allows for creating and updating issued cards
 func (sl *scopeList) IssuedCardsWrite(accountID string) ScopeBuilder {
 	return appendScope("/accounts/%s/issued-cards.write", accountID)
 }
 
-// WARNING: Will return PCI data only allowed use case is by the customer directly to moov otherwise your business will require a PCI audit.
-func (sl *scopeList) IssuedCardsReadSecure(accountID string) ScopeBuilder {
-	return appendScope("/accounts/%s/issued-cards.read-secure", accountID)
+// WARNING: Will return PCI data only allowed use case is by the customer directly to moov otherwise your business will require a PCI audit
+func (sl *scopeList) IssuedCardsReadPrivate(accountID string) ScopeBuilder {
+	return appendScope("/accounts/%s/issued-cards.read-private", accountID)
 }
 
 // Give to the registered ApplePay merchants to allow them manage their ApplePay integration.

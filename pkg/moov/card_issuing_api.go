@@ -59,6 +59,22 @@ func (c Client) UpdateIssuedCard(ctx context.Context, accountID string, cardID s
 	return CompletedObjectOrError[IssuedCard](httpResp)
 }
 
+// GetIssuedCardDetails retrieves the specified issued card, including PCI details, for the given account
+// https://docs.moov.io/api/money-movement/issuing/get-details/
+//
+// To access this endpoint using an [access token](https://docs.moov.io/api/authentication/access-tokens/)
+// you'll need to specify the `/accounts/{accountID}/issued-cards.read-private` scope
+func (c Client) GetIssuedCardDetails(ctx context.Context, accountID string, cardID string) (*FullIssuedCard, error) {
+	httpResp, err := c.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathIssuingCardDetails, accountID, cardID),
+		AcceptJson())
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[FullIssuedCard](httpResp)
+}
+
 // ListIssuedCardAuthorizations retrieves all issued card authorizations for the given account
 // https://docs.moov.io/api/money-movement/issuing/list-authorizations/
 func (c Client) ListIssuedCardAuthorizations(ctx context.Context, accountID string, filters ...ListIssuedCardAuthorizationsFilter) ([]IssuedCardAuthorization, error) {
