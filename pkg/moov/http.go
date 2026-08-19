@@ -50,14 +50,18 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", *call.token))
 	case c.bearerToken != "":
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.bearerToken))
-		if c.origin != "" {
-			req.Header.Add("Origin", c.origin)
-		}
-		if c.referer != "" {
-			req.Header.Add("Referer", c.referer)
-		}
 	default:
 		req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
+	}
+
+	// Bearer tokens 401 without at least one of these.
+	if strings.Contains(req.Header.Get("Authorization"), "Bearer") {
+		if c.origin != "" && req.Header.Get("Origin") == "" {
+			req.Header.Set("Origin", c.origin)
+		}
+		if c.referer != "" && req.Header.Get("Referer") == "" {
+			req.Header.Set("Referer", c.referer)
+		}
 	}
 
 	resp, err := c.HttpClient.Do(req)
