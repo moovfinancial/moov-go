@@ -39,9 +39,10 @@ error from moov - status: bad_request http.request_id:  http.status_code: 400
 
 func TestCallHttp_AuthHeader(t *testing.T) {
 	type capture struct {
-		auth    string
-		origin  string
-		referer string
+		auth     string
+		allAuths []string
+		origin   string
+		referer  string
 	}
 
 	newClient := func(t *testing.T, cfg ...ClientConfigurable) (*Client, *capture) {
@@ -49,6 +50,7 @@ func TestCallHttp_AuthHeader(t *testing.T) {
 		cap := &capture{}
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cap.auth = r.Header.Get("Authorization")
+			cap.allAuths = r.Header.Values("Authorization")
 			cap.origin = r.Header.Get("Origin")
 			cap.referer = r.Header.Get("Referer")
 			w.WriteHeader(http.StatusOK)
@@ -108,6 +110,26 @@ func TestCallHttp_AuthHeader(t *testing.T) {
 		_, err := c.CallHttp(context.Background(), Endpoint(http.MethodGet, "/ping"))
 		require.NoError(t, err)
 		require.True(t, strings.HasPrefix(cap.auth, "Basic "), "expected Basic auth, got %q", cap.auth)
+	})
+
+	t.Run("Basic auth does not send origin or referer", func(t *testing.T) {
+		c, cap := newClient(t)
+		c.origin, c.referer = "https://example.com", "https://example.com/checkout"
+		_, err := c.CallHttp(context.Background(), Endpoint(http.MethodGet, "/ping"))
+		require.NoError(t, err)
+		require.True(t, strings.HasPrefix(cap.auth, "Basic "), "expected Basic auth, got %q", cap.auth)
+		require.Empty(t, cap.origin)
+		require.Empty(t, cap.referer)
+	})
+
+	t.Run("only one Authorization header is sent", func(t *testing.T) {
+		c, cap := newClient(t)
+		c = c.WithBearerToken("abc")
+		_, err := c.CallHttp(context.Background(), Endpoint(http.MethodGet, "/ping"),
+			Header("Authorization", "Bearer caller-supplied"))
+		require.NoError(t, err)
+		require.Len(t, cap.allAuths, 1)
+		require.Equal(t, "Bearer abc", cap.auth)
 	})
 }
 

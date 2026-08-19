@@ -57,6 +57,10 @@ func NewClient(configurables ...ClientConfigurable) (*Client, error) {
 // headers is sent, so pass WithOrigin and/or WithReferer options for those.
 // Any origin/referer already set on c carries over unless an option overrides it.
 func (c *Client) WithBearerToken(t string, opts ...BearerTokenOption) *Client {
+	if c == nil {
+		return nil
+	}
+
 	client := &Client{
 		rateLimiter:   c.rateLimiter,
 		decoder:       c.decoder,

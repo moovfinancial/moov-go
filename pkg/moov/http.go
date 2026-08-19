@@ -45,17 +45,20 @@ func (c *Client) CallHttp(ctx context.Context, endpoint EndpointArg, args ...cal
 	}
 	req.Header.Add("User-Agent", fmt.Sprintf("moov-go/%s", moovgo.Version()))
 
+	var bearerAuth bool
 	switch {
 	case call.token != nil:
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", *call.token))
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", *call.token))
+		bearerAuth = true
 	case c.bearerToken != "":
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.bearerToken))
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.bearerToken))
+		bearerAuth = true
 	default:
 		req.SetBasicAuth(c.Credentials.PublicKey, c.Credentials.SecretKey)
 	}
 
 	// Bearer tokens 401 without at least one of these.
-	if strings.Contains(req.Header.Get("Authorization"), "Bearer") {
+	if bearerAuth {
 		if c.origin != "" && req.Header.Get("Origin") == "" {
 			req.Header.Set("Origin", c.origin)
 		}
