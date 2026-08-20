@@ -48,13 +48,19 @@ func TestPercentageRate_UnmarshalJSON_Errors(t *testing.T) {
 	t.Run("empty string is not a valid number", func(t *testing.T) {
 		var fee moov.InterchangeProgramFee
 		err := json.Unmarshal([]byte(`{"percentageRate":""}`), &fee)
-		require.ErrorContains(t, err, "invalid number literal")
+		require.Error(t, err)
+
+		var typeErr *json.UnmarshalTypeError
+		require.ErrorAs(t, err, &typeErr)
 	})
 
 	t.Run("non-numeric string is not a valid number", func(t *testing.T) {
 		var fee moov.InterchangeProgramFee
 		err := json.Unmarshal([]byte(`{"percentageRate":"one percent"}`), &fee)
-		require.ErrorContains(t, err, "invalid number literal")
+		require.Error(t, err)
+
+		var typeErr *json.UnmarshalTypeError
+		require.ErrorAs(t, err, &typeErr)
 	})
 }
 
