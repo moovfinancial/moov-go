@@ -137,6 +137,7 @@ const (
 
 	pathIssuedCards                = "/issuing/%s/cards"
 	pathIssuedCard                 = "/issuing/%s/cards/%s"
+	pathIssuingCardDetails         = "/issuing/%s/cards/%s/details"
 	pathIssuingAuthorizations      = "/issuing/%s/authorizations"
 	pathIssuingAuthorization       = "/issuing/%s/authorizations/%s"
 	pathIssuingAuthorizationEvents = "/issuing/%s/authorizations/%s/events"

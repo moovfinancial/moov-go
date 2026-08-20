@@ -39,7 +39,10 @@ error from moov - status: bad_request http.request_id:  http.status_code: 400
 
 func TestCallHttp_AuthHeader(t *testing.T) {
 	type capture struct {
-		auth string
+		auth     string
+		allAuths []string
+		origin   string
+		referer  string
 	}
 
 	newClient := func(t *testing.T, cfg ...ClientConfigurable) (*Client, *capture) {
@@ -47,11 +50,16 @@ func TestCallHttp_AuthHeader(t *testing.T) {
 		cap := &capture{}
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cap.auth = r.Header.Get("Authorization")
+			cap.allAuths = r.Header.Values("Authorization")
+			cap.origin = r.Header.Get("Origin")
+			cap.referer = r.Header.Get("Referer")
 			w.WriteHeader(http.StatusOK)
 		}))
 		t.Cleanup(srv.Close)
 
 		host := strings.TrimPrefix(srv.URL, "http://")
+		// Stub credentials up front so the tests don't depend on MOOV_* env vars.
+		cfg = append([]ClientConfigurable{WithCredentials(Credentials{PublicKey: "pk", SecretKey: "sk"})}, cfg...)
 		cfg = append(cfg, WithMoovURLScheme("http"))
 
 		c, err := NewClient(cfg...)
@@ -66,6 +74,8 @@ func TestCallHttp_AuthHeader(t *testing.T) {
 		_, err := c.CallHttp(context.Background(), Endpoint(http.MethodGet, "/ping"))
 		require.NoError(t, err)
 		require.Equal(t, "Bearer abc", cap.auth)
+		require.Empty(t, cap.origin)
+		require.Empty(t, cap.referer)
 	})
 
 	t.Run("WithToken option sets the bearer", func(t *testing.T) {
@@ -76,11 +86,50 @@ func TestCallHttp_AuthHeader(t *testing.T) {
 		require.Equal(t, "Bearer xyz", cap.auth)
 	})
 
+	t.Run("WithOrigin and WithReferer set their headers", func(t *testing.T) {
+		c, cap := newClient(t)
+		c = c.WithBearerToken("abc", WithOrigin("https://example.com"), WithReferer("https://example.com/checkout"))
+		_, err := c.CallHttp(context.Background(), Endpoint(http.MethodGet, "/ping"))
+		require.NoError(t, err)
+		require.Equal(t, "Bearer abc", cap.auth)
+		require.Equal(t, "https://example.com", cap.origin)
+		require.Equal(t, "https://example.com/checkout", cap.referer)
+	})
+
+	t.Run("origin and referer carry over to a re-tokened client", func(t *testing.T) {
+		c, cap := newClient(t)
+		c = c.WithBearerToken("abc", WithOrigin("https://example.com")).WithBearerToken("def")
+		_, err := c.CallHttp(context.Background(), Endpoint(http.MethodGet, "/ping"))
+		require.NoError(t, err)
+		require.Equal(t, "Bearer def", cap.auth)
+		require.Equal(t, "https://example.com", cap.origin)
+	})
+
 	t.Run("falls back to Basic auth when no token is set", func(t *testing.T) {
 		c, cap := newClient(t, WithCredentials(Credentials{PublicKey: "pk", SecretKey: "sk"}))
 		_, err := c.CallHttp(context.Background(), Endpoint(http.MethodGet, "/ping"))
 		require.NoError(t, err)
 		require.True(t, strings.HasPrefix(cap.auth, "Basic "), "expected Basic auth, got %q", cap.auth)
+	})
+
+	t.Run("Basic auth does not send origin or referer", func(t *testing.T) {
+		c, cap := newClient(t)
+		c.origin, c.referer = "https://example.com", "https://example.com/checkout"
+		_, err := c.CallHttp(context.Background(), Endpoint(http.MethodGet, "/ping"))
+		require.NoError(t, err)
+		require.True(t, strings.HasPrefix(cap.auth, "Basic "), "expected Basic auth, got %q", cap.auth)
+		require.Empty(t, cap.origin)
+		require.Empty(t, cap.referer)
+	})
+
+	t.Run("only one Authorization header is sent", func(t *testing.T) {
+		c, cap := newClient(t)
+		c = c.WithBearerToken("abc")
+		_, err := c.CallHttp(context.Background(), Endpoint(http.MethodGet, "/ping"),
+			Header("Authorization", "Bearer caller-supplied"))
+		require.NoError(t, err)
+		require.Len(t, cap.allAuths, 1)
+		require.Equal(t, "Bearer abc", cap.auth)
 	})
 }
 

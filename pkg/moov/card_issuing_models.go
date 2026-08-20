@@ -294,6 +294,12 @@ func WithIssuedCardCount(count int) ListIssuedCardsFilter {
 	return Count(count)
 }
 
+type FullIssuedCard struct {
+	IssuedCard
+	PAN string `json:"pan"`
+	CVV string `json:"cvv"`
+}
+
 type CreateIssuedCard struct {
 	AuthorizedUserAccountID *string               `json:"authorizedUserAccountID,omitempty"`
 	Nickname                *string               `json:"nickname,omitempty"`
