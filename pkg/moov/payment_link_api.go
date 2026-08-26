@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 // CreatePaymentLink creates a new payment link for a Moov account.
@@ -12,6 +13,7 @@ import (
 func (c Client) CreatePaymentLink(ctx context.Context, accountID string, paymentLink CreatePaymentLink) (*PaymentLink, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathPaymentLinks, accountID),
+		MoovVersion(Version2026_07),
 		AcceptJson(),
 		JsonBody(paymentLink),
 	)
@@ -27,6 +29,7 @@ func (c Client) CreatePaymentLink(ctx context.Context, accountID string, payment
 func (c Client) GetPaymentLink(ctx context.Context, accountID, paymentLinkCode string) (*PaymentLink, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathPaymentLink, accountID, paymentLinkCode),
+		MoovVersion(Version2026_07),
 		AcceptJson(),
 	)
 	if err != nil {
@@ -41,6 +44,7 @@ func (c Client) GetPaymentLink(ctx context.Context, accountID, paymentLinkCode s
 func (c Client) UpdatePaymentLink(ctx context.Context, accountID, paymentLinkCode string, paymentLink UpdatePaymentLink) (*PaymentLink, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPatch, pathPaymentLink, accountID, paymentLinkCode),
+		MoovVersion(Version2026_07),
 		AcceptJson(),
 		JsonBody(paymentLink),
 	)
@@ -57,6 +61,7 @@ func (c Client) UpdatePaymentLink(ctx context.Context, accountID, paymentLinkCod
 func (c Client) DisablePaymentLink(ctx context.Context, accountID, paymentLinkCode string) error {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodDelete, pathPaymentLink, accountID, paymentLinkCode),
+		MoovVersion(Version2026_07),
 	)
 	if err != nil {
 		return err
@@ -71,6 +76,7 @@ func (c Client) DisablePaymentLink(ctx context.Context, accountID, paymentLinkCo
 func (c Client) GetPaymentLinkQRCode(ctx context.Context, accountID, paymentLinkCode string) ([]byte, string, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathPaymentLinkQRCode, accountID, paymentLinkCode),
+		MoovVersion(Version2026_07),
 		AcceptContentType("image/*"),
 	)
 	if err != nil {
@@ -108,10 +114,25 @@ func WithPaymentLinkSkip(skip int) ListPaymentLinkFilter {
 	})
 }
 
+// WithPaymentLinkTypes filters payment links by type.
+func WithPaymentLinkTypes(types ...PaymentLinkType) ListPaymentLinkFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		if len(types) == 0 {
+			return nil
+		}
+		var strs []string
+		for _, t := range types {
+			strs = append(strs, string(t))
+		}
+		call.params["types"] = strings.Join(strs, ",")
+		return nil
+	})
+}
+
 // ListPaymentLinks lists the payment links for a Moov account.
 // https://docs.moov.io/api/money-movement/payment-links/list/
 func (c Client) ListPaymentLinks(ctx context.Context, accountID string, filters ...ListPaymentLinkFilter) ([]PaymentLink, error) {
-	args := prependArgs(filters, AcceptJson())
+	args := prependArgs(filters, MoovVersion(Version2026_07), AcceptJson())
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathPaymentLinks, accountID), args...)
 	if err != nil {
 		return nil, fmt.Errorf("calling http: %w", err)
