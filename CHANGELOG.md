@@ -2,6 +2,12 @@
 
 Please refer to the [Github Releases](https://github.com/moovfinancial/moov-go/releases) page for moov-go for future updates.
 
+## [Unreleased]
+
+ADDITIONS
+
+- transfers: add 16 new `CardFailureCode` values (`account-closed`, `account-not-activated`, `authentication-failed`, `authentication-required`, `cardholder-action-required`, `format-error`, `invalid-pin`, `offline-approved`, `offline-declined`, `partial-approval`, `payment-stopped`, `pin-required`, `record-not-found`, `surcharge-not-permitted`, `transaction-reversed`, `verification-failed`)
+
 ## v0.16.0 (Released 2025-05-28)
 
 ADDITIONS
