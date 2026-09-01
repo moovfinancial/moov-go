@@ -20,6 +20,7 @@ Create a pull request for the current branch.
    - Focus on what the PR does, not how
    - `chore`, `docs`, `test` do not require a component
    - `!` is required for breaking changes
+   - Do not include Linear ticket references (e.g., CAR-*, LEDG-*) in the title
 8. Determine which GitHub labels to apply:
    - `feat` -> `enhancement`
    - `fix` -> `bug`
@@ -52,7 +53,8 @@ Create a pull request for the current branch.
    - End with a signature line naming the agent, e.g. `— Claude`.
 
 10. Before creating the PR, show the user the generated title, labels, and description. Ask for confirmation.
-11. Create the PR using `gh pr create` with the generated title, description, and labels.
+11. Create the PR using `gh pr create --title "TITLE" --body "BODY"` with the generated title, description, and labels.
+    - Use `--title` and `--body` (or `--body-file`) so the command is not interactive.
     - Use `--label` flag for each label (e.g., `--label enhancement`)
     - Push the branch first if needed (`git push -u origin HEAD`)
     - If a label doesn't exist on the repo, retry without that label.
