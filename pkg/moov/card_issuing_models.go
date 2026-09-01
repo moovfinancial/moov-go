@@ -43,6 +43,9 @@ const (
 	// operational and can approve incoming authorizations
 	IssuedCardState_Active IssuedCardState = "active"
 
+	// temporarily deactivated and cannot approve incoming authorizations, but can be reactivated
+	IssuedCardState_Frozen IssuedCardState = "frozen"
+
 	// permanently deactivated, either by request or because it expired, and cannot approve incoming authorizations
 	IssuedCardState_Closed IssuedCardState = "closed"
 )
@@ -320,6 +323,13 @@ type UpdateIssuedCard struct {
 type UpdateIssuedCardState string
 
 const (
+	// reactivate a frozen card so it can approve incoming authorizations
+	UpdateIssuedCardState_Active UpdateIssuedCardState = "active"
+
+	// temporarily deactivate a card so it cannot approve incoming authorizations, but can be reactivated
+	UpdateIssuedCardState_Frozen UpdateIssuedCardState = "frozen"
+
+	// permanently deactivate a card so it cannot approve incoming authorizations
 	UpdateIssuedCardState_Closed UpdateIssuedCardState = "closed"
 )
 
