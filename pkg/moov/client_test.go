@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
@@ -33,6 +35,9 @@ func NewTestClient(t testing.TB, c ...moov.ClientConfigurable) *moov.Client {
 		}
 	}
 
+	c = append([]moov.ClientConfigurable{
+		moov.WithHttpClient(&http.Client{Timeout: 10 * time.Second}),
+	}, c...)
 	c = append(c, moov.WithDecoder(strictDecoder))
 
 	mc, err := moov.NewClient(c...)
