@@ -12,22 +12,7 @@ func Test_Transfers(t *testing.T) {
 	mc := NewTestClient(t)
 
 	account := getLincolnBank(t, mc)
-
-	options, err := mc.TransferOptions(BgCtx(), FACILITATOR_ID, moov.CreateTransferOptions{
-		Source: moov.CreateTransferOptionsTarget{
-			AccountID: account.AccountID,
-		},
-		Destination: moov.CreateTransferOptionsTarget{
-			AccountID: FACILITATOR_ID,
-		},
-		Amount: moov.Amount{
-			Currency: "USD",
-			Value:    1,
-		},
-	})
-
-	NoResponseError(t, err)
-	source, dest := paymentMethodsFromOptions(t, options, moov.PaymentMethodType_AchDebitFund, moov.PaymentMethodType_MoovWallet)
+	source, dest := lincolnAchDebitToPartnerWallet(t, mc, account.AccountID)
 
 	t.Run("make async transfer", func(t *testing.T) {
 		started, err := mc.CreateTransfer(BgCtx(),
@@ -195,22 +180,7 @@ func Test_Transfers(t *testing.T) {
 func Test_Cancellations(t *testing.T) {
 	mc := NewTestClient(t)
 	account := getLincolnBank(t, mc)
-
-	options, err := mc.TransferOptions(BgCtx(), FACILITATOR_ID, moov.CreateTransferOptions{
-		Source: moov.CreateTransferOptionsTarget{
-			AccountID: account.AccountID,
-		},
-		Destination: moov.CreateTransferOptionsTarget{
-			AccountID: FACILITATOR_ID,
-		},
-		Amount: moov.Amount{
-			Currency: "USD",
-			Value:    1,
-		},
-	})
-
-	NoResponseError(t, err)
-	source, dest := paymentMethodsFromOptions(t, options, moov.PaymentMethodType_AchDebitFund, moov.PaymentMethodType_MoovWallet)
+	source, dest := lincolnAchDebitToPartnerWallet(t, mc, account.AccountID)
 
 	var transferID string
 	t.Run("make sync transfer", func(t *testing.T) {

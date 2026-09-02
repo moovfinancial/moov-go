@@ -6,9 +6,40 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
+
+func TestDefaultHttpClient_HasTimeout(t *testing.T) {
+	c := DefaultHttpClient()
+	require.Equal(t, DefaultHTTPTimeout, c.Timeout)
+	require.Greater(t, c.Timeout, time.Duration(0))
+	require.Less(t, c.Timeout, 2*time.Minute)
+}
+
+func TestCallHttp_ClientTimeout(t *testing.T) {
+	started := make(chan struct{})
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		close(started)
+		<-r.Context().Done()
+	}))
+	t.Cleanup(srv.Close)
+
+	c, err := NewClient(WithCredentials(Credentials{PublicKey: "pk", SecretKey: "sk"}))
+	require.NoError(t, err)
+	c.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
+	c.moovURLScheme = "http"
+	c.HttpClient = &http.Client{Timeout: 100 * time.Millisecond}
+
+	start := time.Now()
+	_, err = c.CallHttp(context.Background(), Endpoint(http.MethodGet, "/ping"))
+	elapsed := time.Since(start)
+
+	<-started
+	require.Error(t, err)
+	require.Less(t, elapsed, time.Second, "request hung %s, expected client timeout", elapsed)
+}
 
 func TestHTTPCallResponse(t *testing.T) {
 	t.Run("400", func(t *testing.T) {

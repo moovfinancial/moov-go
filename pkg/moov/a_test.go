@@ -1,11 +1,13 @@
 package moov_test
 
 import (
+	"cmp"
 	"context"
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"slices"
 	"testing"
 	"time"
 
@@ -120,6 +122,49 @@ func paymentMethodsFromOptions(t *testing.T, options *moov.TransferOptions, sour
 	require.NotEmpty(t, destId, "unable to find destination payment method for type")
 
 	return sourceId, destId
+}
+
+func requirePaymentMethodID(t *testing.T, mc *moov.Client, accountID string, pmType moov.PaymentMethodType) string {
+	t.Helper()
+	pms, err := mc.ListPaymentMethods(t.Context(), accountID, moov.WithPaymentMethodType(string(pmType)))
+	NoResponseError(t, err)
+	require.NotEmpty(t, pms, "unable to find payment method for type %s", pmType)
+	slices.SortFunc(pms, func(a, b moov.PaymentMethod) int {
+		return cmp.Compare(a.PaymentMethodID, b.PaymentMethodID)
+	})
+	return pms[0].PaymentMethodID
+}
+
+// lincolnAchDebitToPartnerWallet returns an ACH debit-fund source on the sandbox
+// merchant and the partner wallet destination.
+//
+// TransferOptions by account ID currently returns no options for this merchant
+// (it has hundreds of leftover payment methods). Listing by type, then pinning
+// TransferOptions to those IDs, still exercises the endpoint.
+func lincolnAchDebitToPartnerWallet(t *testing.T, mc *moov.Client, sourceAccountID string) (string, string) {
+	t.Helper()
+
+	source := requirePaymentMethodID(t, mc, sourceAccountID, moov.PaymentMethodType_AchDebitFund)
+	dest := FACILITATOR_WALLET_PM_ID
+
+	options, err := mc.TransferOptions(t.Context(), FACILITATOR_ID, moov.CreateTransferOptions{
+		Source: moov.CreateTransferOptionsTarget{
+			PaymentMethodID: source,
+		},
+		Destination: moov.CreateTransferOptionsTarget{
+			PaymentMethodID: dest,
+		},
+		Amount: moov.Amount{
+			Currency: "USD",
+			Value:    1,
+		},
+	})
+	NoResponseError(t, err)
+	gotSource, gotDest := paymentMethodsFromOptions(t, options, moov.PaymentMethodType_AchDebitFund, moov.PaymentMethodType_MoovWallet)
+	require.Equal(t, source, gotSource)
+	require.Equal(t, dest, gotDest)
+
+	return source, dest
 }
 
 func NoResponseError(t *testing.T, err error) {

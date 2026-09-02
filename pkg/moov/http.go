@@ -8,13 +8,19 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	moovgo "github.com/moovfinancial/moov-go"
 )
 
+// DefaultHTTPTimeout is the default timeout for the SDK HTTP client.
+// It is intentionally well below Cloudflare's ~120s origin timeout so hung
+// origins fail here instead of blocking until a 524.
+const DefaultHTTPTimeout = 30 * time.Second
+
 func DefaultHttpClient() *http.Client {
 	return &http.Client{
-		Transport: http.DefaultTransport,
+		Timeout: DefaultHTTPTimeout,
 	}
 }
 
