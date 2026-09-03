@@ -334,15 +334,16 @@ const (
 )
 
 type IssuedCardAuthorization struct {
-	AuthorizationID  string                        `json:"authorizationID"`
-	IssuedCardID     string                        `json:"issuedCardID"`
-	FundingWalletID  string                        `json:"fundingWalletID"`
-	CreatedOn        time.Time                     `json:"createdOn"`
-	Network          IssuedCardTransactionNetwork  `json:"network"`
-	AuthorizedAmount string                        `json:"authorizedAmount"`
-	Status           IssuedCardAuthorizationStatus `json:"status"`
-	MerchantData     IssuedCardTransactionMerchant `json:"merchantData"`
-	CardTransactions []string                      `json:"cardTransactions,omitempty"`
+	AuthorizationID    string                        `json:"authorizationID"`
+	IssuedCardID       string                        `json:"issuedCardID"`
+	LastFourCardNumber *string                       `json:"lastFourCardNumber,omitempty"`
+	FundingWalletID    string                        `json:"fundingWalletID"`
+	CreatedOn          time.Time                     `json:"createdOn"`
+	Network            IssuedCardTransactionNetwork  `json:"network"`
+	AuthorizedAmount   string                        `json:"authorizedAmount"`
+	Status             IssuedCardAuthorizationStatus `json:"status"`
+	MerchantData       IssuedCardTransactionMerchant `json:"merchantData"`
+	CardTransactions   []string                      `json:"cardTransactions,omitempty"`
 }
 
 // IssuedCardTransactionNetwork represents name of the network a card transaction is routed through
@@ -459,14 +460,15 @@ func WithIssuedCardAuthorizationEventCount(count int) ListIssuedCardAuthorizatio
 }
 
 type IssuedCardTransaction struct {
-	CardTransactionID string                        `json:"cardTransactionID"`
-	IssuedCardID      string                        `json:"issuedCardID"`
-	FundingWalletID   string                        `json:"fundingWalletID"`
-	Amount            string                        `json:"amount"`
-	AuthorizationID   *string                       `json:"authorizationID,omitempty"`
-	CreatedOn         time.Time                     `json:"createdOn"`
-	AuthorizedOn      time.Time                     `json:"authorizedOn"`
-	MerchantData      IssuedCardTransactionMerchant `json:"merchantData"`
+	CardTransactionID  string                        `json:"cardTransactionID"`
+	IssuedCardID       string                        `json:"issuedCardID"`
+	LastFourCardNumber *string                       `json:"lastFourCardNumber,omitempty"`
+	FundingWalletID    string                        `json:"fundingWalletID"`
+	Amount             string                        `json:"amount"`
+	AuthorizationID    *string                       `json:"authorizationID,omitempty"`
+	CreatedOn          time.Time                     `json:"createdOn"`
+	AuthorizedOn       time.Time                     `json:"authorizedOn"`
+	MerchantData       IssuedCardTransactionMerchant `json:"merchantData"`
 }
 
 type ListIssuedCardTransactionsFilter callArg
