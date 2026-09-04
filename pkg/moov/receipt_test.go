@@ -2,12 +2,14 @@ package moov_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
 
+// Tests that an async transfer becomes queryable before a receipt references it.
 func Test_Receipts(t *testing.T) {
 	mc := NewTestClient(t)
 
@@ -36,6 +38,11 @@ func Test_Receipts(t *testing.T) {
 		require.NotNil(t, started)
 
 		transfer = started
+		require.Eventually(t, func() bool {
+			_, err = mc.GetTransfer(BgCtx(), testtools.PARTNER_ID, transfer.TransferID)
+			return err == nil
+		}, 10*time.Second, 100*time.Millisecond)
+		require.NoError(t, err)
 	})
 
 	t.Run("create receipt", func(t *testing.T) {
