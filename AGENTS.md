@@ -4,7 +4,7 @@ Guidance for AI coding agents working in the `moov-go` repo. This is the single 
 
 ## Agent messages
 
-Apply these rules only to messages posted to shared communication systems. Examples include GitHub PR descriptions, GitHub comments, and Slack messages.
+Apply these rules only to messages posted to shared communication systems. Examples include GitHub PR descriptions and GitHub comments.
 
 Do not apply these rules to direct user-agent conversations in a terminal, an IDE, or an agent application.
 
