@@ -2,6 +2,7 @@ package moov_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
@@ -31,11 +32,13 @@ func Test_Receipts(t *testing.T) {
 			},
 		}).Started()
 		NoResponseError(t, err)
-
-		// We made an async transfer, so completed should be nil, while started not nil
 		require.NotNil(t, started)
 
 		transfer = started
+		require.Eventually(t, func() bool {
+			_, err := mc.GetTransfer(BgCtx(), testtools.PARTNER_ID, transfer.TransferID)
+			return err == nil
+		}, 3*time.Second, 250*time.Millisecond)
 	})
 
 	t.Run("create receipt", func(t *testing.T) {
@@ -61,7 +64,6 @@ func Test_Receipts(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, receipts, 1)
 
-		// The receipt may be sent or not by this point so we need to clear out the sentFor list
 		for i := range receipts {
 			receipts[i].SentFor = nil
 		}
