@@ -26,7 +26,7 @@ Do not apply these rules to direct user-agent conversations in a terminal, an ID
    — Claude
    ```
 
-   Use `Claude`, `Gemini`, `Copilot`, `Codex`, `Cursor`, `Grok`, or the equivalent name. Do not skip the emoji or the signature.
+   Use `Claude`, `Gemini`, `Copilot`, `Codex`, `Cursor`, `Grok`, or the equivalent name. Do not skip the emoji or the signature. This rule also applies to short replies in shared communication.
 
 Commit messages are exempt. They follow the Conventional Commits format in the styleguide.
 
