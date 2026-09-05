@@ -4,7 +4,9 @@ Guidance for AI coding agents working in the `moov-go` repo. This is the single 
 
 ## Agent messages
 
-Each message that an agent writes must follow these rules. This includes chat replies, PR comments, review comments, and PR descriptions.
+Apply these rules only to messages posted to shared communication systems. Examples include GitHub PR descriptions and GitHub comments.
+
+Do not apply these rules to direct user-agent conversations in a terminal, an IDE, or an agent application.
 
 1. **Start with 🤖** as the first character.
 2. **Write in [ASD-STE100 Simplified Technical English](https://www.asd-ste100.org/)** (Issue 9):
@@ -24,7 +26,7 @@ Each message that an agent writes must follow these rules. This includes chat re
    — Claude
    ```
 
-   Use `Claude`, `Gemini`, `Copilot`, `Codex`, `Cursor`, `Grok`, or the equivalent name. Do not skip the emoji or the signature. This also applies to short replies.
+   Use `Claude`, `Gemini`, `Copilot`, `Codex`, `Cursor`, `Grok`, or the equivalent name. Do not skip the emoji or the signature. This rule also applies to short replies in shared communication.
 
 Commit messages are exempt. They follow the Conventional Commits format in the styleguide.
 
