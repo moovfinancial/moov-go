@@ -160,4 +160,11 @@ const (
 
 	pathResolutionLinks = "/accounts/%s/resolution-links"
 	pathResolutionLink  = "/accounts/%s/resolution-links/%s"
+
+	pathPaymentLinks      = "/accounts/%s/payment-links"
+	pathPaymentLink       = "/accounts/%s/payment-links/%s"
+	pathPaymentLinkQRCode = "/accounts/%s/payment-links/%s/qrcode"
+
+	pathOnboardingInvites = "/onboarding-invites"
+	pathOnboardingInvite  = "/onboarding-invites/%s"
 )
