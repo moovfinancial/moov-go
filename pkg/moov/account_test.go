@@ -5,11 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/moovfinancial/moov-go/pkg/mv2507"
+	"github.com/moovfinancial/moov-go/pkg/mv2604"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -230,6 +232,67 @@ func TestPatchIndividualAccount_V2507(t *testing.T) {
 	require.True(t, result.Profile.Individual.BirthDateProvided)
 }
 
+func TestPatchIndividualAccount_V2604(t *testing.T) {
+	mc := NewTestClient(t)
+	ctx := BgCtx()
+
+	account, _, err := mc.CreateAccount(ctx, createTestIndividualAccount())
+	NoResponseError(t, err)
+	require.NotNil(t, account)
+
+	patchAccount := mv2604.PatchAccount{
+		Profile: mv2604.PatchProfile{
+			Individual: moov.Set(mv2604.PatchIndividualProfile{
+				Name: moov.Name{
+					FirstName: "John",
+					LastName:  "Doe",
+				},
+				Phone: moov.Set(moov.Phone{
+					Number:      "555-555-6666",
+					CountryCode: "1",
+				}),
+				Email: "john.doe@moov.io",
+				Address: moov.Set(moov.Address{
+					AddressLine1:    "123 Main St",
+					City:            "Moov City",
+					StateOrProvince: "CA",
+					PostalCode:      "12345",
+					Country:         "US",
+				}),
+				BirthDate: moov.Set(moov.Date{
+					Year:  1990,
+					Month: 1,
+					Day:   1,
+				}),
+				GovernmentID: moov.Set(moov.GovernmentID{
+					SSN: &moov.SSN{
+						Full: "123-45-6789",
+					},
+				}),
+			}),
+		},
+	}
+
+	result, err := mv2604.Accounts.Patch(context.Background(), *mc, account.AccountID, patchAccount)
+	NoResponseError(t, err)
+	require.NotNil(t, result)
+	require.NotNil(t, result.Profile.Individual)
+	require.Nil(t, result.Profile.Business)
+	require.NotNil(t, result.Profile.Individual.Phone)
+	require.Equal(t, "John", result.Profile.Individual.Name.FirstName)
+	require.Equal(t, "Doe", result.Profile.Individual.Name.LastName)
+	require.Equal(t, "5555556666", result.Profile.Individual.Phone.Number)
+	require.Equal(t, "1", result.Profile.Individual.Phone.CountryCode)
+	require.Equal(t, "john.doe@moov.io", result.Profile.Individual.Email)
+	require.Equal(t, "123 Main St", result.Profile.Individual.Address.AddressLine1)
+	require.Equal(t, "Moov City", result.Profile.Individual.Address.City)
+	require.Equal(t, "CA", result.Profile.Individual.Address.StateOrProvince)
+	require.Equal(t, "12345", result.Profile.Individual.Address.PostalCode)
+	require.Equal(t, "US", result.Profile.Individual.Address.Country)
+	require.True(t, result.Profile.Individual.GovernmentIDProvided)
+	require.True(t, result.Profile.Individual.BirthDateProvided)
+}
+
 func TestPatchBusinessAccount(t *testing.T) {
 	mc := NewTestClient(t)
 	ctx := BgCtx()
@@ -364,6 +427,111 @@ func TestPatchBusinessAccount(t *testing.T) {
 		NoResponseError(t, err)
 		require.NotNil(t, result)
 		require.Contains(t, result.Metadata, "key1")
+	})
+}
+
+func TestPatchBusinessAccount_V2604(t *testing.T) {
+	mc := NewTestClient(t)
+	ctx := BgCtx()
+
+	account, _, err := mc.CreateAccount(ctx, createTestBusinessAccount())
+	NoResponseError(t, err)
+	require.NotNil(t, account)
+
+	t.Run("foreignID, customer support and account settings", func(t *testing.T) {
+		foreignID := uuid.NewString()
+		patchAccount := mv2604.PatchAccount{
+			ForeignID: foreignID,
+			TermsOfService: moov.Set(mv2604.TermsOfServicePayload{
+				Manual: moov.Set(moov.TermsOfServiceManual{
+					AcceptanceIP:        "127.0.0.1",
+					AcceptanceDomain:    "moov.io",
+					AcceptanceUserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+					AcceptanceDate:      time.Now(),
+				}),
+			}),
+			CustomerSupport: moov.Set(mv2604.CustomerSupport{
+				Email: "test@moov.io",
+				Phone: moov.Set(moov.Phone{
+					Number:      "555-555-5555",
+					CountryCode: "1",
+				}),
+				Website: "https://moov.io",
+				Address: moov.Set(moov.Address{
+					AddressLine1:    "123 Main St",
+					City:            "Moov City",
+					StateOrProvince: "CA",
+					PostalCode:      "12345",
+					Country:         "US",
+				}),
+			}),
+			AccountSettings: moov.Set(mv2604.AccountSettings{
+				CardPayment: moov.Set(moov.CardPaymentSettings{
+					StatementDescriptor: "Moov",
+				}),
+				AchPayment: moov.Set(moov.AchPaymentSettings{
+					CompanyName: "Moov",
+				}),
+			}),
+		}
+
+		validate := func(result *moov.Account) {
+			require.NotNil(t, result)
+			require.NotNil(t, result.TermsOfService)
+			require.NotNil(t, result.CustomerSupport)
+			require.NotNil(t, result.CustomerSupport.Phone)
+			require.NotNil(t, result.CustomerSupport.Address)
+			require.NotNil(t, result.Settings)
+			require.NotNil(t, result.Settings.CardPayment)
+			require.NotNil(t, result.Settings.AchPayment)
+			require.Equal(t, foreignID, result.ForeignID)
+			require.Equal(t, "127.0.0.1", result.TermsOfService.AcceptedIP)
+			require.WithinDuration(t, time.Now(), result.TermsOfService.AcceptedDate, 5*time.Second)
+			require.Equal(t, "5555555555", result.CustomerSupport.Phone.Number)
+			require.Equal(t, "1", result.CustomerSupport.Phone.CountryCode)
+			require.Equal(t, "https://moov.io", result.CustomerSupport.Website)
+			require.Equal(t, "123 Main St", result.CustomerSupport.Address.AddressLine1)
+			require.Equal(t, "Moov City", result.CustomerSupport.Address.City)
+			require.Equal(t, "CA", result.CustomerSupport.Address.StateOrProvince)
+			require.Equal(t, "12345", result.CustomerSupport.Address.PostalCode)
+			require.Equal(t, "US", result.CustomerSupport.Address.Country)
+			require.Equal(t, "Moov", result.Settings.CardPayment.StatementDescriptor)
+			require.Equal(t, "Moov", result.Settings.AchPayment.CompanyName)
+			require.Equal(t, "electronics-appliances", result.Profile.Business.Industry)
+		}
+
+		result, err := mv2604.Accounts.Patch(context.Background(), *mc, account.AccountID, patchAccount)
+		NoResponseError(t, err)
+		validate(result)
+
+		result, err = mc.GetAccount(ctx, account.AccountID)
+		NoResponseError(t, err)
+		validate(result)
+	})
+
+	t.Run("null out AccountSettings and CustomerSupport fields", func(t *testing.T) {
+		// Currently, the accounts backend does not support nulling out the TermsOfService field.
+		// Uncomment the fields below when support is added.
+		patchAccount := mv2604.PatchAccount{
+			// TermsOfService:  moov.SetNull[mv2604.TermsOfServicePayload](),
+			CustomerSupport: moov.SetNull[mv2604.CustomerSupport](),
+			AccountSettings: moov.SetNull[mv2604.AccountSettings](),
+		}
+
+		validate := func(result *moov.Account) {
+			require.NotNil(t, result)
+			// require.Nil(t, result.TermsOfService)
+			require.Nil(t, result.CustomerSupport)
+			require.Nil(t, result.Settings)
+		}
+
+		result, err := mv2604.Accounts.Patch(context.Background(), *mc, account.AccountID, patchAccount)
+		NoResponseError(t, err)
+		validate(result)
+
+		result, err = mc.GetAccount(ctx, account.AccountID)
+		NoResponseError(t, err)
+		validate(result)
 	})
 }
 
