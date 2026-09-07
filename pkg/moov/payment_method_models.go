@@ -39,6 +39,7 @@ const (
 	PaymentMethodType_PullFromGooglePay  PaymentMethodType = "pull-from-google-pay"
 	PaymentMethodType_CardPresentPayment PaymentMethodType = "card-present-payment"
 	PaymentMethodType_InstantBankCredit  PaymentMethodType = "instant-bank-credit" // #nosec G101
+	PaymentMethodType_WireCredit         PaymentMethodType = "wire-credit"
 )
 
 // WalletPaymentMethod A Moov wallet to store funds for transfers.
