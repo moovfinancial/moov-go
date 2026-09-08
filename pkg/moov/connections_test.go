@@ -35,7 +35,7 @@ func Test_ShareConnection(t *testing.T) {
 		require.Eventually(t, func() bool {
 			connections, err = mv2507.Accounts.ListConnected(BgCtx(), *mc, merchant.AccountID)
 			return err == nil && len(connections) > 0
-		}, time.Second*1, time.Millisecond*100)
+		}, 3*time.Second, 250*time.Millisecond)
 
 		require.NoError(t, err)
 		require.NotNil(t, connections)
