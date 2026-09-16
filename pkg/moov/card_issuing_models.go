@@ -344,6 +344,7 @@ type IssuedCardAuthorization struct {
 	Status             IssuedCardAuthorizationStatus `json:"status"`
 	MerchantData       IssuedCardTransactionMerchant `json:"merchantData"`
 	CardTransactions   []string                      `json:"cardTransactions,omitempty"`
+	DeclineReason      *IssuingDeclineReason         `json:"declineReason,omitempty"`
 }
 
 // IssuedCardTransactionNetwork represents name of the network a card transaction is routed through
@@ -423,11 +424,12 @@ func WithIssuedCardAuthorizationEndDate(t time.Time) ListIssuedCardAuthorization
 }
 
 type IssuedCardAuthorizationEvent struct {
-	EventID   string                             `json:"eventID"`
-	EventType IssuedCardEventType                `json:"eventType"`
-	CreatedOn time.Time                          `json:"createdOn"`
-	Amount    string                             `json:"amount"`
-	Result    IssuedCardAuthorizationEventResult `json:"result"`
+	EventID       string                             `json:"eventID"`
+	EventType     IssuedCardEventType                `json:"eventType"`
+	CreatedOn     time.Time                          `json:"createdOn"`
+	Amount        string                             `json:"amount"`
+	Result        IssuedCardAuthorizationEventResult `json:"result"`
+	DeclineReason *IssuingDeclineReason              `json:"declineReason,omitempty"`
 }
 
 type IssuedCardEventType string
@@ -447,6 +449,27 @@ const (
 	IssuedCardAuthorizationEventResult_Approved  IssuedCardAuthorizationEventResult = "approved"
 	IssuedCardAuthorizationEventResult_Declined  IssuedCardAuthorizationEventResult = "declined"
 	IssuedCardAuthorizationEventResult_Processed IssuedCardAuthorizationEventResult = "processed"
+)
+
+// IssuingDeclineReason represents the reason an authorization or authorization event was declined
+type IssuingDeclineReason string
+
+const (
+	IssuingDeclineReason_InsufficientFunds            IssuingDeclineReason = "insufficient-funds"
+	IssuingDeclineReason_CardNotActive                IssuingDeclineReason = "card-not-active"
+	IssuingDeclineReason_CardExpiration               IssuingDeclineReason = "card-expiration"
+	IssuingDeclineReason_SpendCutoffReached           IssuingDeclineReason = "spend-cutoff-reached"
+	IssuingDeclineReason_OutsideAllowedSchedule       IssuingDeclineReason = "outside-allowed-schedule"
+	IssuingDeclineReason_SpendLimitExceeded           IssuingDeclineReason = "spend-limit-exceeded"
+	IssuingDeclineReason_MerchantCategoryNotSupported IssuingDeclineReason = "merchant-category-not-supported"
+	IssuingDeclineReason_MerchantCategoryRestricted   IssuingDeclineReason = "merchant-category-restricted"
+	IssuingDeclineReason_MerchantRestricted           IssuingDeclineReason = "merchant-restricted"
+	IssuingDeclineReason_MerchantCountryNotSupported  IssuingDeclineReason = "merchant-country-not-supported"
+	IssuingDeclineReason_UnsupportedTransaction       IssuingDeclineReason = "unsupported-transaction"
+	IssuingDeclineReason_NetworkStandIn               IssuingDeclineReason = "network-stand-in"
+	IssuingDeclineReason_DeclinedByIssuer             IssuingDeclineReason = "declined-by-issuer"
+	IssuingDeclineReason_InvalidRequest               IssuingDeclineReason = "invalid-request"
+	IssuingDeclineReason_SystemError                  IssuingDeclineReason = "system-error"
 )
 
 type ListIssuedCardAuthorizationEventsFilter callArg

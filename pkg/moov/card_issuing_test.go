@@ -228,7 +228,10 @@ func TestUpdateIssuingControlsMarshal(t *testing.T) {
 }
 
 func TestIssuedCardAuthorizationMarshal(t *testing.T) {
-	input := []byte(`{
+	decode := func(t *testing.T, statusFields string) *moov.IssuedCardAuthorization {
+		t.Helper()
+
+		input := []byte(`{
 			"authorizationID": "220c75d3-fac6-4572-9379-a2a2fb29f8cf",
 			"issuedCardID": "ec7e1848-dc80-4ab0-8827-dd7fc0737b43",
 			"lastFourCardNumber": "1234",
@@ -236,7 +239,7 @@ func TestIssuedCardAuthorizationMarshal(t *testing.T) {
 			"createdOn": "2023-11-08T23:06:16Z",
 			"network": "visa",
 			"authorizedAmount": "-1.23",
-			"status": "cleared",
+			` + statusFields + `
 			"merchantData": {
 				"networkID": "123456789012345",
 				"name": "Moov Financial",
@@ -252,37 +255,72 @@ func TestIssuedCardAuthorizationMarshal(t *testing.T) {
 			]
 		}`)
 
-	authorization := new(moov.IssuedCardAuthorization)
+		authorization := new(moov.IssuedCardAuthorization)
 
-	dec := json.NewDecoder(bytes.NewReader(input))
-	dec.DisallowUnknownFields()
+		dec := json.NewDecoder(bytes.NewReader(input))
+		dec.DisallowUnknownFields()
 
-	err := dec.Decode(&authorization)
-	require.NoError(t, err)
+		err := dec.Decode(&authorization)
+		require.NoError(t, err)
 
-	require.Equal(t, "220c75d3-fac6-4572-9379-a2a2fb29f8cf", authorization.AuthorizationID)
-	require.NotNil(t, authorization.LastFourCardNumber)
-	require.Equal(t, "1234", *authorization.LastFourCardNumber)
+		require.Equal(t, "220c75d3-fac6-4572-9379-a2a2fb29f8cf", authorization.AuthorizationID)
+		require.NotNil(t, authorization.LastFourCardNumber)
+		require.Equal(t, "1234", *authorization.LastFourCardNumber)
+
+		return authorization
+	}
+
+	t.Run("declined carries a reason", func(t *testing.T) {
+		authorization := decode(t, `"status": "declined", "declineReason": "insufficient-funds",`)
+
+		require.NotNil(t, authorization.DeclineReason)
+		require.Equal(t, moov.IssuingDeclineReason_InsufficientFunds, *authorization.DeclineReason)
+	})
+
+	t.Run("cleared has no reason", func(t *testing.T) {
+		authorization := decode(t, `"status": "cleared",`)
+
+		require.Nil(t, authorization.DeclineReason)
+	})
 }
 
 func TestIssuedCardAuthorizationEventMarshal(t *testing.T) {
-	input := []byte(`{
+	decode := func(t *testing.T, resultFields string) *moov.IssuedCardAuthorizationEvent {
+		t.Helper()
+
+		input := []byte(`{
 			"eventID": "afc99714-7611-4136-bd17-a97f687274b7",
 			"eventType": "authorization",
 			"createdOn": "2023-11-08T23:06:16Z",
 			"amount": "-1.23",
-			"result": "approved"
+			` + resultFields + `
 		}`)
 
-	event := new(moov.IssuedCardAuthorizationEvent)
+		event := new(moov.IssuedCardAuthorizationEvent)
 
-	dec := json.NewDecoder(bytes.NewReader(input))
-	dec.DisallowUnknownFields()
+		dec := json.NewDecoder(bytes.NewReader(input))
+		dec.DisallowUnknownFields()
 
-	err := dec.Decode(&event)
-	require.NoError(t, err)
+		err := dec.Decode(&event)
+		require.NoError(t, err)
 
-	require.Equal(t, "afc99714-7611-4136-bd17-a97f687274b7", event.EventID)
+		require.Equal(t, "afc99714-7611-4136-bd17-a97f687274b7", event.EventID)
+
+		return event
+	}
+
+	t.Run("declined carries a reason", func(t *testing.T) {
+		event := decode(t, `"result": "declined", "declineReason": "card-not-active"`)
+
+		require.NotNil(t, event.DeclineReason)
+		require.Equal(t, moov.IssuingDeclineReason_CardNotActive, *event.DeclineReason)
+	})
+
+	t.Run("approved has no reason", func(t *testing.T) {
+		event := decode(t, `"result": "approved"`)
+
+		require.Nil(t, event.DeclineReason)
+	})
 }
 
 func TestIssuedCardTransactionMarshal(t *testing.T) {
