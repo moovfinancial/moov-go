@@ -184,6 +184,13 @@ func (r *httpCallResponse) ContentType() string {
 	return r.resp.Header.Get("Content-Type")
 }
 
+func (r *httpCallResponse) ContentDisposition() string {
+	if r == nil || r.resp == nil {
+		return ""
+	}
+	return r.resp.Header.Get("Content-Disposition")
+}
+
 func (r *httpCallResponse) RequestId() string {
 	if r.resp != nil {
 		return r.resp.Header.Get("X-Request-ID")
