@@ -131,6 +131,10 @@ func (c Client) DownloadFile(ctx context.Context, accountID string, fileID strin
 
 	contents := &FileContents{Data: buf.Bytes()}
 
+	// CallResponse exposes no header access, so reach the two headers through
+	// the concrete type, as GetAvatar does. CallHttp only ever returns
+	// *httpCallResponse -- the sole CallResponse implementation -- so the
+	// assertion holds and ContentType and FileName are always populated here.
 	hcr, ok := resp.(*httpCallResponse)
 	if !ok {
 		return contents, nil
