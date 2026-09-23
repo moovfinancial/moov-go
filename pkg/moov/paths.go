@@ -21,8 +21,9 @@ const (
 	pathUnderwriting = "/accounts/%s/underwriting"
 	pathDepositView  = "/underwriting/%s/deposit-accounts"
 
-	pathFiles = "/accounts/%s/files"
-	pathFile  = "/accounts/%s/files/%s"
+	pathFiles        = "/accounts/%s/files"
+	pathFile         = "/accounts/%s/files/%s"
+	pathFileContents = "/accounts/%s/files/%s/contents"
 
 	pathPaymentMethods = "/accounts/%s/payment-methods"
 	pathPaymentMethod  = "/accounts/%s/payment-methods/%s"
