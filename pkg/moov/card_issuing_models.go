@@ -524,3 +524,41 @@ func WithIssuedCardTransactionEndDate(t time.Time) ListIssuedCardTransactionsFil
 		return nil
 	})
 }
+
+type ListIssuedCardActivityFilter callArg
+
+func WithIssuedCardActivitySkip(skip int) ListIssuedCardActivityFilter {
+	return Skip(skip)
+}
+
+func WithIssuedCardActivityCount(count int) ListIssuedCardActivityFilter {
+	return Count(count)
+}
+
+func WithIssuedCardActivityCardID(cardID string) ListIssuedCardActivityFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["issuedCardID"] = cardID
+		return nil
+	})
+}
+
+func WithIssuedCardActivityAuthorizedUserAccountID(accountID string) ListIssuedCardActivityFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["authorizedUserAccountID"] = accountID
+		return nil
+	})
+}
+
+func WithIssuedCardActivityStartDate(t time.Time) ListIssuedCardActivityFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["startDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}
+
+func WithIssuedCardActivityEndDate(t time.Time) ListIssuedCardActivityFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["endDateTime"] = t.Format(time.RFC3339)
+		return nil
+	})
+}

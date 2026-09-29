@@ -2,6 +2,7 @@ package moov
 
 import (
 	"context"
+	"errors"
 	"net/http"
 )
 
@@ -138,4 +139,20 @@ func (c Client) GetIssuedCardTransaction(ctx context.Context, accountID string, 
 	}
 
 	return CompletedObjectOrError[IssuedCardTransaction](httpResp)
+}
+
+func ListIssuedCardActivityGeneric[T any](ctx context.Context, client *Client, version Version, accountID string, filters ...ListIssuedCardActivityFilter) ([]T, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathIssuingActivity, accountID),
+		prependArgs(filters, MoovVersion(version), AcceptJson())...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[T](resp)
 }
