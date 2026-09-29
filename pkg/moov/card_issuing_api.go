@@ -147,6 +147,9 @@ func ListIssuedCardActivityGeneric[T any](ctx context.Context, client *Client, v
 	if client == nil {
 		return nil, errors.New("client is nil")
 	}
+	if accountID == "" {
+		return nil, errors.New("accountID is required")
+	}
 
 	resp, err := client.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathIssuingActivity, accountID),

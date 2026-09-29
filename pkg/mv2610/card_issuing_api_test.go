@@ -168,3 +168,17 @@ func TestListIssuedCardActivity_NilClient(t *testing.T) {
 	require.Nil(t, actual)
 	require.EqualError(t, err, "client is nil")
 }
+
+func TestListIssuedCardActivity_RequiresAccountID(t *testing.T) {
+	called := false
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+	}))
+	t.Cleanup(srv.Close)
+
+	actual, err := newCardIssuingTestClient(t, srv).ListIssuedCardActivity(context.Background(), "")
+	require.Nil(t, actual)
+	require.EqualError(t, err, "accountID is required")
+	require.False(t, called, "no request should reach the server")
+}
