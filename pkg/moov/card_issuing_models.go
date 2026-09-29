@@ -549,6 +549,17 @@ func WithIssuedCardActivityAuthorizedUserAccountID(accountID string) ListIssuedC
 	})
 }
 
+func WithIssuedCardActivityStatuses(statuses []IssuedCardAuthorizationStatus) ListIssuedCardActivityFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		statusStrings := make([]string, len(statuses))
+		for i, status := range statuses {
+			statusStrings[i] = string(status)
+		}
+		call.params["statuses"] = strings.Join(statusStrings, ",")
+		return nil
+	})
+}
+
 func WithIssuedCardActivityStartDate(t time.Time) ListIssuedCardActivityFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["startDateTime"] = t.Format(time.RFC3339)

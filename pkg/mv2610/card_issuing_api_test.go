@@ -86,6 +86,10 @@ func TestListIssuedCardActivity(t *testing.T) {
 		moov.WithIssuedCardActivityCount(20),
 		moov.WithIssuedCardActivityCardID("card-1"),
 		moov.WithIssuedCardActivityAuthorizedUserAccountID("user-1"),
+		moov.WithIssuedCardActivityStatuses([]moov.IssuedCardAuthorizationStatus{
+			moov.IssuedCardAuthorizationStatus_Declined,
+			moov.IssuedCardAuthorizationStatus_Cleared,
+		}),
 		moov.WithIssuedCardActivityStartDate(start),
 		moov.WithIssuedCardActivityEndDate(end),
 	)
@@ -99,6 +103,7 @@ func TestListIssuedCardActivity(t *testing.T) {
 		"count":                   {"20"},
 		"issuedCardID":            {"card-1"},
 		"authorizedUserAccountID": {"user-1"},
+		"statuses":                {"declined,cleared"},
 		"startDateTime":           {"2026-09-01T00:00:00Z"},
 		"endDateTime":             {"2026-09-30T00:00:00Z"},
 	}, query)
