@@ -6,6 +6,7 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
+// IssuedCardActivity is an authorization or a card transaction. Exactly one of AuthorizationID and CardTransactionID is set.
 type IssuedCardActivity struct {
 	AuthorizationID         *string                            `json:"authorizationID,omitempty"`
 	CardTransactionID       *string                            `json:"cardTransactionID,omitempty"`
