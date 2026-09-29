@@ -562,14 +562,14 @@ func WithIssuedCardActivityStatuses(statuses []IssuedCardAuthorizationStatus) Li
 
 func WithIssuedCardActivityStartDate(t time.Time) ListIssuedCardActivityFilter {
 	return callBuilderFn(func(call *callBuilder) error {
-		call.params["startDateTime"] = t.Format(time.RFC3339)
+		call.params["startDateTime"] = t.Format(time.RFC3339Nano)
 		return nil
 	})
 }
 
 func WithIssuedCardActivityEndDate(t time.Time) ListIssuedCardActivityFilter {
 	return callBuilderFn(func(call *callBuilder) error {
-		call.params["endDateTime"] = t.Format(time.RFC3339)
+		call.params["endDateTime"] = t.Format(time.RFC3339Nano)
 		return nil
 	})
 }

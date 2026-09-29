@@ -79,7 +79,7 @@ func TestListIssuedCardActivity(t *testing.T) {
 	t.Cleanup(srv.Close)
 
 	start := time.Date(2026, 9, 1, 0, 0, 0, 0, time.UTC)
-	end := time.Date(2026, 9, 30, 0, 0, 0, 0, time.UTC)
+	end := time.Date(2026, 9, 30, 0, 0, 0, 750*int(time.Millisecond), time.UTC)
 
 	actual, err := newCardIssuingTestClient(t, srv).ListIssuedCardActivity(context.Background(), "account-123",
 		moov.WithIssuedCardActivitySkip(10),
@@ -105,7 +105,7 @@ func TestListIssuedCardActivity(t *testing.T) {
 		"authorizedUserAccountID": {"user-1"},
 		"statuses":                {"declined,cleared"},
 		"startDateTime":           {"2026-09-01T00:00:00Z"},
-		"endDateTime":             {"2026-09-30T00:00:00Z"},
+		"endDateTime":             {"2026-09-30T00:00:00.75Z"},
 	}, query)
 
 	require.Len(t, actual, 2)
