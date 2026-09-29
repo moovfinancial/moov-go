@@ -141,6 +141,8 @@ func (c Client) GetIssuedCardTransaction(ctx context.Context, accountID string, 
 	return CompletedObjectOrError[IssuedCardTransaction](httpResp)
 }
 
+// ListIssuedCardActivityGeneric retrieves all issued card activity for the given account.
+// https://docs.moov.io/api/money-movement/issuing/list-card-activity/
 func ListIssuedCardActivityGeneric[T any](ctx context.Context, client *Client, version Version, accountID string, filters ...ListIssuedCardActivityFilter) ([]T, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
