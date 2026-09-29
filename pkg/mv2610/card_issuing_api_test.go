@@ -64,6 +64,7 @@ func TestListIssuedCardActivity(t *testing.T) {
 		method  string
 		path    string
 		version string
+		accept  string
 		query   url.Values
 	)
 
@@ -71,6 +72,7 @@ func TestListIssuedCardActivity(t *testing.T) {
 		method = r.Method
 		path = r.URL.Path
 		version = r.Header.Get(moov.VersionHeader)
+		accept = r.Header.Get("Accept")
 		query = r.URL.Query()
 
 		w.Header().Set("Content-Type", "application/json")
@@ -98,6 +100,7 @@ func TestListIssuedCardActivity(t *testing.T) {
 	require.Equal(t, http.MethodGet, method)
 	require.Equal(t, "/issuing/account-123/activity", path)
 	require.Equal(t, moov.Version2026_10.String(), version)
+	require.Equal(t, "application/json", accept)
 	require.Equal(t, url.Values{
 		"skip":                    {"10"},
 		"count":                   {"20"},
@@ -132,9 +135,18 @@ func TestListIssuedCardActivity(t *testing.T) {
 	require.Nil(t, cleared.AuthorizationID)
 	require.Equal(t, moov.PtrOf("txn-1"), cleared.CardTransactionID)
 	require.Equal(t, moov.IssuedCardAuthorizationStatus_Cleared, cleared.Status)
+	require.Equal(t, "card-1", cleared.IssuedCardID)
 	require.Nil(t, cleared.LastFourCardNumber)
+	require.Nil(t, cleared.AuthorizedUserAccountID)
+	require.Nil(t, cleared.AuthorizedAmount)
 	require.Equal(t, moov.PtrOf("5.00"), cleared.ClearedAmount)
 	require.Nil(t, cleared.DeclineReason)
+	require.Equal(t, start.Add(36*time.Hour), cleared.CreatedOn)
+	require.Equal(t, moov.IssuedCardTransactionMerchant{
+		NetworkID: "net-2",
+		Country:   "US",
+		Mcc:       "5411",
+	}, cleared.MerchantData)
 }
 
 func TestListIssuedCardActivity_NoFilters(t *testing.T) {
