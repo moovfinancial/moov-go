@@ -12,6 +12,7 @@ const (
 	EventTypeAccountCreated           = moov.EventTypeAccountCreated
 	EventTypeAccountDisconnected      = moov.EventTypeAccountDisconnected
 	EventTypeAccountUpdated           = moov.EventTypeAccountUpdated
+	EventTypeAuthorizationExpiring    = moov.EventTypeAuthorizationExpiring
 	EventTypeBalanceUpdated           = moov.EventTypeBalanceUpdated
 	EventTypeBankAccountCreated       = moov.EventTypeBankAccountCreated
 	EventTypeBankAccountDeleted       = moov.EventTypeBankAccountDeleted
@@ -63,6 +64,13 @@ type AccountUpdated struct {
 	// ID of the account
 	AccountID string `json:"accountID"`
 	ForeignID string `json:"foreignID,omitempty"`
+}
+
+type AuthorizationExpiring struct {
+	MerchantAccountID string    `json:"merchantAccountID"`
+	PartnerAccountID  string    `json:"partnerAccountID"`
+	AuthorizationID   string    `json:"authorizationID"`
+	ExpiresOn         time.Time `json:"expiresOn"`
 }
 
 type BalanceUpdated struct {

@@ -37,6 +37,8 @@ func ParseEvent(r *http.Request, secret string) (*Event, error) {
 		eventData = &event.accountDeleted
 	case EventTypeAccountUpdated:
 		eventData = &event.accountUpdated
+	case EventTypeAuthorizationExpiring:
+		eventData = &event.authorizationExpiring
 	case EventTypeBalanceUpdated:
 		eventData = &event.balanceUpdated
 	case EventTypeBankAccountCreated:
@@ -124,6 +126,7 @@ type Event struct {
 	accountCreated           *AccountCreated
 	accountDeleted           *AccountDisconnected
 	accountUpdated           *AccountUpdated
+	authorizationExpiring    *AuthorizationExpiring
 	balanceUpdated           *BalanceUpdated
 	bankAccountCreated       *BankAccountCreated
 	bankAccountDeleted       *BankAccountDeleted
@@ -181,6 +184,14 @@ func (e Event) AccountUpdated() (*AccountUpdated, error) {
 	}
 
 	return e.accountUpdated, nil
+}
+
+func (e Event) AuthorizationExpiring() (*AuthorizationExpiring, error) {
+	if e.EventType != EventTypeAuthorizationExpiring {
+		return nil, newInvalidEventTypeError(EventTypeAuthorizationExpiring, e.EventType)
+	}
+
+	return e.authorizationExpiring, nil
 }
 
 func (e Event) BalanceUpdated() (*BalanceUpdated, error) {
