@@ -1,4 +1,4 @@
-package moov_test
+package mv2610_test
 
 import (
 	"context"
@@ -12,9 +12,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/pkg/mv2610"
 )
 
-func newCardIssuingTestClient(t *testing.T, srv *httptest.Server) *moov.Client {
+func newCardIssuingTestClient(t *testing.T, srv *httptest.Server) mv2610.CardIssuingClient {
 	t.Helper()
 
 	client, err := moov.NewClient(
@@ -24,7 +25,7 @@ func newCardIssuingTestClient(t *testing.T, srv *httptest.Server) *moov.Client {
 	require.NoError(t, err)
 	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
 
-	return client
+	return mv2610.NewCardIssuingClient(client)
 }
 
 const issuedCardActivityJSON = `[
@@ -177,4 +178,24 @@ func TestListIssuedCardActivity_NotFound(t *testing.T) {
 	var httpErr moov.HttpCallResponse
 	require.ErrorAs(t, err, &httpErr)
 	require.Equal(t, moov.StatusNotFound, httpErr.Status())
+}
+
+func TestListIssuedCardActivity_NilClient(t *testing.T) {
+	actual, err := mv2610.NewCardIssuingClient(nil).ListIssuedCardActivity(context.Background(), "account-123")
+	require.Nil(t, actual)
+	require.EqualError(t, err, "client is nil")
+}
+
+func TestListIssuedCardActivity_RequiresAccountID(t *testing.T) {
+	called := false
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+	}))
+	t.Cleanup(srv.Close)
+
+	actual, err := newCardIssuingTestClient(t, srv).ListIssuedCardActivity(context.Background(), "")
+	require.Nil(t, actual)
+	require.EqualError(t, err, "accountID is required")
+	require.False(t, called, "no request should reach the server")
 }
