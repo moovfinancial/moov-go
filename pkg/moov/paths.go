@@ -7,7 +7,7 @@ const (
 	pathOAuth2Revoke = "/oauth2/revoke"
 
 	pathAccounts          = "/accounts"
-	pathAccount           = "/accounts/%s"
+	PathAccount           = "/accounts/%s"
 	pathAccountsConnected = "/accounts/%s/connected-accounts"
 
 	pathApplications    = "/applications"
