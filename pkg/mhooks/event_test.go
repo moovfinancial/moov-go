@@ -38,6 +38,13 @@ func TestParseEvent(t *testing.T) {
 	createdOn, err := time.Parse(time.RFC3339, timestamp)
 	require.NoError(t, err)
 
+	authorizationExpiring := AuthorizationExpiring{
+		MerchantAccountID: uuid.NewString(),
+		PartnerAccountID:  uuid.NewString(),
+		AuthorizationID:   uuid.NewString(),
+		ExpiresOn:         createdOn,
+	}
+
 	// Initialize the HTTP handler func for the target webhook URL
 	webhookHandlerFunc := func(w http.ResponseWriter, r *http.Request) {
 		event, err := ParseEvent(r, secret)
@@ -63,6 +70,12 @@ func TestParseEvent(t *testing.T) {
 
 			t.Logf("Got TransferCreated webhook with transferID=%v\n", got.TransferID)
 			require.Equal(t, transferCreated, *got)
+		case EventTypeAuthorizationExpiring:
+			got, err := event.AuthorizationExpiring()
+			require.NoError(t, err)
+
+			t.Logf("Got AuthorizationExpiring webhook with authorizationID=%v", got.AuthorizationID)
+			require.Equal(t, authorizationExpiring, *got)
 		default:
 			require.FailNow(t, "unexpected event type: %v", event.EventType)
 		}
@@ -85,6 +98,10 @@ func TestParseEvent(t *testing.T) {
 		{
 			eventType: EventTypeTransferCreated,
 			data:      transferCreated,
+		},
+		{
+			eventType: EventTypeAuthorizationExpiring,
+			data:      authorizationExpiring,
 		},
 	} {
 		t.Run(fmt.Sprintf("%d %v", i, tt.eventType), func(t *testing.T) {
