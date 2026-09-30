@@ -24,6 +24,7 @@ go.work
 misspell*
 staticcheck*
 lint-project.sh
+.golangci-lint-generated.yml
 gitleaks.tar.gz
 
 # code coverage
