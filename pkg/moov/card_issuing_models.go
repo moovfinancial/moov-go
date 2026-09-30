@@ -525,6 +525,21 @@ func WithIssuedCardTransactionEndDate(t time.Time) ListIssuedCardTransactionsFil
 	})
 }
 
+// IssuedCardActivity is an authorization or a card transaction. Exactly one of AuthorizationID and CardTransactionID is set.
+type IssuedCardActivity struct {
+	AuthorizationID         *string                       `json:"authorizationID,omitempty"`
+	CardTransactionID       *string                       `json:"cardTransactionID,omitempty"`
+	Status                  IssuedCardAuthorizationStatus `json:"status"`
+	IssuedCardID            string                        `json:"issuedCardID"`
+	LastFourCardNumber      *string                       `json:"lastFourCardNumber,omitempty"`
+	AuthorizedUserAccountID *string                       `json:"authorizedUserAccountID,omitempty"`
+	AuthorizedAmount        *string                       `json:"authorizedAmount,omitempty"`
+	ClearedAmount           *string                       `json:"clearedAmount,omitempty"`
+	DeclineReason           *IssuingDeclineReason         `json:"declineReason,omitempty"`
+	CreatedOn               time.Time                     `json:"createdOn"`
+	MerchantData            IssuedCardTransactionMerchant `json:"merchantData"`
+}
+
 type ListIssuedCardActivityFilter callArg
 
 func WithIssuedCardActivitySkip(skip int) ListIssuedCardActivityFilter {
