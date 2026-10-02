@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/pkg/mv2610"
 
 	"github.com/stretchr/testify/require"
 )
@@ -403,6 +404,34 @@ func Test_CardIssuing(t *testing.T) {
 		moov.WithIssuedCardTransactionCardID(card.IssuedCardID))
 	NoResponseError(t, err)
 	require.Empty(t, transactions)
+
+	cardIssuing := mv2610.NewCardIssuingClient(mc)
+
+	// list issued card activity
+	activity, err := cardIssuing.ListIssuedCardActivity(BgCtx(), MERCHANT_ID,
+		moov.WithIssuedCardActivityCardID(card.IssuedCardID))
+	NoResponseError(t, err)
+	require.Empty(t, activity)
+
+	// list issued card activity across the account, so the strict decoder sees any existing items
+	activity, err = cardIssuing.ListIssuedCardActivity(BgCtx(), MERCHANT_ID,
+		moov.WithIssuedCardActivityStatuses([]moov.IssuedCardAuthorizationStatus{
+			moov.IssuedCardAuthorizationStatus_Pending,
+			moov.IssuedCardAuthorizationStatus_Declined,
+			moov.IssuedCardAuthorizationStatus_Canceled,
+			moov.IssuedCardAuthorizationStatus_Cleared,
+			moov.IssuedCardAuthorizationStatus_Expired,
+		}),
+		moov.WithIssuedCardActivityStartDate(time.Now().AddDate(0, 0, -90)),
+		moov.WithIssuedCardActivityEndDate(time.Now()),
+		moov.WithIssuedCardActivitySkip(0),
+		moov.WithIssuedCardActivityCount(10))
+	NoResponseError(t, err)
+	require.LessOrEqual(t, len(activity), 10)
+	for _, item := range activity {
+		require.NotEqual(t, item.AuthorizationID == nil, item.CardTransactionID == nil,
+			"exactly one of authorizationID and cardTransactionID must be set")
+	}
 }
 
 func closeIssuedCard(ctx context.Context, mc *moov.Client, accountID, cardID string) error {

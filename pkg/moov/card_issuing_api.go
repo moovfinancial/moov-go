@@ -2,6 +2,7 @@ package moov
 
 import (
 	"context"
+	"errors"
 	"net/http"
 )
 
@@ -138,4 +139,24 @@ func (c Client) GetIssuedCardTransaction(ctx context.Context, accountID string, 
 	}
 
 	return CompletedObjectOrError[IssuedCardTransaction](httpResp)
+}
+
+// ListIssuedCardActivityGeneric lists issued card activity for the given account.
+func ListIssuedCardActivityGeneric[TActivity any](ctx context.Context, client *Client, version Version, accountID string, filters ...ListIssuedCardActivityFilter) ([]TActivity, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+	if accountID == "" {
+		return nil, errors.New("accountID is required")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathIssuingActivity, accountID),
+		prependArgs(filters, MoovVersion(version), AcceptJson())...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[TActivity](resp)
 }

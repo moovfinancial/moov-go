@@ -144,6 +144,7 @@ const (
 	pathIssuingAuthorizationEvents = "/issuing/%s/authorizations/%s/events"
 	pathIssuingTransactions        = "/issuing/%s/card-transactions"
 	pathIssuingTransaction         = "/issuing/%s/card-transactions/%s"
+	pathIssuingActivity            = "/issuing/%s/activity"
 
 	pathImages        = "/accounts/%s/images"
 	pathImage         = "/accounts/%s/images/%s"
