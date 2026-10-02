@@ -142,7 +142,7 @@ func (c Client) GetIssuedCardTransaction(ctx context.Context, accountID string, 
 }
 
 // ListIssuedCardActivityGeneric lists issued card activity for the given account.
-func ListIssuedCardActivityGeneric[T any](ctx context.Context, client *Client, version Version, accountID string, filters ...ListIssuedCardActivityFilter) ([]T, error) {
+func ListIssuedCardActivityGeneric[TActivity any](ctx context.Context, client *Client, version Version, accountID string, filters ...ListIssuedCardActivityFilter) ([]TActivity, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
 	}
@@ -158,5 +158,5 @@ func ListIssuedCardActivityGeneric[T any](ctx context.Context, client *Client, v
 		return nil, err
 	}
 
-	return CompletedListOrError[T](resp)
+	return CompletedListOrError[TActivity](resp)
 }
