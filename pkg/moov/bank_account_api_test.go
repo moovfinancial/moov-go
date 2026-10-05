@@ -75,6 +75,23 @@ func TestCreateBankAccount_RequestRiskVerification(t *testing.T) {
 			},
 		},
 		{
+			name: "skips a nil option",
+			opts: []moov.CreateBankAccountType{
+				nil,
+				moov.WithBankAccount(account),
+				nil,
+			},
+			want: map[string]any{
+				"account": map[string]any{
+					"holderName":      "Ada Lovelace",
+					"holderType":      "individual",
+					"bankAccountType": "checking",
+					"accountNumber":   "123456789",
+					"routingNumber":   "273976369",
+				},
+			},
+		},
+		{
 			name: "omits the flag when the option is not passed",
 			opts: []moov.CreateBankAccountType{
 				moov.WithBankAccount(account),

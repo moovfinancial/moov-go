@@ -57,7 +57,9 @@ func WithBankAccountRequestRiskVerification() CreateBankAccountType {
 func (c Client) CreateBankAccount(ctx context.Context, accountID string, opts ...CreateBankAccountType) (*BankAccount, error) {
 	builder := &createBankAccountBuilder{}
 	for _, opt := range opts {
-		opt(builder)
+		if opt != nil {
+			opt(builder)
+		}
 	}
 
 	args := prependArgs(builder.callArgs, AcceptJson(), JsonBody(builder.body))
