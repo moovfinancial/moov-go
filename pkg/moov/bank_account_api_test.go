@@ -39,6 +39,7 @@ func TestCreateBankAccount_RequestRiskVerification(t *testing.T) {
 		opts    []moov.CreateBankAccountType
 		want    map[string]any
 		waitFor string
+		version string
 	}{
 		{
 			name: "sets the flag on an existing bank account body",
@@ -118,6 +119,23 @@ func TestCreateBankAccount_RequestRiskVerification(t *testing.T) {
 			},
 		},
 		{
+			name: "keeps generic call args such as MoovVersion",
+			opts: []moov.CreateBankAccountType{
+				moov.WithBankAccount(account),
+				moov.CreateBankAccountType(moov.MoovVersion(moov.Version2026_10)),
+			},
+			want: map[string]any{
+				"account": map[string]any{
+					"holderName":      "Ada Lovelace",
+					"holderType":      "individual",
+					"bankAccountType": "checking",
+					"accountNumber":   "123456789",
+					"routingNumber":   "273976369",
+				},
+			},
+			version: moov.Version2026_10.String(),
+		},
+		{
 			name: "keeps WaitForPaymentMethod as a header",
 			opts: []moov.CreateBankAccountType{
 				moov.WithBankAccount(account),
@@ -144,6 +162,7 @@ func TestCreateBankAccount_RequestRiskVerification(t *testing.T) {
 				method    string
 				path      string
 				waitFor   string
+				version   string
 				body      map[string]any
 				decodeErr error
 			)
@@ -154,6 +173,7 @@ func TestCreateBankAccount_RequestRiskVerification(t *testing.T) {
 				method = r.Method
 				path = r.URL.Path
 				waitFor = r.Header.Get("X-Wait-For")
+				version = r.Header.Get(moov.VersionHeader)
 				decodeErr = json.NewDecoder(r.Body).Decode(&body)
 
 				w.Header().Set("Content-Type", "application/json")
@@ -171,6 +191,7 @@ func TestCreateBankAccount_RequestRiskVerification(t *testing.T) {
 			require.Equal(t, http.MethodPost, method)
 			require.Equal(t, "/accounts/account-123/bank-accounts", path)
 			require.Equal(t, tt.waitFor, waitFor)
+			require.Equal(t, tt.version, version)
 			require.Equal(t, tt.want, body)
 
 			require.NotNil(t, created)

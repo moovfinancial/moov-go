@@ -48,7 +48,8 @@ type callBuilder struct {
 	headers map[string]string
 	token   *string
 
-	body io.Reader
+	body     io.Reader
+	jsonBody any
 }
 
 func newCall(endpoint EndpointArg, args ...callArg) (*callBuilder, error) {
@@ -59,13 +60,35 @@ func newCall(endpoint EndpointArg, args ...callArg) (*callBuilder, error) {
 
 	args = prependArgs(args, endpoint)
 
-	for _, args := range args {
-		if err := args.apply(call); err != nil {
+	for _, arg := range args {
+		if arg == nil {
+			continue
+		}
+		if err := arg.apply(call); err != nil {
 			return nil, err
 		}
 	}
 
+	if err := call.marshalJSONBody(); err != nil {
+		return nil, err
+	}
+
 	return call, nil
+}
+
+func (call *callBuilder) marshalJSONBody() error {
+	if call.jsonBody == nil {
+		return nil
+	}
+
+	payload, err := json.Marshal(call.jsonBody)
+	if err != nil {
+		return err
+	}
+
+	call.headers["Content-Type"] = "application/json"
+	call.body = bytes.NewBuffer(payload)
+	return nil
 }
 
 type callArg interface {
