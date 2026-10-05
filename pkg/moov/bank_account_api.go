@@ -6,64 +6,68 @@ import (
 	"net/http"
 )
 
-type CreateBankAccountType callArg
+type CreateBankAccountType func(*createBankAccountBuilder) callArg
 
-func createBankAccountBody(call *callBuilder) *createBankAccount {
-	if body, ok := call.jsonBody.(*createBankAccount); ok && body != nil {
-		return body
-	}
-
-	body := &createBankAccount{}
-	call.jsonBody = body
-	return body
+type createBankAccountBuilder struct {
+	body createBankAccount
 }
 
 func WithBankAccount(bankAccount BankAccountRequest) CreateBankAccountType {
-	return callBuilderFn(func(call *callBuilder) error {
-		createBankAccountBody(call).Account = &bankAccount
-		return nil
-	})
+	return func(b *createBankAccountBuilder) callArg {
+		b.body.Account = &bankAccount
+		return NoopArg()
+	}
 }
 
 func WithPlaid(plaid PlaidRequest) CreateBankAccountType {
-	return callBuilderFn(func(call *callBuilder) error {
-		createBankAccountBody(call).Plaid = &plaid
-		return nil
-	})
+	return func(b *createBankAccountBuilder) callArg {
+		b.body.Plaid = &plaid
+		return NoopArg()
+	}
 }
 
 func WithPlaidLink(plaidLink PlaidLinkRequest) CreateBankAccountType {
-	return callBuilderFn(func(call *callBuilder) error {
-		createBankAccountBody(call).PlaidLink = &plaidLink
-		return nil
-	})
+	return func(b *createBankAccountBuilder) callArg {
+		b.body.PlaidLink = &plaidLink
+		return NoopArg()
+	}
 }
 
 func WithMX(mx MXRequest) CreateBankAccountType {
-	return callBuilderFn(func(call *callBuilder) error {
-		createBankAccountBody(call).MX = &mx
-		return nil
-	})
+	return func(b *createBankAccountBuilder) callArg {
+		b.body.MX = &mx
+		return NoopArg()
+	}
 }
 
 func WaitForPaymentMethod() CreateBankAccountType {
-	return WaitFor("payment-method")
+	return func(b *createBankAccountBuilder) callArg {
+		return WaitFor("payment-method")
+	}
 }
 
 // WithBankAccountRequestRiskVerification requests a synchronous risk check on create.
 // Use it with WithBankAccount. A decline still creates the bank account.
 // Read the result on BankAccount.RiskVerificationOutcome.
 func WithBankAccountRequestRiskVerification() CreateBankAccountType {
-	return callBuilderFn(func(call *callBuilder) error {
-		createBankAccountBody(call).RequestRiskVerification = true
-		return nil
-	})
+	return func(b *createBankAccountBuilder) callArg {
+		b.body.RequestRiskVerification = true
+		return NoopArg()
+	}
 }
 
 // CreateBankAccount creates a new bank account for the given customer account
 // https://docs.moov.io/api/sources/bank-accounts/create/
 func (c Client) CreateBankAccount(ctx context.Context, accountID string, opts ...CreateBankAccountType) (*BankAccount, error) {
-	args := prependArgs(opts, AcceptJson())
+	builder := &createBankAccountBuilder{}
+	args := []callArg{AcceptJson()}
+	for _, opt := range opts {
+		if opt != nil {
+			args = append(args, opt(builder))
+		}
+	}
+	args = append(args, JsonBody(builder.body))
+
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathBankAccounts, accountID),
 		args...)
