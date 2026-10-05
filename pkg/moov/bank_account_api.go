@@ -6,40 +6,61 @@ import (
 	"net/http"
 )
 
-type CreateBankAccountType callArg
+type CreateBankAccountType func(*createBankAccountBuilder)
+
+type createBankAccountBuilder struct {
+	body     createBankAccount
+	callArgs []callArg
+}
 
 func WithBankAccount(bankAccount BankAccountRequest) CreateBankAccountType {
-	return JsonBody(createBankAccount{
-		Account: &bankAccount,
-	})
+	return func(b *createBankAccountBuilder) {
+		b.body.Account = &bankAccount
+	}
 }
 
 func WithPlaid(plaid PlaidRequest) CreateBankAccountType {
-	return JsonBody(createBankAccount{
-		Plaid: &plaid,
-	})
+	return func(b *createBankAccountBuilder) {
+		b.body.Plaid = &plaid
+	}
 }
 
 func WithPlaidLink(plaidLink PlaidLinkRequest) CreateBankAccountType {
-	return JsonBody(createBankAccount{
-		PlaidLink: &plaidLink,
-	})
+	return func(b *createBankAccountBuilder) {
+		b.body.PlaidLink = &plaidLink
+	}
 }
 
 func WithMX(mx MXRequest) CreateBankAccountType {
-	return JsonBody(createBankAccount{
-		MX: &mx,
-	})
+	return func(b *createBankAccountBuilder) {
+		b.body.MX = &mx
+	}
 }
 
 func WaitForPaymentMethod() CreateBankAccountType {
-	return WaitFor("payment-method")
+	return func(b *createBankAccountBuilder) {
+		b.callArgs = append(b.callArgs, WaitFor("payment-method"))
+	}
+}
+
+// WithBankAccountRequestRiskVerification requests a synchronous risk check on create.
+// Use it with WithBankAccount. A decline still creates the bank account.
+// Read the result on BankAccount.RiskVerificationOutcome.
+func WithBankAccountRequestRiskVerification() CreateBankAccountType {
+	return func(b *createBankAccountBuilder) {
+		b.body.RequestRiskVerification = true
+	}
 }
 
 // CreateBankAccount creates a new bank account for the given customer account
 // https://docs.moov.io/api/sources/bank-accounts/create/
 func (c Client) CreateBankAccount(ctx context.Context, accountID string, opts ...CreateBankAccountType) (*BankAccount, error) {
-	args := prependArgs(opts, AcceptJson())
+	builder := &createBankAccountBuilder{}
+	for _, opt := range opts {
+		opt(builder)
+	}
+
+	args := prependArgs(builder.callArgs, AcceptJson(), JsonBody(builder.body))
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathBankAccounts, accountID),
 		args...)
