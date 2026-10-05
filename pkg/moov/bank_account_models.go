@@ -9,6 +9,8 @@ type createBankAccount struct {
 	Plaid     *PlaidRequest       `json:"plaid,omitempty"`
 	PlaidLink *PlaidLinkRequest   `json:"plaidLink,omitempty"`
 	MX        *MXRequest          `json:"mx,omitempty"`
+
+	RequestRiskVerification bool `json:"requestRiskVerification,omitempty"`
 }
 
 type BankAccountRequest struct {
@@ -57,17 +59,18 @@ type MXRequest struct {
 type BankAccount struct {
 	BankAccountID string `json:"bankAccountID,omitempty"`
 	// Once the bank account is linked, we don't reveal the full bank account number. The fingerprint acts as a way to identify whether two linked bank accounts are the same.
-	Fingerprint           string                  `json:"fingerprint,omitempty"`
-	Status                BankAccountStatus       `json:"status,omitempty"`
-	HolderName            string                  `json:"holderName,omitempty"`
-	HolderType            HolderType              `json:"holderType,omitempty"`
-	BankName              string                  `json:"bankName,omitempty"`
-	BankAccountType       BankAccountType         `json:"bankAccountType,omitempty"`
-	RoutingNumber         string                  `json:"routingNumber,omitempty"`
-	LastFourAccountNumber string                  `json:"lastFourAccountNumber,omitempty"`
-	UpdatedOn             time.Time               `json:"updatedOn,omitempty"`
-	StatusReason          BankAccountStatusReason `json:"statusReason,omitempty"`
-	ExceptionDetails      *ExceptionDetails       `json:"exceptionDetails,omitempty"`
+	Fingerprint             string                             `json:"fingerprint,omitempty"`
+	Status                  BankAccountStatus                  `json:"status,omitempty"`
+	HolderName              string                             `json:"holderName,omitempty"`
+	HolderType              HolderType                         `json:"holderType,omitempty"`
+	BankName                string                             `json:"bankName,omitempty"`
+	BankAccountType         BankAccountType                    `json:"bankAccountType,omitempty"`
+	RoutingNumber           string                             `json:"routingNumber,omitempty"`
+	LastFourAccountNumber   string                             `json:"lastFourAccountNumber,omitempty"`
+	UpdatedOn               time.Time                          `json:"updatedOn,omitempty"`
+	StatusReason            BankAccountStatusReason            `json:"statusReason,omitempty"`
+	ExceptionDetails        *ExceptionDetails                  `json:"exceptionDetails,omitempty"`
+	RiskVerificationOutcome BankAccountRiskVerificationOutcome `json:"riskVerificationOutcome,omitempty"`
 
 	// Includes any payment methods generated for a newly created bank account, removing the need to  call the List Payment Methods endpoint following a successful Create BankAccount request.
 	// **NOTE: This field is only populated for Create BankAccount requests made with the `X-Wait-For` header.**
@@ -182,3 +185,17 @@ type BankAccountVerification struct {
 	Status             BankAccountVerificationStatus `json:"status"`
 	ExceptionDetails   *ExceptionDetails             `json:"exceptionDetails"`
 }
+
+type BankAccountRiskVerificationOutcome string
+
+const (
+	// RiskVerificationOutcomeNotAttempted means risk verification was not requested.
+	RiskVerificationOutcomeNotAttempted BankAccountRiskVerificationOutcome = "notAttempted"
+	// RiskVerificationOutcomeSuccess means Moov scored the bank account as low risk.
+	RiskVerificationOutcomeSuccess BankAccountRiskVerificationOutcome = "success"
+	// RiskVerificationOutcomeInconclusive means Moov could not reach a low or high risk decision.
+	RiskVerificationOutcomeInconclusive BankAccountRiskVerificationOutcome = "inconclusive"
+	// RiskVerificationOutcomeDecline means Moov scored the bank account as high risk.
+	// Decline does not block bank account creation.
+	RiskVerificationOutcomeDecline BankAccountRiskVerificationOutcome = "decline"
+)
