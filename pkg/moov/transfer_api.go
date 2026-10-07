@@ -382,7 +382,7 @@ func (c Client) RefundTransfer(ctx context.Context, partnerAccountID, transferID
 		r, err := CompletedObjectOrError[Refund](resp)
 		return r, nil, err
 	case StatusStarted:
-		r, err := CompletedObjectOrError[RefundStarted](resp)
+		r, err := UnmarshalObjectResponse[RefundStarted](resp)
 		return nil, r, err
 	default:
 		return nil, nil, resp
@@ -413,7 +413,7 @@ func RefundTransferGeneric[TRequest any, TRefund any](ctx context.Context, clien
 		r, err := CompletedObjectOrError[TRefund](resp)
 		return r, nil, err
 	case StatusStarted:
-		r, err := CompletedObjectOrError[RefundStarted](resp)
+		r, err := UnmarshalObjectResponse[RefundStarted](resp)
 		return nil, r, err
 	default:
 		return nil, nil, resp
