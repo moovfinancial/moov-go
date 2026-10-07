@@ -183,3 +183,64 @@ func TestSimulations_NilClient(t *testing.T) {
 	require.Nil(t, started)
 	require.EqualError(t, err, "client is nil")
 }
+
+func TestSimulations_RequiresIDs(t *testing.T) {
+	cases := []struct {
+		name    string
+		wantErr string
+		call    simulationCall
+	}{
+		{
+			name:    "authorization without accountID",
+			wantErr: "accountID is required",
+			call: func(c mv2610.CardIssuingClient) (*moov.IssuedCardAuthorization, *mv2610.AuthorizationSimulationAsyncResponse, error) {
+				return c.SimulateAuthorization(context.Background(), "", mv2610.CreateAuthorizationSimulation{})
+			},
+		},
+		{
+			name:    "clearing without accountID",
+			wantErr: "accountID and authorizationID are required",
+			call: func(c mv2610.CardIssuingClient) (*moov.IssuedCardAuthorization, *mv2610.AuthorizationSimulationAsyncResponse, error) {
+				return c.SimulateClearing(context.Background(), "", "auth-1", mv2610.CreateClearingSimulation{})
+			},
+		},
+		{
+			name:    "clearing without authorizationID",
+			wantErr: "accountID and authorizationID are required",
+			call: func(c mv2610.CardIssuingClient) (*moov.IssuedCardAuthorization, *mv2610.AuthorizationSimulationAsyncResponse, error) {
+				return c.SimulateClearing(context.Background(), "account-123", "", mv2610.CreateClearingSimulation{})
+			},
+		},
+		{
+			name:    "reversal without accountID",
+			wantErr: "accountID and authorizationID are required",
+			call: func(c mv2610.CardIssuingClient) (*moov.IssuedCardAuthorization, *mv2610.AuthorizationSimulationAsyncResponse, error) {
+				return c.SimulateReversal(context.Background(), "", "auth-1")
+			},
+		},
+		{
+			name:    "reversal without authorizationID",
+			wantErr: "accountID and authorizationID are required",
+			call: func(c mv2610.CardIssuingClient) (*moov.IssuedCardAuthorization, *mv2610.AuthorizationSimulationAsyncResponse, error) {
+				return c.SimulateReversal(context.Background(), "account-123", "")
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			called := false
+
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				called = true
+			}))
+			t.Cleanup(srv.Close)
+
+			authorization, started, err := tc.call(newCardIssuingTestClient(t, srv))
+			require.Nil(t, authorization)
+			require.Nil(t, started)
+			require.EqualError(t, err, tc.wantErr)
+			require.False(t, called, "no request should reach the server")
+		})
+	}
+}
