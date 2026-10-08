@@ -46,12 +46,24 @@ var simulationCases = []struct {
 			return c.SimulateAuthorization(context.Background(), "account-123", mv2610.CreateAuthorizationSimulation{
 				IssuedCardID: "card-1",
 				Amount:       "12.34",
-				MerchantData: &moov.IssuedCardTransactionMerchant{
+				MerchantData: &mv2610.SimulationIssuingMerchantData{
 					NetworkID: "net-1",
-					Name:      moov.PtrOf("Coffee Shop"),
+					Name:      "Coffee Shop",
 					Country:   "US",
 					Mcc:       "5814",
 				},
+			})
+		},
+	},
+	{
+		name:     "authorization with partial merchant data",
+		path:     "/issuing/simulations/account-123/authorizations",
+		wantBody: `{"issuedCardID":"card-1","amount":"12.34","merchantData":{"name":"Coffee Shop"}}`,
+		call: func(c mv2610.CardIssuingClient) (*moov.IssuedCardAuthorization, *mv2610.AuthorizationSimulationAsyncResponse, error) {
+			return c.SimulateAuthorization(context.Background(), "account-123", mv2610.CreateAuthorizationSimulation{
+				IssuedCardID: "card-1",
+				Amount:       "12.34",
+				MerchantData: &mv2610.SimulationIssuingMerchantData{Name: "Coffee Shop"},
 			})
 		},
 	},

@@ -25,8 +25,19 @@ type IssuedCardActivity struct {
 type CreateAuthorizationSimulation struct {
 	IssuedCardID string `json:"issuedCardID"`
 	// Decimal-formatted amount, such as "12.34".
-	Amount       string                              `json:"amount"`
-	MerchantData *moov.IssuedCardTransactionMerchant `json:"merchantData,omitempty"`
+	Amount       string                         `json:"amount"`
+	MerchantData *SimulationIssuingMerchantData `json:"merchantData,omitempty"`
+}
+
+// SimulationIssuingMerchantData is optional merchant data for a simulated authorization.
+type SimulationIssuingMerchantData struct {
+	NetworkID  string `json:"networkID,omitempty"`
+	Name       string `json:"name,omitempty"`
+	City       string `json:"city,omitempty"`
+	Country    string `json:"country,omitempty"`
+	PostalCode string `json:"postalCode,omitempty"`
+	State      string `json:"state,omitempty"`
+	Mcc        string `json:"mcc,omitempty"`
 }
 
 // CreateClearingSimulation is the request to simulate a clearing on an issued card authorization in test mode.
