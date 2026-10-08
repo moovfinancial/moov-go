@@ -20,3 +20,33 @@ type IssuedCardActivity struct {
 	CreatedOn               time.Time                          `json:"createdOn"`
 	MerchantData            moov.IssuedCardTransactionMerchant `json:"merchantData"`
 }
+
+// CreateAuthorizationSimulation is the request to simulate an authorization on an issued card in test mode.
+type CreateAuthorizationSimulation struct {
+	IssuedCardID string `json:"issuedCardID"`
+	// Decimal-formatted amount, such as "12.34".
+	Amount       string                         `json:"amount"`
+	MerchantData *SimulationIssuingMerchantData `json:"merchantData,omitempty"`
+}
+
+// SimulationIssuingMerchantData is optional merchant data for a simulated authorization.
+type SimulationIssuingMerchantData struct {
+	NetworkID  string `json:"networkID,omitempty"`
+	Name       string `json:"name,omitempty"`
+	City       string `json:"city,omitempty"`
+	Country    string `json:"country,omitempty"`
+	PostalCode string `json:"postalCode,omitempty"`
+	State      string `json:"state,omitempty"`
+	Mcc        string `json:"mcc,omitempty"`
+}
+
+// CreateClearingSimulation is the request to simulate a clearing on an issued card authorization in test mode.
+type CreateClearingSimulation struct {
+	// Decimal-formatted amount, such as "12.34".
+	Amount *string `json:"amount,omitempty"`
+}
+
+// AuthorizationSimulationAsyncResponse is returned when a simulation did not complete before the request timed out.
+type AuthorizationSimulationAsyncResponse struct {
+	AuthorizationID string `json:"authorizationID"`
+}

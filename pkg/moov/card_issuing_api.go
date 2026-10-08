@@ -160,3 +160,58 @@ func ListIssuedCardActivityGeneric[TActivity any](ctx context.Context, client *C
 
 	return CompletedListOrError[TActivity](resp)
 }
+
+// SimulateIssuedCardAuthorizationGeneric creates a simulated authorization for an issued card in test mode.
+// Exactly one of the returned authorization, started response, or error is non-nil.
+func SimulateIssuedCardAuthorizationGeneric[TRequest any, TStarted any](ctx context.Context, client *Client, version Version, accountID string, simulation TRequest) (*IssuedCardAuthorization, *TStarted, error) {
+	if accountID == "" {
+		return nil, nil, errors.New("accountID is required")
+	}
+	return simulateIssuedCardAuthorization[TStarted](ctx, client,
+		Endpoint(http.MethodPost, pathIssuingSimulationAuthorizations, accountID),
+		MoovVersion(version), AcceptJson(), JsonBody(simulation))
+}
+
+// SimulateIssuedCardClearingGeneric creates a simulated clearing for an issued card authorization in test mode.
+// Exactly one of the returned authorization, started response, or error is non-nil.
+func SimulateIssuedCardClearingGeneric[TRequest any, TStarted any](ctx context.Context, client *Client, version Version, accountID string, authorizationID string, simulation TRequest) (*IssuedCardAuthorization, *TStarted, error) {
+	if accountID == "" || authorizationID == "" {
+		return nil, nil, errors.New("accountID and authorizationID are required")
+	}
+	return simulateIssuedCardAuthorization[TStarted](ctx, client,
+		Endpoint(http.MethodPost, pathIssuingSimulationClearings, accountID, authorizationID),
+		MoovVersion(version), AcceptJson(), JsonBody(simulation))
+}
+
+// SimulateIssuedCardReversalGeneric creates a simulated reversal for an issued card authorization in test mode.
+// Exactly one of the returned authorization, started response, or error is non-nil.
+func SimulateIssuedCardReversalGeneric[TStarted any](ctx context.Context, client *Client, version Version, accountID string, authorizationID string) (*IssuedCardAuthorization, *TStarted, error) {
+	if accountID == "" || authorizationID == "" {
+		return nil, nil, errors.New("accountID and authorizationID are required")
+	}
+	return simulateIssuedCardAuthorization[TStarted](ctx, client,
+		Endpoint(http.MethodPost, pathIssuingSimulationReversals, accountID, authorizationID),
+		MoovVersion(version), AcceptJson())
+}
+
+func simulateIssuedCardAuthorization[TStarted any](ctx context.Context, client *Client, endpoint EndpointArg, args ...callArg) (*IssuedCardAuthorization, *TStarted, error) {
+	if client == nil {
+		return nil, nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx, endpoint, args...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	switch resp.Status() {
+	case StatusCompleted:
+		authorization, err := UnmarshalObjectResponse[IssuedCardAuthorization](resp)
+		return authorization, nil, err
+	case StatusStarted:
+		started, err := UnmarshalObjectResponse[TStarted](resp)
+		return nil, started, err
+	default:
+		return nil, nil, resp
+	}
+}
