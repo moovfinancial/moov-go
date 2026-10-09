@@ -440,7 +440,7 @@ func Test_CardIssuing(t *testing.T) {
 	}
 
 	// get issued card activity
-	if activityID == "" {
+	if activityID != "" {
 		got, err := cardIssuing.GetIssuedCardActivity(BgCtx(), MERCHANT_ID, activityID)
 		NoResponseError(t, err)
 		require.NotNil(t, got)
