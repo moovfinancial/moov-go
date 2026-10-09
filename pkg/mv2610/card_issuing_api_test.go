@@ -2,6 +2,7 @@ package mv2610_test
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -197,5 +198,86 @@ func TestListIssuedCardActivity_RequiresAccountID(t *testing.T) {
 	actual, err := newCardIssuingTestClient(t, srv).ListIssuedCardActivity(context.Background(), "")
 	require.Nil(t, actual)
 	require.EqualError(t, err, "accountID is required")
+	require.False(t, called, "no request should reach the server")
+}
+
+func TestGetIssuedCardActivity(t *testing.T) {
+	var (
+		method  string
+		path    string
+		version string
+		accept  string
+	)
+
+	activityID := "txn-1"
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		method = r.Method
+		path = r.URL.Path
+		version = r.Header.Get(moov.VersionHeader)
+		accept = r.Header.Get("Accept")
+
+		expResp := fmt.Sprintf(`{
+			"cardTransactionID": "%s",
+			"status": "cleared",
+			"issuedCardID": "card-1",
+			"clearedAmount": "5.00",
+			"createdOn": "2026-09-02T12:00:00Z",
+			"merchantData": {"networkID": "net-2", "country": "US", "mcc": "5411"}
+		}`, activityID)
+
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(expResp))
+	}))
+	t.Cleanup(srv.Close)
+
+	actual, err := newCardIssuingTestClient(t, srv).GetIssuedCardActivity(context.Background(), "account-123", activityID)
+	require.NoError(t, err)
+
+	require.Equal(t, http.MethodGet, method)
+	require.Equal(t, fmt.Sprintf("/issuing/account-123/activity/%s", activityID), path)
+	require.Equal(t, moov.Version2026_10.String(), version)
+	require.Equal(t, "application/json", accept)
+
+	require.NotNil(t, actual)
+	require.Nil(t, actual.AuthorizationID)
+	require.Equal(t, moov.PtrOf(activityID), actual.CardTransactionID)
+	require.Equal(t, moov.IssuedCardAuthorizationStatus_Cleared, actual.Status)
+	require.Equal(t, "card-1", actual.IssuedCardID)
+	require.Equal(t, moov.PtrOf("5.00"), actual.ClearedAmount)
+}
+
+func TestGetIssuedCardActivity_NotFound(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	t.Cleanup(srv.Close)
+
+	actual, err := newCardIssuingTestClient(t, srv).GetIssuedCardActivity(context.Background(), "account-123", "txn-1")
+	require.Nil(t, actual)
+
+	var httpErr moov.HttpCallResponse
+	require.ErrorAs(t, err, &httpErr)
+	require.Equal(t, moov.StatusNotFound, httpErr.Status())
+}
+
+func TestGetIssuedCardActivity_RequiresIDs(t *testing.T) {
+	called := false
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+	}))
+	t.Cleanup(srv.Close)
+
+	client := newCardIssuingTestClient(t, srv)
+
+	actual, err := client.GetIssuedCardActivity(context.Background(), "", "txn-1")
+	require.Nil(t, actual)
+	require.EqualError(t, err, "accountID and activityID (authorizationID or cardTransactionID) are required")
+
+	actual, err = client.GetIssuedCardActivity(context.Background(), "account-123", "")
+	require.Nil(t, actual)
+	require.EqualError(t, err, "accountID and activityID (authorizationID or cardTransactionID) are required")
+
 	require.False(t, called, "no request should reach the server")
 }
