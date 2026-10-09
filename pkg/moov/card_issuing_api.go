@@ -161,6 +161,25 @@ func ListIssuedCardActivityGeneric[TActivity any](ctx context.Context, client *C
 	return CompletedListOrError[TActivity](resp)
 }
 
+// GetIssuedCardActivityGeneric retrieves a single issued card activity for the given account.
+func GetIssuedCardActivityGeneric[TActivity any](ctx context.Context, client *Client, version Version, accountID string, activityID string) (*TActivity, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+	if accountID == "" || activityID == "" {
+		return nil, errors.New("accountID and activityID (authorizationID or cardTransactionID) are required")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathIssuingActivityItem, accountID, activityID),
+		MoovVersion(version), AcceptJson())
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[TActivity](resp)
+}
+
 // SimulateIssuedCardAuthorizationGeneric creates a simulated authorization for an issued card in test mode.
 // Exactly one of the returned authorization, started response, or error is non-nil.
 func SimulateIssuedCardAuthorizationGeneric[TRequest any, TStarted any](ctx context.Context, client *Client, version Version, accountID string, simulation TRequest) (*IssuedCardAuthorization, *TStarted, error) {

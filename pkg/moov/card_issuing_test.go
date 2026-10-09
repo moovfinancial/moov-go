@@ -428,10 +428,21 @@ func Test_CardIssuing(t *testing.T) {
 		moov.WithIssuedCardActivityCount(10))
 	NoResponseError(t, err)
 	require.LessOrEqual(t, len(activity), 10)
+	var activityID string
 	for _, item := range activity {
 		require.NotEqual(t, item.AuthorizationID == nil, item.CardTransactionID == nil,
 			"exactly one of authorizationID and cardTransactionID must be set")
+		if item.AuthorizationID != nil {
+			activityID = *item.AuthorizationID
+		} else {
+			activityID = *item.CardTransactionID
+		}
 	}
+
+	// get issued card activity
+	got, err := cardIssuing.GetIssuedCardActivity(BgCtx(), MERCHANT_ID, activityID)
+	NoResponseError(t, err)
+	require.NotNil(t, got)
 }
 
 func closeIssuedCard(ctx context.Context, mc *moov.Client, accountID, cardID string) error {
