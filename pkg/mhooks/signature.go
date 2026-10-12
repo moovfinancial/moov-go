@@ -24,11 +24,7 @@ func checkSignature(headers http.Header, secret string) (bool, error) {
 		return false, err
 	}
 
-	if *wantHash == gotHash {
-		return true, nil
-	} else {
-		return false, nil
-	}
+	return hmac.Equal([]byte(*wantHash), []byte(gotHash)), nil
 }
 
 // hash generates a SHA512 HMAC hash of p using the secret provided.
