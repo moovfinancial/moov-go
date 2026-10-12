@@ -19,6 +19,11 @@ func (c CardIssuingClient) ListIssuedCardActivity(ctx context.Context, accountID
 	return moov.ListIssuedCardActivityGeneric[IssuedCardActivity](ctx, c.Client, moov.Version2026_10, accountID, filters...)
 }
 
+// GetIssuedCardActivity retrieves a single issued card activity for the given account.
+func (c CardIssuingClient) GetIssuedCardActivity(ctx context.Context, accountID string, activityID string) (*IssuedCardActivity, error) {
+	return moov.GetIssuedCardActivityGeneric[IssuedCardActivity](ctx, c.Client, moov.Version2026_10, accountID, activityID)
+}
+
 // SimulateAuthorization creates a simulated authorization for an issued card in test mode.
 // Exactly one of the returned authorization, started response, or error is non-nil.
 func (c CardIssuingClient) SimulateAuthorization(ctx context.Context, accountID string, simulation CreateAuthorizationSimulation) (*moov.IssuedCardAuthorization, *AuthorizationSimulationAsyncResponse, error) {
