@@ -6,7 +6,7 @@ toolchain go1.27.2
 
 require (
 	github.com/go-faker/faker/v4 v4.12.0
-	github.com/go-jose/go-jose/v4 v4.1.5
+	github.com/go-jose/go-jose/v4 v4.1.6
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.12.1
