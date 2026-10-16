@@ -141,6 +141,25 @@ func (c Client) GetIssuedCardTransaction(ctx context.Context, accountID string, 
 	return CompletedObjectOrError[IssuedCardTransaction](httpResp)
 }
 
+// CreateIssuedCardGeneric requests a new card be issued for the given account.
+func CreateIssuedCardGeneric[TRequest any, TCard any](ctx context.Context, client *Client, version Version, accountID string, card TRequest) (*TCard, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+	if accountID == "" {
+		return nil, errors.New("accountID is required")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathIssuedCards, accountID),
+		MoovVersion(version), AcceptJson(), JsonBody(card))
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[TCard](resp)
+}
+
 // ListIssuedCardActivityGeneric lists issued card activity for the given account.
 func ListIssuedCardActivityGeneric[TActivity any](ctx context.Context, client *Client, version Version, accountID string, filters ...ListIssuedCardActivityFilter) ([]TActivity, error) {
 	if client == nil {

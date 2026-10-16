@@ -23,6 +23,8 @@ var (
 	Version2026_07 = NewVersion(2026, 7, 0)
 	Version2026_10 = NewVersion(2026, 10, 0)
 
+	Version2027_01 = NewVersion(2027, 1, 0)
+
 	// Selects the latest version that isn't Beta
 	Latest = Version{"v9000.00.00"}
 )

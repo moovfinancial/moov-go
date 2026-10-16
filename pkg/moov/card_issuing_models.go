@@ -304,12 +304,14 @@ type FullIssuedCard struct {
 }
 
 type CreateIssuedCard struct {
-	AuthorizedUserAccountID *string               `json:"authorizedUserAccountID,omitempty"`
-	Nickname                *string               `json:"nickname,omitempty"`
-	Metadata                map[string]string     `json:"metadata,omitempty"`
-	BillingAddress          *Address              `json:"billingAddress,omitempty"`
-	Expiration              *IssuedCardExpiration `json:"expiration,omitempty"`
-	Controls                *IssuingControls      `json:"controls,omitempty"`
+	AuthorizedUserAccountID *string           `json:"authorizedUserAccountID,omitempty"`
+	Nickname                *string           `json:"nickname,omitempty"`
+	Metadata                map[string]string `json:"metadata,omitempty"`
+	BillingAddress          *Address          `json:"billingAddress,omitempty"`
+	// Deprecated: the API no longer accepts a custom expiration and returns an error when it is set.
+	// Use Controls.ExpiresOn to limit the card lifetime.
+	Expiration *IssuedCardExpiration `json:"expiration,omitempty"`
+	Controls   *IssuingControls      `json:"controls,omitempty"`
 }
 
 type UpdateIssuedCard struct {
