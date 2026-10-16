@@ -188,6 +188,7 @@ func TestCreateIssuedCardMarshal(t *testing.T) {
 	} {
 		require.Contains(t, s, key)
 	}
+	require.NotContains(t, s, `"expiration"`)
 }
 
 func TestUpdateIssuingControlsMarshal(t *testing.T) {
