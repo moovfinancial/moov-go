@@ -127,4 +127,35 @@ func TestUpdateInvoice_MarshalJSON(t *testing.T) {
 		require.NotContains(t, m, "invoiceDate")
 		require.NotContains(t, m, "taxAmount")
 	})
+
+	t.Run("empty payment produces empty payment object", func(t *testing.T) {
+		u := UpdateInvoice{
+			Payment: &UpdateInvoicePaymentOptions{},
+		}
+		data, err := json.Marshal(u)
+		require.NoError(t, err)
+		require.Equal(t, `{"payment":{}}`, string(data))
+	})
+
+	t.Run("null allowed methods is included as null", func(t *testing.T) {
+		u := UpdateInvoice{
+			Payment: &UpdateInvoicePaymentOptions{
+				AllowedMethods: SetNull[[]PaymentMethodType](),
+			},
+		}
+		data, err := json.Marshal(u)
+		require.NoError(t, err)
+		require.Equal(t, `{"payment":{"allowedMethods":null}}`, string(data))
+	})
+
+	t.Run("set allowed methods is included as array", func(t *testing.T) {
+		u := UpdateInvoice{
+			Payment: &UpdateInvoicePaymentOptions{
+				AllowedMethods: Set([]PaymentMethodType{PaymentMethodType_CardPayment, PaymentMethodType_ApplePay}),
+			},
+		}
+		data, err := json.Marshal(u)
+		require.NoError(t, err)
+		require.Equal(t, `{"payment":{"allowedMethods":["card-payment","apple-pay"]}}`, string(data))
+	})
 }
