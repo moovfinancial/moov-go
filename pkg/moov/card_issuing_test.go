@@ -237,6 +237,7 @@ func TestIssuedCardAuthorizationMarshal(t *testing.T) {
 			"authorizationID": "220c75d3-fac6-4572-9379-a2a2fb29f8cf",
 			"issuedCardID": "ec7e1848-dc80-4ab0-8827-dd7fc0737b43",
 			"lastFourCardNumber": "1234",
+			"authorizedUserAccountID": "user-1",
 			"fundingWalletID": "50469144-f859-46dc-bdbd-9587c2fa7b42",
 			"createdOn": "2023-11-08T23:06:16Z",
 			"network": "visa",
@@ -268,6 +269,7 @@ func TestIssuedCardAuthorizationMarshal(t *testing.T) {
 		require.Equal(t, "220c75d3-fac6-4572-9379-a2a2fb29f8cf", authorization.AuthorizationID)
 		require.NotNil(t, authorization.LastFourCardNumber)
 		require.Equal(t, "1234", *authorization.LastFourCardNumber)
+		require.Equal(t, moov.PtrOf("user-1"), authorization.AuthorizedUserAccountID)
 
 		return authorization
 	}
@@ -330,6 +332,7 @@ func TestIssuedCardTransactionMarshal(t *testing.T) {
 			"cardTransactionID": "86d4b88b-eb1b-4640-941c-d8f087256b90",
 			"issuedCardID": "ec7e1848-dc80-4ab0-8827-dd7fc0737b43",
 			"lastFourCardNumber": "1234",
+			"authorizedUserAccountID": "user-1",
 			"fundingWalletID": "50469144-f859-46dc-bdbd-9587c2fa7b42",
 			"amount": "-1.23",
 			"authorizationID": "220c75d3-fac6-4572-9379-a2a2fb29f8cf",
@@ -357,6 +360,7 @@ func TestIssuedCardTransactionMarshal(t *testing.T) {
 	require.Equal(t, "86d4b88b-eb1b-4640-941c-d8f087256b90", transaction.CardTransactionID)
 	require.NotNil(t, transaction.LastFourCardNumber)
 	require.Equal(t, "1234", *transaction.LastFourCardNumber)
+	require.Equal(t, moov.PtrOf("user-1"), transaction.AuthorizedUserAccountID)
 }
 
 func Test_CardIssuing(t *testing.T) {
