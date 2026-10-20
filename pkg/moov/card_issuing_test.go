@@ -4,6 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"strings"
 	"testing"
 	"time"
 
@@ -361,6 +365,98 @@ func TestIssuedCardTransactionMarshal(t *testing.T) {
 	require.NotNil(t, transaction.LastFourCardNumber)
 	require.Equal(t, "1234", *transaction.LastFourCardNumber)
 	require.Equal(t, moov.PtrOf("user-1"), transaction.AuthorizedUserAccountID)
+}
+
+func newCardIssuingTestClient(t *testing.T, srv *httptest.Server) *moov.Client {
+	t.Helper()
+
+	client, err := moov.NewClient(
+		moov.WithCredentials(moov.Credentials{PublicKey: "pk", SecretKey: "sk"}),
+		moov.WithMoovURLScheme("http"),
+	)
+	require.NoError(t, err)
+	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
+
+	return client
+}
+
+func TestListIssuedCardFilters_AuthorizedUserAccountID(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		call      func(*moov.Client) error
+		wantPath  string
+		wantQuery url.Values
+	}{
+		{
+			name: "list cards",
+			call: func(c *moov.Client) error {
+				_, err := c.ListIssuedCards(ctx, "account-123",
+					moov.WithIssuedCardAuthorizedUserAccountID("user-1"),
+					moov.WithIssuedCardCount(5),
+				)
+				return err
+			},
+			wantPath: "/issuing/account-123/cards",
+			wantQuery: url.Values{
+				"authorizedUserAccountID": {"user-1"},
+				"count":                   {"5"},
+			},
+		},
+		{
+			name: "list authorizations",
+			call: func(c *moov.Client) error {
+				_, err := c.ListIssuedCardAuthorizations(ctx, "account-123",
+					moov.WithIssuedCardAuthorizationAuthorizedUserAccountID("user-1"),
+					moov.WithIssuedCardAuthorizationCardID("card-1"),
+				)
+				return err
+			},
+			wantPath: "/issuing/account-123/authorizations",
+			wantQuery: url.Values{
+				"authorizedUserAccountID": {"user-1"},
+				"issuedCardID":            {"card-1"},
+			},
+		},
+		{
+			name: "list card transactions",
+			call: func(c *moov.Client) error {
+				_, err := c.ListIssuedCardTransactions(ctx, "account-123",
+					moov.WithIssuedCardTransactionAuthorizedUserAccountID("user-1"),
+					moov.WithIssuedCardTransactionCardID("card-1"),
+				)
+				return err
+			},
+			wantPath: "/issuing/account-123/card-transactions",
+			wantQuery: url.Values{
+				"authorizedUserAccountID": {"user-1"},
+				"issuedCardID":            {"card-1"},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var (
+				path  string
+				query url.Values
+			)
+
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				path = r.URL.Path
+				query = r.URL.Query()
+
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`[]`))
+			}))
+			t.Cleanup(srv.Close)
+
+			require.NoError(t, tt.call(newCardIssuingTestClient(t, srv)))
+			require.Equal(t, tt.wantPath, path)
+			require.Equal(t, tt.wantQuery, query)
+		})
+	}
 }
 
 func Test_CardIssuing(t *testing.T) {

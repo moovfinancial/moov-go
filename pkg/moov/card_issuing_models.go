@@ -297,6 +297,13 @@ func WithIssuedCardCount(count int) ListIssuedCardsFilter {
 	return Count(count)
 }
 
+func WithIssuedCardAuthorizedUserAccountID(accountID string) ListIssuedCardsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["authorizedUserAccountID"] = accountID
+		return nil
+	})
+}
+
 type FullIssuedCard struct {
 	IssuedCard
 	PAN string `json:"pan"`
@@ -404,6 +411,13 @@ func WithIssuedCardAuthorizationCardID(cardID string) ListIssuedCardAuthorizatio
 	})
 }
 
+func WithIssuedCardAuthorizationAuthorizedUserAccountID(accountID string) ListIssuedCardAuthorizationsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["authorizedUserAccountID"] = accountID
+		return nil
+	})
+}
+
 func WithIssuedCardAuthorizationSkip(skip int) ListIssuedCardAuthorizationsFilter {
 	return Skip(skip)
 }
@@ -503,6 +517,13 @@ type ListIssuedCardTransactionsFilter callArg
 func WithIssuedCardTransactionCardID(cardID string) ListIssuedCardTransactionsFilter {
 	return callBuilderFn(func(call *callBuilder) error {
 		call.params["issuedCardID"] = cardID
+		return nil
+	})
+}
+
+func WithIssuedCardTransactionAuthorizedUserAccountID(accountID string) ListIssuedCardTransactionsFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["authorizedUserAccountID"] = accountID
 		return nil
 	})
 }
