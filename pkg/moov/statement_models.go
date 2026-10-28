@@ -24,6 +24,7 @@ type Statement struct {
 	AccountFees                *AccountFees        `json:"accountFees,omitempty"`
 	OtherCardFees              *OtherCardFees      `json:"otherCardFees,omitempty"`
 	PartnerFees                *PartnerFees        `json:"partnerFees,omitempty"`
+	Adjustments                *AdjustmentFees     `json:"adjustments,omitempty"`
 }
 
 type Summary struct {
@@ -168,6 +169,19 @@ type PartnerFees struct {
 	MinimumCommitment AmountDecimal `json:"minimumCommitment,omitempty"`
 	MonthlyPlatform   AmountDecimal `json:"monthlyPlatform,omitempty"`
 	Total             AmountDecimal `json:"total,omitempty"`
+}
+
+type AdjustmentFees struct {
+	Items []BillingAdjustment `json:"items"`
+	Total CountAndAmount      `json:"total"`
+}
+
+// BillingAdjustment is an adjustment fee grouped by its fee name.
+// The amount is negative for a credit.
+type BillingAdjustment struct {
+	FeeName string        `json:"feeName"`
+	Count   int64         `json:"count"`
+	Amount  AmountDecimal `json:"amount"`
 }
 
 type ListStatementFilter callArg

@@ -168,3 +168,35 @@ func TestStatement_InterchangePrograms(t *testing.T) {
 	require.Equal(t, moov.PercentageRate("1.123456789"), (*programs)[1].PercentageRate)
 	require.Equal(t, int64(40), (*programs)[1].Count)
 }
+
+const statementWithAdjustments = `{
+  "statementID": "f0b0c6a4-0f4e-4c2d-9a51-1b2c3d4e5f60",
+  "summary": {},
+  "adjustments": {
+    "items": [
+      { "feeName": "Refund Credit", "count": 1, "amount": { "currency": "USD", "valueDecimal": "-2.50" } },
+      { "feeName": "Adjustment Fee", "count": 2, "amount": { "currency": "USD", "valueDecimal": "10.00" } }
+    ],
+    "total": { "count": 3, "amount": { "currency": "USD", "valueDecimal": "7.50" } }
+  }
+}`
+
+func TestStatement_Adjustments(t *testing.T) {
+	var statement moov.Statement
+	err := strictDecoder(strings.NewReader(statementWithAdjustments), "application/json", &statement)
+	require.NoError(t, err)
+
+	require.NotNil(t, statement.Adjustments)
+	require.Len(t, statement.Adjustments.Items, 2)
+
+	require.Equal(t, "Refund Credit", statement.Adjustments.Items[0].FeeName)
+	require.Equal(t, int64(1), statement.Adjustments.Items[0].Count)
+	require.Equal(t, "-2.50", statement.Adjustments.Items[0].Amount.ValueDecimal)
+
+	require.Equal(t, "Adjustment Fee", statement.Adjustments.Items[1].FeeName)
+	require.Equal(t, int64(2), statement.Adjustments.Items[1].Count)
+	require.Equal(t, "10.00", statement.Adjustments.Items[1].Amount.ValueDecimal)
+
+	require.Equal(t, int64(3), statement.Adjustments.Total.Count)
+	require.Equal(t, "7.50", statement.Adjustments.Total.Amount.ValueDecimal)
+}
