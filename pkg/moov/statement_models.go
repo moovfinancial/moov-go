@@ -172,16 +172,16 @@ type PartnerFees struct {
 }
 
 type AdjustmentFees struct {
-	Items []BillingAdjustment `json:"items"`
-	Total CountAndAmount      `json:"total"`
+	Items []BillingAdjustment `json:"items,omitempty"`
+	Total CountAndAmount      `json:"total,omitempty"`
 }
 
 // BillingAdjustment is an adjustment fee grouped by its fee name.
 // The amount is negative for a credit.
 type BillingAdjustment struct {
-	FeeName string        `json:"feeName"`
-	Count   int64         `json:"count"`
-	Amount  AmountDecimal `json:"amount"`
+	FeeName string        `json:"feeName,omitempty"`
+	Count   int64         `json:"count,omitempty"`
+	Amount  AmountDecimal `json:"amount,omitempty"`
 }
 
 type ListStatementFilter callArg
