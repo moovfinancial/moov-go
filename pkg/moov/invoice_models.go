@@ -3,32 +3,33 @@ package moov
 import "time"
 
 type Invoice struct {
-	InvoiceID           string           `json:"invoiceID"`
-	InvoiceNumber       string           `json:"invoiceNumber"`
-	Description         string           `json:"description"`
-	CustomerAccountID   string           `json:"customerAccountID"`
-	PartnerAccountID    string           `json:"partnerAccountID,omitempty"`
-	CustomerDisplayName string           `json:"customerDisplayName"`
-	CustomerEmail       string           `json:"customerEmail"`
-	Status              InvoiceStatus    `json:"status"`
-	LineItems           InvoiceLineItems `json:"lineItems"`
-	SubtotalAmount      AmountDecimal    `json:"subtotalAmount"`
-	TaxAmount           AmountDecimal    `json:"taxAmount"`
-	TotalAmount         AmountDecimal    `json:"totalAmount"`
-	PendingAmount       AmountDecimal    `json:"pendingAmount"`
-	PaidAmount          AmountDecimal    `json:"paidAmount"`
-	RefundedAmount      AmountDecimal    `json:"refundedAmount"`
-	DisputedAmount      AmountDecimal    `json:"disputedAmount"`
-	PaymentLinkCode     string           `json:"paymentLinkCode"`
-	PaymentLinkURL      string           `json:"paymentLinkURL,omitempty"`
-	Payments            []InvoicePayment `json:"invoicePayments,omitempty"`
-	CreatedOn           time.Time        `json:"createdOn"`
-	InvoiceDate         *time.Time       `json:"invoiceDate"`
-	DueDate             *time.Time       `json:"dueDate"`
-	SentOn              *time.Time       `json:"sentOn"`
-	PaidOn              *time.Time       `json:"paidOn"`
-	CanceledOn          *time.Time       `json:"canceledOn"`
-	DisabledOn          *time.Time       `json:"disabledOn"`
+	InvoiceID           string                 `json:"invoiceID"`
+	InvoiceNumber       string                 `json:"invoiceNumber"`
+	Description         string                 `json:"description"`
+	CustomerAccountID   string                 `json:"customerAccountID"`
+	PartnerAccountID    string                 `json:"partnerAccountID,omitempty"`
+	CustomerDisplayName string                 `json:"customerDisplayName"`
+	CustomerEmail       string                 `json:"customerEmail"`
+	Status              InvoiceStatus          `json:"status"`
+	LineItems           InvoiceLineItems       `json:"lineItems"`
+	SubtotalAmount      AmountDecimal          `json:"subtotalAmount"`
+	TaxAmount           AmountDecimal          `json:"taxAmount"`
+	TotalAmount         AmountDecimal          `json:"totalAmount"`
+	PendingAmount       AmountDecimal          `json:"pendingAmount"`
+	PaidAmount          AmountDecimal          `json:"paidAmount"`
+	RefundedAmount      AmountDecimal          `json:"refundedAmount"`
+	DisputedAmount      AmountDecimal          `json:"disputedAmount"`
+	PaymentLinkCode     string                 `json:"paymentLinkCode"`
+	PaymentLinkURL      string                 `json:"paymentLinkURL,omitempty"`
+	Payments            []InvoicePayment       `json:"invoicePayments,omitempty"`
+	CreatedOn           time.Time              `json:"createdOn"`
+	InvoiceDate         *time.Time             `json:"invoiceDate"`
+	DueDate             *time.Time             `json:"dueDate"`
+	SentOn              *time.Time             `json:"sentOn"`
+	PaidOn              *time.Time             `json:"paidOn"`
+	CanceledOn          *time.Time             `json:"canceledOn"`
+	DisabledOn          *time.Time             `json:"disabledOn"`
+	Payment             *InvoicePaymentOptions `json:"payment,omitempty"`
 }
 
 type InvoiceStatus string
@@ -78,19 +79,47 @@ type CreateInvoice struct {
 	InvoiceDate       *time.Time             `json:"invoiceDate,omitempty"`
 	DueDate           *time.Time             `json:"dueDate,omitempty"`
 	TaxAmount         *AmountDecimal         `json:"taxAmount,omitempty"`
+	Payment           *InvoicePaymentOptions `json:"payment,omitempty"`
 }
 
 // UpdateInvoice represents the request to update an invoice.
-// Nullable fields (InvoiceDate, DueDate, TaxAmount) use *Nullable to
+// Nullable fields (InvoiceDate, DueDate, TaxAmount, Payment.AllowedMethods) use *Nullable to
 // distinguish between "not updating" (nil), "unsetting" (SetNull),
 // and "setting to a value" (Set).
 type UpdateInvoice struct {
-	Description *string                  `json:"description,omitempty"`
-	LineItems   *CreateInvoiceLineItems  `json:"lineItems,omitempty"`
-	Status      *InvoiceStatus           `json:"status,omitempty"`
-	InvoiceDate *Nullable[time.Time]     `json:"invoiceDate,omitempty"`
-	DueDate     *Nullable[time.Time]     `json:"dueDate,omitempty"`
-	TaxAmount   *Nullable[AmountDecimal] `json:"taxAmount,omitempty"`
+	Description *string                      `json:"description,omitempty"`
+	LineItems   *CreateInvoiceLineItems      `json:"lineItems,omitempty"`
+	Status      *InvoiceStatus               `json:"status,omitempty"`
+	InvoiceDate *Nullable[time.Time]         `json:"invoiceDate,omitempty"`
+	DueDate     *Nullable[time.Time]         `json:"dueDate,omitempty"`
+	TaxAmount   *Nullable[AmountDecimal]     `json:"taxAmount,omitempty"`
+	Payment     *UpdateInvoicePaymentOptions `json:"payment,omitempty"`
+}
+
+// InvoicePaymentOptions represents the payment options of an invoice
+type InvoicePaymentOptions struct {
+	AllowedMethods []PaymentMethodType `json:"allowedMethods,omitempty"`
+	CardDetails    *InvoiceCardDetails `json:"cardDetails,omitempty"`
+	AchDetails     *InvoiceAchDetails  `json:"achDetails,omitempty"`
+}
+
+// UpdateInvoicePaymentOptions represents the request to update the payment options of an invoice.
+// AllowedMethods uses *Nullable so SetNull clears the allowed methods.
+type UpdateInvoicePaymentOptions struct {
+	AllowedMethods *Nullable[[]PaymentMethodType] `json:"allowedMethods,omitempty"`
+	CardDetails    *InvoiceCardDetails            `json:"cardDetails,omitempty"`
+	AchDetails     *InvoiceAchDetails             `json:"achDetails,omitempty"`
+}
+
+// InvoiceCardDetails represents the card payment details of an invoice
+type InvoiceCardDetails struct {
+	DynamicDescriptor *string `json:"dynamicDescriptor,omitempty"`
+}
+
+// InvoiceAchDetails represents the ACH payment details of an invoice
+type InvoiceAchDetails struct {
+	CompanyEntryDescription *string `json:"companyEntryDescription,omitempty"`
+	OriginatingCompanyName  *string `json:"originatingCompanyName,omitempty"`
 }
 
 // CreateInvoicePayment represents the request to create an external payment for an invoice
