@@ -44,7 +44,7 @@ func (ac *AccountClient[T, V]) Create(ctx context.Context, client Client, accoun
 // Get returns an account based on accountID.
 func (ac AccountClient[T, V]) Get(ctx context.Context, client Client, accountID string) (*V, error) {
 	resp, err := client.CallHttp(ctx,
-		Endpoint(http.MethodGet, pathAccount, accountID),
+		Endpoint(http.MethodGet, PathAccount, accountID),
 		MoovVersion(ac.Version),
 		AcceptJson())
 	if err != nil {
@@ -57,7 +57,7 @@ func (ac AccountClient[T, V]) Get(ctx context.Context, client Client, accountID 
 // Patch updates an account.
 func (ac AccountClient[T, V]) Patch(ctx context.Context, client Client, accountID string, account PatchAccount) (*V, error) {
 	resp, err := client.CallHttp(ctx,
-		Endpoint(http.MethodPatch, pathAccount, accountID),
+		Endpoint(http.MethodPatch, PathAccount, accountID),
 		MoovVersion(ac.Version),
 		AcceptJson(),
 		JsonBody(account))
@@ -98,7 +98,7 @@ func (ac AccountClient[T, V]) ListConnected(ctx context.Context, client Client, 
 // This also means you'll only have read-only access to the account going forward for reporting purposes.
 func (ac AccountClient[T, V]) Disconnect(ctx context.Context, client Client, accountID string) error {
 	resp, err := client.CallHttp(ctx,
-		Endpoint(http.MethodDelete, pathAccount, accountID),
+		Endpoint(http.MethodDelete, PathAccount, accountID),
 		MoovVersion(ac.Version),
 		AcceptJson())
 	if err != nil {
@@ -145,7 +145,7 @@ func (c *Client) CreateAccount(ctx context.Context, account CreateAccount) (crea
 // GetAccount returns an account based on accountID.
 func (c Client) GetAccount(ctx context.Context, accountID string) (*Account, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodGet, pathAccount, accountID),
+		Endpoint(http.MethodGet, PathAccount, accountID),
 		AcceptJson())
 	if err != nil {
 		return nil, err
@@ -158,7 +158,7 @@ func (c Client) GetAccount(ctx context.Context, accountID string) (*Account, err
 // UpdateAccount updates an account.
 func (c Client) UpdateAccount(ctx context.Context, account Account) (*Account, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPatch, pathAccount, account.AccountID),
+		Endpoint(http.MethodPatch, PathAccount, account.AccountID),
 		AcceptJson(),
 		JsonBody(account))
 	if err != nil {
@@ -172,7 +172,7 @@ func (c Client) UpdateAccount(ctx context.Context, account Account) (*Account, e
 // PatchAccount updates an account.
 func (c Client) PatchAccount(ctx context.Context, accountID string, account PatchAccount) (*Account, error) {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPatch, pathAccount, accountID),
+		Endpoint(http.MethodPatch, PathAccount, accountID),
 		AcceptJson(),
 		JsonBody(account))
 	if err != nil {
@@ -265,7 +265,7 @@ func (c Client) ListAccounts(ctx context.Context, opts ...ListAccountFilter) ([]
 // Only use for Preversioned API calls. Use mvxxxx.Accounts.Disconnect(...) instead.
 func (c Client) DisconnectAccount(ctx context.Context, accountID string) error {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodDelete, pathAccount, accountID),
+		Endpoint(http.MethodDelete, PathAccount, accountID),
 		AcceptJson())
 	if err != nil {
 		return err
