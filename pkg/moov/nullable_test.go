@@ -130,7 +130,7 @@ func TestUpdateInvoice_MarshalJSON(t *testing.T) {
 
 	t.Run("empty payment produces empty payment object", func(t *testing.T) {
 		u := UpdateInvoice{
-			Payment: &UpdateInvoicePaymentOptions{},
+			PaymentOptions: &UpdateInvoicePaymentOptions{},
 		}
 		data, err := json.Marshal(u)
 		require.NoError(t, err)
@@ -139,7 +139,7 @@ func TestUpdateInvoice_MarshalJSON(t *testing.T) {
 
 	t.Run("null allowed methods is included as null", func(t *testing.T) {
 		u := UpdateInvoice{
-			Payment: &UpdateInvoicePaymentOptions{
+			PaymentOptions: &UpdateInvoicePaymentOptions{
 				AllowedMethods: SetNull[[]PaymentMethodType](),
 			},
 		}
@@ -150,7 +150,7 @@ func TestUpdateInvoice_MarshalJSON(t *testing.T) {
 
 	t.Run("set allowed methods is included as array", func(t *testing.T) {
 		u := UpdateInvoice{
-			Payment: &UpdateInvoicePaymentOptions{
+			PaymentOptions: &UpdateInvoicePaymentOptions{
 				AllowedMethods: Set([]PaymentMethodType{PaymentMethodType_CardPayment, PaymentMethodType_ApplePay}),
 			},
 		}

@@ -29,7 +29,7 @@ type Invoice struct {
 	PaidOn              *time.Time             `json:"paidOn"`
 	CanceledOn          *time.Time             `json:"canceledOn"`
 	DisabledOn          *time.Time             `json:"disabledOn"`
-	Payment             *InvoicePaymentOptions `json:"payment,omitempty"`
+	PaymentOptions      *InvoicePaymentOptions `json:"payment,omitempty"`
 }
 
 type InvoiceStatus string
@@ -79,21 +79,21 @@ type CreateInvoice struct {
 	InvoiceDate       *time.Time             `json:"invoiceDate,omitempty"`
 	DueDate           *time.Time             `json:"dueDate,omitempty"`
 	TaxAmount         *AmountDecimal         `json:"taxAmount,omitempty"`
-	Payment           *InvoicePaymentOptions `json:"payment,omitempty"`
+	PaymentOptions    *InvoicePaymentOptions `json:"payment,omitempty"`
 }
 
 // UpdateInvoice represents the request to update an invoice.
-// Nullable fields (InvoiceDate, DueDate, TaxAmount, Payment.AllowedMethods) use *Nullable to
+// Nullable fields (InvoiceDate, DueDate, TaxAmount, PaymentOptions.AllowedMethods) use *Nullable to
 // distinguish between "not updating" (nil), "unsetting" (SetNull),
 // and "setting to a value" (Set).
 type UpdateInvoice struct {
-	Description *string                      `json:"description,omitempty"`
-	LineItems   *CreateInvoiceLineItems      `json:"lineItems,omitempty"`
-	Status      *InvoiceStatus               `json:"status,omitempty"`
-	InvoiceDate *Nullable[time.Time]         `json:"invoiceDate,omitempty"`
-	DueDate     *Nullable[time.Time]         `json:"dueDate,omitempty"`
-	TaxAmount   *Nullable[AmountDecimal]     `json:"taxAmount,omitempty"`
-	Payment     *UpdateInvoicePaymentOptions `json:"payment,omitempty"`
+	Description    *string                      `json:"description,omitempty"`
+	LineItems      *CreateInvoiceLineItems      `json:"lineItems,omitempty"`
+	Status         *InvoiceStatus               `json:"status,omitempty"`
+	InvoiceDate    *Nullable[time.Time]         `json:"invoiceDate,omitempty"`
+	DueDate        *Nullable[time.Time]         `json:"dueDate,omitempty"`
+	TaxAmount      *Nullable[AmountDecimal]     `json:"taxAmount,omitempty"`
+	PaymentOptions *UpdateInvoicePaymentOptions `json:"payment,omitempty"`
 }
 
 // InvoicePaymentOptions represents the payment options of an invoice
