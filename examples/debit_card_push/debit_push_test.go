@@ -3,6 +3,7 @@ package debit_card_push
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/go-faker/faker/v4"
@@ -18,6 +19,10 @@ func TestVisaSandboxPush(t *testing.T) {
 	// your credentials, if you don't want to use environment variables.
 	// However, it is recommended to load the credentials from the
 	// configuration file.
+	if os.Getenv("MOOV_PUBLIC_KEY") == "" || os.Getenv("MOOV_SECRET_KEY") == "" {
+		t.Skip("MOOV_PUBLIC_KEY/MOOV_SECRET_KEY not set; skipping integration test")
+	}
+
 	mc, err := moov.NewClient(moov.WithCredentials(moov.CredentialsFromEnv()))
 	require.NoError(t, err)
 

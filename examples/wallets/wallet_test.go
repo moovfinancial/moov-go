@@ -3,6 +3,7 @@ package wallets
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -65,6 +66,10 @@ func ExampleClient_wallet() {
 }
 
 func TestWalletEndpoints(t *testing.T) {
+	if os.Getenv("MOOV_PUBLIC_KEY") == "" || os.Getenv("MOOV_SECRET_KEY") == "" {
+		t.Skip("MOOV_PUBLIC_KEY/MOOV_SECRET_KEY not set; skipping integration test")
+	}
+
 	mc, err := moov.NewClient()
 	require.NoError(t, err)
 	walletClientV2604 := mv2604.NewWalletClient(mc)

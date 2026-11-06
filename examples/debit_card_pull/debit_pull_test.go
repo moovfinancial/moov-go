@@ -2,6 +2,7 @@ package debit_card_pull
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/moovfinancial/moov-go/internal/testtools"
@@ -20,6 +21,10 @@ func TestDebitPullWithRefund(t *testing.T) {
 
 	// The account facilitating the transfer
 	partnerAccountID := testtools.PARTNER_ID // example
+
+	if os.Getenv("MOOV_PUBLIC_KEY") == "" || os.Getenv("MOOV_SECRET_KEY") == "" {
+		t.Skip("MOOV_PUBLIC_KEY/MOOV_SECRET_KEY not set; skipping integration test")
+	}
 
 	mc, err := moov.NewClient(moov.WithCredentials(moov.CredentialsFromEnv()))
 	require.NoError(t, err)

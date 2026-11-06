@@ -3,6 +3,7 @@ package debit_bank_account
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -20,6 +21,10 @@ func TestMicroDepositExample(t *testing.T) {
 	// your credentials, if you don't want to use environment variables.
 	// However, it is recommended to load the credentials from the
 	// configuration file.
+
+	if os.Getenv("MOOV_PUBLIC_KEY") == "" || os.Getenv("MOOV_SECRET_KEY") == "" {
+		t.Skip("MOOV_PUBLIC_KEY/MOOV_SECRET_KEY not set; skipping integration test")
+	}
 
 	mc, err := moov.NewClient() // reads credentials from Environmental variables
 	require.NoError(t, err)

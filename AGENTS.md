@@ -48,7 +48,7 @@ Consumers import `github.com/moovfinancial/moov-go/pkg/moov` and call `moov.NewC
 
 ```bash
 make build                          # go build ./...
-make check                          # download lint-project.sh, then lint and test
+make check                          # download lint-project.sh, then lint and test; live tests skip without credentials
 SKIP_TESTS=yes make check           # lint only
 SKIP_LINTERS=yes make check         # tests only
 go test ./pkg/mhooks/... ./pkg/mv2607/...   # unit tests that do not need credentials
@@ -57,7 +57,7 @@ go test -run TestName ./pkg/moov/...        # one test
 go vet ./...
 ```
 
-`make check` downloads `lint-project.sh` from `moov-io/infra`. Cover threshold is 30 percent (`COVER_THRESHOLD=30.0`).
+`make check` downloads `lint-project.sh` from `moov-io/infra`. When both `MOOV_PUBLIC_KEY` and `MOOV_SECRET_KEY` are non-empty, the cover threshold is 30 percent (`COVER_THRESHOLD=30.0`). Otherwise the cover threshold is `COVER_THRESHOLD=0`. CI supplies both keys, so CI keeps the 30 percent gate.
 
 ## Credentials
 
@@ -67,7 +67,7 @@ Copy `secrets-template.env` to `secrets.env`. The Makefile loads `secrets.env` w
 - `MOOV_HOST` — optional. Default is `api.moov.io`
 - `PLAID_CLIENT_ID` / `PLAID_SECRET` — only for Plaid examples
 
-Most tests in `pkg/moov` and `examples/` call the live API. Without credentials those tests fail. `pkg/mhooks` and httptest cases in `pkg/mv2607` do not need credentials.
+Most tests in `pkg/moov` and `examples/` call the live API. They skip when `MOOV_PUBLIC_KEY` or `MOOV_SECRET_KEY` is absent or empty, after the optional `secrets.env` load. Local tests such as `pkg/mhooks`, the httptest cases in `pkg/mv2607`, and `Test_Client_InvalidCredentials` still run without credentials.
 
 ## Versioned APIs
 

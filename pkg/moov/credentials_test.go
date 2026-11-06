@@ -9,9 +9,8 @@ import (
 )
 
 func Test_CredentialsFromEnv(t *testing.T) {
-	// If its not set on the local machine just skip for now.
-	if _, ok := os.LookupEnv(moov.ENV_MOOV_PUBLIC_KEY); !ok {
-		t.SkipNow()
+	if os.Getenv(moov.ENV_MOOV_PUBLIC_KEY) == "" || os.Getenv(moov.ENV_MOOV_SECRET_KEY) == "" {
+		t.Skip("MOOV_PUBLIC_KEY/MOOV_SECRET_KEY not set; skipping integration test")
 	}
 
 	creds := moov.CredentialsFromEnv()

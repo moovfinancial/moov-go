@@ -14,7 +14,7 @@ ifeq ($(OS),Windows_NT)
 else
 	@wget -O lint-project.sh https://raw.githubusercontent.com/moov-io/infra/master/go/lint-project.sh
 	@chmod +x ./lint-project.sh
-	COVER_THRESHOLD=30.0 GOTEST_PKGS=./... ./lint-project.sh
+	COVER_THRESHOLD=$(if $(and $(MOOV_PUBLIC_KEY),$(MOOV_SECRET_KEY)),30.0,0) GOTEST_PKGS=./... ./lint-project.sh
 endif
 
 .PHONY: clean

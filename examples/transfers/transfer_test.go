@@ -2,6 +2,7 @@ package transfers
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/moovfinancial/moov-go/internal/testtools"
@@ -11,6 +12,10 @@ import (
 )
 
 func TestCreateAndPatchTransfer(t *testing.T) {
+	if os.Getenv("MOOV_PUBLIC_KEY") == "" || os.Getenv("MOOV_SECRET_KEY") == "" {
+		t.Skip("MOOV_PUBLIC_KEY/MOOV_SECRET_KEY not set; skipping integration test")
+	}
+
 	mc, err := moov.NewClient()
 	require.NoError(t, err)
 	transferClientV2604 := mv2604.NewTransferClient(mc)
