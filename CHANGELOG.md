@@ -1,5 +1,9 @@
 ## Future Releases
 
+BUG FIXES
+
+- apple-pay: `UpdateApplePayDomain` now sends PATCH instead of PUT. PUT was not a defined operation for the Apple Pay domains endpoint.
+
 Please refer to the [Github Releases](https://github.com/moovfinancial/moov-go/releases) page for moov-go for future updates.
 
 ## v0.16.0 (Released 2025-05-28)
