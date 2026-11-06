@@ -2,6 +2,7 @@ package debit_card_pull
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/moovfinancial/moov-go/internal/testtools"
@@ -11,6 +12,10 @@ import (
 
 // Pull transfer is a transfer from the user's card to the Moov wallet.
 func TestDebitPullWithRefund(t *testing.T) {
+	if os.Getenv("MOOV_PUBLIC_KEY") == "" || os.Getenv("MOOV_SECRET_KEY") == "" {
+		t.Skip("MOOV_PUBLIC_KEY/MOOV_SECRET_KEY not set; skipping integration test")
+	}
+
 	// Step 1: create Moov client and set some variables
 
 	// The following code shows how you can configure the moov client with

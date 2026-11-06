@@ -2,6 +2,7 @@ package sweeps
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -11,6 +12,10 @@ import (
 )
 
 func TestSweepConfigsEndpoints(t *testing.T) {
+	if os.Getenv("MOOV_PUBLIC_KEY") == "" || os.Getenv("MOOV_SECRET_KEY") == "" {
+		t.Skip("MOOV_PUBLIC_KEY/MOOV_SECRET_KEY not set; skipping integration test")
+	}
+
 	mc, err := moov.NewClient()
 	require.NoError(t, err)
 	sweepClientV2604 := mv2604.NewSweepClient(mc)
@@ -77,6 +82,10 @@ func TestSweepConfigsEndpoints(t *testing.T) {
 }
 
 func TestSweepEndpoints(t *testing.T) {
+	if os.Getenv("MOOV_PUBLIC_KEY") == "" || os.Getenv("MOOV_SECRET_KEY") == "" {
+		t.Skip("MOOV_PUBLIC_KEY/MOOV_SECRET_KEY not set; skipping integration test")
+	}
+
 	mc, err := moov.NewClient()
 	require.NoError(t, err)
 

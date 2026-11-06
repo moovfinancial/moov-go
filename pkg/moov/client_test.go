@@ -23,6 +23,8 @@ func BgCtx() context.Context {
 }
 
 func NewTestClient(t testing.TB, c ...moov.ClientConfigurable) *moov.Client {
+	t.Helper()
+
 	// If we have a secrets.env file written read that and populate the test environment
 	secretsPath := filepath.Join("..", "..", "secrets.env")
 
@@ -33,6 +35,10 @@ func NewTestClient(t testing.TB, c ...moov.ClientConfigurable) *moov.Client {
 		for k, v := range secrets {
 			t.Setenv(k, v)
 		}
+	}
+
+	if os.Getenv("MOOV_PUBLIC_KEY") == "" || os.Getenv("MOOV_SECRET_KEY") == "" {
+		t.Skip("MOOV_PUBLIC_KEY/MOOV_SECRET_KEY not set; skipping integration test")
 	}
 
 	c = append([]moov.ClientConfigurable{

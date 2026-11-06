@@ -3,6 +3,7 @@ package schedules
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -26,8 +27,13 @@ type Env struct {
 }
 
 func Setup(t *testing.T, ctx context.Context) *Env {
+	t.Helper()
 
 	godotenv.Load("../../secrets.env")
+
+	if os.Getenv("MOOV_PUBLIC_KEY") == "" || os.Getenv("MOOV_SECRET_KEY") == "" {
+		t.Skip("MOOV_PUBLIC_KEY/MOOV_SECRET_KEY not set; skipping integration test")
+	}
 
 	// The following code shows how you can configure the moov client with
 	// your credentials, if you don't want to use environment variables.

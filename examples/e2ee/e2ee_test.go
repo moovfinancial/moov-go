@@ -2,6 +2,7 @@ package e2ee_test
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/go-jose/go-jose/v4"
@@ -20,6 +21,10 @@ import (
 // Please contact Moov representative to enable
 // on production accounts.
 func Test_EndToEndEncryption(t *testing.T) {
+	if os.Getenv("MOOV_PUBLIC_KEY") == "" || os.Getenv("MOOV_SECRET_KEY") == "" {
+		t.Skip("MOOV_PUBLIC_KEY/MOOV_SECRET_KEY not set; skipping integration test")
+	}
+
 	ctx := context.Background()
 
 	mc, err := moov.NewClient(moov.WithCredentials(moov.CredentialsFromEnv()))
