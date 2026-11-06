@@ -1,5 +1,10 @@
 ## Future Releases
 
+ADDITIONS
+
+- payment links: add `CreatePaymentLink`, `GetPaymentLink`, `UpdatePaymentLink`, `DisablePaymentLink`, `ListPaymentLinks`, and `GetPaymentLinkQRCode` (API version 2026.07)
+- onboarding invites: add `CreateOnboardingInvite`, `GetOnboardingInvite`, `ListOnboardingInvites`, and `RevokeOnboardingInvite`
+
 Please refer to the [Github Releases](https://github.com/moovfinancial/moov-go/releases) page for moov-go for future updates.
 
 ## v0.16.0 (Released 2025-05-28)
