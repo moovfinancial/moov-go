@@ -64,6 +64,16 @@ func TestLiveSuiteForeignIDs(t *testing.T) {
 				want: 1,
 			},
 			{
+				name: "pointer-wrapped literal alias",
+				src:  "package p\nconst ref = \"ref-123\"\nvar t = Transfer{ForeignID: moov.PtrOf(ref)}\n",
+				want: 1,
+			},
+			{
+				name: "mixed initializer alias",
+				src:  "package p\nfunc f() { ref, body := \"fixed-ref\", makeDescription(); _ = Ticket{ForeignID: ref, Body: body} }\n",
+				want: 1,
+			},
+			{
 				name: "foreignID JSON fixture property",
 				src:  "package p\nvar raw = []byte(`{\"foreignID\":\"ref-123\"}`)\n",
 				want: 1,
@@ -81,6 +91,16 @@ func TestLiveSuiteForeignIDs(t *testing.T) {
 			{
 				name: "pointer to dynamic foreign ID",
 				src:  "package p\nvar t = Transfer{ForeignID: moov.PtrOf(testtools.RandomForeignID())}\n",
+				want: 0,
+			},
+			{
+				name: "formatted dynamic foreign ID",
+				src:  "package p\nvar t = Transfer{ForeignID: fmt.Sprintf(\"%s\", testtools.RandomForeignID())}\n",
+				want: 0,
+			},
+			{
+				name: "generated foreign ID with reused local name",
+				src:  "package p\nfunc resource() { id := \"wallet-id\"; _ = id }\nfunc request() { id := testtools.RandomForeignID(); _ = Ticket{ForeignID: id} }\n",
 				want: 0,
 			},
 			{
@@ -135,9 +155,6 @@ func findFixedForeignIDs(filename string, src []byte) ([]fixedForeignIDFinding, 
 		return nil, err
 	}
 
-	literalAliases := make(map[string]bool)
-	collectLiteralAliases(file, literalAliases)
-
 	var findings []fixedForeignIDFinding
 	ast.Inspect(file, func(node ast.Node) bool {
 		switch n := node.(type) {
@@ -151,8 +168,8 @@ func findFixedForeignIDs(filename string, src []byte) ([]fixedForeignIDFinding, 
 				if !ok || !isForeignIDField(key.Name) {
 					continue
 				}
-				if why := fixedForeignIDValue(kv.Value, literalAliases); why != "" {
-					findings = append(findings, fixedForeignIDFinding{fset.Position(kv.Pos()).Line, why})
+				if fixedForeignIDValue(kv.Value, make(map[*ast.Object]bool)) {
+					findings = append(findings, fixedForeignIDFinding{fset.Position(kv.Pos()).Line, "fixed foreign ID"})
 				}
 			}
 		case *ast.BasicLit:
@@ -173,67 +190,64 @@ func findFixedForeignIDs(filename string, src []byte) ([]fixedForeignIDFinding, 
 	return findings, nil
 }
 
-func collectLiteralAliases(file *ast.File, aliases map[string]bool) {
-	ast.Inspect(file, func(node ast.Node) bool {
-		switch n := node.(type) {
-		case *ast.ValueSpec:
-			if allStringLiterals(n.Values) {
-				for _, name := range n.Names {
-					aliases[name.Name] = true
-				}
-			}
-		case *ast.AssignStmt:
-			if allStringLiterals(n.Rhs) {
-				for _, lhs := range n.Lhs {
-					if id, ok := lhs.(*ast.Ident); ok {
-						aliases[id.Name] = true
-					}
-				}
-			}
-		}
-		return true
-	})
-}
-
-func allStringLiterals(exprs []ast.Expr) bool {
-	if len(exprs) == 0 {
-		return false
-	}
-	for _, expr := range exprs {
-		lit, ok := expr.(*ast.BasicLit)
-		if !ok || lit.Kind != token.STRING {
-			return false
-		}
-	}
-	return true
-}
-
 func isForeignIDField(name string) bool {
 	return name == "ForeignID" || name == "ExternalID"
 }
 
-func fixedForeignIDValue(expr ast.Expr, aliases map[string]bool) string {
+func fixedForeignIDValue(expr ast.Expr, seen map[*ast.Object]bool) bool {
 	switch value := expr.(type) {
 	case *ast.BasicLit:
-		if value.Kind == token.STRING {
-			return "direct string foreign ID"
-		}
+		return value.Kind == token.STRING
 	case *ast.Ident:
-		if aliases[value.Name] {
-			return "literal-backed foreign ID alias"
-		}
+		return literalBackedObject(value.Obj, seen)
 	case *ast.UnaryExpr:
 		if value.Op == token.AND {
-			if id, ok := value.X.(*ast.Ident); ok && aliases[id.Name] {
-				return "literal-backed foreign ID alias"
-			}
+			return fixedForeignIDValue(value.X, seen)
 		}
 	case *ast.CallExpr:
-		for _, arg := range value.Args {
-			if lit, ok := arg.(*ast.BasicLit); ok && lit.Kind == token.STRING {
-				return "pointer-wrapped foreign ID string"
+		if isPointerWrapper(value.Fun) && len(value.Args) == 1 {
+			return fixedForeignIDValue(value.Args[0], seen)
+		}
+	}
+	return false
+}
+
+func isPointerWrapper(fun ast.Expr) bool {
+	switch f := fun.(type) {
+	case *ast.Ident:
+		return f.Name == "PtrOf"
+	case *ast.SelectorExpr:
+		return f.Sel.Name == "PtrOf"
+	}
+	return false
+}
+
+func literalBackedObject(obj *ast.Object, seen map[*ast.Object]bool) bool {
+	if obj == nil {
+		return false
+	}
+	if resolved, ok := seen[obj]; ok {
+		return resolved
+	}
+	seen[obj] = false
+
+	result := false
+	switch decl := obj.Decl.(type) {
+	case *ast.ValueSpec:
+		for i, name := range decl.Names {
+			if name.Obj == obj && i < len(decl.Values) {
+				result = fixedForeignIDValue(decl.Values[i], seen)
+				break
+			}
+		}
+	case *ast.AssignStmt:
+		for i, lhs := range decl.Lhs {
+			if id, ok := lhs.(*ast.Ident); ok && id.Obj == obj && i < len(decl.Rhs) {
+				result = fixedForeignIDValue(decl.Rhs[i], seen)
+				break
 			}
 		}
 	}
-	return ""
+	seen[obj] = result
+	return result
 }
