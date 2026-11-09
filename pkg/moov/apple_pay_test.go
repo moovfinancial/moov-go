@@ -2,7 +2,11 @@ package moov_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
@@ -34,6 +38,28 @@ func TestApplePayMarshal(t *testing.T) {
 	assert.Equal(t, "Discover", applePay.Brand)
 	assert.Equal(t, "debit", applePay.CardType)
 	assert.Equal(t, "Visa 1234", applePay.CardDisplayName)
+}
+
+func TestUpdateApplePayDomain_MethodPatch(t *testing.T) {
+	var gotMethod string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotMethod = r.Method
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	t.Cleanup(srv.Close)
+
+	client, err := moov.NewClient(
+		moov.WithCredentials(moov.Credentials{PublicKey: "pk", SecretKey: "sk"}),
+		moov.WithMoovURLScheme("http"),
+	)
+	require.NoError(t, err)
+	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
+
+	err = client.UpdateApplePayDomain(context.Background(), "account-1", moov.PatchApplyPayDomains{
+		AddDomains: []string{"pay.classbooker.dev"},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, http.MethodPatch, gotMethod)
 }
 
 /*
