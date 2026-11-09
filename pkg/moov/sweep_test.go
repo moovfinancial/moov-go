@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
@@ -15,8 +16,8 @@ func Test_SweepConfig_CRUD_Endpoints(t *testing.T) {
 
 		ctx = context.Background()
 		// IDs for Lincoln National Corporation
-		accountID  = "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
-		walletID   = "4dbac313-d505-4d51-a0fe-c11787916fcf"
+		accountID  = testtools.MERCHANT_ID
+		walletID   = testtools.MERCHANT_WALLET_ID
 		minBalance = "1000.0"
 	)
 
@@ -62,8 +63,8 @@ func Test_Sweep_ListAndGet(t *testing.T) {
 
 		ctx = context.Background()
 		// IDs for Lincoln National Corporation
-		accountID = "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
-		walletID  = "4dbac313-d505-4d51-a0fe-c11787916fcf"
+		accountID = testtools.MERCHANT_ID
+		walletID  = testtools.MERCHANT_WALLET_ID
 	)
 
 	sweeps, err := mc.ListSweeps(ctx, accountID, walletID)
@@ -86,8 +87,8 @@ func Test_Sweep_ListAccuring(t *testing.T) {
 
 		ctx = context.Background()
 		// IDs for Lincoln National Corporation
-		accountID = "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
-		walletID  = "4dbac313-d505-4d51-a0fe-c11787916fcf"
+		accountID = testtools.MERCHANT_ID
+		walletID  = testtools.MERCHANT_WALLET_ID
 	)
 
 	sweeps, err := mc.ListSweeps(ctx, accountID, walletID, moov.WithSweepStatus(string(moov.SweepStatus_Accruing)))

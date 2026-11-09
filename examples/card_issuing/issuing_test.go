@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 
 	"github.com/stretchr/testify/require"
@@ -31,7 +32,7 @@ func TestCardIssuing(t *testing.T) {
 	// Step 2: create account for the user
 
 	// For now just using a known existing account that is already allowed in the closed beta for card issuing
-	accountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
+	accountID := testtools.MERCHANT_ID
 
 	// Step 3: enable the card-issuing capability for the account
 

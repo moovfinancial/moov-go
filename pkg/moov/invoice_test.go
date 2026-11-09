@@ -86,7 +86,7 @@ func Test_Invoice_CreateUpdateGet(t *testing.T) {
 		require.Equal(t, moov.InvoiceStatusUnpaid, updatedInvoice.Status)
 
 		createdPayment, err := mc.CreateInvoicePayment(ctx, accountID, createdInvoice.InvoiceID, moov.CreateInvoicePayment{
-			ForeignID:   moov.PtrOf("abc123"),
+			ForeignID:   moov.PtrOf(testtools.RandomForeignID()),
 			Description: moov.PtrOf("Customer paid with check"),
 			Amount:      updatedInvoice.TotalAmount,
 		})

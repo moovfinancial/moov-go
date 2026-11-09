@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/moovfinancial/moov-go/pkg/mv2604"
 )
@@ -18,8 +19,8 @@ func TestSweepConfigsEndpoints(t *testing.T) {
 	var (
 		ctx = context.Background()
 
-		accountID  = "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
-		walletID   = "4dbac313-d505-4d51-a0fe-c11787916fcf"
+		accountID  = testtools.MERCHANT_ID
+		walletID   = testtools.MERCHANT_WALLET_ID
 		minBalance = "1000.00"
 	)
 
@@ -81,8 +82,8 @@ func TestSweepEndpoints(t *testing.T) {
 	require.NoError(t, err)
 
 	var (
-		accountID = "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
-		walletID  = "4dbac313-d505-4d51-a0fe-c11787916fcf"
+		accountID = testtools.MERCHANT_ID
+		walletID  = testtools.MERCHANT_WALLET_ID
 		ctx       = context.Background()
 	)
 
