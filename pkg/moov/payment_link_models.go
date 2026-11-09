@@ -458,7 +458,6 @@ type UpdatePaymentLinkAmountDetails struct {
 	Surcharge *Nullable[AmountDecimalUpdate] `json:"surcharge,omitempty"`
 }
 
-// AmountUpdate
 type AmountUpdate struct {
 	Currency *Currency `json:"currency,omitempty"`
 	// Quantity in the smallest unit of the specified currency. In USD this is cents, for example, $12.04 is 1204 and $0.99 is 99.

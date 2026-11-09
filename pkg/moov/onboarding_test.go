@@ -24,13 +24,9 @@ func Test_OnboardingInvite_CreateGetListRevoke(t *testing.T) {
 			moov.CapabilityName_Wallet,
 		},
 		FeePlanCodes: []string{"merchant-direct"},
-		Prefill: func() *moov.CreateAccount {
-			account := createTestBusinessAccount()
-			return &account
-		}(),
+		Prefill:      moov.PtrOf(createTestBusinessAccount()),
 	}
 
-	// create the invite
 	created, err := mc.CreateOnboardingInvite(ctx, create)
 	require.NoError(t, err)
 	require.NotEmpty(t, created.Code)
@@ -42,21 +38,17 @@ func Test_OnboardingInvite_CreateGetListRevoke(t *testing.T) {
 		_ = mc.RevokeOnboardingInvite(ctx, code)
 	})
 
-	// fetch by code
 	fetched, err := mc.GetOnboardingInvite(ctx, code)
 	require.NoError(t, err)
 	require.Equal(t, created.Code, fetched.Code)
 
-	// list invites and confirm the created one is present
 	listed, err := mc.ListOnboardingInvites(ctx)
 	require.NoError(t, err)
 	require.Contains(t, listed, *created)
 
-	// revoke the invite
 	err = mc.RevokeOnboardingInvite(ctx, code)
 	require.NoError(t, err)
 
-	// revoked invite can still be fetched and has RevokedOn set
 	fetched, err = mc.GetOnboardingInvite(ctx, code)
 	require.NoError(t, err)
 	require.NotNil(t, fetched.RevokedOn)

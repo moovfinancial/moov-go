@@ -2,7 +2,10 @@ package moov_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -63,7 +66,6 @@ func Test_PaymentLink_CreateGetListUpdateDisable(t *testing.T) {
 		},
 	}
 
-	// create the payment link
 	created, err := mc.CreatePaymentLink(ctx, accountID, create)
 	require.NoError(t, err)
 	require.NotEmpty(t, created.Code)
@@ -78,19 +80,16 @@ func Test_PaymentLink_CreateGetListUpdateDisable(t *testing.T) {
 		_ = mc.DisablePaymentLink(ctx, accountID, code)
 	})
 
-	// fetch by code
 	fetched, err := mc.GetPaymentLink(ctx, accountID, code)
 	require.NoError(t, err)
 	require.Equal(t, created.Code, fetched.Code)
 
-	// list filtered by type
 	listed, err := mc.ListPaymentLinks(ctx, accountID,
 		moov.WithPaymentLinkTypes(moov.PaymentLinkType_Payment),
 		moov.WithPaymentLinkCount(100))
 	require.NoError(t, err)
 	require.Contains(t, listed, *created)
 
-	// update the display title and set an expiration
 	expiresOn := time.Now().UTC().Add(24 * time.Hour).Truncate(time.Second)
 	updated, err := mc.UpdatePaymentLink(ctx, accountID, code, moov.UpdatePaymentLink{
 		Display: &moov.PaymentLinkDisplayOptionsUpdate{
@@ -102,24 +101,20 @@ func Test_PaymentLink_CreateGetListUpdateDisable(t *testing.T) {
 	require.Equal(t, "Updated moov-go title", updated.Display.Title)
 	require.NotNil(t, updated.ExpiresOn)
 
-	// clear the expiration with an explicit null
 	updated, err = mc.UpdatePaymentLink(ctx, accountID, code, moov.UpdatePaymentLink{
 		ExpiresOn: moov.SetNull[time.Time](),
 	})
 	require.NoError(t, err)
 	require.Nil(t, updated.ExpiresOn)
 
-	// fetch the QR code image
 	img, contentType, err := mc.GetPaymentLinkQRCode(ctx, accountID, code)
 	require.NoError(t, err)
 	require.NotEmpty(t, img)
 	require.Contains(t, contentType, "image/png")
 
-	// disable the payment link
 	err = mc.DisablePaymentLink(ctx, accountID, code)
 	require.NoError(t, err)
 
-	// disabled link can still be fetched and reports its status
 	fetched, err = mc.GetPaymentLink(ctx, accountID, code)
 	require.NoError(t, err)
 	require.Equal(t, moov.PaymentLinkStatus_Disabled, fetched.Status)
@@ -160,4 +155,70 @@ func Test_PaymentLink_CustomAmount(t *testing.T) {
 	t.Cleanup(func() {
 		_ = mc.DisablePaymentLink(ctx, accountID, string(created.Code))
 	})
+}
+
+func Test_PaymentLink_UpdateAmountDetailsNullable(t *testing.T) {
+	tests := []struct {
+		name   string
+		update moov.UpdatePaymentLink
+		want   map[string]any
+	}{
+		{
+			name:   "omitted amount details",
+			update: moov.UpdatePaymentLink{},
+			want:   map[string]any{},
+		},
+		{
+			name: "set tax and surcharge",
+			update: moov.UpdatePaymentLink{
+				AmountDetails: &moov.UpdatePaymentLinkAmountDetails{
+					Tax:       moov.Set(moov.AmountDecimalUpdate{Currency: moov.PtrOf(moov.Currency("USD")), ValueDecimal: "1.00"}),
+					Surcharge: moov.Set(moov.AmountDecimalUpdate{ValueDecimal: "2.00"}),
+				},
+			},
+			want: map[string]any{
+				"amountDetails": map[string]any{
+					"tax":       map[string]any{"currency": "USD", "valueDecimal": "1.00"},
+					"surcharge": map[string]any{"valueDecimal": "2.00"},
+				},
+			},
+		},
+		{
+			name: "explicit null tax and surcharge",
+			update: moov.UpdatePaymentLink{
+				AmountDetails: &moov.UpdatePaymentLinkAmountDetails{
+					Tax:       moov.SetNull[moov.AmountDecimalUpdate](),
+					Surcharge: moov.SetNull[moov.AmountDecimalUpdate](),
+				},
+			},
+			want: map[string]any{
+				"amountDetails": map[string]any{
+					"tax":       nil,
+					"surcharge": nil,
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var (
+				body      map[string]any
+				decodeErr error
+			)
+
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				decodeErr = json.NewDecoder(r.Body).Decode(&body)
+
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{"code":"link-123"}`))
+			}))
+			t.Cleanup(srv.Close)
+
+			_, err := newBankAccountTestClient(t, srv).UpdatePaymentLink(BgCtx(), "account-123", "link-123", tt.update)
+			require.NoError(t, err)
+			require.NoError(t, decodeErr)
+			require.Equal(t, tt.want, body)
+		})
+	}
 }
