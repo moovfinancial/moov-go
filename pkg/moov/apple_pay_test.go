@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
@@ -48,14 +47,9 @@ func TestUpdateApplePayDomain_Patch(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 
-	client, err := moov.NewClient(
-		moov.WithCredentials(moov.Credentials{PublicKey: "pk", SecretKey: "sk"}),
-		moov.WithMoovURLScheme("http"),
-	)
-	require.NoError(t, err)
-	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
+	client := newBankAccountTestClient(t, srv)
 
-	err = client.UpdateApplePayDomain(context.Background(), "account-1", moov.PatchApplyPayDomains{
+	err := client.UpdateApplePayDomain(context.Background(), "account-1", moov.PatchApplyPayDomains{
 		AddDomains:    []string{"pay.classbooker.dev"},
 		RemoveDomains: []string{"checkout.classbooker.dev"},
 	})
