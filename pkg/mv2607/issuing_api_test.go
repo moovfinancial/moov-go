@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -12,20 +11,6 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/moovfinancial/moov-go/pkg/mv2607"
 )
-
-// newIssuingTestClient points a client at srv so tests can assert on the raw request.
-func newIssuingTestClient(t *testing.T, srv *httptest.Server) mv2607.IssuingClient {
-	t.Helper()
-
-	client, err := moov.NewClient(
-		moov.WithCredentials(moov.Credentials{PublicKey: "pk", SecretKey: "sk"}),
-		moov.WithMoovURLScheme("http"),
-	)
-	require.NoError(t, err)
-	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
-
-	return mv2607.NewIssuingClient(client)
-}
 
 func TestListMerchantCategories(t *testing.T) {
 	t.Run("returns categories with their MCCs", func(t *testing.T) {
@@ -50,7 +35,7 @@ func TestListMerchantCategories(t *testing.T) {
 		}))
 		t.Cleanup(srv.Close)
 
-		categories, err := newIssuingTestClient(t, srv).ListMerchantCategories(context.Background())
+		categories, err := mv2607.NewIssuingClient(newProductTestClient(t, srv).Client).ListMerchantCategories(context.Background())
 		require.NoError(t, err)
 
 		require.Equal(t, http.MethodGet, method)
@@ -71,7 +56,7 @@ func TestListMerchantCategories(t *testing.T) {
 		}))
 		t.Cleanup(srv.Close)
 
-		categories, err := newIssuingTestClient(t, srv).ListMerchantCategories(context.Background())
+		categories, err := mv2607.NewIssuingClient(newProductTestClient(t, srv).Client).ListMerchantCategories(context.Background())
 		require.NoError(t, err)
 
 		require.NotNil(t, categories)
