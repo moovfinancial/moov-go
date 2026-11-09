@@ -42,10 +42,10 @@ func TestLinkGooglePayToken(t *testing.T) {
 
 	googlePay := mv2604.NewGooglePayClient(client)
 
-	methods, err := googlePay.LinkGooglePayToken(context.Background(), "account-123", moov.LinkGooglePay{
+	methods, err := googlePay.LinkGooglePayToken(context.Background(), "account-123", mv2604.LinkGooglePay{
 		MerchantAccountID: "merchant-1",
-		PaymentMethodData: moov.GooglePayPaymentMethodData{
-			TokenizationData: moov.GooglePayTokenizationData{Token: "gateway-token"},
+		PaymentMethodData: mv2604.GooglePayPaymentMethodData{
+			TokenizationData: mv2604.GooglePayTokenizationData{Token: "gateway-token"},
 		},
 	})
 	require.NoError(t, err)

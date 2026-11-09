@@ -13,6 +13,7 @@ import (
 
 	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/pkg/mv2604"
 )
 
 func Test_Invoice_CreateUpdateGet(t *testing.T) {
@@ -186,7 +187,7 @@ func TestCreateInvoiceNotificationGeneric(t *testing.T) {
 	require.NoError(t, err)
 	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
 
-	notification := moov.CreateInvoiceNotification{Channels: []moov.NotificationChannel{moov.NotificationChannelEmail}}
+	notification := mv2604.CreateInvoiceNotification{Channels: []mv2604.NotificationChannel{mv2604.NotificationChannelEmail}}
 
 	err = moov.CreateInvoiceNotificationGeneric(context.Background(), client, moov.Version2026_04, "account-123", "invoice-456", notification)
 	require.NoError(t, err)

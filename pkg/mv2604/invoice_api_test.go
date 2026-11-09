@@ -43,8 +43,8 @@ func TestCreateInvoiceNotification(t *testing.T) {
 
 	invoice := mv2604.NewInvoiceClient(client)
 
-	err = invoice.CreateInvoiceNotification(context.Background(), "account-123", "invoice-456", moov.CreateInvoiceNotification{
-		Channels: []moov.NotificationChannel{moov.NotificationChannelEmail},
+	err = invoice.CreateInvoiceNotification(context.Background(), "account-123", "invoice-456", mv2604.CreateInvoiceNotification{
+		Channels: []mv2604.NotificationChannel{mv2604.NotificationChannelEmail},
 	})
 	require.NoError(t, err)
 

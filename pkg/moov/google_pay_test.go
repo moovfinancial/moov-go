@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/pkg/mv2604"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -139,12 +140,12 @@ func TestLinkGooglePayTokenGeneric(t *testing.T) {
 	require.NoError(t, err)
 	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
 
-	link := moov.LinkGooglePay{
+	link := mv2604.LinkGooglePay{
 		MerchantAccountID: "merchant-1",
-		PaymentMethodData: moov.GooglePayPaymentMethodData{
+		PaymentMethodData: mv2604.GooglePayPaymentMethodData{
 			Type:             "CARD",
-			Info:             moov.GooglePayCardInfo{CardNetwork: "VISA", CardDetails: "1234"},
-			TokenizationData: moov.GooglePayTokenizationData{Token: "gateway-token"},
+			Info:             mv2604.GooglePayCardInfo{CardNetwork: "VISA", CardDetails: "1234"},
+			TokenizationData: mv2604.GooglePayTokenizationData{Token: "gateway-token"},
 		},
 	}
 

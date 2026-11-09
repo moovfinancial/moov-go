@@ -154,15 +154,3 @@ type CreateInvoiceLineItemOption struct {
 	PriceModifier *AmountDecimal `json:"priceModifier,omitempty"`
 	Group         *string        `json:"group,omitempty"`
 }
-
-// CreateInvoiceNotification represents the request to notify an invoice's customer
-type CreateInvoiceNotification struct {
-	Channels []NotificationChannel `json:"channels"`
-}
-
-// NotificationChannel is a channel used to notify an invoice's customer
-type NotificationChannel string
-
-const (
-	NotificationChannelEmail NotificationChannel = "email"
-)

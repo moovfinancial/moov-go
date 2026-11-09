@@ -162,7 +162,7 @@ func (c Client) ListInvoicePayments(ctx context.Context, accountID, invoiceID st
 }
 
 // CreateInvoiceNotificationGeneric notifies an invoice's customer over the requested channels.
-func CreateInvoiceNotificationGeneric(ctx context.Context, client *Client, version Version, accountID, invoiceID string, notification CreateInvoiceNotification) error {
+func CreateInvoiceNotificationGeneric[T any](ctx context.Context, client *Client, version Version, accountID, invoiceID string, notification T) error {
 	if client == nil {
 		return fmt.Errorf("client is nil")
 	}

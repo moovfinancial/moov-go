@@ -14,6 +14,18 @@ func NewInvoiceClient(client *moov.Client) InvoiceClient {
 	return InvoiceClient{Client: client}
 }
 
-func (i InvoiceClient) CreateInvoiceNotification(ctx context.Context, accountID, invoiceID string, notification moov.CreateInvoiceNotification) error {
+func (i InvoiceClient) CreateInvoiceNotification(ctx context.Context, accountID, invoiceID string, notification CreateInvoiceNotification) error {
 	return moov.CreateInvoiceNotificationGeneric(ctx, i.Client, moov.Version2026_04, accountID, invoiceID, notification)
 }
+
+// CreateInvoiceNotification represents the request to notify an invoice's customer
+type CreateInvoiceNotification struct {
+	Channels []NotificationChannel `json:"channels"`
+}
+
+// NotificationChannel is a channel used to notify an invoice's customer
+type NotificationChannel string
+
+const (
+	NotificationChannelEmail NotificationChannel = "email"
+)
