@@ -86,6 +86,16 @@ var foreignIDFixtures = []foreignIDFixture{
 		rejected: true,
 	},
 	{
+		name:     "pointer wrapped value with type argument",
+		src:      "package fixture\n\nvar r = request{ForeignID: moov.PtrOf[string](\"fixed-value\")}\n",
+		rejected: true,
+	},
+	{
+		name:     "pointer wrapped literal bound identifier",
+		src:      "package fixture\n\nfunc f() {\n\tid := moov.PtrOf(\"fixed-value\")\n\t_ = request{ForeignID: id}\n}\n",
+		rejected: true,
+	},
+	{
 		name:     "literal bound identifier",
 		src:      "package fixture\n\nfunc f() {\n\tid := \"fixed-value\"\n\t_ = request{ForeignID: id}\n}\n",
 		rejected: true,
@@ -189,7 +199,7 @@ func literalStringBindings(file *ast.File) map[string]string {
 				if i >= len(node.Values) {
 					continue
 				}
-				if value, ok := directString(node.Values[i]); ok {
+				if value, ok := resolveStringLiteral(node.Values[i], bindings); ok {
 					bindings[name.Name] = value
 				}
 			}
@@ -199,7 +209,7 @@ func literalStringBindings(file *ast.File) map[string]string {
 				if !ok || i >= len(node.Rhs) {
 					continue
 				}
-				if value, ok := directString(node.Rhs[i]); ok {
+				if value, ok := resolveStringLiteral(node.Rhs[i], bindings); ok {
 					bindings[ident.Name] = value
 				}
 			}
@@ -230,14 +240,6 @@ func resolveStringLiteral(expr ast.Expr, bindings map[string]string) (string, bo
 	return "", false
 }
 
-func directString(expr ast.Expr) (string, bool) {
-	lit, ok := expr.(*ast.BasicLit)
-	if !ok || lit.Kind != token.STRING {
-		return "", false
-	}
-	return stringValue(lit)
-}
-
 func stringValue(lit *ast.BasicLit) (string, bool) {
 	value, err := strconv.Unquote(lit.Value)
 	if err != nil {
@@ -250,7 +252,11 @@ func wrapperArg(call *ast.CallExpr) ast.Expr {
 	if len(call.Args) != 1 {
 		return nil
 	}
-	switch fun := call.Fun.(type) {
+	fun := call.Fun
+	if index, ok := fun.(*ast.IndexExpr); ok {
+		fun = index.X
+	}
+	switch fun := fun.(type) {
 	case *ast.Ident:
 		if fun.Name == "PtrOf" || fun.Name == "Set" {
 			return call.Args[0]

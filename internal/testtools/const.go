@@ -1,6 +1,9 @@
 package testtools
 
-import "os"
+import (
+	"cmp"
+	"os"
+)
 
 const (
 	defaultPartnerID          = "5352b013-ae58-4a63-8a3f-97f316a917cf"
@@ -13,16 +16,9 @@ const (
 // The seeded sandbox resources. Each identifier accepts an optional MOOV_
 // environment override; an absent or empty value keeps the default.
 var (
-	PARTNER_ID            = seededID("MOOV_PARTNER_ID", defaultPartnerID)
-	PARTNER_WALLET_PM_ID  = seededID("MOOV_PARTNER_WALLET_PM_ID", defaultPartnerWalletPMID)
-	MERCHANT_ID           = seededID("MOOV_MERCHANT_ID", defaultMerchantID)
-	MERCHANT_WALLET_PM_ID = seededID("MOOV_MERCHANT_WALLET_PM_ID", defaultMerchantWalletPMID)
-	MERCHANT_WALLET_ID    = seededID("MOOV_MERCHANT_WALLET_ID", defaultMerchantWalletID)
+	PARTNER_ID            = cmp.Or(os.Getenv("MOOV_PARTNER_ID"), defaultPartnerID)
+	PARTNER_WALLET_PM_ID  = cmp.Or(os.Getenv("MOOV_PARTNER_WALLET_PM_ID"), defaultPartnerWalletPMID)
+	MERCHANT_ID           = cmp.Or(os.Getenv("MOOV_MERCHANT_ID"), defaultMerchantID)
+	MERCHANT_WALLET_PM_ID = cmp.Or(os.Getenv("MOOV_MERCHANT_WALLET_PM_ID"), defaultMerchantWalletPMID)
+	MERCHANT_WALLET_ID    = cmp.Or(os.Getenv("MOOV_MERCHANT_WALLET_ID"), defaultMerchantWalletID)
 )
-
-func seededID(envKey, fallback string) string {
-	if v := os.Getenv(envKey); v != "" {
-		return v
-	}
-	return fallback
-}
