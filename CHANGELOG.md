@@ -2,6 +2,12 @@
 
 Please refer to the [Github Releases](https://github.com/moovfinancial/moov-go/releases) page for moov-go for future updates.
 
+ADDITIONS
+
+- accounts: add `ListAdjustments` and `GetAdjustment` client methods; `ListAdjustments` accepts an optional `walletID` filter
+- accounts: add `GetAccountCountries` and `AssignAccountCountries` client methods; `AssignAccountCountries` replaces the account's country list
+- accounts: add `GetMerchantProcessingAgreement` client method that returns the merchant processing agreement as PDF bytes
+
 ## v0.16.0 (Released 2025-05-28)
 
 ADDITIONS
