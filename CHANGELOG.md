@@ -2,6 +2,11 @@
 
 Please refer to the [Github Releases](https://github.com/moovfinancial/moov-go/releases) page for moov-go for future updates.
 
+ADDITIONS
+
+- google pay: add `mv2604.GooglePayClient.LinkGooglePayToken` to link a Google Pay token
+- invoices: add `mv2604.InvoiceClient.CreateInvoiceNotification` to notify an invoice's customer
+
 ## v0.16.0 (Released 2025-05-28)
 
 ADDITIONS

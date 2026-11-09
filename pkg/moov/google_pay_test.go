@@ -2,7 +2,12 @@ package moov_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -104,4 +109,74 @@ func TestGooglePayTransferMarshal(t *testing.T) {
 	assert.Nil(t, xfr.Destination.GooglePay)
 	require.NotNil(t, xfr.Destination.Wallet)
 	assert.Equal(t, "wallet-123", xfr.Destination.Wallet.WalletID)
+}
+
+func TestLinkGooglePayTokenGeneric(t *testing.T) {
+	var (
+		method  string
+		path    string
+		version string
+		body    []byte
+	)
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		b, err := io.ReadAll(r.Body)
+		require.NoError(t, err)
+		method = r.Method
+		path = r.URL.Path
+		version = r.Header.Get(moov.VersionHeader)
+		body = b
+
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`[{"paymentMethodID":"pm-1","paymentMethodType":"google-pay","googlePay":{"tokenID":"tok-1","brand":"Visa"}}]`))
+	}))
+	t.Cleanup(srv.Close)
+
+	client, err := moov.NewClient(
+		moov.WithCredentials(moov.Credentials{PublicKey: "pk", SecretKey: "sk"}),
+		moov.WithMoovURLScheme("http"),
+	)
+	require.NoError(t, err)
+	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
+
+	link := moov.LinkGooglePay{
+		MerchantAccountID: "merchant-1",
+		PaymentMethodData: moov.GooglePayPaymentMethodData{
+			Type:             "CARD",
+			Info:             moov.GooglePayCardInfo{CardNetwork: "VISA", CardDetails: "1234"},
+			TokenizationData: moov.GooglePayTokenizationData{Token: "gateway-token"},
+		},
+	}
+
+	methods, err := moov.LinkGooglePayTokenGeneric(context.Background(), client, moov.Version2026_04, "account-123", link)
+	require.NoError(t, err)
+
+	require.Equal(t, http.MethodPost, method)
+	require.Equal(t, "/accounts/account-123/google-pay/tokens", path)
+	require.Equal(t, moov.Version2026_04.String(), version)
+	require.JSONEq(t, `{"merchantAccountID":"merchant-1","paymentMethodData":{"type":"CARD","info":{"cardNetwork":"VISA","cardDetails":"1234"},"tokenizationData":{"token":"gateway-token"}}}`, string(body))
+
+	require.Len(t, methods, 1)
+	require.Equal(t, "pm-1", methods[0].PaymentMethodID)
+	require.Equal(t, moov.PaymentMethodType_GooglePay, methods[0].PaymentMethodType)
+	require.NotNil(t, methods[0].GooglePay)
+	require.Equal(t, "tok-1", methods[0].GooglePay.TokenID)
+
+	t.Run("rejected token preserves the API error", func(t *testing.T) {
+		rejected := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(`{"error":"token rejected"}`))
+		}))
+		t.Cleanup(rejected.Close)
+
+		client.Credentials.Host = strings.TrimPrefix(rejected.URL, "http://")
+
+		_, err := moov.LinkGooglePayTokenGeneric(context.Background(), client, moov.Version2026_04, "account-123", link)
+		require.Error(t, err)
+
+		httpErr := moov.ErrorAsHttpCallResponse(err)
+		require.NotNil(t, httpErr)
+		require.Equal(t, moov.StatusBadRequest, httpErr.Status())
+	})
 }
