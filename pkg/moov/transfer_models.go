@@ -198,6 +198,14 @@ type Transfer struct {
 	LineItems *TransferLineItems `json:"lineItems,omitempty"`
 }
 
+// BatchGetTransfersRequest asks for transfers by their IDs.
+type BatchGetTransfersRequest struct {
+	TransferIDs []string `json:"transferIDs"`
+}
+
+// BatchGetTransfersResponse maps each requested transfer ID to its transfer.
+type BatchGetTransfersResponse map[string]Transfer
+
 // Fees charged to accounts involved in the transfer.
 type MoovFee struct {
 	// ID of the account that fees were charged to.
