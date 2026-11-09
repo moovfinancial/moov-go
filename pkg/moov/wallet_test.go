@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
@@ -34,7 +35,7 @@ func TestWalletMarshal(t *testing.T) {
 func TestListWallet(t *testing.T) {
 	mc := NewTestClient(t)
 
-	wallets, err := mc.ListWallets(context.Background(), "ebbf46c6-122a-4367-bc45-7dd555e1d3b9")
+	wallets, err := mc.ListWallets(context.Background(), testtools.MERCHANT_ID)
 	NoResponseError(t, err)
 	require.NotNil(t, wallets)
 
@@ -46,8 +47,8 @@ func TestListWallet(t *testing.T) {
 func TestGetWallet(t *testing.T) {
 	mc := NewTestClient(t)
 
-	accountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
-	walletID := "4dbac313-d505-4d51-a0fe-c11787916fcf"
+	accountID := testtools.MERCHANT_ID
+	walletID := testtools.MERCHANT_WALLET_ID
 
 	wallet, err := mc.GetWallet(context.Background(), accountID, walletID)
 	NoResponseError(t, err)
@@ -59,8 +60,8 @@ func TestGetWallet(t *testing.T) {
 func TestListWalletTransactions(t *testing.T) {
 	mc := NewTestClient(t)
 
-	accountID := "ebbf46c6-122a-4367-bc45-7dd555e1d3b9"
-	walletID := "4dbac313-d505-4d51-a0fe-c11787916fcf"
+	accountID := testtools.MERCHANT_ID
+	walletID := testtools.MERCHANT_WALLET_ID
 
 	transactions, err := mc.ListWalletTransactions(context.Background(), accountID, walletID)
 	NoResponseError(t, err)

@@ -7,6 +7,24 @@ export MOOV_PUBLIC_KEY="public key here"
 export MOOV_SECRET_KEY="secret key here"
 ```
 
+The live tests run against a shared sandbox account. The suite uses the seeded
+account and wallet identifiers in `internal/testtools` by default. You can point
+the suite at a different sandbox account with these optional environment
+variables. Leave a variable unset or empty to use the default.
+
+```bash
+export MOOV_PARTNER_ID="..."
+export MOOV_PARTNER_WALLET_PM_ID="..."
+export MOOV_MERCHANT_ID="..."
+export MOOV_MERCHANT_WALLET_PM_ID="..."
+export MOOV_MERCHANT_WALLET_ID="..."
+```
+
+Each live run creates its own foreign identifiers. Concurrent runs on the same
+account do not collide.
+
+The ACH examples that use Plaid also need `PLAID_CLIENT_ID` and `PLAID_SECRET`.
+
 
 ## ACH
 - [Debit a Bank Account with micro deposits](./ach/debit_bank_account/micro_deposits_test.go)

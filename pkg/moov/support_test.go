@@ -3,6 +3,7 @@ package moov_test
 import (
 	"testing"
 
+	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/stretchr/testify/require"
 )
@@ -15,13 +16,14 @@ func Test_Tickets(t *testing.T) {
 	var (
 		ticket1 *moov.Ticket = nil
 		ticket2 *moov.Ticket = nil
+
+		ticketForeignID = testtools.RandomForeignID()
 	)
 
 	const (
-		ticketTitle     = "moov-go SDK Test Ticket"
-		ticketBody      = "Testing the moov-go SDK ticket creation"
-		ticketAuthor    = "Override Author"
-		ticketForeignID = "ticket-foreign-id"
+		ticketTitle  = "moov-go SDK Test Ticket"
+		ticketBody   = "Testing the moov-go SDK ticket creation"
+		ticketAuthor = "Override Author"
 	)
 
 	t.Run("create ticket", func(t *testing.T) {
