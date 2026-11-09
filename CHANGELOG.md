@@ -3,6 +3,7 @@
 ADDITIONS
 
 - transfers: add `FetchTransfers` to retrieve multiple transfers by ID in one request
+- transfers: add `BatchGetTransfersRequest` with `transferIDs` and `BatchGetTransfersResponse`, a map of transfer ID to `Transfer`
 
 Please refer to the [Github Releases](https://github.com/moovfinancial/moov-go/releases) page for moov-go for future updates.
 

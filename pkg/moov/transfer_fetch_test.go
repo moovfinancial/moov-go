@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -69,12 +68,7 @@ func TestFetchTransfers(t *testing.T) {
 			}))
 			t.Cleanup(srv.Close)
 
-			client, err := moov.NewClient(
-				moov.WithCredentials(moov.Credentials{PublicKey: "pk", SecretKey: "sk"}),
-				moov.WithMoovURLScheme("http"),
-			)
-			require.NoError(t, err)
-			client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
+			client := newFilesTestClient(t, srv)
 
 			request := moov.BatchGetTransfersRequest{TransferIDs: []string{"transfer-1", "transfer-2"}}
 			got, err := client.FetchTransfers(context.Background(), "account-1", request)
