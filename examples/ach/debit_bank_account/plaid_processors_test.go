@@ -19,6 +19,11 @@ import (
 
 // Sets up an account with linked bank account to be debited via ACH
 func TestPlaidProcessorExample(t *testing.T) {
+	if strings.TrimSpace(os.Getenv("PLAID_PROCESSOR_TOKEN")) == "" &&
+		(os.Getenv("PLAID_CLIENT_ID") == "" || os.Getenv("PLAID_SECRET") == "") {
+		t.Skip("PLAID_PROCESSOR_TOKEN or PLAID_CLIENT_ID/PLAID_SECRET not set; skipping Plaid example")
+	}
+
 	// Step 1: create Moov client and set some variables
 
 	// The following code shows how you can configure the moov client with
