@@ -81,6 +81,11 @@ var foreignIDFixtures = []foreignIDFixture{
 		rejected: true,
 	},
 	{
+		name:     "foreign ID field assignment",
+		src:      "package fixture\n\ntype request struct { ForeignID string }; func f() { var r request; r.ForeignID = \"fixed-value\"; _ = r }\n",
+		rejected: true,
+	},
+	{
 		name:     "pointer wrapped value",
 		src:      "package fixture\n\nvar r = request{ForeignID: moov.PtrOf(\"fixed-value\")}\n",
 		rejected: true,
@@ -108,6 +113,11 @@ var foreignIDFixtures = []foreignIDFixture{
 	{
 		name:     "computed identifier",
 		src:      "package fixture\n\nfunc f() {\n\tforeignID := newID()\n\t_ = request{ForeignID: foreignID}\n}\n",
+		rejected: false,
+	},
+	{
+		name:     "computed identifier with unrelated local binding",
+		src:      "package fixture\n\nimport \"github.com/moovfinancial/moov-go/internal/testtools\"\n\ntype request struct { ForeignID string }; func f() { id := testtools.RandomForeignID(); _ = request{ForeignID: id} }; func g() { id := \"plain text\"; _ = id }\n",
 		rejected: false,
 	},
 	{
@@ -155,12 +165,22 @@ func fixedForeignIDs(filename string, src []byte) []string {
 			}
 		case *ast.AssignStmt:
 			for i, lhs := range node.Lhs {
-				ident, ok := lhs.(*ast.Ident)
-				if !ok || i >= len(node.Rhs) || !foreignIDName.MatchString(ident.Name) {
+				var name string
+				switch target := lhs.(type) {
+				case *ast.Ident:
+					if foreignIDName.MatchString(target.Name) {
+						name = target.Name
+					}
+				case *ast.SelectorExpr:
+					if isForeignIDField(target.Sel.Name) {
+						name = target.Sel.Name
+					}
+				}
+				if name == "" || i >= len(node.Rhs) {
 					continue
 				}
 				if value, ok := resolveStringLiteral(node.Rhs[i], bindings); ok {
-					findings = append(findings, ident.Name+" = "+value)
+					findings = append(findings, name+" = "+value)
 				}
 			}
 		case *ast.CompositeLit:
@@ -190,27 +210,27 @@ func fixedForeignIDs(filename string, src []byte) []string {
 	return findings
 }
 
-func literalStringBindings(file *ast.File) map[string]string {
-	bindings := make(map[string]string)
+func literalStringBindings(file *ast.File) map[token.Pos]string {
+	bindings := make(map[token.Pos]string)
 	ast.Inspect(file, func(n ast.Node) bool {
 		switch node := n.(type) {
 		case *ast.ValueSpec:
 			for i, name := range node.Names {
-				if i >= len(node.Values) {
+				if name.Obj == nil || i >= len(node.Values) {
 					continue
 				}
 				if value, ok := resolveStringLiteral(node.Values[i], bindings); ok {
-					bindings[name.Name] = value
+					bindings[name.Obj.Pos()] = value
 				}
 			}
 		case *ast.AssignStmt:
 			for i, lhs := range node.Lhs {
 				ident, ok := lhs.(*ast.Ident)
-				if !ok || i >= len(node.Rhs) {
+				if !ok || ident.Obj == nil || i >= len(node.Rhs) {
 					continue
 				}
 				if value, ok := resolveStringLiteral(node.Rhs[i], bindings); ok {
-					bindings[ident.Name] = value
+					bindings[ident.Obj.Pos()] = value
 				}
 			}
 		}
@@ -219,13 +239,15 @@ func literalStringBindings(file *ast.File) map[string]string {
 	return bindings
 }
 
-func resolveStringLiteral(expr ast.Expr, bindings map[string]string) (string, bool) {
+func resolveStringLiteral(expr ast.Expr, bindings map[token.Pos]string) (string, bool) {
 	switch e := expr.(type) {
 	case *ast.BasicLit:
 		return stringValue(e)
 	case *ast.Ident:
-		value, ok := bindings[e.Name]
-		return value, ok
+		if e.Obj != nil {
+			value, ok := bindings[e.Obj.Pos()]
+			return value, ok
+		}
 	case *ast.ParenExpr:
 		return resolveStringLiteral(e.X, bindings)
 	case *ast.UnaryExpr:
