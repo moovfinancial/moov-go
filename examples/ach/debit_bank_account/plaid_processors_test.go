@@ -138,7 +138,6 @@ type plaidLinkTokenRequest struct {
 	CountryCodes []string `json:"country_codes"`
 	Language     string   `json:"language"`
 	Webhook      string   `json:"webhook"`
-	RedirectURI  string   `json:"redirect_uri"`
 }
 
 type plaidLinkTokenResponse struct {
@@ -156,7 +155,6 @@ func createLinkToken(t testing.TB) string {
 		CountryCodes: []string{"US"},
 		Language:     "en",
 		Webhook:      "https://plaid-processor-test.moov.io",
-		RedirectURI:  "https://local.moov.io",
 	}
 	linkToken.User.ClientUserID = "4c7ab47a-487a-4c91-92a7-7fda891b2bb0"
 
