@@ -4,7 +4,8 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
-	"sync/atomic"
+
+	"github.com/google/uuid"
 )
 
 func RandomBankAccountNumber() string {
@@ -12,11 +13,6 @@ func RandomBankAccountNumber() string {
 	return fmt.Sprintf("%d", 100000000+n.Int64())
 }
 
-var (
-	foreignIDPrefix = rand.Text()
-	foreignIDSeq    atomic.Uint64
-)
-
 func RandomForeignID() string {
-	return fmt.Sprintf("%s-%d", foreignIDPrefix, foreignIDSeq.Add(1))
+	return uuid.NewString()
 }
