@@ -121,12 +121,10 @@ func TestLinkGooglePayTokenGeneric(t *testing.T) {
 	)
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		b, err := io.ReadAll(r.Body)
-		require.NoError(t, err)
+		body, _ = io.ReadAll(r.Body)
 		method = r.Method
 		path = r.URL.Path
 		version = r.Header.Get(moov.VersionHeader)
-		body = b
 
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`[{"paymentMethodID":"pm-1","paymentMethodType":"google-pay","googlePay":{"tokenID":"tok-1","brand":"Visa"}}]`))
@@ -159,8 +157,7 @@ func TestLinkGooglePayTokenGeneric(t *testing.T) {
 
 	require.Len(t, methods, 1)
 	require.Equal(t, "pm-1", methods[0].PaymentMethodID)
-	require.Equal(t, moov.PaymentMethodType_GooglePay, methods[0].PaymentMethodType)
-	require.NotNil(t, methods[0].GooglePay)
+	require.Equal(t, "google-pay", methods[0].PaymentMethodType)
 	require.Equal(t, "tok-1", methods[0].GooglePay.TokenID)
 
 	t.Run("rejected token preserves the API error", func(t *testing.T) {

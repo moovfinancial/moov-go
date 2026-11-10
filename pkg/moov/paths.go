@@ -69,7 +69,7 @@ const (
 	pathApplePaySessions = "/accounts/%s/apple-pay/sessions"
 	pathApplePayTokens   = "/accounts/%s/apple-pay/tokens" // #nosec G101
 
-	pathGooglePayTokens = "/accounts/%s/google-pay/tokens" // #nosec G101 - false positive, this is a URL path not a credential
+	pathGooglePayTokens = "/accounts/%s/google-pay/tokens" // #nosec G101
 
 	pathInstitutions = "/institutions"
 

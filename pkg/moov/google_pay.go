@@ -6,8 +6,15 @@ import (
 	"net/http"
 )
 
+// LinkedGooglePayPaymentMethod is a Google Pay payment method linked to a Moov account.
+type LinkedGooglePayPaymentMethod struct {
+	PaymentMethodID   string                 `json:"paymentMethodID"`
+	PaymentMethodType string                 `json:"paymentMethodType"`
+	GooglePay         GooglePayPaymentMethod `json:"googlePay"`
+}
+
 // LinkGooglePayTokenGeneric links a Google Pay token for the accountID.
-func LinkGooglePayTokenGeneric[T any](ctx context.Context, client *Client, version Version, accountID string, link T) ([]PaymentMethod, error) {
+func LinkGooglePayTokenGeneric[T any](ctx context.Context, client *Client, version Version, accountID string, link T) ([]LinkedGooglePayPaymentMethod, error) {
 	if client == nil {
 		return nil, fmt.Errorf("client is nil")
 	}
@@ -26,5 +33,5 @@ func LinkGooglePayTokenGeneric[T any](ctx context.Context, client *Client, versi
 		return nil, fmt.Errorf("linking google pay token: %w", err)
 	}
 
-	return CompletedListOrError[PaymentMethod](resp)
+	return CompletedListOrError[LinkedGooglePayPaymentMethod](resp)
 }
