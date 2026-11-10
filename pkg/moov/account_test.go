@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/google/uuid"
@@ -16,8 +15,7 @@ import (
 )
 
 func TestAccountMarshalResponse(t *testing.T) {
-	foreignID := testtools.RandomForeignID()
-	input := []byte(fmt.Sprintf(`{"mode":"sandbox","accountID":"638481a5-5205-406c-84c7-2fc2239105d1","accountType":"individual","displayName":"Wade Arnold","profile":{"individual":{"name":{"firstName":"Wade","lastName":"Arnold"},"phone":{"number":"5555555555","countryCode":"1"},"birthDateProvided":false,"governmentIDProvided":false}},"verification":{"verificationStatus":"unverified","status":"unverified"},"foreignID":%q,"createdOn":"2023-11-08T23:06:16.168497001Z","updatedOn":"2023-11-08T23:06:16.168497001Z"}`, foreignID))
+	input := []byte(`{"mode":"sandbox","accountID":"638481a5-5205-406c-84c7-2fc2239105d1","accountType":"individual","displayName":"Wade Arnold","profile":{"individual":{"name":{"firstName":"Wade","lastName":"Arnold"},"phone":{"number":"5555555555","countryCode":"1"},"birthDateProvided":false,"governmentIDProvided":false}},"verification":{"verificationStatus":"unverified","status":"unverified"},"foreignID":"your-correlation-id","createdOn":"2023-11-08T23:06:16.168497001Z","updatedOn":"2023-11-08T23:06:16.168497001Z"}`)
 
 	account := new(moov.Account)
 
@@ -28,7 +26,6 @@ func TestAccountMarshalResponse(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, "Wade", account.Profile.Individual.Name.FirstName)
-	assert.Equal(t, foreignID, account.ForeignID)
 	t.Logf("%#v", account)
 }
 

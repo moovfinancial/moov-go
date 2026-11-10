@@ -17,7 +17,6 @@ var (
 	foreignIDSeq    atomic.Uint64
 )
 
-// RandomForeignID returns an identifier that is unique for this test process.
 func RandomForeignID() string {
 	return fmt.Sprintf("%s-%d", foreignIDPrefix, foreignIDSeq.Add(1))
 }
