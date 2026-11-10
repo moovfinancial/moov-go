@@ -12,14 +12,6 @@ export MOOV_SECRET_KEY="secret key here"
 - `MOOV_HOST` — API host. The default is `api.moov.io`.
 - `PLAID_CLIENT_ID` and `PLAID_SECRET` — only for the Plaid examples.
 
-The live tests use a shared sandbox account. These optional variables select the seeded resources. An absent or empty value uses the default:
-
-- `MOOV_PARTNER_ID`
-- `MOOV_PARTNER_WALLET_PM_ID`
-- `MOOV_MERCHANT_ID`
-- `MOOV_MERCHANT_WALLET_PM_ID`
-- `MOOV_MERCHANT_WALLET_ID`
-
 The live tests generate a random foreign ID for each process. CI and a local run can therefore share the seeded account without identifier collisions.
 
 
