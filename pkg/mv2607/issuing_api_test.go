@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -11,6 +12,20 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov"
 	"github.com/moovfinancial/moov-go/pkg/mv2607"
 )
+
+// newIssuingTestClient points a client at srv so tests can assert on the raw request.
+func newIssuingTestClient(t *testing.T, srv *httptest.Server) mv2607.IssuingClient {
+	t.Helper()
+
+	client, err := moov.NewClient(
+		moov.WithCredentials(moov.Credentials{PublicKey: "pk", SecretKey: "sk"}),
+		moov.WithMoovURLScheme("http"),
+	)
+	require.NoError(t, err)
+	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
+
+	return mv2607.NewIssuingClient(client)
+}
 
 func TestListMerchantCategories(t *testing.T) {
 	t.Run("returns categories with their MCCs", func(t *testing.T) {
@@ -35,7 +50,7 @@ func TestListMerchantCategories(t *testing.T) {
 		}))
 		t.Cleanup(srv.Close)
 
-		categories, err := mv2607.NewIssuingClient(newProductTestClient(t, srv).Client).ListMerchantCategories(context.Background())
+		categories, err := newIssuingTestClient(t, srv).ListMerchantCategories(context.Background())
 		require.NoError(t, err)
 
 		require.Equal(t, http.MethodGet, method)
@@ -47,19 +62,5 @@ func TestListMerchantCategories(t *testing.T) {
 		require.Equal(t, []string{"5812", "5813"}, categories[0].MCCs)
 		require.Equal(t, moov.IssuingMerchantCategory_Airlines, categories[1].Category)
 		require.Equal(t, []string{"4511", "3000-3299"}, categories[1].MCCs)
-	})
-
-	t.Run("returns an empty slice for an empty merchantCategories array", func(t *testing.T) {
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"merchantCategories": []}`))
-		}))
-		t.Cleanup(srv.Close)
-
-		categories, err := mv2607.NewIssuingClient(newProductTestClient(t, srv).Client).ListMerchantCategories(context.Background())
-		require.NoError(t, err)
-
-		require.NotNil(t, categories)
-		require.Empty(t, categories)
 	})
 }

@@ -232,8 +232,7 @@ func SimulateIssuedCardReversalGeneric[TStarted any](ctx context.Context, client
 		MoovVersion(version), AcceptJson())
 }
 
-// ListIssuingMerchantCategoriesGeneric lists issuing merchant categories for a specific API
-// version. TCategories is the version's wrapper type holding the merchantCategories envelope.
+// ListIssuingMerchantCategoriesGeneric lists issuing merchant categories for a specific API version.
 func ListIssuingMerchantCategoriesGeneric[TCategories any](ctx context.Context, client *Client, version Version) (*TCategories, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
