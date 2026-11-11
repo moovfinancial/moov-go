@@ -177,6 +177,39 @@ func Test_Transfers(t *testing.T) {
 	})
 }
 
+func Test_FetchTransfers(t *testing.T) {
+	mc := NewTestClient(t)
+
+	account := getLincolnBank(t, mc)
+	source, dest := lincolnAchDebitToPartnerWallet(t, mc, account.AccountID)
+
+	var transferIDs []string
+	for range 2 {
+		completed, _, err := mc.CreateTransfer(BgCtx(), FACILITATOR_ID, moov.CreateTransfer{
+			Source: moov.CreateTransfer_Source{
+				PaymentMethodID: source,
+			},
+			Destination: moov.CreateTransfer_Destination{
+				PaymentMethodID: dest,
+			},
+			Amount: moov.Amount{
+				Currency: "usd",
+				Value:    1,
+			},
+		}).WaitForRailResponse()
+		NoResponseError(t, err)
+		require.NotNil(t, completed)
+		transferIDs = append(transferIDs, completed.TransferID)
+	}
+
+	fetched, err := mc.FetchTransfers(BgCtx(), FACILITATOR_ID, moov.FetchTransfersRequest{TransferIDs: transferIDs})
+	NoResponseError(t, err)
+	require.Len(t, fetched, len(transferIDs))
+	for _, transferID := range transferIDs {
+		require.Contains(t, fetched, transferID)
+	}
+}
+
 func Test_Cancellations(t *testing.T) {
 	mc := NewTestClient(t)
 	account := getLincolnBank(t, mc)
