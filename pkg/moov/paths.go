@@ -132,6 +132,13 @@ const (
 	pathStatements = "/accounts/%s/statements"
 	pathStatement  = "/accounts/%s/statements/%s"
 
+	pathAdjustments = "/accounts/%s/adjustments"
+	pathAdjustment  = "/accounts/%s/adjustments/%s"
+
+	pathAccountCountries = "/accounts/%s/countries"
+
+	pathMerchantAgreement = "/accounts/%s/merchant-agreement"
+
 	pathInvoices        = "/accounts/%s/invoices"
 	pathInvoice         = "/accounts/%s/invoices/%s"
 	pathInvoicePayments = "/accounts/%s/invoices/%s/payments"
