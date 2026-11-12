@@ -79,6 +79,12 @@ Add version-specific types and methods in `pkg/mvYYMM`, not by changing shared `
 
 Exported `pkg/moov` changes are a public SDK contract. A renamed field or a removed method is a breaking change. Mark the PR title with `!`.
 
+## Conventions
+
+1. Do not edit `CHANGELOG.md`. Release notes go in [GitHub Releases](https://github.com/moovfinancial/moov-go/releases). The link under `## Future Releases` in `CHANGELOG.md` is the current pointer.
+2. Name new files and client types after the existing domain files for the same API area in `pkg/moov` and the other `pkg/mvYYMM` packages. Check the existing names before you create a file or type. For example, card issuing uses `card_issuing_api.go`, `card_issuing_models.go`, and `CardIssuingClient` (see `pkg/mv2610`).
+3. A wrapper or generic function returns the response object that the API spec defines. A wrapped body such as `{"merchantCategories": [...]}` is a struct with that field, not a bare slice. For example, `Client.ListIndustries` returns `*Industries`, whose `Industries` field serializes as `industries`.
+
 ## Styleguide
 
 See [.agents/styleguide.md](.agents/styleguide.md) for the PR title format (Conventional Commits variant) and Go conventions. Gemini Code Assist only reads `.gemini/styleguide.md`, so that path is a symlink to the single `.agents/styleguide.md` source — edit the `.agents/styleguide.md` file, never a separate copy.
