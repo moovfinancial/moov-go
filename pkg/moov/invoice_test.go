@@ -1,6 +1,10 @@
 package moov_test
 
 import (
+	"context"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
@@ -9,6 +13,7 @@ import (
 
 	"github.com/moovfinancial/moov-go/internal/testtools"
 	"github.com/moovfinancial/moov-go/pkg/moov"
+	"github.com/moovfinancial/moov-go/pkg/mv2604"
 )
 
 func Test_Invoice_CreateUpdateGet(t *testing.T) {
@@ -153,4 +158,60 @@ func Test_Invoice_Delete(t *testing.T) {
 	fetchedInvoice, err := mc.GetInvoice(ctx, accountID, createdInvoice.InvoiceID)
 	require.NoError(t, err)
 	require.NotNil(t, fetchedInvoice.DisabledOn)
+}
+
+func TestCreateInvoiceNotificationGeneric(t *testing.T) {
+	var (
+		method  string
+		path    string
+		version string
+		body    []byte
+	)
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		b, err := io.ReadAll(r.Body)
+		require.NoError(t, err)
+		method = r.Method
+		path = r.URL.Path
+		version = r.Header.Get(moov.VersionHeader)
+		body = b
+
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	t.Cleanup(srv.Close)
+
+	client, err := moov.NewClient(
+		moov.WithCredentials(moov.Credentials{PublicKey: "pk", SecretKey: "sk"}),
+		moov.WithMoovURLScheme("http"),
+	)
+	require.NoError(t, err)
+	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
+
+	notification := mv2604.CreateInvoiceNotification{Channels: []mv2604.NotificationChannel{mv2604.NotificationChannelEmail}}
+
+	err = moov.CreateInvoiceNotificationGeneric(context.Background(), client, moov.Version2026_04, "account-123", "invoice-456", notification)
+	require.NoError(t, err)
+
+	require.Equal(t, http.MethodPost, method)
+	require.Equal(t, "/accounts/account-123/invoices/invoice-456/notifications", path)
+	require.Equal(t, moov.Version2026_04.String(), version)
+	require.JSONEq(t, `{"channels":["email"]}`, string(body))
+
+	t.Run("conflict and rate limit preserve the API error", func(t *testing.T) {
+		for _, status := range []int{http.StatusConflict, http.StatusTooManyRequests} {
+			errSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(status)
+			}))
+			t.Cleanup(errSrv.Close)
+
+			client.Credentials.Host = strings.TrimPrefix(errSrv.URL, "http://")
+
+			err := moov.CreateInvoiceNotificationGeneric(context.Background(), client, moov.Version2026_04, "account-123", "invoice-456", notification)
+			require.Error(t, err)
+
+			httpErr := moov.ErrorAsHttpCallResponse(err)
+			require.NotNil(t, httpErr)
+			require.Equal(t, status, httpErr.StatusCode())
+		}
+	})
 }

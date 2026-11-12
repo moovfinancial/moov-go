@@ -160,3 +160,29 @@ func (c Client) ListInvoicePayments(ctx context.Context, accountID, invoiceID st
 
 	return CompletedListOrError[InvoicePayment](resp)
 }
+
+// CreateInvoiceNotificationGeneric notifies an invoice's customer over the requested channels.
+func CreateInvoiceNotificationGeneric[T any](ctx context.Context, client *Client, version Version, accountID, invoiceID string, notification T) error {
+	if client == nil {
+		return fmt.Errorf("client is nil")
+	}
+	if accountID == "" {
+		return fmt.Errorf("accountID is required")
+	}
+	if invoiceID == "" {
+		return fmt.Errorf("invoiceID is required")
+	}
+
+	resp, err := client.CallHttp(
+		ctx,
+		Endpoint(http.MethodPost, pathInvoiceNotifications, accountID, invoiceID),
+		MoovVersion(version),
+		AcceptJson(),
+		JsonBody(notification),
+	)
+	if err != nil {
+		return fmt.Errorf("creating invoice notification: %w", err)
+	}
+
+	return CompletedNilOrError(resp)
+}

@@ -69,6 +69,8 @@ const (
 	pathApplePaySessions = "/accounts/%s/apple-pay/sessions"
 	pathApplePayTokens   = "/accounts/%s/apple-pay/tokens" // #nosec G101
 
+	pathGooglePayTokens = "/accounts/%s/google-pay/tokens" // #nosec G101
+
 	pathInstitutions = "/institutions"
 
 	pathTransferOptions = "/accounts/%s/transfer-options"
@@ -132,9 +134,10 @@ const (
 	pathStatements = "/accounts/%s/statements"
 	pathStatement  = "/accounts/%s/statements/%s"
 
-	pathInvoices        = "/accounts/%s/invoices"
-	pathInvoice         = "/accounts/%s/invoices/%s"
-	pathInvoicePayments = "/accounts/%s/invoices/%s/payments"
+	pathInvoices             = "/accounts/%s/invoices"
+	pathInvoice              = "/accounts/%s/invoices/%s"
+	pathInvoicePayments      = "/accounts/%s/invoices/%s/payments"
+	pathInvoiceNotifications = "/accounts/%s/invoices/%s/notifications"
 
 	pathIssuedCards                = "/issuing/%s/cards"
 	pathIssuedCard                 = "/issuing/%s/cards/%s"

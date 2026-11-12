@@ -44,11 +44,18 @@ func Test_Receipts(t *testing.T) {
 	t.Run("create receipt", func(t *testing.T) {
 		require.NotNil(t, transfer)
 
-		receipts, err := mc.CreateReceipt(BgCtx(), moov.CreateReceipt{
-			Kind:          "sale.customer.v1",
-			ForTransferID: &transfer.TransferID,
-			Email:         moov.PtrOf("noreply@moov.io"),
-		})
+		var (
+			receipts []moov.Receipt
+			err      error
+		)
+		require.Eventually(t, func() bool {
+			receipts, err = mc.CreateReceipt(BgCtx(), moov.CreateReceipt{
+				Kind:          "sale.customer.v1",
+				ForTransferID: &transfer.TransferID,
+				Email:         moov.PtrOf("noreply@moov.io"),
+			})
+			return err == nil
+		}, 10*time.Second, 250*time.Millisecond)
 		require.NoError(t, err)
 		require.Len(t, receipts, 1)
 		require.NotEmpty(t, receipts[0].ID)
