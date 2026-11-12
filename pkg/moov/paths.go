@@ -74,8 +74,9 @@ const (
 	pathTransferOptions = "/accounts/%s/transfer-options"
 	pathTransferConfig  = "/accounts/%s/transfer-config"
 
-	pathTransfers = "/accounts/%s/transfers"
-	pathTransfer  = "/accounts/%s/transfers/%s"
+	pathTransfers      = "/accounts/%s/transfers"
+	pathTransfer       = "/accounts/%s/transfers/%s"
+	pathTransfersFetch = "/accounts/%s/transfers/.fetch"
 
 	pathTransferRiskOutcomes = "/transfers/%s/risk-outcomes"
 
