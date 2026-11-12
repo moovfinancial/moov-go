@@ -13,8 +13,8 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/mv2607"
 )
 
-// newIssuingTestClient points a client at srv so tests can assert on the raw request.
-func newIssuingTestClient(t *testing.T, srv *httptest.Server) mv2607.IssuingClient {
+// newCardIssuingTestClient points a client at srv so tests can assert on the raw request.
+func newCardIssuingTestClient(t *testing.T, srv *httptest.Server) mv2607.CardIssuingClient {
 	t.Helper()
 
 	client, err := moov.NewClient(
@@ -24,7 +24,7 @@ func newIssuingTestClient(t *testing.T, srv *httptest.Server) mv2607.IssuingClie
 	require.NoError(t, err)
 	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
 
-	return mv2607.NewIssuingClient(client)
+	return mv2607.NewCardIssuingClient(client)
 }
 
 func TestListMerchantCategories(t *testing.T) {
@@ -50,7 +50,7 @@ func TestListMerchantCategories(t *testing.T) {
 		}))
 		t.Cleanup(srv.Close)
 
-		categories, err := newIssuingTestClient(t, srv).ListMerchantCategories(context.Background())
+		categories, err := newCardIssuingTestClient(t, srv).ListMerchantCategories(context.Background())
 		require.NoError(t, err)
 
 		require.Equal(t, http.MethodGet, method)

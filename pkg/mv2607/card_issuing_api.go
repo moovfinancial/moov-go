@@ -6,18 +6,18 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
-type IssuingClient struct {
+type CardIssuingClient struct {
 	*moov.Client
 }
 
-func NewIssuingClient(client *moov.Client) IssuingClient {
-	return IssuingClient{Client: client}
+func NewCardIssuingClient(client *moov.Client) CardIssuingClient {
+	return CardIssuingClient{Client: client}
 }
 
 // ListMerchantCategories returns the issuing merchant categories and the merchant
 // category codes (MCCs) each one covers.
 // https://docs.moov.io/api/money-movement/issuing/list-merchant-categories/
-func (i IssuingClient) ListMerchantCategories(ctx context.Context) ([]IssuingMerchantCategoryMCCs, error) {
+func (i CardIssuingClient) ListMerchantCategories(ctx context.Context) ([]IssuingMerchantCategoryMCCs, error) {
 	categories, err := moov.ListIssuingMerchantCategoriesGeneric[IssuingMerchantCategoryMCCsList](ctx, i.Client, moov.Version2026_07)
 	if err != nil {
 		return nil, err
