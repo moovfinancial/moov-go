@@ -1,9 +1,5 @@
 ## Future Releases
 
-ADDITIONS
-
-- issuing: add `NewIssuingClient` and `ListMerchantCategories` to `pkg/mv2607`, which lists issuing merchant categories and their MCCs from `GET /issuing/merchant-categories` (API version v2026.07.00)
-
 Please refer to the [Github Releases](https://github.com/moovfinancial/moov-go/releases) page for moov-go for future updates.
 
 ## v0.16.0 (Released 2025-05-28)

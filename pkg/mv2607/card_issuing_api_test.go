@@ -59,8 +59,8 @@ func TestListMerchantCategories(t *testing.T) {
 
 		require.Equal(t, &mv2607.MerchantCategories{
 			MerchantCategories: []mv2607.MerchantCategory{
-				{Category: moov.IssuingMerchantCategory_RestaurantsAndDining, MCCs: []string{"5812", "5813"}},
-				{Category: moov.IssuingMerchantCategory_Airlines, MCCs: []string{"4511", "3000-3299"}},
+				{Category: moov.IssuingMerchantCategory_RestaurantsAndDining, Mccs: []string{"5812", "5813"}},
+				{Category: moov.IssuingMerchantCategory_Airlines, Mccs: []string{"4511", "3000-3299"}},
 			},
 		}, categories)
 	})
