@@ -17,11 +17,6 @@ func NewCardIssuingClient(client *moov.Client) CardIssuingClient {
 // ListMerchantCategories returns the issuing merchant categories and the merchant
 // category codes (MCCs) each one covers.
 // https://docs.moov.io/api/money-movement/issuing/list-merchant-categories/
-func (i CardIssuingClient) ListMerchantCategories(ctx context.Context) ([]IssuingMerchantCategoryMCCs, error) {
-	categories, err := moov.ListIssuingMerchantCategoriesGeneric[IssuingMerchantCategoryMCCsList](ctx, i.Client, moov.Version2026_07)
-	if err != nil {
-		return nil, err
-	}
-
-	return categories.MerchantCategories, nil
+func (i CardIssuingClient) ListMerchantCategories(ctx context.Context) (*MerchantCategories, error) {
+	return moov.ListIssuingMerchantCategoriesGeneric[MerchantCategories](ctx, i.Client, moov.Version2026_07)
 }
