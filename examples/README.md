@@ -7,6 +7,13 @@ export MOOV_PUBLIC_KEY="public key here"
 export MOOV_SECRET_KEY="secret key here"
 ```
 
+## Optional settings
+
+- `MOOV_HOST` — API host. The default is `api.moov.io`.
+- `PLAID_CLIENT_ID` and `PLAID_SECRET` — only for the Plaid examples.
+
+The live tests generate a random foreign ID for each process. CI and a local run can therefore share the seeded account without identifier collisions.
+
 
 ## ACH
 - [Debit a Bank Account with micro deposits](./ach/debit_bank_account/micro_deposits_test.go)
