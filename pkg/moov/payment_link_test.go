@@ -57,11 +57,11 @@ func Test_PaymentLink_CreateGetListUpdateDisable(t *testing.T) {
 		Display: moov.PaymentLinkDisplayOptions{
 			Title:        "Testing moov-go",
 			Description:  "Payment link created by the moov-go test suite",
-			CallToAction: moov.CallToAction_Pay,
+			CallToAction: moov.CallToActionPay,
 		},
 		Payment: &moov.PaymentLinkPaymentDetails{
 			AllowedMethods: []moov.CollectionPaymentMethodType{
-				moov.CollectionPaymentMethodType_CardPayment,
+				moov.CollectionPaymentMethodTypeCardPayment,
 			},
 		},
 	}
@@ -70,8 +70,8 @@ func Test_PaymentLink_CreateGetListUpdateDisable(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, created.Code)
 	require.NotEmpty(t, created.Link)
-	require.Equal(t, moov.PaymentLinkType_Payment, created.PaymentLinkType)
-	require.Equal(t, moov.PaymentLinkStatus_Active, created.Status)
+	require.Equal(t, moov.PaymentLinkTypePayment, created.PaymentLinkType)
+	require.Equal(t, moov.PaymentLinkStatusActive, created.Status)
 	require.Equal(t, testtools.PARTNER_ID, created.PartnerAccountID)
 	require.Equal(t, accountID, created.MerchantAccountID)
 
@@ -85,7 +85,7 @@ func Test_PaymentLink_CreateGetListUpdateDisable(t *testing.T) {
 	require.Equal(t, created.Code, fetched.Code)
 
 	listed, err := mc.ListPaymentLinks(ctx, accountID,
-		moov.WithPaymentLinkTypes(moov.PaymentLinkType_Payment),
+		moov.WithPaymentLinkTypes(moov.PaymentLinkTypePayment),
 		moov.WithPaymentLinkCount(100))
 	require.NoError(t, err)
 	require.Contains(t, listed, *created)
@@ -117,7 +117,7 @@ func Test_PaymentLink_CreateGetListUpdateDisable(t *testing.T) {
 
 	fetched, err = mc.GetPaymentLink(ctx, accountID, code)
 	require.NoError(t, err)
-	require.Equal(t, moov.PaymentLinkStatus_Disabled, fetched.Status)
+	require.Equal(t, moov.PaymentLinkStatusDisabled, fetched.Status)
 	require.NotNil(t, fetched.DisabledOn)
 }
 
@@ -134,11 +134,11 @@ func Test_PaymentLink_CustomAmount(t *testing.T) {
 		Display: moov.PaymentLinkDisplayOptions{
 			Title:        "Custom amount moov-go test",
 			Description:  "Pay what you want",
-			CallToAction: moov.CallToAction_Donate,
+			CallToAction: moov.CallToActionDonate,
 		},
 		CustomAmountPayment: &moov.PaymentLinkCustomAmountPaymentDetails{
 			AllowedMethods: []moov.CollectionPaymentMethodType{
-				moov.CollectionPaymentMethodType_CardPayment,
+				moov.CollectionPaymentMethodTypeCardPayment,
 			},
 			AmountRange: &moov.AmountDecimalRange{
 				Minimum: &moov.AmountDecimal{Currency: "USD", ValueDecimal: "1.00"},
@@ -149,7 +149,7 @@ func Test_PaymentLink_CustomAmount(t *testing.T) {
 
 	created, err := mc.CreatePaymentLink(ctx, accountID, create)
 	require.NoError(t, err)
-	require.Equal(t, moov.PaymentLinkType_CustomAmountPayment, created.PaymentLinkType)
+	require.Equal(t, moov.PaymentLinkTypeCustomAmountPayment, created.PaymentLinkType)
 	require.Nil(t, created.Amount)
 
 	t.Cleanup(func() {
