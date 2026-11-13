@@ -7,19 +7,19 @@ type Email string
 type PaymentLinkStatus string
 
 const (
-	PaymentLinkStatusActive   PaymentLinkStatus = "active"
-	PaymentLinkStatusUsed     PaymentLinkStatus = "used"
-	PaymentLinkStatusDisabled PaymentLinkStatus = "disabled"
-	PaymentLinkStatusExpired  PaymentLinkStatus = "expired"
+	PaymentLinkStatus_Active   PaymentLinkStatus = "active"
+	PaymentLinkStatus_Used     PaymentLinkStatus = "used"
+	PaymentLinkStatus_Disabled PaymentLinkStatus = "disabled"
+	PaymentLinkStatus_Expired  PaymentLinkStatus = "expired"
 )
 
 type PaymentLinkType string
 
 const (
-	PaymentLinkTypePayment             PaymentLinkType = "payment"
-	PaymentLinkTypePayout              PaymentLinkType = "payout"
-	PaymentLinkTypeInvoicePayment      PaymentLinkType = "invoice-payment"
-	PaymentLinkTypeCustomAmountPayment PaymentLinkType = "custom-amount-payment"
+	PaymentLinkType_Payment             PaymentLinkType = "payment"
+	PaymentLinkType_Payout              PaymentLinkType = "payout"
+	PaymentLinkType_InvoicePayment      PaymentLinkType = "invoice-payment"
+	PaymentLinkType_CustomAmountPayment PaymentLinkType = "custom-amount-payment"
 )
 
 // ACHCompanyEntryDescription An optional override of the default NACHA company entry description for a transfer.
@@ -55,12 +55,12 @@ type AmountDecimalUpdate struct {
 type CallToAction string
 
 const (
-	CallToActionPay       CallToAction = "pay"
-	CallToActionBook      CallToAction = "book"
-	CallToActionSubscribe CallToAction = "subscribe"
-	CallToActionDonate    CallToAction = "donate"
-	CallToActionConfirm   CallToAction = "confirm"
-	CallToActionAuto      CallToAction = "auto"
+	CallToAction_Pay       CallToAction = "pay"
+	CallToAction_Book      CallToAction = "book"
+	CallToAction_Subscribe CallToAction = "subscribe"
+	CallToAction_Donate    CallToAction = "donate"
+	CallToAction_Confirm   CallToAction = "confirm"
+	CallToAction_Auto      CallToAction = "auto"
 )
 
 // CardDynamicDescriptor An optional override of the default card statement descriptor for a transfer. Accounts must be enabled by Moov to set this field.
@@ -75,10 +75,10 @@ type CardPaymentDetails struct {
 type CollectionPaymentMethodType string
 
 const (
-	CollectionPaymentMethodTypeApplePay        CollectionPaymentMethodType = "apple-pay"
-	CollectionPaymentMethodTypeCardPayment     CollectionPaymentMethodType = "card-payment"
-	CollectionPaymentMethodTypeACHDebitCollect CollectionPaymentMethodType = "ach-debit-collect"
-	CollectionPaymentMethodTypeGooglePay       CollectionPaymentMethodType = "google-pay"
+	CollectionPaymentMethodType_ApplePay        CollectionPaymentMethodType = "apple-pay"
+	CollectionPaymentMethodType_CardPayment     CollectionPaymentMethodType = "card-payment"
+	CollectionPaymentMethodType_ACHDebitCollect CollectionPaymentMethodType = "ach-debit-collect"
+	CollectionPaymentMethodType_GooglePay       CollectionPaymentMethodType = "google-pay"
 )
 
 // CreatePaymentLink Request to create a new payment link. A payment link must include exactly one of `payment`, `payout`, or `customAmountPayment` details. For payout payment links, `maxUses` will automatically be set to 1, as these are intended for a one-time disbursement to a specific recipient.
@@ -138,12 +138,12 @@ type Currency string
 type DisbursementPaymentMethodType string
 
 const (
-	DisbursementPaymentMethodTypePushToCard        DisbursementPaymentMethodType = "push-to-card"
-	DisbursementPaymentMethodTypeRtpCredit         DisbursementPaymentMethodType = "rtp-credit"
-	DisbursementPaymentMethodTypeACHCreditSameDay  DisbursementPaymentMethodType = "ach-credit-same-day"
-	DisbursementPaymentMethodTypeACHCreditStandard DisbursementPaymentMethodType = "ach-credit-standard"
-	DisbursementPaymentMethodTypePushToApplePay    DisbursementPaymentMethodType = "push-to-apple-pay"
-	DisbursementPaymentMethodTypePushToGooglePay   DisbursementPaymentMethodType = "push-to-google-pay"
+	DisbursementPaymentMethodType_PushToCard        DisbursementPaymentMethodType = "push-to-card"
+	DisbursementPaymentMethodType_RtpCredit         DisbursementPaymentMethodType = "rtp-credit"
+	DisbursementPaymentMethodType_ACHCreditSameDay  DisbursementPaymentMethodType = "ach-credit-same-day"
+	DisbursementPaymentMethodType_ACHCreditStandard DisbursementPaymentMethodType = "ach-credit-standard"
+	DisbursementPaymentMethodType_PushToApplePay    DisbursementPaymentMethodType = "push-to-apple-pay"
+	DisbursementPaymentMethodType_PushToGooglePay   DisbursementPaymentMethodType = "push-to-google-pay"
 )
 
 // ImageID Unique identifier for a image resource.
@@ -303,8 +303,8 @@ type PayoutRecipient struct {
 type PushDeliverySpeed string
 
 const (
-	PushDeliverySpeedInstant  PushDeliverySpeed = "instant"
-	PushDeliverySpeedDeferred PushDeliverySpeed = "deferred"
+	PushDeliverySpeed_Instant  PushDeliverySpeed = "instant"
+	PushDeliverySpeed_Deferred PushDeliverySpeed = "deferred"
 )
 
 type PushOptions struct {
