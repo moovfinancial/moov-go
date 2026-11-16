@@ -15,6 +15,9 @@ Please refer to the [Github Releases](https://github.com/moovfinancial/moov-go/r
 
 ADDITIONS
 
+- accounts: add `ListAdjustments` and `GetAdjustment` client methods; `ListAdjustments` accepts an optional `walletID` filter
+- accounts: add `GetAccountCountries` and `AssignAccountCountries` client methods; `AssignAccountCountries` replaces the account's country list
+- accounts: add `GetMerchantProcessingAgreement` client method that returns the merchant processing agreement as PDF bytes
 - google pay: add `mv2604.GooglePayClient.LinkGooglePayToken` to link a Google Pay token
 - invoices: add `mv2604.InvoiceClient.CreateInvoiceNotification` to notify an invoice's customer
 
