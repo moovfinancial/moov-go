@@ -1,6 +1,7 @@
 package moov_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -29,19 +30,16 @@ func TestListAdjustments(t *testing.T) {
 	tests := []struct {
 		name       string
 		opts       []moov.AdjustmentListFilter
-		response   string
 		wantWallet string
 		want       []moov.Adjustment
 	}{
 		{
-			name:     "lists adjustments without a wallet filter",
-			response: "[" + adjustmentJSON + "]",
-			want:     want,
+			name: "lists adjustments without a wallet filter",
+			want: want,
 		},
 		{
 			name:       "filters by walletID",
 			opts:       []moov.AdjustmentListFilter{moov.WithAdjustmentWalletID("wallet-456")},
-			response:   "[" + adjustmentJSON + "]",
 			wantWallet: "wallet-456",
 			want:       want,
 		},
@@ -49,6 +47,9 @@ func TestListAdjustments(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			response, err := json.Marshal(tt.want)
+			require.NoError(t, err)
+
 			var (
 				method  string
 				path    string
@@ -65,7 +66,7 @@ func TestListAdjustments(t *testing.T) {
 				accept = r.Header.Get("Accept")
 
 				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(tt.response))
+				_, _ = w.Write(response)
 			}))
 			t.Cleanup(srv.Close)
 
