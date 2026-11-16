@@ -2,7 +2,6 @@ package moov
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 )
 
@@ -16,7 +15,7 @@ func (c Client) CreateOnboardingInvite(ctx context.Context, invite OnboardingInv
 		JsonBody(invite),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("calling http: %w", err)
+		return nil, err
 	}
 
 	return CompletedObjectOrError[OnboardingInvite](resp)
@@ -30,7 +29,7 @@ func (c Client) GetOnboardingInvite(ctx context.Context, code string) (*Onboardi
 		AcceptJson(),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("calling http: %w", err)
+		return nil, err
 	}
 
 	return CompletedObjectOrError[OnboardingInvite](resp)
@@ -44,7 +43,7 @@ func (c Client) ListOnboardingInvites(ctx context.Context) ([]OnboardingInvite, 
 		AcceptJson(),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("calling http: %w", err)
+		return nil, err
 	}
 
 	return CompletedListOrError[OnboardingInvite](resp)

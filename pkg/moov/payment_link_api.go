@@ -18,7 +18,7 @@ func (c Client) CreatePaymentLink(ctx context.Context, accountID string, payment
 		JsonBody(paymentLink),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("calling http: %w", err)
+		return nil, err
 	}
 
 	return CompletedObjectOrError[PaymentLink](resp)
@@ -33,7 +33,7 @@ func (c Client) GetPaymentLink(ctx context.Context, accountID, paymentLinkCode s
 		AcceptJson(),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("calling http: %w", err)
+		return nil, err
 	}
 
 	return CompletedObjectOrError[PaymentLink](resp)
@@ -49,7 +49,7 @@ func (c Client) UpdatePaymentLink(ctx context.Context, accountID, paymentLinkCod
 		JsonBody(paymentLink),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("calling http: %w", err)
+		return nil, err
 	}
 
 	return CompletedObjectOrError[PaymentLink](resp)
@@ -80,7 +80,7 @@ func (c Client) GetPaymentLinkQRCode(ctx context.Context, accountID, paymentLink
 		AcceptContentType("image/*"),
 	)
 	if err != nil {
-		return nil, "", fmt.Errorf("calling http: %w", err)
+		return nil, "", err
 	}
 
 	buf, err := CompletedObjectOrError[bytes.Buffer](resp)
@@ -135,7 +135,7 @@ func (c Client) ListPaymentLinks(ctx context.Context, accountID string, filters 
 	args := prependArgs(filters, MoovVersion(Version2026_07), AcceptJson())
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathPaymentLinks, accountID), args...)
 	if err != nil {
-		return nil, fmt.Errorf("calling http: %w", err)
+		return nil, err
 	}
 
 	return CompletedListOrError[PaymentLink](resp)
