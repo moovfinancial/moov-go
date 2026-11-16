@@ -204,9 +204,9 @@ func Test_FetchTransfers(t *testing.T) {
 
 	fetched, err := mc.FetchTransfers(BgCtx(), FACILITATOR_ID, moov.FetchTransfersRequest{TransferIDs: transferIDs})
 	NoResponseError(t, err)
-	require.Len(t, fetched, len(transferIDs))
+	require.Len(t, *fetched, len(transferIDs))
 	for _, transferID := range transferIDs {
-		require.Contains(t, fetched, transferID)
+		require.Contains(t, *fetched, transferID)
 	}
 }
 

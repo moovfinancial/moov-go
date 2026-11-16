@@ -197,7 +197,7 @@ func (c Client) GetTransfer(ctx context.Context, accountID, transferID string) (
 
 // FetchTransfers retrieves multiple transfers by their IDs
 // https://docs.moov.io/api/money-movement/transfers/batch-get-transfers/
-func (c Client) FetchTransfers(ctx context.Context, accountID string, request FetchTransfersRequest) (FetchTransfersResponse, error) {
+func (c Client) FetchTransfers(ctx context.Context, accountID string, request FetchTransfersRequest) (*FetchTransfersResponse, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodPost, pathTransfersFetch, accountID),
 		AcceptJson(),
@@ -206,11 +206,7 @@ func (c Client) FetchTransfers(ctx context.Context, accountID string, request Fe
 		return nil, err
 	}
 
-	transfers, err := CompletedObjectOrError[FetchTransfersResponse](resp)
-	if err != nil {
-		return nil, err
-	}
-	return *transfers, nil
+	return CompletedObjectOrError[FetchTransfersResponse](resp)
 }
 
 type TransferPatcher func(patch *patchTransfer)
