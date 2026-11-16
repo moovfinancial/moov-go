@@ -198,6 +198,14 @@ type Transfer struct {
 	LineItems *TransferLineItems `json:"lineItems,omitempty"`
 }
 
+// FetchTransfersRequest asks for transfers by their IDs.
+type FetchTransfersRequest struct {
+	TransferIDs []string `json:"transferIDs"`
+}
+
+// FetchTransfersResponse maps each requested transfer ID to its transfer.
+type FetchTransfersResponse map[string]Transfer
+
 // Fees charged to accounts involved in the transfer.
 type MoovFee struct {
 	// ID of the account that fees were charged to.
