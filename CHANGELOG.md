@@ -5,6 +5,10 @@ ADDITIONS
 - transfers: add `FetchTransfers` to retrieve multiple transfers by ID in one request
 - transfers: add `FetchTransfersRequest` with `transferIDs` and `FetchTransfersResponse`, a map of transfer ID to `Transfer`
 
+BUG FIXES
+
+- apple-pay: fix `UpdateApplePayDomain` to send `PATCH` instead of `PUT`. `PUT` was not a defined operation for this endpoint.
+
 Please refer to the [Github Releases](https://github.com/moovfinancial/moov-go/releases) page for moov-go for future updates.
 
 ## v0.16.0 (Released 2025-05-28)
