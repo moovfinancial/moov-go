@@ -11,6 +11,7 @@ import (
 func (c Client) GetMerchantProcessingAgreement(ctx context.Context, accountID string) ([]byte, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathMerchantAgreement, accountID),
+		MoovVersion(Version2026_07),
 		AcceptContentType("application/pdf"),
 	)
 	if err != nil {

@@ -37,7 +37,7 @@ func TestGetMerchantProcessingAgreement(t *testing.T) {
 	require.Equal(t, http.MethodGet, method)
 	require.Equal(t, "/accounts/account-123/merchant-agreement", path)
 	require.Equal(t, "application/pdf", accept)
-	require.Empty(t, version)
+	require.Equal(t, moov.Version2026_07.String(), version)
 
 	require.Equal(t, pdf, agreement)
 }
