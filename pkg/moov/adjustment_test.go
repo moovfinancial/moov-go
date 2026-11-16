@@ -1,6 +1,7 @@
 package moov_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,35 +19,15 @@ const adjustmentJSON = `{
 	"amount": { "currency": "USD", "valueDecimal": "-12.50" }
 }`
 
-const adjustmentListJSON = `[
-	{
-		"adjustmentID": "adj-123",
-		"walletID": "wallet-456",
-		"createdOn": "2026-01-02T03:04:05Z",
-		"amount": { "currency": "USD", "valueDecimal": "-12.50" }
-	}
-]`
-
-const walletAdjustmentListJSON = `[
-	{
-		"adjustmentID": "adj-789",
-		"walletID": "wallet-789",
-		"createdOn": "2026-01-03T03:04:05Z",
-		"amount": { "currency": "USD", "valueDecimal": "25.00" }
-	}
-]`
-
 func TestListAdjustments(t *testing.T) {
 	tests := []struct {
 		name       string
 		opts       []moov.AdjustmentListFilter
-		response   string
 		wantWallet string
 		want       []moov.Adjustment
 	}{
 		{
-			name:     "lists adjustments without a wallet filter",
-			response: adjustmentListJSON,
+			name: "lists adjustments without a wallet filter",
 			want: []moov.Adjustment{{
 				AdjustmentID: "adj-123",
 				WalletID:     "wallet-456",
@@ -57,7 +38,6 @@ func TestListAdjustments(t *testing.T) {
 		{
 			name:       "filters by walletID",
 			opts:       []moov.AdjustmentListFilter{moov.WithAdjustmentWalletID("wallet-789")},
-			response:   walletAdjustmentListJSON,
 			wantWallet: "wallet-789",
 			want: []moov.Adjustment{{
 				AdjustmentID: "adj-789",
@@ -78,6 +58,9 @@ func TestListAdjustments(t *testing.T) {
 				accept  string
 			)
 
+			response, err := json.Marshal(tt.want)
+			require.NoError(t, err)
+
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				method = r.Method
 				path = r.URL.Path
@@ -86,7 +69,7 @@ func TestListAdjustments(t *testing.T) {
 				accept = r.Header.Get("Accept")
 
 				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(tt.response))
+				_, _ = w.Write(response)
 			}))
 			t.Cleanup(srv.Close)
 
