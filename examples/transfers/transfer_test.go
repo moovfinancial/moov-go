@@ -20,7 +20,7 @@ func TestCreateAndPatchTransfer(t *testing.T) {
 		partnerAccountID      = testtools.PARTNER_ID
 		sourcePaymentMethodID = "aea716b2-3e25-42e7-9802-c75dd2dfabb1" // customer bank ach-debit-fund
 		destPaymentMethodID   = testtools.MERCHANT_WALLET_PM_ID        // moov-wallet
-		initialForeignID      = "external-ref-123"
+		initialForeignID      = testtools.RandomForeignID()
 	)
 
 	started, err := mc.CreateTransfer(ctx, partnerAccountID, moov.CreateTransfer{

@@ -5,6 +5,10 @@ ADDITIONS
 - payment-links: add `CreatePaymentLink`, `GetPaymentLink`, `ListPaymentLinks`, `UpdatePaymentLink`, `DisablePaymentLink`, and `GetPaymentLinkQRCode` methods. These requests use API version `2026.07.00`.
 - onboarding-invites: add `CreateOnboardingInvite`, `GetOnboardingInvite`, `ListOnboardingInvites`, and `RevokeOnboardingInvite` methods.
 
+BUG FIXES
+
+- apple-pay: fix `UpdateApplePayDomain` to send `PATCH` instead of `PUT`. `PUT` was not a defined operation for this endpoint.
+
 Please refer to the [Github Releases](https://github.com/moovfinancial/moov-go/releases) page for moov-go for future updates.
 
 ## v0.16.0 (Released 2025-05-28)
