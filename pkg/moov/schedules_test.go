@@ -101,12 +101,23 @@ func Test_Schedules(t *testing.T) {
 
 		for _, party := range getTests {
 			t.Run(fmt.Sprintf("Get & list from %s accountID", party.name), func(t *testing.T) {
-				s2, err := mc.GetSchedule(ctx, party.id, schedule.ScheduleID)
+				var (
+					s2  *moov.Schedule
+					err error
+				)
+				require.Eventually(t, func() bool {
+					s2, err = mc.GetSchedule(ctx, party.id, schedule.ScheduleID)
+					return err == nil
+				}, 3*time.Second, 250*time.Millisecond)
 				require.NoError(t, err)
 				require.Len(t, s2.Occurrences, 7)
 				require.Equal(t, schedule, s2)
 
-				list, err := mc.ListSchedule(ctx, party.id, moov.Count(10), moov.Skip(0))
+				var list []moov.Schedule
+				require.Eventually(t, func() bool {
+					list, err = mc.ListSchedule(ctx, party.id, moov.Count(10), moov.Skip(0))
+					return err == nil
+				}, 3*time.Second, 250*time.Millisecond)
 				require.NoError(t, err)
 				require.Contains(t, list, *s2)
 			})
