@@ -98,6 +98,8 @@ func Test_RecreateBankAccount(t *testing.T) {
 	})
 
 	t.Run("re-create bank account with the same details", func(t *testing.T) {
+		require.NotNil(t, resp)
+
 		second, err := mc.CreateBankAccount(BgCtx(), account.AccountID, moov.WithBankAccount(req))
 		require.NoError(t, err)
 
