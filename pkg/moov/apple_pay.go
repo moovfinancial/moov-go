@@ -122,7 +122,7 @@ type PatchApplyPayDomains struct {
 // https://docs.moov.io/api/#tag/Cards/operation/updateApplePayMerchantDomains
 func (c Client) UpdateApplePayDomain(ctx context.Context, accountID string, patch PatchApplyPayDomains) error {
 	resp, err := c.CallHttp(ctx,
-		Endpoint(http.MethodPut, pathApplePayDomains, accountID),
+		Endpoint(http.MethodPatch, pathApplePayDomains, accountID),
 		AcceptJson(),
 		JsonBody(patch))
 	if err != nil {
