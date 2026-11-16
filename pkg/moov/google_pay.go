@@ -13,8 +13,13 @@ type LinkedGooglePayPaymentMethod struct {
 	GooglePay         GooglePayPaymentMethod `json:"googlePay"`
 }
 
+// GooglePayTokenLink is a Google Pay token link request body accepted by LinkGooglePayTokenGeneric.
+type GooglePayTokenLink interface {
+	GooglePayTokenLink()
+}
+
 // LinkGooglePayTokenGeneric links a Google Pay token for the accountID.
-func LinkGooglePayTokenGeneric[T any](ctx context.Context, client *Client, version Version, accountID string, link T) ([]LinkedGooglePayPaymentMethod, error) {
+func LinkGooglePayTokenGeneric[T GooglePayTokenLink](ctx context.Context, client *Client, version Version, accountID string, link T) ([]LinkedGooglePayPaymentMethod, error) {
 	if client == nil {
 		return nil, fmt.Errorf("client is nil")
 	}

@@ -6,6 +6,9 @@ type LinkGooglePay struct {
 	PaymentMethodData GooglePayPaymentMethodData `json:"paymentMethodData"`
 }
 
+// GooglePayTokenLink marks LinkGooglePay as a Google Pay token link request body.
+func (LinkGooglePay) GooglePayTokenLink() {}
+
 // GooglePayPaymentMethodData is the Google Pay token payload from the Google Pay API.
 type GooglePayPaymentMethodData struct {
 	Type             string                    `json:"type,omitempty"`
