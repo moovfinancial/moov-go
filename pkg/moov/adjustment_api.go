@@ -8,7 +8,7 @@ import (
 // ListAdjustments lists adjustments for a Moov account
 // https://docs.moov.io/api/moov-accounts/adjustments/list/
 func (c Client) ListAdjustments(ctx context.Context, accountID string, filters ...AdjustmentListFilter) ([]Adjustment, error) {
-	args := prependArgs(filters, AcceptJson())
+	args := prependArgs(filters, MoovVersion(Version2026_07), AcceptJson())
 	resp, err := c.CallHttp(ctx, Endpoint(http.MethodGet, pathAdjustments, accountID), args...)
 	if err != nil {
 		return nil, err
@@ -22,6 +22,7 @@ func (c Client) ListAdjustments(ctx context.Context, accountID string, filters .
 func (c Client) GetAdjustment(ctx context.Context, accountID, adjustmentID string) (*Adjustment, error) {
 	resp, err := c.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathAdjustment, accountID, adjustmentID),
+		MoovVersion(Version2026_07),
 		AcceptJson(),
 	)
 	if err != nil {

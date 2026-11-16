@@ -77,7 +77,7 @@ func TestListAdjustments(t *testing.T) {
 			require.Equal(t, "/accounts/account-123/adjustments", path)
 			require.Equal(t, tt.wantWallet, wallet)
 			require.Equal(t, "application/json", accept)
-			require.Empty(t, version)
+			require.Equal(t, moov.Version2026_07.String(), version)
 
 			require.Equal(t, tt.want, adjustments)
 		})
@@ -109,7 +109,7 @@ func TestGetAdjustment(t *testing.T) {
 	require.Equal(t, http.MethodGet, method)
 	require.Equal(t, "/accounts/account-123/adjustments/adj-123", path)
 	require.Equal(t, "application/json", accept)
-	require.Empty(t, version)
+	require.Equal(t, moov.Version2026_07.String(), version)
 
 	require.Equal(t, "adj-123", adjustment.AdjustmentID)
 	require.Equal(t, "wallet-456", adjustment.WalletID)
