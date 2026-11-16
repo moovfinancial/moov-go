@@ -232,6 +232,23 @@ func SimulateIssuedCardReversalGeneric[TStarted any](ctx context.Context, client
 		MoovVersion(version), AcceptJson())
 }
 
+// ListIssuingMerchantCategoriesGeneric lists issuing merchant categories for a specific API version.
+func ListIssuingMerchantCategoriesGeneric[TCategories any](ctx context.Context, client *Client, version Version) (*TCategories, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathIssuingMerchantCategories),
+		MoovVersion(version),
+		AcceptJson())
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[TCategories](resp)
+}
+
 func simulateIssuedCardAuthorization[TStarted any](ctx context.Context, client *Client, endpoint EndpointArg, args ...callArg) (*IssuedCardAuthorization, *TStarted, error) {
 	if client == nil {
 		return nil, nil, errors.New("client is nil")
