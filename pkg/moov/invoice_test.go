@@ -166,15 +166,14 @@ func TestCreateInvoiceNotificationGeneric(t *testing.T) {
 		path    string
 		version string
 		body    []byte
+		readErr error
 	)
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		b, err := io.ReadAll(r.Body)
-		require.NoError(t, err)
+		body, readErr = io.ReadAll(r.Body)
 		method = r.Method
 		path = r.URL.Path
 		version = r.Header.Get(moov.VersionHeader)
-		body = b
 
 		w.WriteHeader(http.StatusNoContent)
 	}))
@@ -191,11 +190,18 @@ func TestCreateInvoiceNotificationGeneric(t *testing.T) {
 
 	err = moov.CreateInvoiceNotificationGeneric(context.Background(), client, moov.Version2026_04, "account-123", "invoice-456", notification)
 	require.NoError(t, err)
+	require.NoError(t, readErr)
 
 	require.Equal(t, http.MethodPost, method)
 	require.Equal(t, "/accounts/account-123/invoices/invoice-456/notifications", path)
 	require.Equal(t, moov.Version2026_04.String(), version)
 	require.JSONEq(t, `{"channels":["email"]}`, string(body))
+
+	t.Run("validation errors are typed", func(t *testing.T) {
+		require.ErrorIs(t, moov.CreateInvoiceNotificationGeneric(context.Background(), nil, moov.Version2026_04, "account-123", "invoice-456", notification), moov.ErrClientIsNil)
+		require.ErrorIs(t, moov.CreateInvoiceNotificationGeneric(context.Background(), client, moov.Version2026_04, "", "invoice-456", notification), moov.ErrAccountIDRequired)
+		require.ErrorIs(t, moov.CreateInvoiceNotificationGeneric(context.Background(), client, moov.Version2026_04, "account-123", "", notification), moov.ErrInvoiceIDRequired)
+	})
 
 	t.Run("conflict and rate limit preserve the API error", func(t *testing.T) {
 		for _, status := range []int{http.StatusConflict, http.StatusTooManyRequests} {

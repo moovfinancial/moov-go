@@ -2,7 +2,6 @@ package moov
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 )
 
@@ -21,10 +20,10 @@ type GooglePayTokenLink interface {
 // LinkGooglePayTokenGeneric links a Google Pay token for the accountID.
 func LinkGooglePayTokenGeneric[T GooglePayTokenLink](ctx context.Context, client *Client, version Version, accountID string, link T) ([]LinkedGooglePayPaymentMethod, error) {
 	if client == nil {
-		return nil, fmt.Errorf("client is nil")
+		return nil, ErrClientIsNil
 	}
 	if accountID == "" {
-		return nil, fmt.Errorf("accountID is required")
+		return nil, ErrAccountIDRequired
 	}
 
 	resp, err := client.CallHttp(
@@ -35,7 +34,7 @@ func LinkGooglePayTokenGeneric[T GooglePayTokenLink](ctx context.Context, client
 		JsonBody(link),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("linking google pay token: %w", err)
+		return nil, err
 	}
 
 	return CompletedListOrError[LinkedGooglePayPaymentMethod](resp)

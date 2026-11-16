@@ -164,13 +164,13 @@ func (c Client) ListInvoicePayments(ctx context.Context, accountID, invoiceID st
 // CreateInvoiceNotificationGeneric notifies an invoice's customer over the requested channels.
 func CreateInvoiceNotificationGeneric[T any](ctx context.Context, client *Client, version Version, accountID, invoiceID string, notification T) error {
 	if client == nil {
-		return fmt.Errorf("client is nil")
+		return ErrClientIsNil
 	}
 	if accountID == "" {
-		return fmt.Errorf("accountID is required")
+		return ErrAccountIDRequired
 	}
 	if invoiceID == "" {
-		return fmt.Errorf("invoiceID is required")
+		return ErrInvoiceIDRequired
 	}
 
 	resp, err := client.CallHttp(

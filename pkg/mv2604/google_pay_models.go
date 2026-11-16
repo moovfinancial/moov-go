@@ -19,10 +19,11 @@ type GooglePayPaymentMethodData struct {
 
 // GooglePayCardInfo describes the card a Google Pay token represents.
 type GooglePayCardInfo struct {
-	CardNetwork      string                     `json:"cardNetwork,omitempty"`
-	CardDetails      string                     `json:"cardDetails,omitempty"`
-	AssuranceDetails *GooglePayAssuranceDetails `json:"assuranceDetails,omitempty"`
-	BillingAddress   *GooglePayBillingAddress   `json:"billingAddress,omitempty"`
+	CardNetwork       string                     `json:"cardNetwork,omitempty"`
+	CardDetails       string                     `json:"cardDetails,omitempty"`
+	CardFundingSource string                     `json:"cardFundingSource,omitempty"`
+	AssuranceDetails  *GooglePayAssuranceDetails `json:"assuranceDetails,omitempty"`
+	BillingAddress    *GooglePayBillingAddress   `json:"billingAddress,omitempty"`
 }
 
 // GooglePayTokenizationData carries the gateway token for a Google Pay card.
@@ -42,6 +43,7 @@ type GooglePayBillingAddress struct {
 	Address3           string `json:"address3,omitempty"`
 	Locality           string `json:"locality,omitempty"`
 	AdministrativeArea string `json:"administrativeArea,omitempty"`
+	SortingCode        string `json:"sortingCode,omitempty"`
 }
 
 // GooglePayAssuranceDetails carries the Google Pay authentication indicators.

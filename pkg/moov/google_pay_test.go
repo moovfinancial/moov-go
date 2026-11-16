@@ -141,8 +141,13 @@ func TestLinkGooglePayTokenGeneric(t *testing.T) {
 	link := mv2604.LinkGooglePay{
 		MerchantAccountID: "merchant-1",
 		PaymentMethodData: mv2604.GooglePayPaymentMethodData{
-			Type:             "CARD",
-			Info:             mv2604.GooglePayCardInfo{CardNetwork: "VISA", CardDetails: "1234"},
+			Type: "CARD",
+			Info: mv2604.GooglePayCardInfo{
+				CardNetwork:       "VISA",
+				CardDetails:       "1234",
+				CardFundingSource: "CREDIT",
+				BillingAddress:    &mv2604.GooglePayBillingAddress{SortingCode: "123456"},
+			},
 			TokenizationData: mv2604.GooglePayTokenizationData{Token: "gateway-token"},
 		},
 	}
@@ -153,12 +158,20 @@ func TestLinkGooglePayTokenGeneric(t *testing.T) {
 	require.Equal(t, http.MethodPost, method)
 	require.Equal(t, "/accounts/account-123/google-pay/tokens", path)
 	require.Equal(t, moov.Version2026_04.String(), version)
-	require.JSONEq(t, `{"merchantAccountID":"merchant-1","paymentMethodData":{"type":"CARD","info":{"cardNetwork":"VISA","cardDetails":"1234"},"tokenizationData":{"token":"gateway-token"}}}`, string(body))
+	require.JSONEq(t, `{"merchantAccountID":"merchant-1","paymentMethodData":{"type":"CARD","info":{"cardNetwork":"VISA","cardDetails":"1234","cardFundingSource":"CREDIT","billingAddress":{"sortingCode":"123456"}},"tokenizationData":{"token":"gateway-token"}}}`, string(body))
 
 	require.Len(t, methods, 1)
 	require.Equal(t, "pm-1", methods[0].PaymentMethodID)
 	require.Equal(t, "google-pay", methods[0].PaymentMethodType)
 	require.Equal(t, "tok-1", methods[0].GooglePay.TokenID)
+
+	t.Run("validation errors are typed", func(t *testing.T) {
+		_, err := moov.LinkGooglePayTokenGeneric(context.Background(), nil, moov.Version2026_04, "account-123", link)
+		require.ErrorIs(t, err, moov.ErrClientIsNil)
+
+		_, err = moov.LinkGooglePayTokenGeneric(context.Background(), client, moov.Version2026_04, "", link)
+		require.ErrorIs(t, err, moov.ErrAccountIDRequired)
+	})
 
 	t.Run("rejected token preserves the API error", func(t *testing.T) {
 		rejected := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
