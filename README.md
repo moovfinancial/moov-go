@@ -38,6 +38,34 @@ mc, err := moov.NewClient(
 
 Checkout the [examples](./examples/README.md) exist for [ach](./examples/ach/), [card acquiring](./examples/card_acquiring/), debit [push](./examples/debit_card_push/)/[pull](./examples/debit_card_pull/), and [rtp](./examples/rtp/).
 
+## Versioned Clients
+
+Version-specific operations live in the `mvYYMM` packages. The `mv2604` package selects API version `v2026.04.00`.
+
+Link a Google Pay token:
+
+```go
+googlePayClient := mv2604.NewGooglePayClient(mc)
+
+methods, err := googlePayClient.LinkGooglePayToken(ctx, accountID, mv2604.LinkGooglePay{
+  MerchantAccountID: merchantAccountID,
+  PaymentMethodData: mv2604.GooglePayPaymentMethodData{
+    Type:             "CARD",
+    TokenizationData: mv2604.GooglePayTokenizationData{Token: token},
+  },
+})
+```
+
+Notify an invoice's customer:
+
+```go
+invoiceClient := mv2604.NewInvoiceClient(mc)
+
+err = invoiceClient.CreateInvoiceNotification(ctx, accountID, invoiceID, mv2604.CreateInvoiceNotification{
+  Channels: []mv2604.NotificationChannel{mv2604.NotificationChannelEmail},
+})
+```
+
 ## License
 
 Apache License 2.0 - See [LICENSE](LICENSE) for details.

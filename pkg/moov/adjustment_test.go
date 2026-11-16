@@ -1,6 +1,7 @@
 package moov_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,24 +19,15 @@ const adjustmentJSON = `{
 	"amount": { "currency": "USD", "valueDecimal": "-12.50" }
 }`
 
-const walletAdjustmentJSON = `{
-	"adjustmentID": "adj-789",
-	"walletID": "wallet-789",
-	"createdOn": "2026-01-03T03:04:05Z",
-	"amount": { "currency": "USD", "valueDecimal": "25.00" }
-}`
-
 func TestListAdjustments(t *testing.T) {
 	tests := []struct {
 		name       string
 		opts       []moov.AdjustmentListFilter
-		response   string
 		wantWallet string
 		want       []moov.Adjustment
 	}{
 		{
-			name:     "lists adjustments without a wallet filter",
-			response: "[" + adjustmentJSON + "]",
+			name: "lists adjustments without a wallet filter",
 			want: []moov.Adjustment{{
 				AdjustmentID: "adj-123",
 				WalletID:     "wallet-456",
@@ -46,7 +38,6 @@ func TestListAdjustments(t *testing.T) {
 		{
 			name:       "filters by walletID",
 			opts:       []moov.AdjustmentListFilter{moov.WithAdjustmentWalletID("wallet-789")},
-			response:   "[" + walletAdjustmentJSON + "]",
 			wantWallet: "wallet-789",
 			want: []moov.Adjustment{{
 				AdjustmentID: "adj-789",
@@ -59,6 +50,9 @@ func TestListAdjustments(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			response, err := json.Marshal(tt.want)
+			require.NoError(t, err)
+
 			var (
 				method  string
 				path    string
@@ -75,7 +69,7 @@ func TestListAdjustments(t *testing.T) {
 				accept = r.Header.Get("Accept")
 
 				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(tt.response))
+				_, _ = w.Write(response)
 			}))
 			t.Cleanup(srv.Close)
 

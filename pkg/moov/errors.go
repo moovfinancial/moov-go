@@ -36,6 +36,10 @@ var (
 	ErrInstantVerificationFailed    = errors.New("attempted verification failed")
 	ErrXIdempotencyKey              = errors.New("attempted to create a transfer using a duplicate X-Idempotency-Key header")
 
+	ErrClientIsNil       = errors.New("client is nil")
+	ErrAccountIDRequired = errors.New("accountID is required")
+	ErrInvoiceIDRequired = errors.New("invoiceID is required")
+
 	// ErrDuplicateBankAccount = errors.New("duplciate bank account or invalid routing number")
 	// ErrNoMicroDeposit       = errors.New("no account with the specified accountID was found or micro-deposits have not been sent for the source")
 	// ErrAccount              = errors.New("no account with the specified accountID was found")

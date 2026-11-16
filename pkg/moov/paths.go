@@ -69,13 +69,16 @@ const (
 	pathApplePaySessions = "/accounts/%s/apple-pay/sessions"
 	pathApplePayTokens   = "/accounts/%s/apple-pay/tokens" // #nosec G101
 
+	pathGooglePayTokens = "/accounts/%s/google-pay/tokens" // #nosec G101
+
 	pathInstitutions = "/institutions"
 
 	pathTransferOptions = "/accounts/%s/transfer-options"
 	pathTransferConfig  = "/accounts/%s/transfer-config"
 
-	pathTransfers = "/accounts/%s/transfers"
-	pathTransfer  = "/accounts/%s/transfers/%s"
+	pathTransfers      = "/accounts/%s/transfers"
+	pathTransfer       = "/accounts/%s/transfers/%s"
+	pathTransfersFetch = "/accounts/%s/transfers/.fetch"
 
 	pathTransferRiskOutcomes = "/transfers/%s/risk-outcomes"
 
@@ -139,9 +142,10 @@ const (
 
 	pathMerchantAgreement = "/accounts/%s/merchant-agreement"
 
-	pathInvoices        = "/accounts/%s/invoices"
-	pathInvoice         = "/accounts/%s/invoices/%s"
-	pathInvoicePayments = "/accounts/%s/invoices/%s/payments"
+	pathInvoices             = "/accounts/%s/invoices"
+	pathInvoice              = "/accounts/%s/invoices/%s"
+	pathInvoicePayments      = "/accounts/%s/invoices/%s/payments"
+	pathInvoiceNotifications = "/accounts/%s/invoices/%s/notifications"
 
 	pathIssuedCards                = "/issuing/%s/cards"
 	pathIssuedCard                 = "/issuing/%s/cards/%s"
@@ -175,4 +179,11 @@ const (
 
 	pathResolutionLinks = "/accounts/%s/resolution-links"
 	pathResolutionLink  = "/accounts/%s/resolution-links/%s"
+
+	pathPaymentLinks      = "/accounts/%s/payment-links"
+	pathPaymentLink       = "/accounts/%s/payment-links/%s"
+	pathPaymentLinkQRCode = "/accounts/%s/payment-links/%s/qrcode"
+
+	pathOnboardingInvites = "/onboarding-invites"
+	pathOnboardingInvite  = "/onboarding-invites/%s"
 )
