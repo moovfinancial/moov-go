@@ -2,6 +2,8 @@
 
 ADDITIONS
 
+- payment-links: add `CreatePaymentLink`, `GetPaymentLink`, `ListPaymentLinks`, `UpdatePaymentLink`, `DisablePaymentLink`, and `GetPaymentLinkQRCode` methods. These requests use API version `2026.07.00`.
+- onboarding-invites: add `CreateOnboardingInvite`, `GetOnboardingInvite`, `ListOnboardingInvites`, and `RevokeOnboardingInvite` methods.
 - transfers: add `FetchTransfers` to retrieve multiple transfers by ID in one request
 - transfers: add `FetchTransfersRequest` with `transferIDs` and `FetchTransfersResponse`, a map of transfer ID to `Transfer`
 
