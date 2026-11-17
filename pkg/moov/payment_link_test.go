@@ -3,9 +3,9 @@ package moov_test
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -15,28 +15,45 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
-// merchantWalletPaymentMethod creates a merchant wallet because payment links
-// require a wallet owned by the merchant account, then returns its payment method ID.
+// paymentLinkWalletName prefixes the merchant wallet that payment link tests reuse across runs
+const paymentLinkWalletName = "moov-go payment link"
+
+// merchantWalletPaymentMethod returns the payment method ID of a merchant wallet, because payment
+// links require one. It reuses this helper's own active wallet, so each run does not add another
+// wallet to the account. Other general wallets on the account are not valid payment link
+// destinations, so it matches on name rather than reusing any general wallet.
 func merchantWalletPaymentMethod(t *testing.T, mc *moov.Client, accountID string) string {
 	t.Helper()
 
-	wallet, err := mc.CreateWallet(context.Background(), accountID, moov.CreateWallet{
-		Name: fmt.Sprintf("moov-go payment link %d", time.Now().UnixNano()),
-	})
+	wallets, err := mc.ListWallets(context.Background(), accountID,
+		moov.WithWalletStatus(moov.WalletStatus_Active),
+		moov.WithWalletType(moov.WalletType_General))
 	require.NoError(t, err)
-	t.Cleanup(func() {
-		closed := moov.WalletStatus_Closed
-		_, _ = mc.UpdateWallet(context.Background(), accountID, wallet.WalletID, moov.UpdateWallet{Status: &closed})
-	})
+
+	var walletID string
+	for _, w := range wallets {
+		if strings.HasPrefix(w.Name, paymentLinkWalletName) {
+			walletID = w.WalletID
+			break
+		}
+	}
+
+	if walletID == "" {
+		created, err := mc.CreateWallet(context.Background(), accountID, moov.CreateWallet{
+			Name: paymentLinkWalletName,
+		})
+		require.NoError(t, err)
+		walletID = created.WalletID
+	}
 
 	pms, err := mc.ListPaymentMethods(context.Background(), accountID, moov.WithPaymentMethodType(string(moov.PaymentMethodType_MoovWallet)))
 	require.NoError(t, err)
 	for _, pm := range pms {
-		if pm.Wallet != nil && pm.Wallet.WalletID == wallet.WalletID {
+		if pm.Wallet != nil && pm.Wallet.WalletID == walletID {
 			return pm.PaymentMethodID
 		}
 	}
-	require.FailNow(t, "no payment method found for created wallet")
+	require.FailNow(t, "no payment method found for payment link wallet")
 	return ""
 }
 
