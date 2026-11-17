@@ -1,25 +1,6 @@
 ## Future Releases
 
-ADDITIONS
-
-- payment-links: add `CreatePaymentLink`, `GetPaymentLink`, `ListPaymentLinks`, `UpdatePaymentLink`, `DisablePaymentLink`, and `GetPaymentLinkQRCode` methods. These requests use API version `2026.07.00`.
-- onboarding-invites: add `CreateOnboardingInvite`, `GetOnboardingInvite`, `ListOnboardingInvites`, and `RevokeOnboardingInvite` methods.
-- transfers: add `FetchTransfers` to retrieve multiple transfers by ID in one request
-- transfers: add `FetchTransfersRequest` with `transferIDs` and `FetchTransfersResponse`, a map of transfer ID to `Transfer`
-
-BUG FIXES
-
-- apple-pay: fix `UpdateApplePayDomain` to send `PATCH` instead of `PUT`. `PUT` was not a defined operation for this endpoint.
-
 Please refer to the [Github Releases](https://github.com/moovfinancial/moov-go/releases) page for moov-go for future updates.
-
-ADDITIONS
-
-- accounts: add `ListAdjustments` and `GetAdjustment` client methods; `ListAdjustments` accepts an optional `walletID` filter
-- accounts: add `GetAccountCountries` and `AssignAccountCountries` client methods; `AssignAccountCountries` replaces the account's country list
-- accounts: add `GetMerchantProcessingAgreement` client method that returns the merchant processing agreement as PDF bytes
-- google pay: add `mv2604.GooglePayClient.LinkGooglePayToken` to link a Google Pay token
-- invoices: add `mv2604.InvoiceClient.CreateInvoiceNotification` to notify an invoice's customer
 
 ## v0.16.0 (Released 2025-05-28)
 
