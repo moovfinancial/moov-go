@@ -61,19 +61,10 @@ type TransferEventTransferDetails struct {
 }
 
 type TransferEventAuthorizationDetails struct {
-	AuthorizationID string                           `json:"authorizationID"`
-	Status          TransferEventAuthorizationStatus `json:"status"`
-	FailureCode     *moov.CardFailureCode            `json:"failureCode,omitempty"`
+	AuthorizationID string                      `json:"authorizationID"`
+	Status          TransferAuthorizationStatus `json:"status"`
+	FailureCode     *moov.CardFailureCode       `json:"failureCode,omitempty"`
 }
-
-type TransferEventAuthorizationStatus string
-
-// List of TransferEventAuthorizationStatus
-const (
-	TransferEventAuthorizationStatus_Approved TransferEventAuthorizationStatus = "approved"
-	TransferEventAuthorizationStatus_Declined TransferEventAuthorizationStatus = "declined"
-	TransferEventAuthorizationStatus_Reversed TransferEventAuthorizationStatus = "reversed"
-)
 
 type TransferEventCaptureDetails struct {
 	CaptureID   string                `json:"captureID"`
