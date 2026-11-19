@@ -1,4 +1,4 @@
-package mv2701
+package mv2610
 
 import (
 	"time"
@@ -30,7 +30,6 @@ const (
 	TransferEventType_AchCredit         TransferEventType = "ach-credit"
 	TransferEventType_AchDebit          TransferEventType = "ach-debit"
 	TransferEventType_InstantBankCredit TransferEventType = "instant-bank-credit"
-	TransferEventType_WireCredit        TransferEventType = "wire-credit"
 	TransferEventType_CardPayment       TransferEventType = "card-payment"
 	TransferEventType_PushToCard        TransferEventType = "push-to-card"
 	TransferEventType_PullFromCard      TransferEventType = "pull-from-card"
@@ -50,7 +49,6 @@ type TransferEventDetails struct {
 	AchCredit         *TransferEventAchDetails               `json:"achCredit,omitempty"`
 	AchDebit          *TransferEventAchDetails               `json:"achDebit,omitempty"`
 	InstantBankCredit *TransferEventInstantBankCreditDetails `json:"instantBankCredit,omitempty"`
-	WireCredit        *TransferEventWireCreditDetails        `json:"wireCredit,omitempty"`
 	CardPayment       *TransferEventCardPaymentDetails       `json:"cardPayment,omitempty"`
 	PushToCard        *TransferEventPushToCardDetails        `json:"pushToCard,omitempty"`
 	PullFromCard      *TransferEventPullFromCardDetails      `json:"pullFromCard,omitempty"`
@@ -83,17 +81,6 @@ type TransferEventCaptureDetails struct {
 	FailureCode *moov.CardFailureCode `json:"failureCode,omitempty"`
 }
 
-type CaptureStatus string
-
-// List of CaptureStatus
-const (
-	CaptureStatus_Created   CaptureStatus = "created"
-	CaptureStatus_Pending   CaptureStatus = "pending"
-	CaptureStatus_Completed CaptureStatus = "completed"
-	CaptureStatus_Failed    CaptureStatus = "failed"
-	CaptureStatus_Canceled  CaptureStatus = "canceled"
-)
-
 type TransferEventRefundDetails struct {
 	RefundID    string                `json:"refundID"`
 	CaptureID   *string               `json:"captureID,omitempty"`
@@ -124,70 +111,20 @@ type TransferEventInstantBankCreditDetails struct {
 	FailureCode *moov.InstantBankFailureCode `json:"failureCode,omitempty"`
 }
 
-type TransferEventWireCreditDetails struct {
-	Status      WireTransactionStatus `json:"status"`
-	FailureCode *WireFailureCode      `json:"failureCode,omitempty"`
-}
-
-type WireTransactionStatus string
-
-// List of WireTransactionStatus
-const (
-	WireTransactionStatus_Initiated WireTransactionStatus = "initiated"
-	WireTransactionStatus_Completed WireTransactionStatus = "completed"
-	WireTransactionStatus_Failed    WireTransactionStatus = "failed"
-	WireTransactionStatus_Returned  WireTransactionStatus = "returned"
-)
-
-type WireFailureCode string
-
-// List of WireFailureCode
-const (
-	WireFailureCode_ProcessingError         WireFailureCode = "processing-error"
-	WireFailureCode_InvalidAccount          WireFailureCode = "invalid-account"
-	WireFailureCode_AccountClosed           WireFailureCode = "account-closed"
-	WireFailureCode_AccountBlocked          WireFailureCode = "account-blocked"
-	WireFailureCode_InvalidField            WireFailureCode = "invalid-field"
-	WireFailureCode_TransactionNotSupported WireFailureCode = "transaction-not-supported"
-	WireFailureCode_LimitExceeded           WireFailureCode = "limit-exceeded"
-	WireFailureCode_InvalidAmount           WireFailureCode = "invalid-amount"
-	WireFailureCode_Other                   WireFailureCode = "other"
-)
-
 type TransferEventCardPaymentDetails struct {
 	Status      moov.CardTransactionStatus `json:"status"`
 	FailureCode *moov.CardFailureCode      `json:"failureCode,omitempty"`
 }
 
 type TransferEventPushToCardDetails struct {
-	Status      PushToCardTransactionStatus `json:"status"`
-	FailureCode *moov.CardFailureCode       `json:"failureCode,omitempty"`
+	Status      moov.CardTransactionStatus `json:"status"`
+	FailureCode *moov.CardFailureCode      `json:"failureCode,omitempty"`
 }
-
-type PushToCardTransactionStatus string
-
-// List of PushToCardTransactionStatus
-const (
-	PushToCardTransactionStatus_Initiated PushToCardTransactionStatus = "initiated"
-	PushToCardTransactionStatus_Deferred  PushToCardTransactionStatus = "deferred"
-	PushToCardTransactionStatus_Canceled  PushToCardTransactionStatus = "canceled"
-	PushToCardTransactionStatus_Failed    PushToCardTransactionStatus = "failed"
-	PushToCardTransactionStatus_Completed PushToCardTransactionStatus = "completed"
-)
 
 type TransferEventPullFromCardDetails struct {
-	Status      PullFromCardTransactionStatus `json:"status"`
-	FailureCode *moov.CardFailureCode         `json:"failureCode,omitempty"`
+	Status      moov.CardTransactionStatus `json:"status"`
+	FailureCode *moov.CardFailureCode      `json:"failureCode,omitempty"`
 }
-
-type PullFromCardTransactionStatus string
-
-// List of PullFromCardTransactionStatus
-const (
-	PullFromCardTransactionStatus_Initiated PullFromCardTransactionStatus = "initiated"
-	PullFromCardTransactionStatus_Failed    PullFromCardTransactionStatus = "failed"
-	PullFromCardTransactionStatus_Completed PullFromCardTransactionStatus = "completed"
-)
 
 type TransferEventWalletTransactionDetails struct {
 	AccountID       string                     `json:"accountID"`
