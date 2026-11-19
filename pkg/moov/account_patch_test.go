@@ -68,7 +68,12 @@ func TestPatchAccount_BusinessTaxID(t *testing.T) {
 				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					method = r.Method
 					path = r.URL.Path
-					body, _ = io.ReadAll(r.Body)
+					var err error
+					body, err = io.ReadAll(r.Body)
+					if err != nil {
+						w.WriteHeader(http.StatusInternalServerError)
+						return
+					}
 
 					w.Header().Set("Content-Type", "application/json")
 					_, _ = w.Write([]byte(`{"accountID":"account-123"}`))

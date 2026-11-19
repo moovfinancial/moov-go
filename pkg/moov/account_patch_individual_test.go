@@ -47,7 +47,12 @@ func TestPatchAccount_IndividualProfile(t *testing.T) {
 			// The handler runs on its own goroutine, so it records what it saw rather
 			// than asserting.
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				body, _ = io.ReadAll(r.Body)
+				var err error
+				body, err = io.ReadAll(r.Body)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
 
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`{"accountID":"account-123"}`))
