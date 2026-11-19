@@ -13,9 +13,9 @@ import (
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
 
-// Accounts merges the PATCH body into the stored profile, so "email":"" replaces the
-// stored email and an empty name fails validation. An individual patch must leave
-// these fields out unless the caller sets them.
+// Accounts merges the PATCH body into the stored profile, so "email":"" or
+// "postalCode":"" replaces the stored value and an empty name fails validation. An
+// individual patch must leave these fields out unless the caller sets them.
 func TestPatchAccount_IndividualProfile(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -23,9 +23,9 @@ func TestPatchAccount_IndividualProfile(t *testing.T) {
 		expected   map[string]any
 	}{
 		{
-			name:       "unset name and email are omitted",
+			name:       "unset fields are omitted",
 			individual: moov.PatchIndividualProfile{Address: &moov.Address{City: "Moov City"}},
-			expected:   map[string]any{},
+			expected:   map[string]any{"address": map[string]any{"city": "Moov City"}},
 		},
 		{
 			name: "supplied name and email are sent",
@@ -68,7 +68,7 @@ func TestPatchAccount_IndividualProfile(t *testing.T) {
 			}
 			require.NoError(t, json.Unmarshal(body, &sent))
 
-			for _, field := range []string{"name", "email"} {
+			for _, field := range []string{"name", "email", "address"} {
 				value, found := sent.Profile.Individual[field]
 				expected, want := tc.expected[field]
 				require.Equal(t, want, found, "%s presence in body: %s", field, body)

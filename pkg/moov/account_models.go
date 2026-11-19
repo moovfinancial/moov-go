@@ -204,12 +204,12 @@ type Phone struct {
 
 // Address struct for Address
 type Address struct {
-	AddressLine1    string `json:"addressLine1"`
+	AddressLine1    string `json:"addressLine1,omitempty"`
 	AddressLine2    string `json:"addressLine2,omitempty"`
-	City            string `json:"city"`
-	StateOrProvince string `json:"stateOrProvince"`
-	PostalCode      string `json:"postalCode"`
-	Country         string `json:"country"`
+	City            string `json:"city,omitempty"`
+	StateOrProvince string `json:"stateOrProvince,omitempty"`
+	PostalCode      string `json:"postalCode,omitempty"`
+	Country         string `json:"country,omitempty"`
 }
 
 // AddressPatch is for partial address updates. Only fields that are non-nil will be updated.
