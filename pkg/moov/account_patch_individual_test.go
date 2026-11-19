@@ -14,15 +14,30 @@ import (
 )
 
 // Accounts merges the PATCH body into the stored profile, so "email":"" replaces the
-// stored email. An individual patch must leave email out unless the caller sets it.
-func TestPatchAccount_IndividualEmail(t *testing.T) {
+// stored email and an empty name fails validation. An individual patch must leave
+// these fields out unless the caller sets them.
+func TestPatchAccount_IndividualProfile(t *testing.T) {
 	tests := []struct {
-		name     string
-		email    string
-		expected any
+		name       string
+		individual moov.PatchIndividualProfile
+		expected   map[string]any
 	}{
-		{name: "empty email is omitted", email: "", expected: nil},
-		{name: "supplied email is sent", email: "jane@moov.io", expected: "jane@moov.io"},
+		{
+			name:       "unset name and email are omitted",
+			individual: moov.PatchIndividualProfile{Address: &moov.Address{City: "Moov City"}},
+			expected:   map[string]any{},
+		},
+		{
+			name: "supplied name and email are sent",
+			individual: moov.PatchIndividualProfile{
+				Name:  moov.Name{FirstName: "Jane", LastName: "Doe"},
+				Email: "jane@moov.io",
+			},
+			expected: map[string]any{
+				"name":  map[string]any{"firstName": "Jane", "lastName": "Doe"},
+				"email": "jane@moov.io",
+			},
+		},
 	}
 
 	for _, tc := range tests {
@@ -40,12 +55,7 @@ func TestPatchAccount_IndividualEmail(t *testing.T) {
 			t.Cleanup(srv.Close)
 
 			patch := moov.PatchAccount{
-				Profile: moov.PatchProfile{
-					Individual: &moov.PatchIndividualProfile{
-						Name:  moov.Name{FirstName: "Jane", LastName: "Doe"},
-						Email: tc.email,
-					},
-				},
+				Profile: moov.PatchProfile{Individual: &tc.individual},
 			}
 
 			_, err := newFilesTestClient(t, srv).PatchAccount(context.Background(), "account-123", patch)
@@ -57,14 +67,13 @@ func TestPatchAccount_IndividualEmail(t *testing.T) {
 				} `json:"profile"`
 			}
 			require.NoError(t, json.Unmarshal(body, &sent))
-			require.Contains(t, sent.Profile.Individual, "name")
 
-			email, found := sent.Profile.Individual["email"]
-			if tc.expected == nil {
-				require.False(t, found, "email must not be sent: %s", body)
-				return
+			for _, field := range []string{"name", "email"} {
+				value, found := sent.Profile.Individual[field]
+				expected, want := tc.expected[field]
+				require.Equal(t, want, found, "%s presence in body: %s", field, body)
+				require.Equal(t, expected, value)
 			}
-			require.Equal(t, tc.expected, email)
 		})
 	}
 }
