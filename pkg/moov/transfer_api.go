@@ -160,6 +160,14 @@ func WithTransferDisputed() ListTransferFilter {
 	})
 }
 
+// WithTransferTypes filters by transfer type, such as "card-payment". The filter starts in v2026.10.00.
+func WithTransferTypes(transferTypes []string) ListTransferFilter {
+	return callBuilderFn(func(call *callBuilder) error {
+		call.params["transferTypes"] = strings.Join(transferTypes, ",")
+		return nil
+	})
+}
+
 func WithTransferSkip(skip int) ListTransferFilter {
 	return Skip(skip)
 }
@@ -362,6 +370,28 @@ func GetTransferGeneric[TTransfer any](ctx context.Context, client *Client, vers
 	}
 
 	return CompletedObjectOrError[TTransfer](resp)
+}
+
+// FetchTransfersGeneric retrieves multiple transfers by their IDs, keyed by transfer ID.
+func FetchTransfersGeneric[TTransfer any](ctx context.Context, client *Client, version Version, accountID string, request FetchTransfersRequest) (map[string]TTransfer, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodPost, pathTransfersFetch, accountID),
+		MoovVersion(version),
+		AcceptJson(),
+		JsonBody(request))
+	if err != nil {
+		return nil, err
+	}
+
+	out, err := CompletedObjectOrError[map[string]TTransfer](resp)
+	if err != nil {
+		return nil, err
+	}
+	return *out, nil
 }
 
 // ListTransferEventsGeneric lists a transfer's event timeline, oldest to newest. The events endpoint starts in v2026.10.00.
@@ -570,6 +600,40 @@ func (c Client) CancelTransfer(ctx context.Context, accountID string, transferID
 	}
 
 	return CompletedObjectOrError[Cancellation](resp)
+}
+
+type CreateCancellationArgs callArg
+
+// Can be specified to overwrite a randomly generated one.
+func WithCancellationIdempotencyKey(key uuid.UUID) CreateCancellationArgs {
+	return IdempotencyKey(key.String())
+}
+
+// CancelTransferGeneric cancels a transfer. From v2026.10.00 the request needs an idempotency key and accepts an optional body.
+func CancelTransferGeneric[TRequest any, TCancellation any](ctx context.Context, client *Client, version Version, accountID, transferID string, cancellation TRequest, options ...CreateCancellationArgs) (*TCancellation, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	args := prependArgs(options,
+		MoovVersion(version),
+		AcceptJson(),
+		WithCancellationIdempotencyKey(uuid.New()),
+		JsonBody(cancellation),
+	)
+
+	resp, err := client.CallHttp(ctx, Endpoint(http.MethodPost, pathCancellations, accountID, transferID), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	// The API spec allows 200 and 202 here, and both carry a cancellation body.
+	switch resp.Status() {
+	case StatusCompleted, StatusStarted:
+		return UnmarshalObjectResponse[TCancellation](resp)
+	default:
+		return nil, resp
+	}
 }
 
 // GetCancellation gets a cancellation

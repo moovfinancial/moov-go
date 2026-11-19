@@ -562,6 +562,8 @@ const (
 	TransferStatus_Reversed  TransferStatus = "reversed"
 	TransferStatus_Queued    TransferStatus = "queued"
 	TransferStatus_Canceled  TransferStatus = "canceled"
+	// TransferStatus_AwaitingCapture is a v2026.10 auth-capture card payment that is authorized but not fully captured.
+	TransferStatus_AwaitingCapture TransferStatus = "awaiting-capture"
 )
 
 // FailureReason Reason for a transfer's failure.
@@ -657,6 +659,7 @@ const (
 	AchStatus_Corrected  AchStatus = "corrected"
 	AchStatus_Returned   AchStatus = "returned"
 	AchStatus_Completed  AchStatus = "completed"
+	AchStatus_Canceled   AchStatus = "canceled"
 )
 
 // RtpStatus Status of the RTP lifecycle.
