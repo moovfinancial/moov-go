@@ -61,9 +61,9 @@ type TransferEventTransferDetails struct {
 }
 
 type TransferEventAuthorizationDetails struct {
-	AuthorizationID string                      `json:"authorizationID"`
-	Status          TransferAuthorizationStatus `json:"status"`
-	FailureCode     *moov.CardFailureCode       `json:"failureCode,omitempty"`
+	AuthorizationID string                `json:"authorizationID"`
+	Status          AuthorizationStatus   `json:"status"`
+	FailureCode     *moov.CardFailureCode `json:"failureCode,omitempty"`
 }
 
 type TransferEventCaptureDetails struct {

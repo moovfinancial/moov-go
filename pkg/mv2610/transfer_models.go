@@ -1,13 +1,13 @@
 package mv2610
 
-// TransferAuthorizationStatus is the status of a card authorization on a transfer.
-type TransferAuthorizationStatus string
+// AuthorizationStatus is the status of a card authorization on a transfer.
+type AuthorizationStatus string
 
-// List of TransferAuthorizationStatus
+// List of AuthorizationStatus
 const (
-	TransferAuthorizationStatus_Approved TransferAuthorizationStatus = "approved"
-	TransferAuthorizationStatus_Declined TransferAuthorizationStatus = "declined"
-	TransferAuthorizationStatus_Reversed TransferAuthorizationStatus = "reversed"
+	AuthorizationStatus_Approved AuthorizationStatus = "approved"
+	AuthorizationStatus_Declined AuthorizationStatus = "declined"
+	AuthorizationStatus_Reversed AuthorizationStatus = "reversed"
 )
 
 type CaptureStatus string
