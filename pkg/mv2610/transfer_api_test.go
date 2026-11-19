@@ -54,7 +54,13 @@ func TestListTransferEvents(t *testing.T) {
 	require.NoError(t, err)
 	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
 
-	events, err := mv2610.NewTransferClient(client).ListTransferEvents(context.Background(), "account-123", "transfer-123")
+	transfers := mv2610.NewTransferClient(client)
+
+	_, err = transfers.ListTransferEvents(context.Background(), "account-123", "")
+	require.EqualError(t, err, "accountID and transferID are required")
+	require.Empty(t, path, "an empty transferID must not send a request")
+
+	events, err := transfers.ListTransferEvents(context.Background(), "account-123", "transfer-123")
 	require.NoError(t, err)
 
 	require.Equal(t, "/accounts/account-123/transfers/transfer-123/events", path)

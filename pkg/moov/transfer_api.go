@@ -369,6 +369,9 @@ func ListTransferEventsGeneric[TEvent any](ctx context.Context, client *Client, 
 	if client == nil {
 		return nil, errors.New("client is nil")
 	}
+	if accountID == "" || transferID == "" {
+		return nil, errors.New("accountID and transferID are required")
+	}
 
 	resp, err := client.CallHttp(ctx,
 		Endpoint(http.MethodGet, pathTransferEvents, accountID, transferID),
