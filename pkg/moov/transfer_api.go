@@ -364,6 +364,24 @@ func GetTransferGeneric[TTransfer any](ctx context.Context, client *Client, vers
 	return CompletedObjectOrError[TTransfer](resp)
 }
 
+// ListTransferEventsGeneric lists a transfer's event timeline, oldest to newest. The events endpoint starts in v2026.10.00.
+func ListTransferEventsGeneric[TEvent any](ctx context.Context, client *Client, version Version, accountID, transferID string) ([]TEvent, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathTransferEvents, accountID, transferID),
+		MoovVersion(version),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[TEvent](resp)
+}
+
 type CreateRefundArgs callArg
 
 func WithRefundWaitForRailResponse() CreateRefundArgs {
