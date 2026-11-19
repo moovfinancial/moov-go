@@ -128,7 +128,7 @@ type PatchBusinessProfile struct {
 	Industry         string            `json:"industry,omitempty"`
 	IndustryCodes    *IndustryCodes    `json:"industryCodes,omitempty"`
 	PrimaryRegulator *PrimaryRegulator `json:"primaryRegulator,omitempty"`
-	TaxID            *TaxID            `json:"taxID"`
+	TaxID            *TaxID            `json:"taxID,omitempty"`
 }
 
 // Account Describes a Moov account.
