@@ -109,7 +109,7 @@ type PatchProfile struct {
 type PatchIndividualProfile struct {
 	Name         Name          `json:"name"`
 	Phone        *Phone        `json:"phone,omitempty"`
-	Email        string        `json:"email"`
+	Email        string        `json:"email,omitempty"`
 	Address      *Address      `json:"address,omitempty"`
 	BirthDate    *Date         `json:"birthDate,omitempty"`
 	GovernmentID *GovernmentID `json:"governmentID,omitempty"`
