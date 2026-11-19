@@ -80,6 +80,8 @@ const (
 	pathTransfer       = "/accounts/%s/transfers/%s"
 	pathTransfersFetch = "/accounts/%s/transfers/.fetch"
 	pathTransferEvents = "/accounts/%s/transfers/%s/events"
+	pathCaptures       = "/accounts/%s/transfers/%s/captures"
+	pathCapture        = "/accounts/%s/transfers/%s/captures/%s"
 
 	pathTransferRiskOutcomes = "/transfers/%s/risk-outcomes"
 
