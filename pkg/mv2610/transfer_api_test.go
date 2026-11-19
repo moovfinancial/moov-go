@@ -143,7 +143,11 @@ func TestTransferClient(t *testing.T) {
 		case "POST /accounts/acct-1/transfers/xfr-1/captures":
 			w.WriteHeader(http.StatusCreated)
 			_, _ = w.Write([]byte(`{"captureID":"capt-1","amount":{"currency":"USD","valueDecimal":"25.00"},"isFinal":false,"status":"completed","createdOn":"2024-08-24T14:15:22Z"}`))
-		case "POST /accounts/acct-1/transfers/xfr-1/cancellations":
+		case "GET /accounts/acct-1/transfers/xfr-1/captures":
+			_, _ = w.Write([]byte(`[{"captureID":"capt-1","amount":{"currency":"USD","valueDecimal":"25.00"},"isFinal":false,"status":"completed","createdOn":"2024-08-24T14:15:22Z"}]`))
+		case "GET /accounts/acct-1/transfers/xfr-1/captures/capt-1":
+			_, _ = w.Write([]byte(`{"captureID":"capt-1","amount":{"currency":"USD","valueDecimal":"25.00"},"isFinal":false,"status":"completed","createdOn":"2024-08-24T14:15:22Z"}`))
+		case "POST /accounts/acct-1/transfers/xfr-1/cancellations", "GET /accounts/acct-1/transfers/xfr-1/cancellations/canc-1":
 			_, _ = w.Write([]byte(`{"cancellationID":"canc-1","status":"completed","createdOn":"2024-08-24T14:15:22Z"}`))
 		case "GET /accounts/acct-1/transfers/xfr-1/cancellations":
 			_, _ = w.Write([]byte(`[{"cancellationID":"canc-1","status":"completed","createdOn":"2024-08-24T14:15:22Z"}]`))
@@ -217,12 +221,24 @@ func TestTransferClient(t *testing.T) {
 	}
 	require.Equal(t, &wantCancellation, cancellation)
 
-	// Auth-capture transfers exist only in v2026.10, so the cancellation reads must send its version header.
+	// Auth-capture transfers exist only in v2026.10, so the capture and cancellation reads must send its version header.
 	cancellations, err := transfers.ListCancellations(ctx, "acct-1", "xfr-1")
 	require.NoError(t, err)
 	require.Equal(t, []moov.Cancellation{wantCancellation}, cancellations)
 
-	require.Len(t, requests, 7)
+	gotCancellation, err := transfers.GetCancellation(ctx, "acct-1", "xfr-1", "canc-1")
+	require.NoError(t, err)
+	require.Equal(t, &wantCancellation, gotCancellation)
+
+	captures, err := transfers.ListCaptures(ctx, "acct-1", "xfr-1")
+	require.NoError(t, err)
+	require.Equal(t, []mv2610.Capture{*capture}, captures)
+
+	gotCapture, err := transfers.GetCapture(ctx, "acct-1", "xfr-1", "capt-1")
+	require.NoError(t, err)
+	require.Equal(t, capture, gotCapture)
+
+	require.Len(t, requests, 10)
 	for _, r := range requests {
 		require.Equal(t, moov.Version2026_10.String(), r.version, r.method+" "+r.path)
 	}
