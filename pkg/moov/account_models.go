@@ -107,9 +107,9 @@ type PatchProfile struct {
 }
 
 type PatchIndividualProfile struct {
-	Name         Name          `json:"name"`
+	Name         Name          `json:"name,omitzero"`
 	Phone        *Phone        `json:"phone,omitempty"`
-	Email        string        `json:"email"`
+	Email        string        `json:"email,omitempty"`
 	Address      *Address      `json:"address,omitempty"`
 	BirthDate    *Date         `json:"birthDate,omitempty"`
 	GovernmentID *GovernmentID `json:"governmentID,omitempty"`
@@ -128,7 +128,7 @@ type PatchBusinessProfile struct {
 	Industry         string            `json:"industry,omitempty"`
 	IndustryCodes    *IndustryCodes    `json:"industryCodes,omitempty"`
 	PrimaryRegulator *PrimaryRegulator `json:"primaryRegulator,omitempty"`
-	TaxID            *TaxID            `json:"taxID"`
+	TaxID            *TaxID            `json:"taxID,omitempty"`
 }
 
 // Account Describes a Moov account.
@@ -204,12 +204,12 @@ type Phone struct {
 
 // Address struct for Address
 type Address struct {
-	AddressLine1    string `json:"addressLine1"`
+	AddressLine1    string `json:"addressLine1,omitempty"`
 	AddressLine2    string `json:"addressLine2,omitempty"`
-	City            string `json:"city"`
-	StateOrProvince string `json:"stateOrProvince"`
-	PostalCode      string `json:"postalCode"`
-	Country         string `json:"country"`
+	City            string `json:"city,omitempty"`
+	StateOrProvince string `json:"stateOrProvince,omitempty"`
+	PostalCode      string `json:"postalCode,omitempty"`
+	Country         string `json:"country,omitempty"`
 }
 
 // AddressPatch is for partial address updates. Only fields that are non-nil will be updated.
