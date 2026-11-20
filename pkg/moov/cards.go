@@ -89,6 +89,9 @@ const (
 	// Transaction was successfully cancelled and authorization has been reversed
 	CardTransactionStatus_Canceled CardTransactionStatus = "canceled"
 
+	// Push-to-card transaction is held for later delivery
+	CardTransactionStatus_Deferred CardTransactionStatus = "deferred"
+
 	// Transaction failed; specific failure reason will be in cardDetails.failureCode
 	CardTransactionStatus_Failed CardTransactionStatus = "failed"
 )
