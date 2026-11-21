@@ -324,7 +324,8 @@ type CardPaymentRefundProcessingDetails struct {
 }
 
 type CreateReversal struct {
-	Amount        moov.AmountDecimal   `json:"amount"`
+	// Amount is optional. Without Amount, the request reverses the full amount of the transfer.
+	Amount        *moov.AmountDecimal  `json:"amount,omitempty"`
 	AmountDetails *RefundAmountDetails `json:"amountDetails,omitempty"`
 }
 

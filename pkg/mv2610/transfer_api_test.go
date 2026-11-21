@@ -220,6 +220,94 @@ func TestTransferClient(t *testing.T) {
 	}
 }
 
+// The server answers 202 when the wait for the rail times out. The refund or reversal exists, so the SDK must
+// return it, not an error. The bodies are the moov-api v2026.10 CardAcquiringRefund and Reversal shapes.
+func TestTransferClientRefundsAndReversals(t *testing.T) {
+	const refundJSON = `{"refundID":"ref-1","createdOn":"2024-08-24T14:15:22Z","updatedOn":"2024-08-24T14:15:22Z",` +
+		`"status":"pending","amount":{"currency":"USD","valueDecimal":"10.00"},"processingDetails":{}}`
+	type request struct {
+		version, idempotencyKey, waitFor, body string
+	}
+	requests := map[string]request{}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := io.ReadAll(r.Body)
+		key := r.Method + " " + r.URL.Path
+		requests[key] = request{
+			version:        r.Header.Get(moov.VersionHeader),
+			idempotencyKey: r.Header.Get("X-Idempotency-Key"),
+			waitFor:        r.Header.Get("X-Wait-For"),
+			body:           string(body),
+		}
+		w.Header().Set("Content-Type", "application/json")
+
+		switch key {
+		case "POST /accounts/acct-1/transfers/xfr-1/refunds":
+			w.WriteHeader(http.StatusAccepted)
+			_, _ = w.Write([]byte(refundJSON))
+		case "GET /accounts/acct-1/transfers/xfr-1/refunds":
+			_, _ = w.Write([]byte("[" + refundJSON + "]"))
+		case "GET /accounts/acct-1/transfers/xfr-1/refunds/ref-1":
+			_, _ = w.Write([]byte(refundJSON))
+		case "POST /accounts/acct-1/transfers/xfr-1/reversals":
+			w.WriteHeader(http.StatusAccepted)
+			_, _ = w.Write([]byte(`{"refund":` + refundJSON + `}`))
+		case "POST /accounts/acct-1/transfers/xfr-2/reversals":
+			w.WriteHeader(http.StatusConflict)
+			_, _ = w.Write([]byte(`{"error":"transfer cannot be reversed"}`))
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(srv.Close)
+
+	client, err := moov.NewClient(
+		moov.WithCredentials(moov.Credentials{PublicKey: "pk", SecretKey: "sk"}),
+		moov.WithMoovURLScheme("http"),
+	)
+	require.NoError(t, err)
+	client.Credentials.Host = strings.TrimPrefix(srv.URL, "http://")
+	transfers := mv2610.NewTransferClient(client)
+	ctx := context.Background()
+
+	wantRefund := mv2610.Refund{
+		RefundID:  "ref-1",
+		CreatedOn: time.Date(2024, 8, 24, 14, 15, 22, 0, time.UTC),
+		UpdatedOn: time.Date(2024, 8, 24, 14, 15, 22, 0, time.UTC),
+		Status:    moov.RefundStatus_Pending,
+		Amount:    moov.AmountDecimal{Currency: "USD", ValueDecimal: "10.00"},
+	}
+
+	refund, err := transfers.RefundTransfer(ctx, "acct-1", "xfr-1", mv2610.CreateRefund{}, moov.WithRefundWaitForRailResponse())
+	require.NoError(t, err, "a 202 refund is a success")
+	require.Equal(t, &wantRefund, refund)
+
+	refunds, err := transfers.ListRefunds(ctx, "acct-1", "xfr-1")
+	require.NoError(t, err)
+	require.Equal(t, []mv2610.Refund{wantRefund}, refunds)
+
+	gotRefund, err := transfers.GetRefund(ctx, "acct-1", "xfr-1", "ref-1")
+	require.NoError(t, err)
+	require.Equal(t, &wantRefund, gotRefund)
+
+	reversal, err := transfers.ReverseTransfer(ctx, "acct-1", "xfr-1", mv2610.CreateReversal{})
+	require.NoError(t, err, "a 202 reversal is a success")
+	require.Equal(t, &mv2610.CreatedReversal{Refund: &wantRefund}, reversal)
+
+	_, err = transfers.ReverseTransfer(ctx, "acct-1", "xfr-2", mv2610.CreateReversal{})
+	require.Error(t, err, "a 409 reversal is not a success")
+
+	require.Len(t, requests, 5)
+	for key, r := range requests {
+		require.Equal(t, moov.Version2026_10.String(), r.version, key)
+	}
+	for _, key := range []string{"POST /accounts/acct-1/transfers/xfr-1/refunds", "POST /accounts/acct-1/transfers/xfr-1/reversals"} {
+		_, err := uuid.Parse(requests[key].idempotencyKey)
+		require.NoError(t, err, "%s needs an idempotency key", key)
+		require.JSONEq(t, `{}`, requests[key].body, "%s without an amount refunds or reverses the full amount", key)
+	}
+	require.Equal(t, "rail-response", requests["POST /accounts/acct-1/transfers/xfr-1/refunds"].waitFor)
+}
+
 // awaitingCaptureTransferJSON is the moov-api v2026.10 getTransfer example "Awaiting capture card payment transfer".
 const awaitingCaptureTransferJSON = `{
 	"transferID": "d835gf30-4b19-4850-a9b2-c0624c41ecb3",

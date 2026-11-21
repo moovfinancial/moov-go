@@ -38,8 +38,10 @@ func (t TransferClient) ListTransferEvents(ctx context.Context, accountID, trans
 	return moov.ListTransferEventsGeneric[TransferEvent](ctx, t.Client, moov.Version2026_10, accountID, transferID)
 }
 
-func (t TransferClient) RefundTransfer(ctx context.Context, partnerAccountID, transferID string, refund CreateRefund, options ...moov.CreateRefundArgs) (*Refund, *moov.RefundStarted, error) {
-	return moov.RefundTransferGeneric[CreateRefund, Refund](ctx, t.Client, moov.Version2026_10, partnerAccountID, transferID, refund, options...)
+// RefundTransfer returns the refund for a 200 and for a 202 response. Without
+// moov.WithRefundWaitForRailResponse, the refund has no status or processing details yet.
+func (t TransferClient) RefundTransfer(ctx context.Context, partnerAccountID, transferID string, refund CreateRefund, options ...moov.CreateRefundArgs) (*Refund, error) {
+	return moov.CreateRefundGeneric[CreateRefund, Refund](ctx, t.Client, moov.Version2026_10, partnerAccountID, transferID, refund, options...)
 }
 
 func (t TransferClient) ListRefunds(ctx context.Context, accountID, transferID string) ([]Refund, error) {

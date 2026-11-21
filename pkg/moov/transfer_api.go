@@ -499,6 +499,34 @@ func (c Client) ListRefunds(ctx context.Context, accountID, transferID string) (
 	return CompletedListOrError[Refund](resp)
 }
 
+// CreateRefundGeneric refunds a transfer and returns the refund for a 200 or a 202 response.
+// From v2026.10.00 a 202 means the wait for the rail timed out, and its body is the refund,
+// not the RefundStarted shape that RefundTransferGeneric decodes.
+func CreateRefundGeneric[TRequest any, TRefund any](ctx context.Context, client *Client, version Version, partnerAccountID, transferID string, refund TRequest, options ...CreateRefundArgs) (*TRefund, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	args := prependArgs(options,
+		MoovVersion(version),
+		AcceptJson(),
+		WithRefundIdempotencyKey(uuid.New()),
+		JsonBody(refund),
+	)
+
+	resp, err := client.CallHttp(ctx, Endpoint(http.MethodPost, pathRefunds, partnerAccountID, transferID), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	switch resp.Status() {
+	case StatusCompleted, StatusStarted:
+		return UnmarshalObjectResponse[TRefund](resp)
+	default:
+		return nil, resp
+	}
+}
+
 func ListRefundsGeneric[TRefund any](ctx context.Context, client *Client, version Version, accountID, transferID string) ([]TRefund, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -588,7 +616,13 @@ func ReverseTransferGeneric[TRequest any, TCreatedReversal any](ctx context.Cont
 		return nil, err
 	}
 
-	return CompletedObjectOrError[TCreatedReversal](resp)
+	// A 202 means the reversal was created but the wait for the rail timed out. Its body is the same reversal.
+	switch resp.Status() {
+	case StatusCompleted, StatusStarted:
+		return UnmarshalObjectResponse[TCreatedReversal](resp)
+	default:
+		return nil, resp
+	}
 }
 
 // CancelTransfer cancels a transfer
