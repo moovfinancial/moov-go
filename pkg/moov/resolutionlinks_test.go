@@ -12,6 +12,18 @@ func Test_ResolutionLinks(t *testing.T) {
 
 	var resolutionLinkCode string
 
+	// A run that stops before "delete resolution link" leaves an active link, and the API rejects
+	// every later create with 409 until that link is gone.
+	t.Run("delete leftover active links", func(t *testing.T) {
+		links, err := mc.ListResolutionLinks(BgCtx(), MERCHANT_ID)
+		NoResponseError(t, err)
+		for _, link := range links {
+			if link.Status == moov.ResolutionLinkStatus_Active {
+				NoResponseError(t, mc.DeleteResolutionLink(BgCtx(), MERCHANT_ID, link.ResolutionLinkCode))
+			}
+		}
+	})
+
 	t.Run("create resolution link", func(t *testing.T) {
 		createReq := moov.CreateResolutionLinkRequest{
 			Recipient: moov.Recipient{
