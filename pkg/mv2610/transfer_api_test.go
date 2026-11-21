@@ -226,13 +226,16 @@ func TestTransferClientRefundsAndReversals(t *testing.T) {
 	const refundJSON = `{"refundID":"ref-1","createdOn":"2024-08-24T14:15:22Z","updatedOn":"2024-08-24T14:15:22Z",` +
 		`"status":"pending","amount":{"currency":"USD","valueDecimal":"10.00"},"processingDetails":{}}`
 	type request struct {
-		version, idempotencyKey, waitFor, body string
+		version        string
+		idempotencyKey string
+		waitFor        string
+		body           string
 	}
-	requests := map[string]request{}
+	requestByRoute := map[string]request{}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := io.ReadAll(r.Body)
 		key := r.Method + " " + r.URL.Path
-		requests[key] = request{
+		requestByRoute[key] = request{
 			version:        r.Header.Get(moov.VersionHeader),
 			idempotencyKey: r.Header.Get("X-Idempotency-Key"),
 			waitFor:        r.Header.Get("X-Wait-For"),
@@ -296,16 +299,16 @@ func TestTransferClientRefundsAndReversals(t *testing.T) {
 	_, err = transfers.ReverseTransfer(ctx, "acct-1", "xfr-2", mv2610.CreateReversal{})
 	require.Error(t, err, "a 409 reversal is not a success")
 
-	require.Len(t, requests, 5)
-	for key, r := range requests {
+	require.Len(t, requestByRoute, 5)
+	for key, r := range requestByRoute {
 		require.Equal(t, moov.Version2026_10.String(), r.version, key)
 	}
 	for _, key := range []string{"POST /accounts/acct-1/transfers/xfr-1/refunds", "POST /accounts/acct-1/transfers/xfr-1/reversals"} {
-		_, err := uuid.Parse(requests[key].idempotencyKey)
+		_, err := uuid.Parse(requestByRoute[key].idempotencyKey)
 		require.NoError(t, err, "%s needs an idempotency key", key)
-		require.JSONEq(t, `{}`, requests[key].body, "%s without an amount refunds or reverses the full amount", key)
+		require.JSONEq(t, `{}`, requestByRoute[key].body, "%s without an amount refunds or reverses the full amount", key)
 	}
-	require.Equal(t, "rail-response", requests["POST /accounts/acct-1/transfers/xfr-1/refunds"].waitFor)
+	require.Equal(t, "rail-response", requestByRoute["POST /accounts/acct-1/transfers/xfr-1/refunds"].waitFor)
 }
 
 // awaitingCaptureTransferJSON is the moov-api v2026.10 getTransfer example "Awaiting capture card payment transfer".
