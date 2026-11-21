@@ -94,6 +94,9 @@ const (
 
 	// Transaction failed; specific failure reason will be in cardDetails.failureCode
 	CardTransactionStatus_Failed CardTransactionStatus = "failed"
+
+	// Card payment was cleared by a third party instead of by Moov
+	CardTransactionStatus_ClearedExternally CardTransactionStatus = "cleared-externally"
 )
 
 type CreateCard struct {
