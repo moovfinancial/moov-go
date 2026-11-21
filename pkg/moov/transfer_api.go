@@ -394,6 +394,74 @@ func FetchTransfersGeneric[TTransfer any](ctx context.Context, client *Client, v
 	return *out, nil
 }
 
+type CreateCaptureArgs callArg
+
+// Can be specified to overwrite a randomly generated one.
+func WithCaptureIdempotencyKey(key uuid.UUID) CreateCaptureArgs {
+	return IdempotencyKey(key.String())
+}
+
+// CreateCaptureGeneric captures funds from an authorized card payment. The captures endpoints start in v2026.10.00.
+func CreateCaptureGeneric[TRequest any, TCapture any](ctx context.Context, client *Client, version Version, accountID, transferID string, capture TRequest, options ...CreateCaptureArgs) (*TCapture, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	args := prependArgs(options,
+		MoovVersion(version),
+		AcceptJson(),
+		WithCaptureIdempotencyKey(uuid.New()),
+		JsonBody(capture),
+	)
+
+	resp, err := client.CallHttp(ctx, Endpoint(http.MethodPost, pathCaptures, accountID, transferID), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	// The API answers 201 for every created capture, including a declined one; the capture status reports the outcome.
+	switch resp.Status() {
+	case StatusCompleted, StatusStarted:
+		return UnmarshalObjectResponse[TCapture](resp)
+	default:
+		return nil, resp
+	}
+}
+
+func ListCapturesGeneric[TCapture any](ctx context.Context, client *Client, version Version, accountID, transferID string) ([]TCapture, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathCaptures, accountID, transferID),
+		MoovVersion(version),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[TCapture](resp)
+}
+
+func GetCaptureGeneric[TCapture any](ctx context.Context, client *Client, version Version, accountID, transferID, captureID string) (*TCapture, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathCapture, accountID, transferID, captureID),
+		MoovVersion(version),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[TCapture](resp)
+}
+
 // ListTransferEventsGeneric lists a transfer's event timeline, oldest to newest. The events endpoint starts in v2026.10.00.
 func ListTransferEventsGeneric[TEvent any](ctx context.Context, client *Client, version Version, accountID, transferID string) ([]TEvent, error) {
 	if client == nil {
@@ -668,6 +736,40 @@ func CancelTransferGeneric[TRequest any, TCancellation any](ctx context.Context,
 	default:
 		return nil, resp
 	}
+}
+
+func ListCancellationsGeneric[TCancellation any](ctx context.Context, client *Client, version Version, accountID, transferID string) ([]TCancellation, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathCancellations, accountID, transferID),
+		MoovVersion(version),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedListOrError[TCancellation](resp)
+}
+
+func GetCancellationGeneric[TCancellation any](ctx context.Context, client *Client, version Version, accountID, transferID, cancellationID string) (*TCancellation, error) {
+	if client == nil {
+		return nil, errors.New("client is nil")
+	}
+
+	resp, err := client.CallHttp(ctx,
+		Endpoint(http.MethodGet, pathCancellation, accountID, transferID, cancellationID),
+		MoovVersion(version),
+		AcceptJson(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return CompletedObjectOrError[TCancellation](resp)
 }
 
 // GetCancellation gets a cancellation

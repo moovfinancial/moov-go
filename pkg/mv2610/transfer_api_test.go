@@ -140,8 +140,17 @@ func TestTransferClient(t *testing.T) {
 			_, _ = w.Write([]byte("[" + awaitingCaptureTransferJSON + "]"))
 		case "POST /accounts/acct-1/transfers/.fetch":
 			_, _ = w.Write([]byte(`{"xfr-1":` + awaitingCaptureTransferJSON + `}`))
-		case "POST /accounts/acct-1/transfers/xfr-1/cancellations":
+		case "POST /accounts/acct-1/transfers/xfr-1/captures":
+			w.WriteHeader(http.StatusCreated)
+			_, _ = w.Write([]byte(`{"captureID":"capt-1","amount":{"currency":"USD","valueDecimal":"25.00"},"isFinal":false,"status":"completed","createdOn":"2024-08-24T14:15:22Z"}`))
+		case "GET /accounts/acct-1/transfers/xfr-1/captures":
+			_, _ = w.Write([]byte(`[{"captureID":"capt-1","amount":{"currency":"USD","valueDecimal":"25.00"},"isFinal":false,"status":"completed","createdOn":"2024-08-24T14:15:22Z"}]`))
+		case "GET /accounts/acct-1/transfers/xfr-1/captures/capt-1":
+			_, _ = w.Write([]byte(`{"captureID":"capt-1","amount":{"currency":"USD","valueDecimal":"25.00"},"isFinal":false,"status":"completed","createdOn":"2024-08-24T14:15:22Z"}`))
+		case "POST /accounts/acct-1/transfers/xfr-1/cancellations", "GET /accounts/acct-1/transfers/xfr-1/cancellations/canc-1":
 			_, _ = w.Write([]byte(`{"cancellationID":"canc-1","status":"completed","createdOn":"2024-08-24T14:15:22Z"}`))
+		case "GET /accounts/acct-1/transfers/xfr-1/cancellations":
+			_, _ = w.Write([]byte(`[{"cancellationID":"canc-1","status":"completed","createdOn":"2024-08-24T14:15:22Z"}]`))
 		default:
 			http.NotFound(w, r)
 		}
@@ -192,17 +201,44 @@ func TestTransferClient(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, map[string]mv2610.Transfer{"xfr-1": *got}, fetched)
 
+	isFinal := true
+	capture, err := transfers.CreateCapture(ctx, "acct-1", "xfr-1", mv2610.CreateCapture{
+		Amount:  &moov.AmountDecimal{Currency: "USD", ValueDecimal: "25.00"},
+		IsFinal: &isFinal,
+	})
+	require.NoError(t, err, "a 201 capture response is a success")
+	require.Equal(t, "capt-1", capture.CaptureID)
+	require.Equal(t, mv2610.CaptureStatus_Completed, capture.Status)
+
 	cancellation, err := transfers.CancelTransfer(ctx, "acct-1", "xfr-1", mv2610.CreateCancellation{
 		Amount: &moov.AmountDecimal{Currency: "USD", ValueDecimal: "304.45"},
 	})
 	require.NoError(t, err)
-	require.Equal(t, &moov.Cancellation{
+	wantCancellation := moov.Cancellation{
 		CancellationID: "canc-1",
 		Status:         moov.CancellationStatus_Completed,
 		CreatedOn:      time.Date(2024, 8, 24, 14, 15, 22, 0, time.UTC),
-	}, cancellation)
+	}
+	require.Equal(t, &wantCancellation, cancellation)
 
-	require.Len(t, requests, 5)
+	// Auth-capture transfers exist only in v2026.10, so the capture and cancellation reads must send its version header.
+	cancellations, err := transfers.ListCancellations(ctx, "acct-1", "xfr-1")
+	require.NoError(t, err)
+	require.Equal(t, []moov.Cancellation{wantCancellation}, cancellations)
+
+	gotCancellation, err := transfers.GetCancellation(ctx, "acct-1", "xfr-1", "canc-1")
+	require.NoError(t, err)
+	require.Equal(t, &wantCancellation, gotCancellation)
+
+	captures, err := transfers.ListCaptures(ctx, "acct-1", "xfr-1")
+	require.NoError(t, err)
+	require.Equal(t, []mv2610.Capture{*capture}, captures)
+
+	gotCapture, err := transfers.GetCapture(ctx, "acct-1", "xfr-1", "capt-1")
+	require.NoError(t, err)
+	require.Equal(t, capture, gotCapture)
+
+	require.Len(t, requests, 10)
 	for _, r := range requests {
 		require.Equal(t, moov.Version2026_10.String(), r.version, r.method+" "+r.path)
 	}
@@ -213,8 +249,9 @@ func TestTransferClient(t *testing.T) {
 		"options":{"cardPayment":{"captureMethod":"manual"}}
 	}`, requests[0].body)
 	require.Equal(t, "transferTypes=card-payment%2Cach-debit", requests[2].query)
-	require.JSONEq(t, `{"amount":{"currency":"USD","valueDecimal":"304.45"}}`, requests[4].body)
-	for _, i := range []int{0, 4} {
+	require.JSONEq(t, `{"amount":{"currency":"USD","valueDecimal":"25.00"},"isFinal":true}`, requests[4].body)
+	require.JSONEq(t, `{"amount":{"currency":"USD","valueDecimal":"304.45"}}`, requests[5].body)
+	for _, i := range []int{0, 4, 5} {
 		_, err := uuid.Parse(requests[i].idempotencyKey)
 		require.NoError(t, err, "%s %s needs an idempotency key", requests[i].method, requests[i].path)
 	}
