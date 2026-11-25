@@ -58,7 +58,7 @@ func newEventCase[T any](eventType EventType, getter func(Event) (*T, error), da
 }
 
 func TestParseEvent(t *testing.T) {
-	visaMID := "v1"
+	visaMid := "v1"
 	networkIDUpdatedOn := time.Date(2026, time.April, 2, 0, 0, 0, 0, time.UTC)
 	transferID := "t"
 
