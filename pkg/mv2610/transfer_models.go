@@ -145,7 +145,7 @@ type CardPaymentOptions struct {
 	IsEstimatedAuthorization *bool `json:"isEstimatedAuthorization,omitempty"`
 }
 
-// CaptureMethod selects whether a card payment captures automatically or waits for a capture request.
+// CaptureMethod selects whether a card payment captures automatically or waits for CreateCapture.
 type CaptureMethod string
 
 // List of CaptureMethod
@@ -279,6 +279,34 @@ const (
 	AuthorizationStatus_Declined AuthorizationStatus = "declined"
 	AuthorizationStatus_Reversed AuthorizationStatus = "reversed"
 )
+
+// CreateCapture captures funds from an authorized card payment. Without Amount, the request captures the remaining capturable amount.
+type CreateCapture struct {
+	Amount *moov.AmountDecimal `json:"amount,omitempty"`
+	// IsFinal marks the last capture. The API voids the remaining capturable amount.
+	IsFinal              *bool                         `json:"isFinal,omitempty"`
+	Description          string                        `json:"description,omitempty"`
+	Metadata             map[string]string             `json:"metadata,omitempty"`
+	ForeignID            *string                       `json:"foreignID,omitempty"`
+	LineItems            *moov.CreateTransferLineItems `json:"lineItems,omitempty"`
+	AmountDetails        *CreateTransferAmountDetails  `json:"amountDetails,omitempty"`
+	FacilitatorFeeAmount *moov.AmountDecimal           `json:"facilitatorFeeAmount,omitempty"`
+}
+
+type Capture struct {
+	CaptureID            string                  `json:"captureID"`
+	Amount               moov.AmountDecimal      `json:"amount"`
+	IsFinal              bool                    `json:"isFinal"`
+	Status               CaptureStatus           `json:"status"`
+	CreatedOn            time.Time               `json:"createdOn"`
+	Description          string                  `json:"description,omitempty"`
+	Metadata             map[string]string       `json:"metadata,omitempty"`
+	ForeignID            *string                 `json:"foreignID,omitempty"`
+	LineItems            *moov.TransferLineItems `json:"lineItems,omitempty"`
+	AmountDetails        *TransferAmountDetails  `json:"amountDetails,omitempty"`
+	FacilitatorFeeAmount *moov.AmountDecimal     `json:"facilitatorFeeAmount,omitempty"`
+	FailureCode          *moov.CardFailureCode   `json:"failureCode,omitempty"`
+}
 
 type CaptureStatus string
 

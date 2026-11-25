@@ -38,6 +38,20 @@ func (t TransferClient) ListTransferEvents(ctx context.Context, accountID, trans
 	return moov.ListTransferEventsGeneric[TransferEvent](ctx, t.Client, moov.Version2026_10, accountID, transferID)
 }
 
+// CreateCapture captures funds from a card payment created with CaptureMethod_Manual.
+// A declined capture is not an error. Read its Status.
+func (t TransferClient) CreateCapture(ctx context.Context, accountID, transferID string, capture CreateCapture, options ...moov.CreateCaptureArgs) (*Capture, error) {
+	return moov.CreateCaptureGeneric[CreateCapture, Capture](ctx, t.Client, moov.Version2026_10, accountID, transferID, capture, options...)
+}
+
+func (t TransferClient) ListCaptures(ctx context.Context, accountID, transferID string) ([]Capture, error) {
+	return moov.ListCapturesGeneric[Capture](ctx, t.Client, moov.Version2026_10, accountID, transferID)
+}
+
+func (t TransferClient) GetCapture(ctx context.Context, accountID, transferID, captureID string) (*Capture, error) {
+	return moov.GetCaptureGeneric[Capture](ctx, t.Client, moov.Version2026_10, accountID, transferID, captureID)
+}
+
 // RefundTransfer returns the refund for a 200 and for a 202 response. Without
 // moov.WithRefundWaitForRailResponse, the refund has no status or processing details yet.
 func (t TransferClient) RefundTransfer(ctx context.Context, partnerAccountID, transferID string, refund CreateRefund, options ...moov.CreateRefundArgs) (*Refund, error) {
@@ -60,4 +74,13 @@ func (t TransferClient) ReverseTransfer(ctx context.Context, partnerAccountID, t
 // moov.WithCancellationIdempotencyKey sets one.
 func (t TransferClient) CancelTransfer(ctx context.Context, accountID, transferID string, cancellation CreateCancellation, options ...moov.CreateCancellationArgs) (*moov.Cancellation, error) {
 	return moov.CancelTransferGeneric[CreateCancellation, moov.Cancellation](ctx, t.Client, moov.Version2026_10, accountID, transferID, cancellation, options...)
+}
+
+// ListCancellations sends the v2026.10 version header. The unversioned moov.Client method cannot read auth-capture transfers.
+func (t TransferClient) ListCancellations(ctx context.Context, accountID, transferID string) ([]moov.Cancellation, error) {
+	return moov.ListCancellationsGeneric[moov.Cancellation](ctx, t.Client, moov.Version2026_10, accountID, transferID)
+}
+
+func (t TransferClient) GetCancellation(ctx context.Context, accountID, transferID, cancellationID string) (*moov.Cancellation, error) {
+	return moov.GetCancellationGeneric[moov.Cancellation](ctx, t.Client, moov.Version2026_10, accountID, transferID, cancellationID)
 }
