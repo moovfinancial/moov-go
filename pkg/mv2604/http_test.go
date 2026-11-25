@@ -54,12 +54,17 @@ func newTestClient(t *testing.T, want *expectedRequest, status int, response str
 	}))
 	t.Cleanup(func() {
 		server.Close()
+
+		mu.Lock()
+		received := requests
+		mu.Unlock()
+
 		if want == nil {
-			require.Empty(t, requests, "validation should stop before sending an HTTP request")
+			require.Empty(t, received, "validation should stop before sending an HTTP request")
 			return
 		}
-		require.Len(t, requests, 1)
-		got := requests[0]
+		require.Len(t, received, 1)
+		got := received[0]
 		require.NoError(t, got.readErr)
 		require.Equal(t, want.method, got.method)
 		require.Equal(t, want.path, got.path)
