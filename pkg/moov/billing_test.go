@@ -2,6 +2,10 @@ package moov_test
 
 import (
 	"context"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,6 +13,105 @@ import (
 
 	"github.com/moovfinancial/moov-go/pkg/moov"
 )
+
+func TestOfflineListFeePlanAgreements(t *testing.T) {
+	client := newBillingTestClient(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		assert.Equal(t, "/accounts/account-1/fee-plan-agreements", r.URL.Path)
+		assert.Equal(t, url.Values{
+			"count":       {"2"},
+			"skip":        {"5"},
+			"status":      {"active,terminated"},
+			"agreementID": {"g1,g2"},
+		}, r.URL.Query())
+
+		w.Header().Set("Content-Type", "application/json")
+		_, err := io.WriteString(w, `[
+			{"agreementID":"g1","status":"active"},
+			{"agreementID":"g2","status":"terminated"}
+		]`)
+		assert.NoError(t, err)
+	}))
+
+	agreements, err := client.ListFeePlanAgreements(t.Context(), "account-1",
+		moov.WithFeePlanAgreementCount(2),
+		moov.WithFeePlanAgreementSkip(5),
+		moov.WithFeePlanAgreementStatuses([]moov.FeePlanAgreementStatus{
+			moov.FeePlanAgreementStatus_Active,
+			moov.FeePlanAgreementStatus_Terminated,
+		}),
+		moov.WithFeePlanAgreementIds([]string{"g1", "g2"}),
+	)
+	require.NoError(t, err)
+	require.Equal(t, []moov.FeePlanAgreement{
+		{AgreementID: "g1", Status: moov.FeePlanAgreementStatus_Active},
+		{AgreementID: "g2", Status: moov.FeePlanAgreementStatus_Terminated},
+	}, agreements)
+}
+
+func TestOfflineCreateFeePlanAgreement(t *testing.T) {
+	const success = `{"agreementID":"g1","accountID":"account-1","planID":"plan-1","status":"active"}`
+	tests := []struct {
+		status   int
+		response string
+	}{
+		{status: http.StatusOK, response: success},
+		{status: http.StatusCreated, response: success},
+		{status: http.StatusUnprocessableEntity, response: `{"error":"invalid plan ID"}`},
+	}
+
+	for _, tt := range tests {
+		t.Run(http.StatusText(tt.status), func(t *testing.T) {
+			client := newBillingTestClient(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPost, r.Method)
+				assert.Equal(t, "/accounts/account-1/fee-plan-agreements", r.URL.Path)
+				assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+				body, err := io.ReadAll(r.Body)
+				if assert.NoError(t, err) {
+					assert.JSONEq(t, `{"planID":"plan-1"}`, string(body))
+				}
+
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.status)
+				_, err = io.WriteString(w, tt.response)
+				assert.NoError(t, err)
+			}))
+
+			agreement, err := client.CreateFeePlanAgreement(t.Context(), "account-1",
+				moov.FeePlanAgreementRequest{PlanID: "plan-1"})
+			if tt.status == http.StatusUnprocessableEntity {
+				require.Nil(t, agreement)
+				var httpErr moov.HttpCallResponse
+				require.ErrorAs(t, err, &httpErr)
+				require.Equal(t, http.StatusUnprocessableEntity, httpErr.StatusCode())
+				require.Equal(t, moov.StatusFailedValidation, httpErr.Status())
+				return
+			}
+
+			require.NoError(t, err)
+			require.Equal(t, &moov.FeePlanAgreement{
+				AgreementID: "g1",
+				AccountID:   "account-1",
+				PlanID:      "plan-1",
+				Status:      moov.FeePlanAgreementStatus_Active,
+			}, agreement)
+		})
+	}
+}
+
+func newBillingTestClient(t *testing.T, handler http.Handler) *moov.Client {
+	t.Helper()
+
+	srv := httptest.NewServer(handler)
+	t.Cleanup(srv.Close)
+
+	client, err := moov.NewClient(
+		moov.WithCredentials(moov.Credentials{Host: srv.Listener.Addr().String(), PublicKey: "pk", SecretKey: "sk"}),
+		moov.WithMoovURLScheme("http"),
+	)
+	require.NoError(t, err)
+	return client
+}
 
 func Test_ListFeePlanAgreements(t *testing.T) {
 	mc := NewTestClient(t)
