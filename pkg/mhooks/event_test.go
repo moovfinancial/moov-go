@@ -147,7 +147,7 @@ func TestParseEvent(t *testing.T) {
 		),
 		newEventCase("networkID.updated", Event.NetworkIDUpdated,
 			`{"accountID":"a","visaMid":"v1","updatedOn":"2026-04-02T00:00:00Z"}`,
-			NetworkIDUpdated{AccountID: "a", VisaMid: &visaMID, UpdatedOn: &networkIDUpdatedOn},
+			NetworkIDUpdated{AccountID: "a", VisaMid: &visaMid, UpdatedOn: &networkIDUpdatedOn},
 		),
 		newEventCase("paymentMethod.disabled", Event.PaymentMethodDisabled,
 			`{"accountID":"a","paymentMethodID":"p1","sourceID":"s1"}`,
