@@ -85,6 +85,7 @@ func TestOfflineCreateFeePlanAgreement(t *testing.T) {
 				require.ErrorAs(t, err, &httpErr)
 				require.Equal(t, http.StatusUnprocessableEntity, httpErr.StatusCode())
 				require.Equal(t, moov.StatusFailedValidation, httpErr.Status())
+				require.Contains(t, err.Error(), "invalid plan ID")
 				return
 			}
 
